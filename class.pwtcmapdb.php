@@ -2,6 +2,18 @@
 
 class PwtcMapdb {
 
+/*
+	const MAP_POST_TYPE = 'ride_maps';
+	const TERRAIN_FIELD = 'terrain';
+	const LENGTH_FIELD = 'length';
+	const MAX_LENGTH_FIELD = 'max_length';
+*/
+
+	const MAP_POST_TYPE = 'route';
+	const TERRAIN_FIELD = 'route_terrain';
+	const LENGTH_FIELD = 'route_length';
+	const MAX_LENGTH_FIELD = 'max_route_length';
+
     private static $initiated = false;
 
 	public static function init() {
@@ -40,12 +52,8 @@ class PwtcMapdb {
 	/*************************************************************/
 
 	public static function get_distance($post_id) {
-		$length_field = 'route_length';
-		//$length_field = 'length';
-		$length = get_field($length_field, $post_id);
-		$max_length_field = 'max_route_length';
-		//$max_length_field = 'max_length';
-		$max_length = get_field($max_length_field, $post_id);
+		$length = get_field(self::LENGTH_FIELD, $post_id);
+		$max_length = get_field(self::MAX_LENGTH_FIELD, $post_id);
 		//self::write_log($length);
 		//self::write_log($max_length);
 		if ($max_length == '') {
@@ -57,9 +65,7 @@ class PwtcMapdb {
 	}
 
 	public static function get_terrain($post_id) {
-		$terrain_field = 'route_terrain';
-		//$terrain_field = 'terrain';
-		$terrain = get_field($terrain_field, $post_id);
+		$terrain = get_field(self::TERRAIN_FIELD, $post_id);
 		//self::write_log($terrain);
 		$result = '';
 		foreach ($terrain as $item) {
@@ -86,6 +92,7 @@ class PwtcMapdb {
 			$url = '<a target="_blank" href="' . $link . '">Link</a>';
 		}
 		return $url;
+		//return '';
 	}
 
 	public static function fetch_maps($title, $startswith) {
@@ -94,14 +101,12 @@ class PwtcMapdb {
 		if ($startswith == 'false') {
 			$search_title = '%' . $search_title;
 		}
-		$map_post_type = 'route';
-		//$map_post_type = 'ride_maps';
 		$sql_stmt = $wpdb->prepare(
 			'select ID, post_title' . 
 			' from ' . $wpdb->posts .
 			' where post_title like %s and post_type = %s and post_status = \'publish\'' . 
 			' order by post_title', 
-			$search_title, $map_post_type);
+			$search_title, self::MAP_POST_TYPE);
 		//self::write_log($sql_stmt);
 		$results = $wpdb->get_results($sql_stmt, ARRAY_A);
 		return $results;
