@@ -1,0 +1,107 @@
+.pwtc-mapdb-search-sec {
+  border: 1px solid;
+  border-radius: 5px;
+  padding: 0 10px;
+  margin: 10px 0;
+}
+
+.pwtc-mapdb-stacked-form {
+  width: 200px;    
+}
+
+.pwtc-mapdb-stacked-form input[type=text] {
+  width: 100%;
+  display: inline-block;
+  box-sizing: border-box;
+  margin: 4px 0;
+}
+
+.pwtc-mapdb-stacked-form .pwtc-mapdb-checkbox-wrap {
+  width: 100%;
+  display: inline-block;
+  box-sizing: border-box;
+  margin: 4px 0;
+}
+
+.pwtc-mapdb-stacked-form input[type=submit] {
+  margin: 4px 0;
+}
+
+.pwtc-mapdb-stacked-form input[type=button] {
+  margin: 4px 0;
+}
+
+.pwtc-mapdb-empty-tbl {
+  font-family: Helvetica, Arial, sans-serif;
+  margin: 1em 0;
+  background: #34495E;
+  color: #fff;
+  border-radius: .4em;
+  padding: .5em 1em;  
+}
+
+.pwtc-mapdb-rwd-table {
+  font-family: Helvetica, Arial, sans-serif;
+  margin: 1em 0;
+  min-width: 300px;
+  background: #34495E;
+  color: #fff;
+  border-radius: .4em;
+  overflow: hidden;
+  border-collapse: collapse;
+}
+.pwtc-mapdb-rwd-table caption {
+  background: #34495E;
+  text-align: center;
+  font-weight: bold;
+}
+.pwtc-mapdb-rwd-table th {
+  display: none;
+}
+.pwtc-mapdb-rwd-table td {
+  display: block;
+}
+.pwtc-mapdb-rwd-table td:first-child {
+  padding-top: .5em;
+}
+.pwtc-mapdb-rwd-table td:last-child {
+  padding-bottom: .5em;
+}
+.pwtc-mapdb-rwd-table td:before {
+  content: attr(data-th) ": ";
+  font-weight: bold;
+  width: 6.5em;
+  display: inline-block;
+}
+.pwtc-mapdb-rwd-table th, .pwtc-mapdb-rwd-table td {
+  margin: .5em 1em;
+} 
+.pwtc-mapdb-rwd-table th, .pwtc-mapdb-rwd-table td:before {
+  color: #dd5;
+}
+.pwtc-mapdb-rwd-table th, .pwtc-mapdb-rwd-table td {
+  text-align: left;
+  border: none;
+  padding: 0em .5em;
+}
+.pwtc-mapdb-rwd-table th, .pwtc-mapdb-rwd-table tr, .pwtc-mapdb-rwd-table td { 
+  background: #34495E !important;
+}
+.pwtc-mapdb-rwd-table tr.highlight, .pwtc-mapdb-rwd-table tr.highlight td { 
+  background: grey !important; 
+}
+.pwtc-mapdb-rwd-table a {
+  cursor: pointer;
+  text-decoration: underline;
+  color: #fff;
+}
+
+@media (min-width: 480px) {
+  .pwtc-mapdb-rwd-table td:before {
+    display: none;
+  }
+  .pwtc-mapdb-rwd-table th, .pwtc-mapdb-rwd-table td {
+    display: table-cell;
+    padding: .5em 1em !important;
+  }
+}
