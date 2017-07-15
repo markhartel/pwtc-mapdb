@@ -76,7 +76,7 @@ class PwtcMapdb {
 		//self::write_log($terrain);
 		$result = '';
 		foreach ($terrain as $item) {
-			$result .= $item;
+			$result .= strtoupper($item);
 		}
 		return $result;
 	}
@@ -99,15 +99,15 @@ class PwtcMapdb {
 /*		
 		while (have_rows(self::MAP_FIELD, $post_id) ): the_row();
 			$type = get_sub_field(self::MAP_TYPE_FIELD);
-			self::write_log($type);
+			//self::write_log($type);
 			if ($type == 'file') {
 				$file = get_sub_field(self::MAP_FILE_FIELD);
-				self::write_log($file);
+				//self::write_log($file);
 				$url = '<a target="_blank" href="' . $file['url'] . '">File</a>';
 			}
 			else if ($type == 'link') {
 				$link = get_sub_field(self::MAP_LINK_FIELD);
-				self::write_log($link);
+				//self::write_log($link);
 				$url = '<a target="_blank" href="' . $link . '">Link</a>';
 			}
 		endwhile;
@@ -135,13 +135,13 @@ class PwtcMapdb {
 	public static function lookup_maps_callback() {
 		if (false) {
 			$response = array(
-				'error' => 'You are not allowed to lookup a map.'
+				'error' => 'You are not allowed to search route maps.'
 			);
 			echo wp_json_encode($response);
 		}
 		else if (!isset($_POST['title']) or !isset($_POST['startswith']) or !isset($_POST['limit'])) {
 			$response = array(
-				'error' => 'Input parameters needed to lookup a map are missing.'
+				'error' => 'Input parameters needed to search route maps are missing.'
 			);
 			echo wp_json_encode($response);
 		}
@@ -160,7 +160,7 @@ class PwtcMapdb {
 			foreach ($maps as $map) {
 				$count++;
 				if ($limit > 0 and $count > $limit) {
-					$message = '' . $nmaps . ' maps returned, but only displaying the first ' . $limit . '.';
+					$message = '' . $nmaps . ' route maps returned, but only displaying the first ' . $limit . '.';
 					break;
 				}
 				$post_id = intval($map['ID']);
@@ -199,7 +199,7 @@ class PwtcMapdb {
 		$a = shortcode_atts(array('limit' => 0), $atts);
 		$current_user = wp_get_current_user();
 		if ( 0 == $current_user->ID ) {
-			return 'Please log in to search the map database.';
+			return 'Please log in to search the route map database.';
 		}
 		else {
 			ob_start();
@@ -236,7 +236,7 @@ class PwtcMapdb {
 						populate_maps_table(res.maps);
 					}
 					else {
-						$('.pwtc-mapdb-maps-div').append('<span>No maps found.</span>');					
+						$('.pwtc-mapdb-maps-div').append('<span>No route maps found.</span>');					
 					}
 				}
 			}   
@@ -275,7 +275,7 @@ class PwtcMapdb {
 		});
 	</script>
 	<div class='pwtc-mapdb-search-sec'>
-	<p>To search the map database, press the <strong>Search</strong> button. 
+	<p>To search the route map database, press the <strong>Search</strong> button. 
 	To narrow your search, first enter a string into the <strong>Title</strong> field before searching.
 	<form class="search-frm pwtc-mapdb-stacked-form" action="<?php echo admin_url('admin-ajax.php'); ?>" method="post">
 		<span>Title</span>
