@@ -7,12 +7,19 @@ class PwtcMapdb {
 	const TERRAIN_FIELD = 'terrain';
 	const LENGTH_FIELD = 'length';
 	const MAX_LENGTH_FIELD = 'max_length';
+	const MAP_FIELD = 'maps';
+	const MAP_TYPE_FIELD = 'type';
+	const MAP_LINK_FIELD = 'link';
+	const MAP_FILE_FIELD = 'file';
 */
 
 	const MAP_POST_TYPE = 'route';
 	const TERRAIN_FIELD = 'route_terrain';
 	const LENGTH_FIELD = 'route_length';
 	const MAX_LENGTH_FIELD = 'max_route_length';
+	const MAP_TYPE_FIELD = 'map_type';
+	const MAP_LINK_FIELD = 'map_link';
+	const MAP_FILE_FIELD = 'map_file';
 
     private static $initiated = false;
 
@@ -75,24 +82,37 @@ class PwtcMapdb {
 	}
 
 	public static function get_map($post_id) {
-		$type_field = 'map_type';
-		$type = get_field($type_field, $post_id);
-		//self::write_log($type);
 		$url = '';
+
+		$type = get_field(self::MAP_TYPE_FIELD, $post_id);
+		//self::write_log($type);
 		if ($type == 'file') {
-			$file_field = 'map_file';
-			$file = get_field($file_field, $post_id);
+			$file = get_field(self::MAP_FILE_FIELD, $post_id);
 			//self::write_log($file);
 			$url = '<a target="_blank" href="' . $file['url'] . '">File</a>';
 		}
 		else if ($type == 'link') {
-			$link_field = 'map_link';
-			$link = get_field($link_field, $post_id);
+			$link = get_field(self::MAP_LINK_FIELD, $post_id);
 			//self::write_log($link);
 			$url = '<a target="_blank" href="' . $link . '">Link</a>';
 		}
+/*		
+		while (have_rows(self::MAP_FIELD, $post_id) ): the_row();
+			$type = get_sub_field(self::MAP_TYPE_FIELD);
+			self::write_log($type);
+			if ($type == 'file') {
+				$file = get_sub_field(self::MAP_FILE_FIELD);
+				self::write_log($file);
+				$url = '<a target="_blank" href="' . $file['url'] . '">File</a>';
+			}
+			else if ($type == 'link') {
+				$link = get_sub_field(self::MAP_LINK_FIELD);
+				self::write_log($link);
+				$url = '<a target="_blank" href="' . $link . '">Link</a>';
+			}
+		endwhile;
+*/
 		return $url;
-		//return '';
 	}
 
 	public static function fetch_maps($title, $startswith) {
@@ -157,13 +177,11 @@ class PwtcMapdb {
 			}
 			if ($message == '') {
 				$response = array(
-					'title' => $title,
 					'maps' => $return_maps);
 				echo wp_json_encode($response);
 			}
 			else {
 				$response = array(
-					'title' => $title,
 					'message' => $message,
 					'maps' => $return_maps);
 				echo wp_json_encode($response);
@@ -210,7 +228,6 @@ class PwtcMapdb {
 						'<span><strong>Error:</strong> ' + res.error + '</span>');
 				}
 				else {
-					$(".pwtc-mapdb-search-sec .search-frm input[name='title']").val(res.title);
 					if (res.maps.length > 0) {
 						if (res.message) {
 							$('.pwtc-mapdb-maps-div').append(
