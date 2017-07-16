@@ -2,7 +2,6 @@
 
 class PwtcMapdb {
 
-/*
 	const MAP_POST_TYPE = 'ride_maps';
 	const TERRAIN_FIELD = 'terrain';
 	const LENGTH_FIELD = 'length';
@@ -11,8 +10,8 @@ class PwtcMapdb {
 	const MAP_TYPE_FIELD = 'type';
 	const MAP_LINK_FIELD = 'link';
 	const MAP_FILE_FIELD = 'file';
-*/
 
+/*
 	const MAP_POST_TYPE = 'route';
 	const TERRAIN_FIELD = 'route_terrain';
 	const LENGTH_FIELD = 'route_length';
@@ -20,6 +19,7 @@ class PwtcMapdb {
 	const MAP_TYPE_FIELD = 'map_type';
 	const MAP_LINK_FIELD = 'map_link';
 	const MAP_FILE_FIELD = 'map_file';
+*/
 
     private static $initiated = false;
 
@@ -83,7 +83,7 @@ class PwtcMapdb {
 
 	public static function get_map($post_id) {
 		$url = '';
-
+/*
 		$type = get_field(self::MAP_TYPE_FIELD, $post_id);
 		//self::write_log($type);
 		if ($type == 'file') {
@@ -96,7 +96,7 @@ class PwtcMapdb {
 			//self::write_log($link);
 			$url = '<a target="_blank" href="' . $link . '">Link</a>';
 		}
-/*		
+*/
 		while (have_rows(self::MAP_FIELD, $post_id) ): the_row();
 			$type = get_sub_field(self::MAP_TYPE_FIELD);
 			//self::write_log($type);
@@ -111,7 +111,7 @@ class PwtcMapdb {
 				$url = '<a target="_blank" href="' . $link . '">Link</a>';
 			}
 		endwhile;
-*/
+		
 		return $url;
 	}
 
