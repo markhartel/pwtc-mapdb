@@ -20,7 +20,6 @@ class PwtcMapdb {
 	const MAP_LINK_FIELD = 'map_link';
 	const MAP_FILE_FIELD = 'map_file';
 */
-
     private static $initiated = false;
 
 	public static function init() {
@@ -97,6 +96,7 @@ class PwtcMapdb {
 			$url = '<a target="_blank" href="' . $link . '">Link</a>';
 		}
 */
+
 		while (have_rows(self::MAP_FIELD, $post_id) ): the_row();
 			$type = get_sub_field(self::MAP_TYPE_FIELD);
 			//self::write_log($type);
@@ -115,7 +115,22 @@ class PwtcMapdb {
 		return $url;
 	}
 
-	public static function fetch_maps($title, $startswith) {
+	public static function count_maps($title, $startswith) {
+		global $wpdb;
+		$search_title = $title . '%';
+		if ($startswith == 'false') {
+			$search_title = '%' . $search_title;
+		}
+		$sql_stmt = $wpdb->prepare(
+			'select count(ID)' . 
+			' from ' . $wpdb->posts .
+			' where post_title like %s and post_type = %s and post_status = \'publish\'', 
+			$search_title, self::MAP_POST_TYPE);
+		$results = $wpdb->get_var($sql_stmt);
+		return $results;
+	}
+
+	public static function fetch_maps($title, $startswith, $offset = -1 , $rowcount = -1) {
 		global $wpdb;
 		$search_title = $title . '%';
 		if ($startswith == 'false') {
@@ -127,9 +142,30 @@ class PwtcMapdb {
 			' where post_title like %s and post_type = %s and post_status = \'publish\'' . 
 			' order by post_title', 
 			$search_title, self::MAP_POST_TYPE);
+		if ($offset >= 0 and $rowcount >= 0) {
+			$sql_stmt .= ' limit ' . $offset . ',' . $rowcount;
+		}
 		//self::write_log($sql_stmt);
 		$results = $wpdb->get_results($sql_stmt, ARRAY_A);
 		return $results;
+	}
+
+	public static function build_map_array($maps) {
+		$return_maps = array();
+		foreach ($maps as $map) {
+			$post_id = intval($map['ID']);
+			$distance = self::get_distance($post_id);
+			$terrain = self::get_terrain($post_id);
+			$link = self::get_map($post_id);
+			array_push($return_maps, array(
+				'ID' => $map['ID'],
+				'title' => $map['post_title'],
+				'distance' => $distance,
+				'terrain' => $terrain,
+				'media' => $link
+			));
+		}
+		return $return_maps;		
 	}
 
 	public static function lookup_maps_callback() {
@@ -152,37 +188,29 @@ class PwtcMapdb {
 			if (isset($_POST['startswith'])) {
 				$startswith = trim($_POST['startswith']);
 			}
-			$return_maps = array();
-			$maps = self::fetch_maps($title, $startswith);
-			$nmaps = count($maps);
-			$count = 0;
-			$message = '';
-			foreach ($maps as $map) {
-				$count++;
-				if ($limit > 0 and $count > $limit) {
-					$message = '' . $nmaps . ' route maps returned, but only displaying the first ' . $limit . '.';
-					break;
+			$nmaps = intval(self::count_maps($title, $startswith));
+			if ($limit > 0 and $nmaps > $limit) {
+				$offset = 0;
+				if (isset($_POST['count']) and intval($_POST['count']) == $nmaps) {
+					if (isset($_POST['prev'])) {
+						$offset = intval($_POST['offset']) - $limit;
+					}
+					else if (isset($_POST['next'])) {
+						$offset = intval($_POST['offset']) + $limit;
+					}
 				}
-				$post_id = intval($map['ID']);
-				$distance = self::get_distance($post_id);
-				$terrain = self::get_terrain($post_id);
-				$link = self::get_map($post_id);
-				array_push($return_maps, array(
-					'ID' => $map['ID'],
-					'title' => $map['post_title'],
-					'distance' => $distance,
-					'terrain' => $terrain,
-					'media' => $link
-				));
-			}
-			if ($message == '') {
+				$maps = self::fetch_maps($title, $startswith, $offset, $limit);
+				$return_maps = self::build_map_array($maps);
 				$response = array(
+					'count' => $nmaps,
+					'offset' => $offset,
 					'maps' => $return_maps);
 				echo wp_json_encode($response);
 			}
 			else {
+				$maps = self::fetch_maps($title, $startswith);
+				$return_maps = self::build_map_array($maps);
 				$response = array(
-					'message' => $message,
 					'maps' => $return_maps);
 				echo wp_json_encode($response);
 			}
@@ -220,6 +248,41 @@ class PwtcMapdb {
 				});
 			}
 
+			function create_paging_form(offset, count) {
+				var limit = <?php echo $a['limit'] ?>;
+				var pagenum = (offset/limit) + 1;
+				var numpages = Math.ceil(count/limit);
+				$('.pwtc-mapdb-maps-div').append(
+					'<form class="page-frm">' +
+                    '<input class="prev-btn" type="button" value="Prev"/>' +
+					'<span>&nbsp;Page ' + pagenum + ' of ' + numpages + '&nbsp;</span>' +
+                    '<input class="next-btn" type="button" value="Next"/>' +
+					'<input name="offset" type="hidden" value="' + offset + '"/>' +
+					'<input name="count" type="hidden" value="' + count + '"/>' +
+					'</form>'
+				);
+				$('.pwtc-mapdb-maps-div .page-frm .prev-btn').on('click', function(evt) {
+					evt.preventDefault();
+					load_maps_table('prev');
+				});
+				if (pagenum == 1) {
+					$('.pwtc-mapdb-maps-div .page-frm .prev-btn').attr("disabled", "disabled");
+				}
+				else {
+					$('.pwtc-mapdb-maps-div .page-frm .prev-btn').removeAttr("disabled");
+				}
+				$('.pwtc-mapdb-maps-div .page-frm .next-btn').on('click', function(evt) {
+					evt.preventDefault();
+					load_maps_table('next');
+				});
+				if (pagenum == numpages) {
+					$('.pwtc-mapdb-maps-div .page-frm .next-btn').attr("disabled", "disabled");
+				}
+				else {
+					$('.pwtc-mapdb-maps-div .page-frm .next-btn').removeAttr("disabled");
+				}
+			}
+
 			function lookup_maps_cb(response) {
 				var res = JSON.parse(response);
 				$('.pwtc-mapdb-maps-div').empty();
@@ -233,6 +296,9 @@ class PwtcMapdb {
 							$('.pwtc-mapdb-maps-div').append(
 								'<span><strong>Warning:</strong> ' + res.message + '</span>');
 						}
+						if (res.offset !== undefined) {
+							create_paging_form(res.offset, res.count);
+						}
 						populate_maps_table(res.maps);
 					}
 					else {
@@ -241,30 +307,37 @@ class PwtcMapdb {
 				}
 			}   
 
-			function load_maps_table() {
+			function load_maps_table(mode) {
 				var title = $(".pwtc-mapdb-search-sec .search-frm input[name='title']").val().trim();
 				var startswith = false;
 				if ($(".pwtc-mapdb-search-sec .search-frm input[name='startswith']").is(':checked')) {
 					startswith = true;
 				}
-				if (true) {
-					var action = $('.pwtc-mapdb-search-sec .search-frm').attr('action');
-					var data = {
-						'action': 'pwtc_mapdb_lookup_maps',
-						'title': title,
-						'startswith': startswith,
-						'limit': <?php echo $a['limit'] ?>
-					};
-					$.post(action, data, lookup_maps_cb); 
+				var action = $('.pwtc-mapdb-search-sec .search-frm').attr('action');
+				var data = {
+					'action': 'pwtc_mapdb_lookup_maps',
+					'title': title,
+					'startswith': startswith,
+					'limit': <?php echo $a['limit'] ?>
+				};
+				if (mode != 'search') {
+					var offset = $(".pwtc-mapdb-maps-div .page-frm input[name='offset']").val();
+					var count = $(".pwtc-mapdb-maps-div .page-frm input[name='count']").val();
+					data.offset = offset;
+					data.count = count;
+					if (mode == 'prev') {
+						data.prev = 1;
+					}
+					else if (mode == 'next') {
+						data.next = 1;						
+					}
 				}
-				else {
-					$('.pwtc-mapdb-maps-div').empty();  
-				}  
+				$.post(action, data, lookup_maps_cb); 
 			}
 
 			$('.pwtc-mapdb-search-sec .search-frm').on('submit', function(evt) {
 				evt.preventDefault();
-				load_maps_table();
+				load_maps_table('search');
 			});
 
 			$('.pwtc-mapdb-search-sec .search-frm .reset-btn').on('click', function(evt) {
