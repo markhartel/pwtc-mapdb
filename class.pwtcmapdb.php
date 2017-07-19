@@ -189,6 +189,10 @@ class PwtcMapdb {
 				$startswith = trim($_POST['startswith']);
 			}
 			$nmaps = intval(self::count_maps($title, $startswith));
+			$message = '';
+			if (isset($_POST['count']) and intval($_POST['count']) != $nmaps) {
+				$message = 'Search results have changed, paging context was lost.';
+			}
 			if ($limit > 0 and $nmaps > $limit) {
 				$offset = 0;
 				if (isset($_POST['count']) and intval($_POST['count']) == $nmaps) {
@@ -205,6 +209,9 @@ class PwtcMapdb {
 					'count' => $nmaps,
 					'offset' => $offset,
 					'maps' => $return_maps);
+				if ($message != '') {
+					$response['message'] = $message;
+				}
 				echo wp_json_encode($response);
 			}
 			else {
@@ -212,6 +219,9 @@ class PwtcMapdb {
 				$return_maps = self::build_map_array($maps);
 				$response = array(
 					'maps' => $return_maps);
+				if ($message != '') {
+					$response['message'] = $message;
+				}
 				echo wp_json_encode($response);
 			}
 		}
@@ -288,21 +298,21 @@ class PwtcMapdb {
 				$('.pwtc-mapdb-maps-div').empty();
 				if (res.error) {
 					$('.pwtc-mapdb-maps-div').append(
-						'<span><strong>Error:</strong> ' + res.error + '</span>');
+						'<div><strong>Error:</strong> ' + res.error + '</div>');
 				}
 				else {
+					if (res.message !== undefined) {
+						$('.pwtc-mapdb-maps-div').append(
+							'<div><strong>Warning:</strong> ' + res.message + '</div>');
+					}
 					if (res.maps.length > 0) {
-						if (res.message) {
-							$('.pwtc-mapdb-maps-div').append(
-								'<span><strong>Warning:</strong> ' + res.message + '</span>');
-						}
 						if (res.offset !== undefined) {
 							create_paging_form(res.offset, res.count);
 						}
 						populate_maps_table(res.maps);
 					}
 					else {
-						$('.pwtc-mapdb-maps-div').append('<span>No route maps found.</span>');					
+						$('.pwtc-mapdb-maps-div').append('<div>No route maps found.</div>');					
 					}
 				}
 			}   
