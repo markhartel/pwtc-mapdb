@@ -264,9 +264,9 @@ class PwtcMapdb {
 				var numpages = Math.ceil(count/limit);
 				$('.pwtc-mapdb-maps-div').append(
 					'<form class="page-frm">' +
-                    '<input class="prev-btn" type="button" value="Prev"/>' +
+                    '<input class="prev-btn dark button" type="button" value="Prev"/>' +
 					'<span>&nbsp;Page ' + pagenum + ' of ' + numpages + '&nbsp;</span>' +
-                    '<input class="next-btn" type="button" value="Next"/>' +
+                    '<input class="next-btn dark button" type="button" value="Next"/>' +
 					'<input name="offset" type="hidden" value="' + offset + '"/>' +
 					'<input name="count" type="hidden" value="' + count + '"/>' +
 					'</form>'
@@ -367,8 +367,8 @@ class PwtcMapdb {
 		<span class="pwtc-mapdb-checkbox-wrap">
 			<input type="checkbox" name="startswith"/>
 		</span>
-		<input type="submit" value="Search"/>
-		<input class="reset-btn" type="button" value="Reset"/>
+		<input class="dark button" type="submit" value="Search"/>
+		<input class="reset-btn dark button" type="button" value="Reset"/>
 	</form></p>	
 	</div>
 	<div class="pwtc-mapdb-maps-div"></div>
