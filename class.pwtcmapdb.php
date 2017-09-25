@@ -315,6 +315,7 @@ class PwtcMapdb {
 						$('.pwtc-mapdb-maps-div').append('<div>No route maps found.</div>');					
 					}
 				}
+				$('body').removeClass('pwtc-mapdb-waiting');
 			}   
 
 			function load_maps_table(mode) {
@@ -342,6 +343,7 @@ class PwtcMapdb {
 						data.next = 1;						
 					}
 				}
+				$('body').addClass('pwtc-mapdb-waiting');
 				$.post(action, data, lookup_maps_cb); 
 			}
 

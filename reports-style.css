@@ -1,3 +1,8 @@
+
+body.pwtc-mapdb-waiting * {
+  cursor: progress;
+}
+
 .pwtc-mapdb-search-sec {
   border: 1px solid;
   border-radius: 5px;
