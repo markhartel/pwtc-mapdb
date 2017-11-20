@@ -50,7 +50,8 @@ class PwtcMapdb {
 
 	public static function load_report_scripts() {
         wp_enqueue_style('pwtc_mapdb_report_css', 
-			PWTC_MAPDB__PLUGIN_URL . 'reports-style.css' );
+			PWTC_MAPDB__PLUGIN_URL . 'reports-style.css', array(),
+			filemtime(PWTC_MAPDB__PLUGIN_DIR . 'reports-style.css'));
 	}
 
 	/*************************************************************/
@@ -111,7 +112,7 @@ class PwtcMapdb {
 				$url = '<a target="_blank" href="' . $link . '">Link</a>';
 			}
 		endwhile;
-		
+	
 		return $url;
 	}
 
@@ -264,9 +265,9 @@ class PwtcMapdb {
 				var numpages = Math.ceil(count/limit);
 				$('.pwtc-mapdb-maps-div').append(
 					'<form class="page-frm">' +
-                    '<input class="prev-btn dark button" type="button" value="Prev"/>' +
+                    '<input class="prev-btn dark button" type="button" value="< Prev"/>' +
 					'<span>&nbsp;Page ' + pagenum + ' of ' + numpages + '&nbsp;</span>' +
-                    '<input class="next-btn dark button" type="button" value="Next"/>' +
+                    '<input class="next-btn dark button" type="button" value="Next >"/>' +
 					'<input name="offset" type="hidden" value="' + offset + '"/>' +
 					'<input name="count" type="hidden" value="' + count + '"/>' +
 					'</form>'
