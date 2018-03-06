@@ -96,7 +96,7 @@ class PwtcMapdb {
 		}
 		else if ($type == 'link') {
 			$link = get_field(self::MAP_LINK_FIELD, $post_id);
-			$url = '<a title="Go to map link." target="_blank" href="' . $link . '">' . self::LINK_ANCHOR_LABEL . '</a>';
+			$url = '<a title="Open map link." target="_blank" href="' . $link . '">' . self::LINK_ANCHOR_LABEL . '</a>';
 		}
 */
 
@@ -104,11 +104,11 @@ class PwtcMapdb {
 			$type = get_sub_field(self::MAP_TYPE_FIELD);
 			if ($type == 'file') {
 				$file = get_sub_field(self::MAP_FILE_FIELD);
-				$url = '<a target="_blank" href="' . $file['url'] . '">' . self::FILE_ANCHOR_LABEL . '</a>';
+				$url = '<a title="Download map file." target="_blank" href="' . $file['url'] . '">' . self::FILE_ANCHOR_LABEL . '</a>';
 			}
 			else if ($type == 'link') {
 				$link = get_sub_field(self::MAP_LINK_FIELD);
-				$url = '<a target="_blank" href="' . $link . '">' . self::LINK_ANCHOR_LABEL . '</a>';
+				$url = '<a title="Open map link." target="_blank" href="' . $link . '">' . self::LINK_ANCHOR_LABEL . '</a>';
 			}
 		endwhile;
 	
@@ -268,7 +268,7 @@ class PwtcMapdb {
 	<script type="text/javascript">
 		jQuery(document).ready(function($) { 
 			function populate_maps_table(maps) {
-				var copylink = '<a title="Copy ride title to clipboard." class="copy-btn"><?php echo self::COPY_ANCHOR_LABEL ?></a>';
+				var copylink = '<a title="Copy map title to clipboard." class="copy-btn"><?php echo self::COPY_ANCHOR_LABEL ?></a>';
 				$('.pwtc-mapdb-maps-div').append('<table class="pwtc-mapdb-rwd-table">' +
 					'<tr><th>Title</th><th>Distance</th><th>Terrain</th><th>Actions</th></tr>' +
 					'</table>');
@@ -409,7 +409,7 @@ class PwtcMapdb {
 	<form class="search-frm pwtc-mapdb-stacked-form" action="<?php echo admin_url('admin-ajax.php'); ?>" method="post">
 		<span>Search By</span>
 		<select class="searchby">
-            <option value="title" selected>Ride Title</option>
+            <option value="title" selected>Map Title</option>
 			<!--<option value="location">Start Location</option>-->
         </select>		
 		<span>Search For</span>
