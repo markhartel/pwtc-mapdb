@@ -11,7 +11,7 @@ class PwtcMapdb {
 	const MAP_TYPE_FIELD = 'type';
 	const MAP_LINK_FIELD = 'link';
 	const MAP_FILE_FIELD = 'file';
-	const COPY_ANCHOR_LABEL = '<i class="fa fa-files-o"></i>';
+	const COPY_ANCHOR_LABEL = '<i class="fa fa-clipboard"></i>';
 	const FILE_ANCHOR_LABEL = '<i class="fa fa-download"></i>';
 	const LINK_ANCHOR_LABEL = '<i class="fa fa-link"></i>';
 
