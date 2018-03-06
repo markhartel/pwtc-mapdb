@@ -21,6 +21,13 @@ body.pwtc-mapdb-waiting * {
   margin: 4px 0;
 }
 
+.pwtc-mapdb-stacked-form select {
+  width: 100%;
+  display: inline-block;
+  box-sizing: border-box;
+  margin: 4px 0;
+}
+
 .pwtc-mapdb-stacked-form .pwtc-mapdb-checkbox-wrap {
   width: 100%;
   display: inline-block;
