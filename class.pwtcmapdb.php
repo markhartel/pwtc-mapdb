@@ -14,6 +14,8 @@ class PwtcMapdb {
 	const COPY_ANCHOR_LABEL = '<i class="fa fa-clipboard"></i>';
 	const FILE_ANCHOR_LABEL = '<i class="fa fa-download"></i>';
 	const LINK_ANCHOR_LABEL = '<i class="fa fa-link"></i>';
+	const EDIT_ANCHOR_LABEL = '<i class="fa fa-pencil-square-o"></i>';
+	const EDIT_CAPABILITY = 'edit_others_rides';
 
 /*
 	const MAP_POST_TYPE = 'route';
@@ -27,6 +29,8 @@ class PwtcMapdb {
 	const COPY_ANCHOR_LABEL = 'Copy';
 	const FILE_ANCHOR_LABEL = 'File';
 	const LINK_ANCHOR_LABEL = 'Link';
+	const EDIT_ANCHOR_LABEL = 'Edit';
+	const EDIT_CAPABILITY = 'edit_others_posts';
 */
     private static $initiated = false;
 
@@ -115,6 +119,15 @@ class PwtcMapdb {
 		return $url;
 	}
 
+	public static function get_edit_url($post_id) {
+		$url = '';
+		if (current_user_can(self::EDIT_CAPABILITY)) {
+			$href = admin_url('post.php?post=' . $post_id . '&action=edit');
+			$url = '<a title="Edit map post." target="_blank" href="' . $href . '">' . self::EDIT_ANCHOR_LABEL . '</a>';
+		}
+		return $url;
+	}
+
 	public static function count_maps($title, $startswith, $bylocation) {
 		global $wpdb;
 		$search_title = $title . '%';
@@ -176,12 +189,14 @@ class PwtcMapdb {
 			$distance = self::get_distance($post_id);
 			$terrain = self::get_terrain($post_id);
 			$link = self::get_map($post_id);
+			$edit = self::get_edit_url($post_id);
 			array_push($return_maps, array(
 				'ID' => $map['ID'],
 				'title' => $map['post_title'],
 				'distance' => $distance,
 				'terrain' => $terrain,
-				'media' => $link
+				'media' => $link,
+				'edit' => $edit
 			));
 		}
 		return $return_maps;		
@@ -278,7 +293,7 @@ class PwtcMapdb {
 						'<td data-th="Title"><span>' + item.title + '</span></td>' +
 						'<td data-th="Distance">' + item.distance + '</td>' +
 						'<td data-th="Terrain">' + item.terrain + '</td>' +
-						'<td data-th="Actions">' + copylink + ' ' + item.media + '</td></tr>');    
+						'<td data-th="Actions">' + copylink + ' ' + item.media + ' ' + item.edit + '</td></tr>');    
 				});
 				$('.pwtc-mapdb-maps-div table .copy-btn').on('click', function(evt) {
 					var title = $(this).parent().parent().find('td').first().find('span').first()[0];
@@ -404,8 +419,8 @@ class PwtcMapdb {
 		});
 	</script>
 	<div class='pwtc-mapdb-search-sec'>
-	<div>To browse the map library, press the <strong>Search</strong> button. 
-	To narrow your search, enter a string into the <strong>Search For</strong> field before searching.</div>
+	<p>To browse the map library, press the <strong>Search</strong> button. 
+	To narrow your search, enter a string into the <strong>Search For</strong> field before searching.</p>
 	<form class="search-frm pwtc-mapdb-stacked-form" action="<?php echo admin_url('admin-ajax.php'); ?>" method="post">
 		<span>Search By</span>
 		<select class="searchby">
