@@ -1,8 +1,8 @@
 <?php
 /*
 Plugin Name: PWTC Map DB
-Description: Provides searchable access to the route map database for PWTC club members.
-Version: 1.1
+Description: Provides searchable access to the map library database for PWTC club members.
+Version: 1.2
 Author: Mark Hartel
 */
 
