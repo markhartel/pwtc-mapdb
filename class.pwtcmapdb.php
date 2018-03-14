@@ -11,6 +11,7 @@ class PwtcMapdb {
 	const MAP_TYPE_FIELD = 'type';
 	const MAP_LINK_FIELD = 'link';
 	const MAP_FILE_FIELD = 'file';
+	const MAP_TYPE_QUERY = 'maps_0_type';
 	const COPY_ANCHOR_LABEL = '<i class="fa fa-clipboard"></i>';
 	const FILE_ANCHOR_LABEL = '<i class="fa fa-download"></i>';
 	const LINK_ANCHOR_LABEL = '<i class="fa fa-link"></i>';
@@ -26,6 +27,7 @@ class PwtcMapdb {
 	const MAP_TYPE_FIELD = 'map_type';
 	const MAP_LINK_FIELD = 'map_link';
 	const MAP_FILE_FIELD = 'map_file';
+	const MAP_TYPE_QUERY = 'map_type';
 	const COPY_ANCHOR_LABEL = 'Copy';
 	const FILE_ANCHOR_LABEL = 'File';
 	const LINK_ANCHOR_LABEL = 'Link';
@@ -70,136 +72,148 @@ class PwtcMapdb {
 	/* Shortcode report table utility functions.
 	/*************************************************************/
 
-	public static function get_distance($post_id) {
-		$length = get_field(self::LENGTH_FIELD, $post_id);
-		$max_length = get_field(self::MAX_LENGTH_FIELD, $post_id);
-		if ($max_length == '') {
-			return $length . ' miles';
+	public static function get_query_args($title, $location, $terrain, $min_dist, $max_dist, $media) {
+		$args = array(
+			'post_type' => self::MAP_POST_TYPE,
+			//'post_status' => 'publish',
+			'orderby'   => 'title',
+			'order'     => 'ASC'
+		);
+		if (!empty($title)) {
+			$args['s'] = $title;	
 		}
-		else {
-			return $length . '-' . $max_length . ' miles';
+		if (!empty($location)) {
+            $args['meta_query'][] = [
+                'key' => self::START_LOCATION_FIELD,
+                'value' => $location,
+                'compare' => 'LIKE',
+            ];
 		}
+		if (!empty($terrain)) {
+            $args['meta_query'][] = [
+                'key' => self::TERRAIN_FIELD,
+                'value' => '"' . $terrain . '"',
+                'compare' => 'LIKE',
+            ];
+		}
+		if ($min_dist >= 0 or $max_dist >= 0) {
+			if ($min_dist < 0) {
+				$args['meta_query'][] = [
+					'key' => self::LENGTH_FIELD,
+					'value' => [0, $max_dist],
+					'compare' => 'BETWEEN',
+				];	
+			}
+			else if ($max_dist < 0) {
+				$args['meta_query'][] = [
+					'key' => self::LENGTH_FIELD,
+					'value' => $min_dist,
+					'type' => 'NUMERIC',
+					'compare' => '>',
+				];
+			}
+			else {
+				$args['meta_query'][] = [
+					'key' => self::LENGTH_FIELD,
+					'value' => [$min_dist, $max_dist],
+					'compare' => 'BETWEEN',
+				];	
+			}
+		}
+		if (!empty($media)) {
+			$args['meta_query'][] = [
+				'key' => self::MAP_TYPE_QUERY,
+				'value' => $media,
+				'compare' => 'LIKE',
+			];
+		}
+	return $args;	
 	}
 
-	public static function get_terrain($post_id) {
-		$terrain = get_field(self::TERRAIN_FIELD, $post_id);
-		$result = '';
-		foreach ($terrain as $item) {
-			$result .= strtoupper($item);
-		}
-		return $result;
+	public static function count_maps($title, $location, $terrain, $min_dist, $max_dist, $media) {
+		$args = self::get_query_args($title, $location, $terrain, $min_dist, $max_dist, $media);
+		$args['posts_per_page'] = -1;
+		$args['cache_results'] = false;
+		$args['update_post_meta_cache'] = false;
+		$args['update_post_term_cache'] = false;
+		//self::write_log ($args);
+		$query = new WP_Query($args);
+		$count = $query->found_posts;
+		//self::write_log ('Count = ' . $count);
+		return $count;
 	}
 
-	public static function get_map($post_id) {
-		$url = '';
+	public static function fetch_maps($title, $location, $terrain, $min_dist, $max_dist, $media, $offset = -1 , $rowcount = -1) {
+		$args = self::get_query_args($title, $location, $terrain, $min_dist, $max_dist, $media);
+		$args['posts_per_page'] = $rowcount;
+		if ($offset >= 0) {
+			$args['offset'] = $offset;
+		}
+		//self::write_log ($args);
+		$query = new WP_Query($args);	
+		$results = [];	
+		while ($query->have_posts()) {
+			$query->the_post();
+
+			$terrain = get_field(self::TERRAIN_FIELD);
+			$terrain_str = '';
+			foreach ($terrain as $item) {
+				$terrain_str .= strtoupper($item);
+			}
+
+			$length = get_field(self::LENGTH_FIELD);
+			$max_length = get_field(self::MAX_LENGTH_FIELD);
+			$distance_str = '';
+			if ($max_length == '') {
+				$distance_str = $length . ' miles';
+			}
+			else {
+				$distance_str = $length . '-' . $max_length . ' miles';
+			}
+
+			$url = '';
 /*
-		$type = get_field(self::MAP_TYPE_FIELD, $post_id);
-		if ($type == 'file') {
-			$file = get_field(self::MAP_FILE_FIELD, $post_id);
-			$url = '<a title="Download map file." target="_blank" href="' . $file['url'] . '">' . self::FILE_ANCHOR_LABEL . '</a>';
-		}
-		else if ($type == 'link') {
-			$link = get_field(self::MAP_LINK_FIELD, $post_id);
-			$url = '<a title="Open map link." target="_blank" href="' . $link . '">' . self::LINK_ANCHOR_LABEL . '</a>';
-		}
-*/
-
-		while (have_rows(self::MAP_FIELD, $post_id) ): the_row();
-			$type = get_sub_field(self::MAP_TYPE_FIELD);
+			$type = get_field(self::MAP_TYPE_FIELD);
 			if ($type == 'file') {
-				$file = get_sub_field(self::MAP_FILE_FIELD);
+				$file = get_field(self::MAP_FILE_FIELD);
 				$url = '<a title="Download map file." target="_blank" href="' . $file['url'] . '">' . self::FILE_ANCHOR_LABEL . '</a>';
 			}
 			else if ($type == 'link') {
-				$link = get_sub_field(self::MAP_LINK_FIELD);
+				$link = get_field(self::MAP_LINK_FIELD);
 				$url = '<a title="Open map link." target="_blank" href="' . $link . '">' . self::LINK_ANCHOR_LABEL . '</a>';
 			}
-		endwhile;
+*/	
+
+			while (have_rows(self::MAP_FIELD) ): the_row();
+				$type = get_sub_field(self::MAP_TYPE_FIELD);
+				if ($type == 'file') {
+					$file = get_sub_field(self::MAP_FILE_FIELD);
+					$url = '<a title="Download map file." target="_blank" href="' . $file['url'] . '">' . self::FILE_ANCHOR_LABEL . '</a>';
+				}
+				else if ($type == 'link') {
+					$link = get_sub_field(self::MAP_LINK_FIELD);
+					$url = '<a title="Open map link." target="_blank" href="' . $link . '">' . self::LINK_ANCHOR_LABEL . '</a>';
+				}
+			endwhile;
 	
-		return $url;
-	}
+			$edit_url = '';
+			if (current_user_can(self::EDIT_CAPABILITY)) {
+				$href = admin_url('post.php?post=' . get_the_ID() . '&action=edit');
+				$edit_url = '<a title="Edit map post." target="_blank" href="' . $href . '">' . self::EDIT_ANCHOR_LABEL . '</a>';
+			}
 
-	public static function get_edit_url($post_id) {
-		$url = '';
-		if (current_user_can(self::EDIT_CAPABILITY)) {
-			$href = admin_url('post.php?post=' . $post_id . '&action=edit');
-			$url = '<a title="Edit map post." target="_blank" href="' . $href . '">' . self::EDIT_ANCHOR_LABEL . '</a>';
+			$map = [
+				'ID' => get_the_ID(),
+				'title' => get_the_title(),
+				'terrain' => $terrain_str,
+				'distance' => $distance_str,
+				'media' => $url,
+				'edit' => $edit_url
+			];
+			$results[] = $map;
 		}
-		return $url;
-	}
-
-	public static function count_maps($title, $startswith, $bylocation) {
-		global $wpdb;
-		$search_title = $title . '%';
-		if ($startswith == 'false') {
-			$search_title = '%' . $search_title;
-		}
-		if ($bylocation == 'true') {
-			$sql_stmt = $wpdb->prepare(
-				'select count(p.ID)' . 
-				' from ' . $wpdb->posts . ' as p inner join ' . $wpdb->postmeta . 
-				' as m on p.ID = m.post_id where p.post_type = %s and p.post_status = \'publish\'' . 
-				' and m.meta_key = %s and m.meta_value like %s', 
-				self::MAP_POST_TYPE, self::START_LOCATION_FIELD, $search_title);	
-		}
-		else {
-			$sql_stmt = $wpdb->prepare(
-				'select count(ID)' . 
-				' from ' . $wpdb->posts .
-				' where post_title like %s and post_type = %s and post_status = \'publish\'', 
-				$search_title, self::MAP_POST_TYPE);
-		}
-		$results = $wpdb->get_var($sql_stmt);
+		wp_reset_postdata();
 		return $results;
-	}
-
-	public static function fetch_maps($title, $startswith, $bylocation, $offset = -1 , $rowcount = -1) {
-		global $wpdb;
-		$search_title = $title . '%';
-		if ($startswith == 'false') {
-			$search_title = '%' . $search_title;
-		}
-		if ($bylocation == 'true') {
-			$sql_stmt = $wpdb->prepare(
-				'select p.ID, p.post_title' . 
-				' from ' . $wpdb->posts . ' as p inner join ' . $wpdb->postmeta . 
-				' as m on p.ID = m.post_id where p.post_type = %s and p.post_status = \'publish\'' . 
-				' and m.meta_key = %s and m.meta_value like %s order by p.post_title', 
-				self::MAP_POST_TYPE, self::START_LOCATION_FIELD, $search_title);	
-		}
-		else {
-			$sql_stmt = $wpdb->prepare(
-				'select ID, post_title' . 
-				' from ' . $wpdb->posts .
-				' where post_title like %s and post_type = %s and post_status = \'publish\'' . 
-				' order by post_title', 
-				$search_title, self::MAP_POST_TYPE);
-		}
-		if ($offset >= 0 and $rowcount >= 0) {
-			$sql_stmt .= ' limit ' . $offset . ',' . $rowcount;
-		}
-		$results = $wpdb->get_results($sql_stmt, ARRAY_A);
-		return $results;
-	}
-
-	public static function build_map_array($maps) {
-		$return_maps = array();
-		foreach ($maps as $map) {
-			$post_id = intval($map['ID']);
-			$distance = self::get_distance($post_id);
-			$terrain = self::get_terrain($post_id);
-			$link = self::get_map($post_id);
-			$edit = self::get_edit_url($post_id);
-			array_push($return_maps, array(
-				'ID' => $map['ID'],
-				'title' => $map['post_title'],
-				'distance' => $distance,
-				'terrain' => $terrain,
-				'media' => $link,
-				'edit' => $edit
-			));
-		}
-		return $return_maps;		
 	}
 
 	public static function lookup_maps_callback() {
@@ -209,7 +223,7 @@ class PwtcMapdb {
 			);
 			echo wp_json_encode($response);
 		}
-		else if (!isset($_POST['title']) or !isset($_POST['startswith']) or !isset($_POST['bylocation']) or !isset($_POST['limit'])) {
+		else if (!isset($_POST['title']) or !isset($_POST['location']) or !isset($_POST['terrain']) or !isset($_POST['distance']) or !isset($_POST['media']) or !isset($_POST['limit'])) {
 			$response = array(
 				'error' => 'Input parameters needed to search map library are missing.'
 			);
@@ -217,16 +231,42 @@ class PwtcMapdb {
 		}
 		else {
 			$title = sanitize_text_field($_POST['title']);
-			$bylocation = $_POST['bylocation'];
+			$location = sanitize_text_field($_POST['location']);
+			$terrain = '';
+			if ($_POST['terrain'] != '0') {
+				$terrain = $_POST['terrain'];
+			}
+			$distance = $_POST['distance'];
+			$min_dist = -1;
+			$max_dist = -1;
+			switch ($distance) {
+				case 1:
+					$max_dist = 25;
+					break;
+				case 2:
+					$min_dist = 25;
+					$max_dist = 50;
+					break;
+				case 3:
+					$min_dist = 50;
+					$max_dist = 75;
+					break;
+				case 4:
+					$min_dist = 75;
+					$max_dist = 100;
+					break;
+				case 5:
+					$min_dist = 100;
+					break;
+				default:
+					break;
+			}
+			$media = '';
+			if ($_POST['media'] != '0') {
+				$media = $_POST['media'];
+			}
 			$limit = intval($_POST['limit']);	
-			$startswith = 'false';
-			if (isset($_POST['startswith'])) {
-				$startswith = trim($_POST['startswith']);
-			}
-			if (empty($title) and $bylocation == 'true') {
-				$bylocation = 'false';
-			}
-			$nmaps = intval(self::count_maps($title, $startswith, $bylocation));
+			$nmaps = self::count_maps($title, $location, $terrain, $min_dist, $max_dist, $media);
 			$message = '';
 			if (isset($_POST['count']) and intval($_POST['count']) != $nmaps) {
 				$message = 'Search results have changed, paging context was lost.';
@@ -241,8 +281,7 @@ class PwtcMapdb {
 						$offset = intval($_POST['offset']) + $limit;
 					}
 				}
-				$maps = self::fetch_maps($title, $startswith, $bylocation, $offset, $limit);
-				$return_maps = self::build_map_array($maps);
+				$return_maps = self::fetch_maps($title, $location, $terrain, $min_dist, $max_dist, $media, $offset, $limit);
 				$response = array(
 					'count' => $nmaps,
 					'offset' => $offset,
@@ -253,8 +292,7 @@ class PwtcMapdb {
 				echo wp_json_encode($response);
 			}
 			else {
-				$maps = self::fetch_maps($title, $startswith, $bylocation);
-				$return_maps = self::build_map_array($maps);
+				$return_maps = self::fetch_maps($title, $location, $terrain, $min_dist, $max_dist, $media);
 				$response = array(
 					'maps' => $return_maps);
 				if ($message != '') {
@@ -374,20 +412,19 @@ class PwtcMapdb {
 
 			function load_maps_table(mode) {
 				var title = $(".pwtc-mapdb-search-sec .search-frm input[name='title']").val().trim();
-				var startswith = false;
-				if ($('.pwtc-mapdb-search-sec .search-frm .searchfrom').val() == 'begin') {
-					startswith = true;
-				}
-				var bylocation = false;
-				if ($('.pwtc-mapdb-search-sec .search-frm .searchby').val() == 'location') {
-					bylocation = true;
-				}
+				//var location = $(".pwtc-mapdb-search-sec .search-frm input[name='location']").val().trim();
+				var location = '';
+				var terrain = $('.pwtc-mapdb-search-sec .search-frm .terrain').val();
+				var distance = $('.pwtc-mapdb-search-sec .search-frm .distance').val();
+				var media = $('.pwtc-mapdb-search-sec .search-frm .media').val();
 				var action = $('.pwtc-mapdb-search-sec .search-frm').attr('action');
 				var data = {
 					'action': 'pwtc_mapdb_lookup_maps',
 					'title': title,
-					'startswith': startswith,
-					'bylocation': bylocation,
+					'location': location,
+					'terrain': terrain,
+					'distance': distance,
+					'media': media,
 					'limit': <?php echo $a['limit'] ?>
 				};
 				if (mode != 'search') {
@@ -414,25 +451,47 @@ class PwtcMapdb {
 			$('.pwtc-mapdb-search-sec .search-frm .reset-btn').on('click', function(evt) {
 				evt.preventDefault();
 				$(".pwtc-mapdb-search-sec .search-frm input[type='text']").val(''); 
+				$('.pwtc-mapdb-search-sec .search-frm select').val('0');
 				$('.pwtc-mapdb-maps-div').empty();
+				//load_maps_table('search');
 			});
+
+			//load_maps_table('search');
 		});
 	</script>
 	<div class='pwtc-mapdb-search-sec'>
 	<p>To browse the map library, press the <strong>Search</strong> button. 
-	To narrow your search, enter a string into the <strong>Search For</strong> field before searching.</p>
+	To narrow your search, fill out the form below before searching.</p>
 	<form class="search-frm pwtc-mapdb-stacked-form" action="<?php echo admin_url('admin-ajax.php'); ?>" method="post">
-		<span>Search By</span>
-		<select class="searchby">
-            <option value="title" selected>Map Title</option>
-			<!--<option value="location">Start Location</option>-->
-        </select>		
-		<span>Search For</span>
+		<span>Title</span>
 		<input type="text" name="title"/>
-		<span>Search From</span>
-		<select class="searchfrom">
-            <option value="any" selected>Anywhere in Line</option> 
-            <option value="begin">Beginning of Line</option>
+		<!--
+		<span>Start Location</span>
+		<input type="text" name="location"/>
+		-->
+		<span>Terrain</span>
+		<select class="terrain">
+            <option value="0" selected>Any</option> 
+            <option value="a">A (flat)</option>
+            <option value="b">B (gently rolling)</option>
+            <option value="c">C (short steep hills)</option>
+            <option value="d">D (longer hills)</option>
+            <option value="e">E (mountainous)</option>
+        </select>
+		<span>Distance</span>		
+		<select class="distance">
+            <option value="0" selected>Any</option> 
+            <option value="1">0-25 miles</option>
+            <option value="2">25-50 miles</option>
+            <option value="3">50-75 miles</option>
+            <option value="4">75-100 miles</option>
+            <option value="5">&gt; 100 miles</option>
+        </select>		
+		<span>Media</span>		
+		<select class="media">
+            <option value="0" selected>Any</option> 
+            <option value="file">Scanned File</option>
+            <option value="link">URL Link</option>
         </select>		
 		<input class="dark button" type="submit" value="Search"/>
 		<input class="reset-btn dark button" type="button" value="Reset"/>
