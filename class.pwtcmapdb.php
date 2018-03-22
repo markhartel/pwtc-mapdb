@@ -13,8 +13,8 @@ class PwtcMapdb {
 	const MAP_FILE_FIELD = 'file';
 	const MAP_TYPE_QUERY = 'maps_0_type';
 	const COPY_ANCHOR_LABEL = '<i class="fa fa-clipboard"></i>';
-	const FILE_ANCHOR_LABEL = '<i class="fa fa-download"></i>';
-	const LINK_ANCHOR_LABEL = '<i class="fa fa-link"></i>';
+	//const FILE_ANCHOR_LABEL = '<i class="fa fa-download"></i>';
+	//const LINK_ANCHOR_LABEL = '<i class="fa fa-link"></i>';
 	const EDIT_ANCHOR_LABEL = '<i class="fa fa-pencil-square-o"></i>';
 	const EDIT_CAPABILITY = 'edit_others_rides';
 
@@ -28,9 +28,9 @@ class PwtcMapdb {
 	const MAP_LINK_FIELD = 'map_link';
 	const MAP_FILE_FIELD = 'map_file';
 	const MAP_TYPE_QUERY = 'map_type';
-	const COPY_ANCHOR_LABEL = 'Copy';
-	const FILE_ANCHOR_LABEL = 'File';
-	const LINK_ANCHOR_LABEL = 'Link';
+	const COPY_ANCHOR_LABEL = '[C]';
+	//const FILE_ANCHOR_LABEL = 'File';
+	//const LINK_ANCHOR_LABEL = 'Link';
 	const EDIT_ANCHOR_LABEL = 'Edit';
 	const EDIT_CAPABILITY = 'edit_others_posts';
 */
@@ -176,11 +176,13 @@ class PwtcMapdb {
 			$type = get_field(self::MAP_TYPE_FIELD);
 			if ($type == 'file') {
 				$file = get_field(self::MAP_FILE_FIELD);
-				$url = '<a title="Download map file." target="_blank" href="' . $file['url'] . '">' . self::FILE_ANCHOR_LABEL . '</a>';
+				//$url = '<a title="Download map file." target="_blank" href="' . $file['url'] . '">' . self::FILE_ANCHOR_LABEL . '</a>';
+				$url = '<a title="Download map file." target="_blank" href="' . $file['url'] . '">';
 			}
 			else if ($type == 'link') {
 				$link = get_field(self::MAP_LINK_FIELD);
-				$url = '<a title="Open map link." target="_blank" href="' . $link . '">' . self::LINK_ANCHOR_LABEL . '</a>';
+				//$url = '<a title="Open map link." target="_blank" href="' . $link . '">' . self::LINK_ANCHOR_LABEL . '</a>';
+				$url = '<a title="Open map link." target="_blank" href="' . $link . '">';
 			}
 */	
 
@@ -188,11 +190,13 @@ class PwtcMapdb {
 				$type = get_sub_field(self::MAP_TYPE_FIELD);
 				if ($type == 'file') {
 					$file = get_sub_field(self::MAP_FILE_FIELD);
-					$url = '<a title="Download map file." target="_blank" href="' . $file['url'] . '">' . self::FILE_ANCHOR_LABEL . '</a>';
+					//$url = '<a title="Download map file." target="_blank" href="' . $file['url'] . '">' . self::FILE_ANCHOR_LABEL . '</a>';
+					$url = '<a title="Download map file." target="_blank" href="' . $file['url'] . '">';
 				}
 				else if ($type == 'link') {
 					$link = get_sub_field(self::MAP_LINK_FIELD);
-					$url = '<a title="Open map link." target="_blank" href="' . $link . '">' . self::LINK_ANCHOR_LABEL . '</a>';
+					//$url = '<a title="Open map link." target="_blank" href="' . $link . '">' . self::LINK_ANCHOR_LABEL . '</a>';
+					$url = '<a title="Open map link." target="_blank" href="' . $link . '">';
 				}
 			endwhile;
 	
@@ -271,6 +275,10 @@ class PwtcMapdb {
 			if (isset($_POST['count']) and intval($_POST['count']) != $nmaps) {
 				$message = 'Search results have changed, paging context was lost.';
 			}
+			$can_edit = false;
+			if (current_user_can(self::EDIT_CAPABILITY)) {
+				$can_edit = true;
+			}	
 			if ($limit > 0 and $nmaps > $limit) {
 				$offset = 0;
 				if (isset($_POST['count']) and intval($_POST['count']) == $nmaps) {
@@ -283,6 +291,7 @@ class PwtcMapdb {
 				}
 				$return_maps = self::fetch_maps($title, $location, $terrain, $min_dist, $max_dist, $media, $offset, $limit);
 				$response = array(
+					'can_edit' => $can_edit,
 					'count' => $nmaps,
 					'offset' => $offset,
 					'maps' => $return_maps);
@@ -294,6 +303,7 @@ class PwtcMapdb {
 			else {
 				$return_maps = self::fetch_maps($title, $location, $terrain, $min_dist, $max_dist, $media);
 				$response = array(
+					'can_edit' => $can_edit,
 					'maps' => $return_maps);
 				if ($message != '') {
 					$response['message'] = $message;
@@ -320,21 +330,29 @@ class PwtcMapdb {
 	?>
 	<script type="text/javascript">
 		jQuery(document).ready(function($) { 
-			function populate_maps_table(maps) {
+			function populate_maps_table(maps, can_edit) {
 				var copylink = '<a title="Copy map title to clipboard." class="copy-btn"><?php echo self::COPY_ANCHOR_LABEL ?></a>';
-				$('.pwtc-mapdb-maps-div').append('<table class="pwtc-mapdb-rwd-table">' +
-					'<tr><th>Title</th><th>Distance</th><th>Terrain</th><th>Actions</th></tr>' +
-					'</table>');
+				var header = '<table class="pwtc-mapdb-rwd-table">' +
+					'<tr><th>Title</th><th>Distance</th><th>Terrain</th>';
+				if (can_edit) {
+					header += '<th>Actions</th>';
+				}
+				header += '</tr></table>';
+				$('.pwtc-mapdb-maps-div').append(header);
 				maps.forEach(function(item) {
-					$('.pwtc-mapdb-maps-div table').append(
-						'<tr postid="' + item.ID + '">' + 
-						'<td data-th="Title"><span>' + item.title + '</span></td>' +
-						'<td data-th="Distance">' + item.distance + '</td>' +
-						'<td data-th="Terrain">' + item.terrain + '</td>' +
-						'<td data-th="Actions">' + copylink + ' ' + item.media + ' ' + item.edit + '</td></tr>');    
+					var data = '<tr postid="' + item.ID + '">' +
+					'<td data-th="Title">' + copylink + ' ' + item.media + item.title + '</a></td>' +
+					'<td data-th="Distance">' + item.distance + '</td>' +
+					'<td data-th="Terrain">' + item.terrain + '</td>';
+					if (can_edit) {
+						data += '<td data-th="Actions">' + item.edit + '</td>'
+					}
+					data += '</tr>';
+					$('.pwtc-mapdb-maps-div table').append(data);    
 				});
 				$('.pwtc-mapdb-maps-div table .copy-btn').on('click', function(evt) {
-					var title = $(this).parent().parent().find('td').first().find('span').first()[0];
+					//var title = $(this).parent().parent().find('td').first().find('span').first()[0];
+					var title = $(this).parent().find('a').first().next()[0];
 					if (window.getSelection().rangeCount > 0) window.getSelection().removeAllRanges();
 					var range = document.createRange();  
   					range.selectNode(title);  
@@ -401,7 +419,7 @@ class PwtcMapdb {
 						if (res.offset !== undefined) {
 							create_paging_form(res.offset, res.count);
 						}
-						populate_maps_table(res.maps);
+						populate_maps_table(res.maps, res.can_edit);
 					}
 					else {
 						$('.pwtc-mapdb-maps-div').append('<div>No maps found.</div>');					
@@ -453,10 +471,10 @@ class PwtcMapdb {
 				$(".pwtc-mapdb-search-sec .search-frm input[type='text']").val(''); 
 				$('.pwtc-mapdb-search-sec .search-frm select').val('0');
 				$('.pwtc-mapdb-maps-div').empty();
-				//load_maps_table('search');
+				load_maps_table('search');
 			});
 
-			//load_maps_table('search');
+			load_maps_table('search');
 		});
 	</script>
 	<div class='pwtc-mapdb-search-sec'>
