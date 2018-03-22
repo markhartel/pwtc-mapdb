@@ -199,7 +199,7 @@ class PwtcMapdb {
 					$url = '<a title="Open map link." target="_blank" href="' . $link . '">';
 				}
 			endwhile;
-	
+
 			$edit_url = '';
 			if (current_user_can(self::EDIT_CAPABILITY)) {
 				$href = admin_url('post.php?post=' . get_the_ID() . '&action=edit');
@@ -374,9 +374,10 @@ class PwtcMapdb {
 				var numpages = Math.ceil(count/limit);
 				$('.pwtc-mapdb-maps-div').append(
 					'<form class="page-frm">' +
-                    '<input class="prev-btn dark button" style="margin: 0" type="button" value="< Prev"/>' +
+                    '<input class="prev-btn button" style="margin: 0" type="button" value="< Prev"/>' +
 					'<span style="margin: 0 10px">Page ' + pagenum + ' of ' + numpages + '</span>' +
-                    '<input class="next-btn dark button" style="margin: 0" type="button" value="Next >"/>' +
+                    '<input class="next-btn button" style="margin: 0" type="button" value="Next >"/>' +
+					'<span class="page-msg" style="margin: 0 10px"></span>' +
 					'<input name="offset" type="hidden" value="' + offset + '"/>' +
 					'<input name="count" type="hidden" value="' + count + '"/>' +
 					'</form>'
@@ -429,13 +430,14 @@ class PwtcMapdb {
 			}   
 
 			function load_maps_table(mode) {
-				var title = $(".pwtc-mapdb-search-sec .search-frm input[name='title']").val().trim();
-				//var location = $(".pwtc-mapdb-search-sec .search-frm input[name='location']").val().trim();
+				var title = $(".pwtc-mapdb-search-div .search-frm input[name='title']").val().trim();
+				//var location = $(".pwtc-mapdb-search-div .search-frm input[name='location']").val().trim();
 				var location = '';
-				var terrain = $('.pwtc-mapdb-search-sec .search-frm .terrain').val();
-				var distance = $('.pwtc-mapdb-search-sec .search-frm .distance').val();
-				var media = $('.pwtc-mapdb-search-sec .search-frm .media').val();
-				var action = $('.pwtc-mapdb-search-sec .search-frm').attr('action');
+				var terrain = $('.pwtc-mapdb-search-div .search-frm .terrain').val();
+				var distance = $('.pwtc-mapdb-search-div .search-frm .distance').val();
+				//var media = $('.pwtc-mapdb-search-div .search-frm .media').val();
+				var media = '0';
+				var action = $('.pwtc-mapdb-search-div .search-frm').attr('action');
 				var data = {
 					'action': 'pwtc_mapdb_lookup_maps',
 					'title': title,
@@ -456,20 +458,24 @@ class PwtcMapdb {
 					else if (mode == 'next') {
 						data.next = 1;						
 					}
+					$('.pwtc-mapdb-maps-div .page-frm .page-msg').html('<i class="fa fa-spinner fa-pulse"></i> Loading...');
+				}
+				else {
+					$('.pwtc-mapdb-maps-div').html('<i class="fa fa-spinner fa-pulse"></i> Loading...');
 				}
 				$('body').addClass('pwtc-mapdb-waiting');
 				$.post(action, data, lookup_maps_cb); 
 			}
 
-			$('.pwtc-mapdb-search-sec .search-frm').on('submit', function(evt) {
+			$('.pwtc-mapdb-search-div .search-frm').on('submit', function(evt) {
 				evt.preventDefault();
 				load_maps_table('search');
 			});
 
-			$('.pwtc-mapdb-search-sec .search-frm .reset-btn').on('click', function(evt) {
+			$('.pwtc-mapdb-search-div .search-frm .reset-btn').on('click', function(evt) {
 				evt.preventDefault();
-				$(".pwtc-mapdb-search-sec .search-frm input[type='text']").val(''); 
-				$('.pwtc-mapdb-search-sec .search-frm select').val('0');
+				$(".pwtc-mapdb-search-div .search-frm input[type='text']").val(''); 
+				$('.pwtc-mapdb-search-div .search-frm select').val('0');
 				$('.pwtc-mapdb-maps-div').empty();
 				load_maps_table('search');
 			});
@@ -477,16 +483,63 @@ class PwtcMapdb {
 			load_maps_table('search');
 		});
 	</script>
-	<div class='pwtc-mapdb-search-sec'>
+
+	<div class='pwtc-mapdb-search-div'>
+	<ul class="accordion" data-accordion data-allow-all-closed="true">
+		<li class="accordion-item" data-accordion-item>
+            <a href="#" class="accordion-title"><i class="fa fa-search"></i> Click Here To Search</a>
+            <div class="accordion-content" data-tab-content>
+				<form class="search-frm" action="<?php echo admin_url('admin-ajax.php'); ?>" method="post">
+				<div>
+				<div class="row">
+                    <div class="medium-4 columns">
+                        <label>Title
+							<input type="text" name="title"/>
+                        </label>
+                    </div>
+                    <div class="medium-4 columns">
+                        <label>Distance
+							<select class="distance">
+            					<option value="0" selected>Any</option> 
+           	 					<option value="1">0-25 miles</option>
+            					<option value="2">25-50 miles</option>
+            					<option value="3">50-75 miles</option>
+            					<option value="4">75-100 miles</option>
+            					<option value="5">&gt; 100 miles</option>
+        					</select>		
+                        </label>
+                    </div>
+                    <div class="medium-4 columns">
+                        <label>Terrain
+							<select class="terrain">
+            					<option value="0" selected>Any</option> 
+            					<option value="a">A (flat)</option>
+            					<option value="b">B (gently rolling)</option>
+            					<option value="c">C (short steep hills)</option>
+            					<option value="d">D (longer hills)</option>
+            					<option value="e">E (mountainous)</option>
+        					</select>
+                        </label>
+                    </div>
+				</div>
+				<div class="row column">
+					<input class="accent button" type="submit" value="Search"/>
+					<input class="reset-btn accent button" type="button" value="Reset"/>
+                </div>
+				</div>
+				</form>
+			</div>
+		</li>
+	</ul>
+	</div>
+
+<!--
+	<div class='pwtc-mapdb-search-div pwtc-mapdb-search-sec'>
 	<p>To browse the map library, press the <strong>Search</strong> button. 
 	To narrow your search, fill out the form below before searching.</p>
 	<form class="search-frm pwtc-mapdb-stacked-form" action="<?php echo admin_url('admin-ajax.php'); ?>" method="post">
 		<span>Title</span>
 		<input type="text" name="title"/>
-		<!--
-		<span>Start Location</span>
-		<input type="text" name="location"/>
-		-->
 		<span>Terrain</span>
 		<select class="terrain">
             <option value="0" selected>Any</option> 
@@ -505,16 +558,11 @@ class PwtcMapdb {
             <option value="4">75-100 miles</option>
             <option value="5">&gt; 100 miles</option>
         </select>		
-		<span>Media</span>		
-		<select class="media">
-            <option value="0" selected>Any</option> 
-            <option value="file">Scanned File</option>
-            <option value="link">URL Link</option>
-        </select>		
 		<input class="dark button" type="submit" value="Search"/>
 		<input class="reset-btn dark button" type="button" value="Reset"/>
 	</form>
 	</div>
+-->
 	<div class="pwtc-mapdb-maps-div"></div>
 	<?php
 			return ob_get_clean();
