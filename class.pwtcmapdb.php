@@ -417,10 +417,10 @@ class PwtcMapdb {
 							'<div><strong>Warning:</strong> ' + res.message + '</div>');
 					}
 					if (res.maps.length > 0) {
+						populate_maps_table(res.maps, res.can_edit);
 						if (res.offset !== undefined) {
 							create_paging_form(res.offset, res.count);
 						}
-						populate_maps_table(res.maps, res.can_edit);
 					}
 					else {
 						$('.pwtc-mapdb-maps-div').append('<div>No maps found.</div>');					
