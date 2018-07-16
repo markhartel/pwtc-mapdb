@@ -101,6 +101,7 @@ class PwtcMapdb {
 				$args['meta_query'][] = [
 					'key' => self::LENGTH_FIELD,
 					'value' => [0, $max_dist],
+					'type' => 'NUMERIC',
 					'compare' => 'BETWEEN',
 				];	
 			}
@@ -116,6 +117,7 @@ class PwtcMapdb {
 				$args['meta_query'][] = [
 					'key' => self::LENGTH_FIELD,
 					'value' => [$min_dist, $max_dist],
+					'type' => 'NUMERIC',
 					'compare' => 'BETWEEN',
 				];	
 			}
@@ -176,6 +178,8 @@ class PwtcMapdb {
 			$type = get_field(self::MAP_TYPE_FIELD);
 			if ($type == 'file') {
 				$file = get_field(self::MAP_FILE_FIELD);
+				//$modtime = get_post_modified_time('M Y', false, $file['id']);
+				//self::write_log ($file);
 				//$url = '<a title="Download map file." target="_blank" href="' . $file['url'] . '">' . self::FILE_ANCHOR_LABEL . '</a>';
 				$url = '<a title="Download map file." target="_blank" href="' . $file['url'] . '">';
 			}
@@ -190,6 +194,8 @@ class PwtcMapdb {
 				$type = get_sub_field(self::MAP_TYPE_FIELD);
 				if ($type == 'file') {
 					$file = get_sub_field(self::MAP_FILE_FIELD);
+					//$modtime = get_post_modified_time('M Y', false, $file['id']);
+					//self::write_log ($file);
 					//$url = '<a title="Download map file." target="_blank" href="' . $file['url'] . '">' . self::FILE_ANCHOR_LABEL . '</a>';
 					$url = '<a title="Download map file." target="_blank" href="' . $file['url'] . '">';
 				}
@@ -492,12 +498,12 @@ class PwtcMapdb {
 				<form class="search-frm" action="<?php echo admin_url('admin-ajax.php'); ?>" method="post">
 				<div>
 				<div class="row">
-                    <div class="medium-4 columns">
+                    <div class="small-12 medium-4 columns">
                         <label>Title
 							<input type="text" name="title"/>
                         </label>
                     </div>
-                    <div class="medium-4 columns">
+                    <div class="small-12 medium-4 columns">
                         <label>Distance
 							<select class="distance">
             					<option value="0" selected>Any</option> 
@@ -509,7 +515,7 @@ class PwtcMapdb {
         					</select>		
                         </label>
                     </div>
-                    <div class="medium-4 columns">
+                    <div class="small-12 medium-4 columns">
                         <label>Terrain
 							<select class="terrain">
             					<option value="0" selected>Any</option> 
