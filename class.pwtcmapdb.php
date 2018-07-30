@@ -70,7 +70,10 @@ class PwtcMapdb {
 			array( 'PwtcMapdb', 'ride_leader_fetch_profile_callback') );
 			
 		add_action( 'wp_ajax_pwtc_ride_leader_update_profile', 
-            array( 'PwtcMembers', 'ride_leader_update_profile_callback') );
+			array( 'PwtcMapdb', 'ride_leader_update_profile_callback') );
+			
+		add_action( 'template_redirect', 
+			array( 'PwtcMapdb', 'download_ride_leaders_list' ) );
 
 	}
 
@@ -781,9 +784,15 @@ class PwtcMapdb {
 				$('#pwtc-ride-leader-wait .wait-message').html('Updating ride leader profile.');
 				$('#pwtc-ride-leader-wait').foundation('open');
 			});
-			<?php } else { ?>
+			<?php } else if ($can_view_leaders) { ?>
 			$("#pwtc-ride-leader-profile .profile-frm input[type='text']").attr("disabled", "disabled");
 			$("#pwtc-ride-leader-profile .profile-frm select").attr("disabled", "disabled");
+			<?php } ?>
+
+			<?php if ($can_view_leaders or $can_edit_leaders) { ?>
+			$('#pwtc-ride-leader-download-div a').on('click', function(e) {
+				$('#pwtc-ride-leader-download-div .download-frm').submit();
+			});
 			<?php } ?>
 
 			load_members_table('search');
@@ -849,6 +858,13 @@ class PwtcMapdb {
 			</div>
 		</form>
 	</div>
+	<div id="pwtc-ride-leader-download-div" class="button-group">
+  		<a class="button" title="Download ride leaders."><i class="fa fa-download"></i> Ride Leaders</a>
+		<form class="download-frm" method="post">
+			<input type="hidden" name="pwtc-ride-leaders-download" value="yes"/>
+			<input type="hidden" name="role" value="ride_leader"/>
+		</form>	
+	</div>
 	<?php } ?>
 	<div id='pwtc-ride-leader-search-div'>
 		<ul class="accordion" data-accordion data-allow-all-closed="true">
@@ -860,6 +876,9 @@ class PwtcMapdb {
 						<input type="hidden" name="first_name_sav" value=""/>
 						<input type="hidden" name="email_sav" value=""/>
 						<input type="hidden" name="role_sav" value=""/>
+						<?php if (!$can_view_leaders) { ?>
+						<input class="role" type="hidden" name="role" value="ride_leader"/>
+						<?php } ?>
 						<div>
 							<div class="row">
 								<div class="small-12 medium-3 columns">
@@ -877,6 +896,7 @@ class PwtcMapdb {
 										<input type="text" name="email"/>
                         			</label>
                     			</div>
+								<?php if ($can_view_leaders) { ?>
 								<div class="small-12 medium-3 columns">
                                 	<label>Show
 							        	<select class="role">
@@ -885,6 +905,7 @@ class PwtcMapdb {
                                         </select>                                
                                 	</label>
                             	</div>
+								<?php } ?>
 							</div>
 							<div class="row column">
 								<input class="accent button" type="submit" value="Search"/>
@@ -972,6 +993,31 @@ class PwtcMapdb {
 
         echo wp_json_encode($response);
         wp_die();
+	}
+
+	public static function download_ride_leaders_list() {
+		if (current_user_can(self::VIEW_LEADERS_CAP)) {
+			if (isset($_POST['pwtc-ride-leaders-download'])) {
+				$query_args = self::get_query_args();
+				$today = date('Y-m-d', current_time('timestamp'));
+				header('Content-Description: File Transfer');
+				header("Content-type: text/csv");
+				header("Content-Disposition: attachment; filename={$today}_members.csv");
+				$fp = fopen('php://output', 'w');
+				fputcsv($fp, ['Last Name', 'First Name', 'Email']);
+				$user_query = new WP_User_Query( $query_args );
+				$members = $user_query->get_results();
+				if ( !empty($members) ) {
+					foreach ( $members as $member ) {
+						$member_info = get_userdata($member->ID);
+						fputcsv($fp, [$member_info->last_name, $member_info->first_name, $member_info->user_email]);
+					}
+				}
+
+				fclose($fp);
+				die;
+			}
+		}
 	}
 
 	public static function get_user_query_args() {
