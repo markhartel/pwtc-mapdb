@@ -614,9 +614,26 @@ class PwtcMapdb {
 				$('#pwtc-ride-leader-wait').foundation('close');
 				var res = JSON.parse(response);
 				if (res.error) {
+					$("#pwtc-ride-leader-error .error-msg").html(res.error);
+					$('#pwtc-ride-leader-error').foundation('open');
 				}
 				else {
 					$("#pwtc-ride-leader-profile .header-msg").html(res.first_name + ' ' + res.last_name + ' - ' + res.email);
+					$("#pwtc-ride-leader-profile .profile-frm input[name='contact_email']").val(res.contact_email);
+					$("#pwtc-ride-leader-profile .profile-frm input[name='voice_phone']").val(res.voice_phone);
+					$("#pwtc-ride-leader-profile .profile-frm input[name='text_phone']").val(res.text_phone);
+					if (res.use_contact_email) {
+						$("#pwtc-ride-leader-profile .profile-frm .use_contact_email").val('yes');
+					}
+					else {
+						$("#pwtc-ride-leader-profile .profile-frm .use_contact_email").val('no');
+					}
+					if (res.is_ride_leader) {
+						$("#pwtc-ride-leader-profile .profile-frm .is_ride_leader").val('yes');
+					}
+					else {
+						$("#pwtc-ride-leader-profile .profile-frm .is_ride_leader").val('no');
+					}
 					$("#pwtc-ride-leader-profile .status_msg").html('');
 					$('#pwtc-ride-leader-profile').foundation('open');
 				}
@@ -632,6 +649,9 @@ class PwtcMapdb {
 					$('#pwtc-ride-leader-profile').foundation('open');
 				}
 				else {
+					if (res.refresh) {
+						load_members_table('search');
+					}
 				}
 			}
 			<?php } ?>
@@ -778,7 +798,8 @@ class PwtcMapdb {
 
 			$('#pwtc-ride-leader-search-div .search-frm .reset-btn').on('click', function(evt) {
 				evt.preventDefault();
-				$("#pwtc-ride-leader-search-div .search-frm input[type='text']").val(''); 
+				$("#pwtc-ride-leader-search-div .search-frm input[type='text']").val('');
+				$("#pwtc-ride-leader-search-div .search-frm .role").val('ride_leader'); 
 				$('#pwtc-ride-leaders-div').empty();
 				load_members_table('search');
 			});
@@ -786,11 +807,16 @@ class PwtcMapdb {
 			<?php if ($can_edit_leaders) { ?>
 			$('#pwtc-ride-leader-profile .profile-frm').on('submit', function(evt) {
 				evt.preventDefault();
-				var userid = $("#pwtc-ride-leader-profile input[name='userid']").val();
+				var userid = $("#pwtc-ride-leader-profile .profile-frm input[name='userid']").val();
 				var action = "<?php echo admin_url('admin-ajax.php'); ?>";
 				var data = {
 					'action': 'pwtc_ride_leader_update_profile',
-					'userid': userid
+					'userid': userid,
+					'contact_email': $("#pwtc-ride-leader-profile .profile-frm input[name='contact_email']").val().trim(),
+					'voice_phone': $("#pwtc-ride-leader-profile .profile-frm input[name='voice_phone']").val().trim(),
+					'text_phone': $("#pwtc-ride-leader-profile .profile-frm input[name='text_phone']").val().trim(),
+					'use_contact_email': $("#pwtc-ride-leader-profile .profile-frm .use_contact_email").val(),
+					'is_ride_leader': $("#pwtc-ride-leader-profile .profile-frm .is_ride_leader").val()
 				};
 				$.post(action, data, update_user_profile_cb);
 				$('#pwtc-ride-leader-wait .wait-message').html('Updating ride leader profile.');
@@ -812,6 +838,16 @@ class PwtcMapdb {
 		});
 	</script>
 	<?php if ($can_view_leaders or $can_edit_leaders) { ?>
+	<div id="pwtc-ride-leader-error" class="reveal" data-close-on-click="false" data-reveal>
+		<form class="profile-frm">
+		    <div class="row column">
+				<div class="callout alert"><p class="error-msg"></p></div>
+			</div>
+			<div class="row column clearfix">
+				<input class="accent button float-left" type="button" value="Close" data-close/>
+			</div>
+		</form>
+	</div>
 	<div id="pwtc-ride-leader-wait" class="reveal" data-close-on-click="false" data-reveal>
 		<div class="callout warning">
 			<p><i class="fa fa-spinner fa-pulse"></i> Please wait...</p>
@@ -829,7 +865,7 @@ class PwtcMapdb {
 			<div class="row">
 				<div class="small-12 medium-6 columns">
 					<label>Use Contact Email
-						<select>
+						<select class="use_contact_email">
 							<option value="no" selected>No, use account email</option>
 							<option value="yes">Yes</option>
 						</select>
@@ -852,7 +888,7 @@ class PwtcMapdb {
 				</div>
 				<div class="small-12 medium-6 columns">
 					<label>Is Ride Leader
-						<select>
+						<select class="is_ride_leader">
 							<option value="no" selected>No</option>
 							<option value="yes">Yes</option>
 						</select>
@@ -985,24 +1021,62 @@ class PwtcMapdb {
 	public static function ride_leader_fetch_profile_callback() {
 		$userid = intval($_POST['userid']);
 		$member_info = get_userdata($userid);
-        $response = array(
-			'userid' => $userid,
-			'first_name' => $member_info->first_name,
-			'last_name' => $member_info->last_name,
-			'email' => $member_info->user_email
-		);
-
-        echo wp_json_encode($response);
+		if ($member_info === false) {
+			$response = array(
+				'userid' => $userid,
+				'error' => 'Fetch of profile for user ID ' . $userid . ' failed.'
+			);
+		}
+		else {
+			$is_ride_leader = false;
+			if (in_array('ride_leader', $member_info->roles)) {
+				$is_ride_leader = true;
+			}
+			$response = array(
+				'userid' => $userid,
+				'first_name' => $member_info->first_name,
+				'last_name' => $member_info->last_name,
+				'email' => $member_info->user_email,
+				'voice_phone' => get_field('cell_phone', 'user_'.$userid),
+				'text_phone' => get_field('home_phone', 'user_'.$userid),
+				'contact_email' => get_field('contact_email', 'user_'.$userid),
+				'use_contact_email' => get_field('use_contact_email', 'user_'.$userid),
+				'is_ride_leader' => $is_ride_leader
+			);
+		}
+		echo wp_json_encode($response);
         wp_die();
 	}
 
 	public static function ride_leader_update_profile_callback() {
 		$userid = intval($_POST['userid']);
-        $response = array(
-			'userid' => $userid,
-			'error' => 'Cannot update user ID ' . $userid . ', not implemented!'
-		);
-
+		$member_info = get_userdata($userid);
+		if ($member_info === false) {
+			$response = array(
+				'userid' => $userid,
+				'error' => 'Fetch of profile for user ID ' . $userid . ' failed.'
+			);
+		}
+		else {
+			$refresh = false;
+			$is_ride_leader = $_POST['is_ride_leader'];
+			if (in_array('ride_leader', $member_info->roles)) {
+				if ($is_ride_leader == 'no') {
+					$member_info->remove_role('ride_leader');
+					$refresh = true;
+				}
+			}
+			else {
+				if ($is_ride_leader == 'yes') {
+					$member_info->add_role('ride_leader');
+					$refresh = true;
+				}
+			}
+			$response = array(
+				'userid' => $userid,
+				'refresh' => $refresh
+			);
+		}
         echo wp_json_encode($response);
         wp_die();
 	}
@@ -1025,7 +1099,6 @@ class PwtcMapdb {
 						fputcsv($fp, [$member_info->last_name, $member_info->first_name, $member_info->user_email]);
 					}
 				}
-
 				fclose($fp);
 				die;
 			}
