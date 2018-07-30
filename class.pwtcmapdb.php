@@ -616,7 +616,7 @@ class PwtcMapdb {
 				if (res.error) {
 				}
 				else {
-					$("#pwtc-ride-leader-profile .header_msg").html(res.first_name + '' + res.last_name + ' - ' + res.email);
+					$("#pwtc-ride-leader-profile .header-msg").html(res.first_name + ' ' + res.last_name + ' - ' + res.email);
 					$("#pwtc-ride-leader-profile .status_msg").html('');
 					$('#pwtc-ride-leader-profile').foundation('open');
 				}
@@ -754,7 +754,7 @@ class PwtcMapdb {
 					else if (mode == 'next') {
 						data.page_number = parseInt(pagenum) + 1;
 					}
-					$('#pwtc-ride-leaders-div .page-frm .page-msg').html('<i class="fa fa-spinner fa-pulse"></i> Loading...');
+					$('#pwtc-ride-leaders-div .page-frm .page-msg').html('<i class="fa fa-spinner fa-pulse"></i> Please wait...');
 				}
 				else {
 					data.role = $("#pwtc-ride-leader-search-div .search-frm .role").val();
@@ -765,11 +765,23 @@ class PwtcMapdb {
 					$("#pwtc-ride-leader-search-div .search-frm input[name='email_sav']").val(data.email);
 					$("#pwtc-ride-leader-search-div .search-frm input[name='last_name_sav']").val(data.last_name);
 					$("#pwtc-ride-leader-search-div .search-frm input[name='first_name_sav']").val(data.first_name);	
-					$('#pwtc-ride-leaders-div').html('<i class="fa fa-spinner fa-pulse"></i> Loading...');
+					$('#pwtc-ride-leaders-div').html('<i class="fa fa-spinner fa-pulse"></i> Please wait...');
 				}
 
 				$.post(action, data, lookup_members_cb); 
 			}
+
+			$('#pwtc-ride-leader-search-div .search-frm').on('submit', function(evt) {
+				evt.preventDefault();
+				load_members_table('search');
+			});
+
+			$('#pwtc-ride-leader-search-div .search-frm .reset-btn').on('click', function(evt) {
+				evt.preventDefault();
+				$("#pwtc-ride-leader-search-div .search-frm input[type='text']").val(''); 
+				$('#pwtc-ride-leaders-div').empty();
+				load_members_table('search');
+			});
 
 			<?php if ($can_edit_leaders) { ?>
 			$('#pwtc-ride-leader-profile .profile-frm').on('submit', function(evt) {
@@ -806,11 +818,11 @@ class PwtcMapdb {
 			<p class="wait-message"></p>
 		</div>
 	</div>
-	<div id="pwtc-ride-leader-profile" class="large reveal" data-close-on-click="false" data-v-offset="50" data-reveal>
+	<div id="pwtc-ride-leader-profile" class="small reveal" data-close-on-click="false" data-v-offset="100" data-reveal>
 		<form class="profile-frm">
 			<input type="hidden" name="userid"/>
 			<div class="row column">
-				<div class="callout">
+				<div class="callout primary">
 					<p class="header-msg"></p>
 				</div>
 			</div>
@@ -998,7 +1010,7 @@ class PwtcMapdb {
 	public static function download_ride_leaders_list() {
 		if (current_user_can(self::VIEW_LEADERS_CAP)) {
 			if (isset($_POST['pwtc-ride-leaders-download'])) {
-				$query_args = self::get_query_args();
+				$query_args = self::get_user_query_args();
 				$today = date('Y-m-d', current_time('timestamp'));
 				header('Content-Description: File Transfer');
 				header("Content-type: text/csv");
