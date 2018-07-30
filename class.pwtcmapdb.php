@@ -2,6 +2,9 @@
 
 class PwtcMapdb {
 
+	const VIEW_LEADERS_CAP = 'pwtc_view_leaders';
+	const EDIT_LEADERS_CAP = 'pwtc_edit_leaders';
+
 	const MAP_POST_TYPE = 'ride_maps';
 	const START_LOCATION_FIELD = 'start_location';
 	const TERRAIN_FIELD = 'terrain';
@@ -56,6 +59,19 @@ class PwtcMapdb {
 		// Register shortcode callbacks
 		add_shortcode('pwtc_search_mapdb', 
 			array( 'PwtcMapdb', 'shortcode_search_mapdb'));
+
+		add_shortcode('pwtc_ride_leader_dir', 
+			array( 'PwtcMapdb', 'shortcode_ride_leader_dir'));
+
+		add_action( 'wp_ajax_pwtc_ride_leader_lookup', 
+			array( 'PwtcMapdb', 'ride_leader_lookup_callback') );
+			
+		add_action( 'wp_ajax_pwtc_ride_leader_fetch_profile', 
+			array( 'PwtcMapdb', 'ride_leader_fetch_profile_callback') );
+			
+		add_action( 'wp_ajax_pwtc_ride_leader_update_profile', 
+            array( 'PwtcMembers', 'ride_leader_update_profile_callback') );
+
 	}
 
 	/*************************************************************/
@@ -575,9 +591,480 @@ class PwtcMapdb {
 		}
 	}
 
+	// Generates the [pwtc_ride_leader_dir] shortcode.
+	public static function shortcode_ride_leader_dir($atts) {
+		$a = shortcode_atts(array('limit' => 10), $atts);
+		$current_user = wp_get_current_user();
+		if ( 0 == $current_user->ID ) {
+			return 'Please log in to view the ride leader directory.';
+		}
+		else {
+			$can_view_leaders = current_user_can(self::VIEW_LEADERS_CAP);
+			$can_edit_leaders = current_user_can(self::EDIT_LEADERS_CAP);
+			ob_start();
+	?>
+	<script type="text/javascript">
+		jQuery(document).ready(function($) { 
+
+			<?php if ($can_view_leaders or $can_edit_leaders) { ?>
+			function display_user_profile_cb(response) {
+				$('#pwtc-ride-leader-wait').foundation('close');
+				var res = JSON.parse(response);
+				if (res.error) {
+				}
+				else {
+					$("#pwtc-ride-leader-profile .header_msg").html(res.first_name + '' + res.last_name + ' - ' + res.email);
+					$("#pwtc-ride-leader-profile .status_msg").html('');
+					$('#pwtc-ride-leader-profile').foundation('open');
+				}
+			}
+			<?php } ?>
+
+			<?php if ($can_edit_leaders) { ?>
+			function update_user_profile_cb(response) {
+				$('#pwtc-ride-leader-wait').foundation('close');
+				var res = JSON.parse(response);
+				if (res.error) {
+					$("#pwtc-ride-leader-profile .status_msg").html('<div class="callout small alert"><p>' + res.error + '</p></div>');
+					$('#pwtc-ride-leader-profile').foundation('open');
+				}
+				else {
+				}
+			}
+			<?php } ?>
+
+			function populate_members_table(members) {
+				var header = '<table class="pwtc-mapdb-rwd-table"><tr><th>Last Name</th><th>First Name</th><th>Email</th><th>Phone</th>' +
+				<?php if ($can_view_leaders or $can_edit_leaders) { ?>
+				'<th>Actions</th>' +
+				<?php } ?>
+				'</tr></table>';
+				$('#pwtc-ride-leaders-div').append(header);
+				members.forEach(function(item) {
+					var data = '<tr userid="' + item.ID + '" username="' + item.first_name + ' ' + item.last_name + '">' +
+					'<td data-th="Last Name">' + item.last_name + '</td>' + 
+					'<td data-th="First Name">' + item.first_name + '</td>' +
+					'<td data-th="Email">' + item.email + '</td>' +
+					'<td data-th="Phone">' + item.phone + '</td>' +
+					<?php if ($can_view_leaders or $can_edit_leaders) { ?>
+					'<td data-th="Actions">' +
+						<?php if ($can_edit_leaders) { ?>
+						'<a title="Edit member profile."><i class="fa fa-pencil-square"></i></a> ' +
+						<?php } else { ?>
+						'<a title="View member profile."><i class="fa fa-eye"></i></a> ' +
+						<?php } ?>
+					'</td>' +
+					<?php } ?>
+					'</tr>';
+					$('#pwtc-ride-leaders-div table').append(data);    
+				});
+				<?php if ($can_view_leaders or $can_edit_leaders) { ?>
+				$('#pwtc-ride-leaders-div table a').on('click', function(e) {
+					$("#pwtc-ride-leader-profile input[type='text']").val('');
+					var userid = $(this).parent().parent().attr('userid');
+					$("#pwtc-ride-leader-profile input[name='userid']").val(userid);
+					var action = "<?php echo admin_url('admin-ajax.php'); ?>";
+					var data = {
+						'action': 'pwtc_ride_leader_fetch_profile',
+						'userid': userid
+					};
+					$.post(action, data, display_user_profile_cb);
+					$('#pwtc-ride-leader-wait .wait-message').html('Loading ride leader profile.');
+					$('#pwtc-ride-leader-wait').foundation('open');
+				});
+				<?php } ?>
+            }
+
+			function create_paging_form(pagenum, numpages) {
+				$('#pwtc-ride-leaders-div').append(
+					'<form class="page-frm">' +
+                    '<input class="prev-btn button" style="margin: 0" type="button" value="< Prev"/>' +
+					'<span style="margin: 0 10px">Page ' + pagenum + ' of ' + numpages + '</span>' +
+                    '<input class="next-btn button" style="margin: 0" type="button" value="Next >"/>' +
+					'<span class="page-msg" style="margin: 0 10px"></span>' +
+					'<input name="pagenum" type="hidden" value="' + pagenum + '"/>' +
+					'<input name="numpages" type="hidden" value="' + numpages + '"/>' +
+					'</form>'
+				);
+				$('#pwtc-ride-leaders-div .page-frm .prev-btn').on('click', function(evt) {
+					evt.preventDefault();
+					load_members_table('prev');
+				});
+				if (pagenum == 1) {
+					$('#pwtc-ride-leaders-div .page-frm .prev-btn').attr("disabled", "disabled");
+				}
+				else {
+					$('#pwtc-ride-leaders-div .page-frm .prev-btn').removeAttr("disabled");
+				}
+				$('#pwtc-ride-leaders-div .page-frm .next-btn').on('click', function(evt) {
+					evt.preventDefault();
+					load_members_table('next');
+				});
+				if (pagenum == numpages) {
+					$('#pwtc-ride-leaders-div .page-frm .next-btn').attr("disabled", "disabled");
+				}
+				else {
+					$('#pwtc-ride-leaders-div .page-frm .next-btn').removeAttr("disabled");
+				}
+			}
+
+			function lookup_members_cb(response) {
+				var res = JSON.parse(response);
+				$('#pwtc-ride-leaders-div').empty();
+				if (res.error) {
+					$('#pwtc-ride-leaders-div').append(
+						'<div><strong>Error:</strong> ' + res.error + '</div>');
+				}
+				else {
+					if (res.message !== undefined) {
+						$('#pwtc-ride-leaders-div').append(
+							'<div><strong>Warning:</strong> ' + res.message + '</div>');
+					}
+					if (res.members.length > 0) {
+						populate_members_table(res.members);
+						if (res.total_pages > 1) {
+							create_paging_form(res.page_number, res.total_pages);
+						}
+					}
+					else {
+						$('#pwtc-ride-leaders-div').append('<div><i class="fa fa-exclamation-triangle"></i> No members found.</div>');
+					}
+				}
+			}   
+
+			function load_members_table(mode) {
+                var action = "<?php echo admin_url('admin-ajax.php'); ?>";
+				var data = {
+					'action': 'pwtc_ride_leader_lookup',
+					'limit': <?php echo $a['limit'] ?>
+				};
+				if (mode != 'search') {
+					data.role = $("#pwtc-ride-leader-search-div .search-frm input[name='role_sav']").val();
+					data.email = $("#pwtc-ride-leader-search-div .search-frm input[name='email_sav']").val();
+					data.last_name = $("#pwtc-ride-leader-search-div .search-frm input[name='last_name_sav']").val();
+					data.first_name = $("#pwtc-ride-leader-search-div .search-frm input[name='first_name_sav']").val();
+					var pagenum = $("#pwtc-ride-leaders-div .page-frm input[name='pagenum']").val();
+					var numpages = $("#pwtc-ride-leaders-div .page-frm input[name='numpages']").val();
+					if (mode == 'prev') {
+						data.page_number = parseInt(pagenum) - 1;
+					}
+					else if (mode == 'next') {
+						data.page_number = parseInt(pagenum) + 1;
+					}
+					$('#pwtc-ride-leaders-div .page-frm .page-msg').html('<i class="fa fa-spinner fa-pulse"></i> Loading...');
+				}
+				else {
+					data.role = $("#pwtc-ride-leader-search-div .search-frm .role").val();
+					data.email = $("#pwtc-ride-leader-search-div .search-frm input[name='email']").val().trim();
+					data.last_name = $("#pwtc-ride-leader-search-div .search-frm input[name='last_name']").val().trim();
+					data.first_name = $("#pwtc-ride-leader-search-div .search-frm input[name='first_name']").val().trim();
+					$("#pwtc-ride-leader-search-div .search-frm input[name='role_sav']").val(data.role);
+					$("#pwtc-ride-leader-search-div .search-frm input[name='email_sav']").val(data.email);
+					$("#pwtc-ride-leader-search-div .search-frm input[name='last_name_sav']").val(data.last_name);
+					$("#pwtc-ride-leader-search-div .search-frm input[name='first_name_sav']").val(data.first_name);	
+					$('#pwtc-ride-leaders-div').html('<i class="fa fa-spinner fa-pulse"></i> Loading...');
+				}
+
+				$.post(action, data, lookup_members_cb); 
+			}
+
+			<?php if ($can_edit_leaders) { ?>
+			$('#pwtc-ride-leader-profile .profile-frm').on('submit', function(evt) {
+				evt.preventDefault();
+				var userid = $("#pwtc-ride-leader-profile input[name='userid']").val();
+				var action = "<?php echo admin_url('admin-ajax.php'); ?>";
+				var data = {
+					'action': 'pwtc_ride_leader_update_profile',
+					'userid': userid
+				};
+				$.post(action, data, update_user_profile_cb);
+				$('#pwtc-ride-leader-wait .wait-message').html('Updating ride leader profile.');
+				$('#pwtc-ride-leader-wait').foundation('open');
+			});
+			<?php } else { ?>
+			$("#pwtc-ride-leader-profile .profile-frm input[type='text']").attr("disabled", "disabled");
+			$("#pwtc-ride-leader-profile .profile-frm select").attr("disabled", "disabled");
+			<?php } ?>
+
+			load_members_table('search');
+
+		});
+	</script>
+	<?php if ($can_view_leaders or $can_edit_leaders) { ?>
+	<div id="pwtc-ride-leader-wait" class="reveal" data-close-on-click="false" data-reveal>
+		<div class="callout warning">
+			<p><i class="fa fa-spinner fa-pulse"></i> Please wait...</p>
+			<p class="wait-message"></p>
+		</div>
+	</div>
+	<div id="pwtc-ride-leader-profile" class="large reveal" data-close-on-click="false" data-v-offset="50" data-reveal>
+		<form class="profile-frm">
+			<input type="hidden" name="userid"/>
+			<div class="row column">
+				<div class="callout">
+					<p class="header-msg"></p>
+				</div>
+			</div>
+			<div class="row">
+				<div class="small-12 medium-6 columns">
+					<label>Use Contact Email
+						<select>
+							<option value="no" selected>No, use account email</option>
+							<option value="yes">Yes</option>
+						</select>
+					</label>
+				</div>
+				<div class="small-12 medium-6 columns">
+					<label>Contact Email
+						<input type="text" name="contact_email"/>
+					</label>
+				</div>
+				<div class="small-12 medium-6 columns">
+					<label>Contact Voice Phone
+						<input type="text" name="voice_phone"/>
+					</label>
+				</div>
+				<div class="small-12 medium-6 columns">
+					<label>Contact Text Phone
+						<input type="text" name="text_phone"/>
+					</label>
+				</div>
+				<div class="small-12 medium-6 columns">
+					<label>Is Ride Leader
+						<select>
+							<option value="no" selected>No</option>
+							<option value="yes">Yes</option>
+						</select>
+					</label>
+				</div>
+			</div>
+			<div class="status_msg row column"></div>
+			<div class="row column clearfix">
+				<?php if ($can_edit_leaders) { ?>
+				<input class="accent button float-left" type="submit" value="Submit"/>
+				<input class="accent button float-right" type="button" value="Cancel" data-close/>
+				<?php } else {?>
+				<input class="accent button float-left" type="button" value="Cancel" data-close/>
+				<?php } ?>
+			</div>
+		</form>
+	</div>
+	<?php } ?>
+	<div id='pwtc-ride-leader-search-div'>
+		<ul class="accordion" data-accordion data-allow-all-closed="true">
+			<li class="accordion-item" data-accordion-item>
+				<a href="#" class="accordion-title"><i class="fa fa-search"></i> Click Here To Search</a>
+				<div class="accordion-content" data-tab-content>
+					<form class="search-frm">
+						<input type="hidden" name="last_name_sav" value=""/>
+						<input type="hidden" name="first_name_sav" value=""/>
+						<input type="hidden" name="email_sav" value=""/>
+						<input type="hidden" name="role_sav" value=""/>
+						<div>
+							<div class="row">
+								<div class="small-12 medium-3 columns">
+                        			<label>Last Name
+										<input type="text" name="last_name"/>
+                        			</label>
+                    			</div>
+								<div class="small-12 medium-3 columns">
+                        			<label>First Name
+										<input type="text" name="first_name"/>
+                        			</label>
+                    			</div>
+								<div class="small-12 medium-3 columns">
+                        			<label>Email
+										<input type="text" name="email"/>
+                        			</label>
+                    			</div>
+								<div class="small-12 medium-3 columns">
+                                	<label>Show
+							        	<select class="role">
+											<option value="ride_leader" selected>Ride Leaders</option>
+											<option value="!ride_leader">Others</option>
+                                        </select>                                
+                                	</label>
+                            	</div>
+							</div>
+							<div class="row column">
+								<input class="accent button" type="submit" value="Search"/>
+								<input class="reset-btn accent button" type="button" value="Reset"/>
+							</div>
+						</div>
+					</form>
+				</div>
+			</li>
+		</ul>
+	</div>
+	<div id="pwtc-ride-leaders-div"></div>
+	<?php
+			return ob_get_clean();
+		}
+	}
+
+    public static function ride_leader_lookup_callback() {
+		$query_args = self::get_user_query_args();
+
+		$limit = intval($_POST['limit']);
+		$query_args['number'] = $limit;
+
+		$page_number = 1;
+		if (isset($_POST['page_number'])) {
+			$page_number = intval($_POST['page_number']);
+		}
+		if ($page_number == 1) {
+			$offset = 0;  
+		}
+		else {
+			$offset = ($page_number-1)*$limit;
+		}
+		$query_args['offset'] = $offset;
+
+        $member_names = [];
+        $user_query = new WP_User_Query( $query_args );
+        $members = $user_query->get_results();
+        if ( !empty($members) ) {
+            foreach ( $members as $member ) {
+                $member_info = get_userdata( $member->ID );
+                $member_names[] = [
+                    'ID' => $member->ID,
+                    'first_name' => $member_info->first_name,
+                    'last_name' => $member_info->last_name,
+					'email' => $member_info->user_email,
+					'phone' => ''
+                ];
+            }
+		}
+		
+		$total_users = $user_query->total_users;
+		$total_pages = ceil($user_query->total_users/$limit);
+
+        $response = array(
+			'members' => $member_names,
+			'total_pages' => $total_pages,
+			'page_number' => $page_number
+		);
+
+        echo wp_json_encode($response);
+        wp_die();
+	}
+
+	public static function ride_leader_fetch_profile_callback() {
+		$userid = intval($_POST['userid']);
+		$member_info = get_userdata($userid);
+        $response = array(
+			'userid' => $userid,
+			'first_name' => $member_info->first_name,
+			'last_name' => $member_info->last_name,
+			'email' => $member_info->user_email
+		);
+
+        echo wp_json_encode($response);
+        wp_die();
+	}
+
+	public static function ride_leader_update_profile_callback() {
+		$userid = intval($_POST['userid']);
+        $response = array(
+			'userid' => $userid,
+			'error' => 'Cannot update user ID ' . $userid . ', not implemented!'
+		);
+
+        echo wp_json_encode($response);
+        wp_die();
+	}
+
+	public static function get_user_query_args() {
+        $query_args = [
+            'meta_key' => 'last_name',
+            'orderby' => 'meta_value',
+			'order' => 'ASC',
+			'role__in' => ['current_member', 'expired_member']
+		];
+
+		if (isset($_POST['first_name'])) {
+			if (!isset($query_args['meta_query'])) {
+				$query_args['meta_query'] = [];
+			}
+			$query_args['meta_query'][] = [
+				'key'     => 'first_name',
+				'value'   => $_POST['first_name'],
+				'compare' => 'LIKE'   
+			];
+		}
+
+		if (isset($_POST['last_name'])) {
+			if (!isset($query_args['meta_query'])) {
+				$query_args['meta_query'] = [];
+			}
+			$query_args['meta_query'][] = [
+				'key'     => 'last_name',
+				'value'   => $_POST['last_name'],
+				'compare' => 'LIKE'   
+			];
+		}
+
+		if (isset($_POST['email'])) {
+			$query_args['search'] = '*' . esc_attr($_POST['email']) . '*';
+			$query_args['search_columns'] = array( 'user_email' );
+		}	
+
+		if (isset($_POST['role'])) {
+			$role = $_POST['role'];
+			if ($role != 'all') {
+				if (substr($role, 0, 1) === "!") {
+					$not_role = substr($role, 1, strlen($role)-1);
+					if (isset($query_args['role__not_in'])) {
+						$query_args['role__not_in'][] = $not_role;
+					}
+					else {
+						$query_args['role__not_in'] = [$not_role];
+					}
+				}
+				else {
+					$query_args['role__in'] = [$role];
+				}
+			}
+		}
+
+		return $query_args;
+	}
+	
 	/*************************************************************/
 	/* Plugin installation and removal functions.
 	/*************************************************************/
+
+	public static function add_caps_admin_role() {
+		$admin = get_role('administrator');
+		$admin->add_cap(self::VIEW_LEADERS_CAP);
+		$admin->add_cap(self::EDIT_LEADERS_CAP);
+		self::write_log('PWTC MapDB plugin added capabilities to administrator role');
+	}
+
+	public static function remove_caps_admin_role() {
+		$admin = get_role('administrator');
+		$admin->remove_cap(self::VIEW_LEADERS_CAP);
+		$admin->remove_cap(self::EDIT_LEADERS_CAP);
+		self::write_log('PWTC MapDB plugin removed capabilities from administrator role');
+	}
+
+	public static function add_caps_rc_role() {
+		$captain = get_role('ride_captain'); 
+		if ($captain !== null) {
+			$captain->add_cap(self::VIEW_LEADERS_CAP);
+			$captain->add_cap(self::EDIT_LEADERS_CAP);
+			pwtc_mileage_write_log('PWTC MapDB plugin added capabilities to ride_captain role');
+		} 
+	}
+
+	public static function remove_caps_rc_role() {
+		$captain = get_role('ride_captain'); 
+		if ($captain !== null) {
+			$captain->remove_cap(self::VIEW_LEADERS_CAP);
+			$captain->remove_cap(self::EDIT_LEADERS_CAP);
+			pwtc_mileage_write_log('PWTC MapDB plugin removed capabilities from ride_captain role');
+		} 
+	}	
 
 	public static function plugin_activation() {
 		self::write_log( 'PWTC MapDB plugin activated' );
@@ -585,10 +1072,14 @@ class PwtcMapdb {
 			deactivate_plugins(plugin_basename(__FILE__));
 			wp_die('PWTC MapDB plugin requires Wordpress version of at least ' . PWTC_MAPDB__MINIMUM_WP_VERSION);
 		}
+		self::add_caps_admin_role();
+		self::add_caps_rc_role();
 	}
 
 	public static function plugin_deactivation( ) {
 		self::write_log( 'PWTC MapDB plugin deactivated' );
+		self::remove_caps_admin_role();
+		self::remove_caps_rc_role();
 	}
 
 	public static function plugin_uninstall() {
