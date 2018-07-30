@@ -650,7 +650,7 @@ class PwtcMapdb {
 				}
 				else {
 					if (res.refresh) {
-						load_members_table('search');
+						load_members_table('refresh');
 					}
 				}
 			}
@@ -736,13 +736,9 @@ class PwtcMapdb {
 				$('#pwtc-ride-leaders-div').empty();
 				if (res.error) {
 					$('#pwtc-ride-leaders-div').append(
-						'<div><strong>Error:</strong> ' + res.error + '</div>');
+						'<div class="callout small alert"><p>' + res.error + '</p></div>');
 				}
 				else {
-					if (res.message !== undefined) {
-						$('#pwtc-ride-leaders-div').append(
-							'<div><strong>Warning:</strong> ' + res.message + '</div>');
-					}
 					if (res.members.length > 0) {
 						populate_members_table(res.members);
 						if (res.total_pages > 1) {
@@ -750,7 +746,8 @@ class PwtcMapdb {
 						}
 					}
 					else {
-						$('#pwtc-ride-leaders-div').append('<div><i class="fa fa-exclamation-triangle"></i> No members found.</div>');
+						$('#pwtc-ride-leaders-div').append(
+							'<div class="callout small warning"><p>No members found.</p></div>');
 					}
 				}
 			}   
@@ -766,15 +763,27 @@ class PwtcMapdb {
 					data.email = $("#pwtc-ride-leader-search-div .search-frm input[name='email_sav']").val();
 					data.last_name = $("#pwtc-ride-leader-search-div .search-frm input[name='last_name_sav']").val();
 					data.first_name = $("#pwtc-ride-leader-search-div .search-frm input[name='first_name_sav']").val();
-					var pagenum = $("#pwtc-ride-leaders-div .page-frm input[name='pagenum']").val();
-					var numpages = $("#pwtc-ride-leaders-div .page-frm input[name='numpages']").val();
-					if (mode == 'prev') {
-						data.page_number = parseInt(pagenum) - 1;
+					if (mode == 'refresh') {
+						if ($("#pwtc-ride-leaders-div .page-frm").length != 0) {
+							var pagenum = $("#pwtc-ride-leaders-div .page-frm input[name='pagenum']").val();
+							data.page_number = parseInt(pagenum);
+							$('#pwtc-ride-leaders-div .page-frm .page-msg').html('<i class="fa fa-spinner fa-pulse"></i> Please wait...');	
+						}
+						else {
+							$('#pwtc-ride-leaders-div').html('<i class="fa fa-spinner fa-pulse"></i> Please wait...');
+						}
 					}
-					else if (mode == 'next') {
-						data.page_number = parseInt(pagenum) + 1;
+					else {
+						var pagenum = $("#pwtc-ride-leaders-div .page-frm input[name='pagenum']").val();
+						var numpages = $("#pwtc-ride-leaders-div .page-frm input[name='numpages']").val();
+						if (mode == 'prev') {
+							data.page_number = parseInt(pagenum) - 1;
+						}
+						else if (mode == 'next') {
+							data.page_number = parseInt(pagenum) + 1;
+						}
+						$('#pwtc-ride-leaders-div .page-frm .page-msg').html('<i class="fa fa-spinner fa-pulse"></i> Please wait...');
 					}
-					$('#pwtc-ride-leaders-div .page-frm .page-msg').html('<i class="fa fa-spinner fa-pulse"></i> Please wait...');
 				}
 				else {
 					data.role = $("#pwtc-ride-leader-search-div .search-frm .role").val();
@@ -972,110 +981,159 @@ class PwtcMapdb {
 	}
 
     public static function ride_leader_lookup_callback() {
-		$query_args = self::get_user_query_args();
+		if (isset($_POST['limit'])) {
+			$query_args = self::get_user_query_args();
 
-		$limit = intval($_POST['limit']);
-		$query_args['number'] = $limit;
+			$limit = intval($_POST['limit']);
+			$query_args['number'] = $limit;
 
-		$page_number = 1;
-		if (isset($_POST['page_number'])) {
-			$page_number = intval($_POST['page_number']);
-		}
-		if ($page_number == 1) {
-			$offset = 0;  
+			$page_number = 1;
+			if (isset($_POST['page_number'])) {
+				$page_number = intval($_POST['page_number']);
+			}
+			if ($page_number == 1) {
+				$offset = 0;  
+			}
+			else {
+				$offset = ($page_number-1)*$limit;
+			}
+			$query_args['offset'] = $offset;
+
+			$member_names = [];
+			$user_query = new WP_User_Query( $query_args );
+			$members = $user_query->get_results();
+			if ( !empty($members) ) {
+				foreach ( $members as $member ) {
+					$member_info = get_userdata( $member->ID );
+					$member_names[] = [
+						'ID' => $member->ID,
+						'first_name' => $member_info->first_name,
+						'last_name' => $member_info->last_name,
+						'email' => $member_info->user_email,
+						'phone' => ''
+					];
+				}
+			}
+			
+			$total_users = $user_query->total_users;
+			$total_pages = ceil($user_query->total_users/$limit);
+
+			$response = array(
+				'members' => $member_names,
+				'total_pages' => $total_pages,
+				'page_number' => $page_number
+			);
 		}
 		else {
-			$offset = ($page_number-1)*$limit;
+			$response = array(
+				'error' => 'User ID argment missing.'
+			);		
 		}
-		$query_args['offset'] = $offset;
-
-        $member_names = [];
-        $user_query = new WP_User_Query( $query_args );
-        $members = $user_query->get_results();
-        if ( !empty($members) ) {
-            foreach ( $members as $member ) {
-                $member_info = get_userdata( $member->ID );
-                $member_names[] = [
-                    'ID' => $member->ID,
-                    'first_name' => $member_info->first_name,
-                    'last_name' => $member_info->last_name,
-					'email' => $member_info->user_email,
-					'phone' => ''
-                ];
-            }
-		}
-		
-		$total_users = $user_query->total_users;
-		$total_pages = ceil($user_query->total_users/$limit);
-
-        $response = array(
-			'members' => $member_names,
-			'total_pages' => $total_pages,
-			'page_number' => $page_number
-		);
-
         echo wp_json_encode($response);
         wp_die();
 	}
 
 	public static function ride_leader_fetch_profile_callback() {
-		$userid = intval($_POST['userid']);
-		$member_info = get_userdata($userid);
-		if ($member_info === false) {
-			$response = array(
-				'userid' => $userid,
-				'error' => 'Fetch of profile for user ID ' . $userid . ' failed.'
-			);
+		if (isset($_POST['userid'])) {
+			$userid = intval($_POST['userid']);
+			$member_info = get_userdata($userid);
+			if ($member_info === false) {
+				$response = array(
+					'userid' => $userid,
+					'error' => 'Fetch of profile for user ID ' . $userid . ' failed.'
+				);
+			}
+			else {
+				$is_ride_leader = false;
+				if (in_array('ride_leader', $member_info->roles)) {
+					$is_ride_leader = true;
+				}
+				$response = array(
+					'userid' => $userid,
+					'first_name' => $member_info->first_name,
+					'last_name' => $member_info->last_name,
+					'email' => $member_info->user_email,
+					'voice_phone' => get_field('cell_phone', 'user_'.$userid),
+					'text_phone' => get_field('home_phone', 'user_'.$userid),
+					'contact_email' => get_field('contact_email', 'user_'.$userid),
+					'use_contact_email' => get_field('use_contact_email', 'user_'.$userid),
+					'is_ride_leader' => $is_ride_leader
+				);
+			}
 		}
 		else {
-			$is_ride_leader = false;
-			if (in_array('ride_leader', $member_info->roles)) {
-				$is_ride_leader = true;
-			}
 			$response = array(
-				'userid' => $userid,
-				'first_name' => $member_info->first_name,
-				'last_name' => $member_info->last_name,
-				'email' => $member_info->user_email,
-				'voice_phone' => get_field('cell_phone', 'user_'.$userid),
-				'text_phone' => get_field('home_phone', 'user_'.$userid),
-				'contact_email' => get_field('contact_email', 'user_'.$userid),
-				'use_contact_email' => get_field('use_contact_email', 'user_'.$userid),
-				'is_ride_leader' => $is_ride_leader
-			);
+				'error' => 'User ID argment missing.'
+			);		
 		}
 		echo wp_json_encode($response);
         wp_die();
 	}
 
 	public static function ride_leader_update_profile_callback() {
-		$userid = intval($_POST['userid']);
-		$member_info = get_userdata($userid);
-		if ($member_info === false) {
-			$response = array(
-				'userid' => $userid,
-				'error' => 'Fetch of profile for user ID ' . $userid . ' failed.'
-			);
-		}
-		else {
-			$refresh = false;
-			$is_ride_leader = $_POST['is_ride_leader'];
-			if (in_array('ride_leader', $member_info->roles)) {
-				if ($is_ride_leader == 'no') {
-					$member_info->remove_role('ride_leader');
-					$refresh = true;
-				}
+		if (isset($_POST['userid'])) {
+			$userid = intval($_POST['userid']);
+			$member_info = get_userdata($userid);
+			if ($member_info === false) {
+				$response = array(
+					'userid' => $userid,
+					'error' => 'Fetch of profile for user ID ' . $userid . ' failed.'
+				);
 			}
 			else {
-				if ($is_ride_leader == 'yes') {
-					$member_info->add_role('ride_leader');
-					$refresh = true;
+				$refresh = false;
+				if (isset($_POST['use_contact_email'])) {
+					$use_contact_email = get_field('use_contact_email', 'user_'.$userid);
+					if ($use_contact_email and $_POST['use_contact_email'] == 'no') {
+						update_field('use_contact_email', false, 'user_'.$userid);
+					}
+					else if (!$use_contact_email and $_POST['use_contact_email'] == 'yes') {
+						update_field('use_contact_email', true, 'user_'.$userid);
+					}
 				}
+				if (isset($_POST['voice_phone'])) {
+					$voice_phone = get_field('cell_phone', 'user_'.$userid);
+					if ($voice_phone != $_POST['voice_phone']) {
+						update_field('cell_phone', $_POST['voice_phone'], 'user_'.$userid);
+					}
+				}
+				if (isset($_POST['text_phone'])) {
+					$text_phone = get_field('home_phone', 'user_'.$userid);
+					if ($text_phone != $_POST['text_phone']) {
+						update_field('home_phone', $_POST['text_phone'], 'user_'.$userid);
+					}
+				}
+				if (isset($_POST['contact_email'])) {
+					$contact_email = get_field('contact_email', 'user_'.$userid);
+					if ($contact_email != $_POST['contact_email']) {
+						update_field('contact_email', $_POST['contact_email'], 'user_'.$userid);
+					}
+				}
+				if (isset($_POST['is_ride_leader'])) {
+					$is_ride_leader = $_POST['is_ride_leader'];
+					if (in_array('ride_leader', $member_info->roles)) {
+						if ($is_ride_leader == 'no') {
+							$member_info->remove_role('ride_leader');
+							$refresh = true;
+						}
+					}
+					else {
+						if ($is_ride_leader == 'yes') {
+							$member_info->add_role('ride_leader');
+							$refresh = true;
+						}
+					}
+				}
+				$response = array(
+					'userid' => $userid,
+					'refresh' => $refresh
+				);
 			}
+		}
+		else {
 			$response = array(
-				'userid' => $userid,
-				'refresh' => $refresh
-			);
+				'error' => 'User ID argment missing.'
+			);		
 		}
         echo wp_json_encode($response);
         wp_die();
