@@ -672,9 +672,9 @@ class PwtcMapdb {
 					<?php if ($can_view_leaders or $can_edit_leaders) { ?>
 					'<td data-th="Actions">' +
 						<?php if ($can_edit_leaders) { ?>
-						'<a title="Edit member profile."><i class="fa fa-pencil-square"></i></a> ' +
+						'<a title="Edit ride leader profile."><i class="fa fa-pencil-square"></i></a> ' +
 						<?php } else { ?>
-						'<a title="View member profile."><i class="fa fa-eye"></i></a> ' +
+						'<a title="View ride leader profile."><i class="fa fa-eye"></i></a> ' +
 						<?php } ?>
 					'</td>' +
 					<?php } ?>
@@ -873,7 +873,7 @@ class PwtcMapdb {
 			</div>
 			<div class="row">
 				<div class="small-12 medium-6 columns">
-					<label>Use Contact Email
+					<label>Use Contact Email?
 						<select class="use_contact_email">
 							<option value="no" selected>No, use account email</option>
 							<option value="yes">Yes</option>
@@ -896,7 +896,7 @@ class PwtcMapdb {
 					</label>
 				</div>
 				<div class="small-12 medium-6 columns">
-					<label>Is Ride Leader
+					<label>Is Ride Leader?
 						<select class="is_ride_leader">
 							<option value="no" selected>No</option>
 							<option value="yes">Yes</option>
@@ -910,13 +910,13 @@ class PwtcMapdb {
 				<input class="accent button float-left" type="submit" value="Submit"/>
 				<input class="accent button float-right" type="button" value="Cancel" data-close/>
 				<?php } else {?>
-				<input class="accent button float-left" type="button" value="Cancel" data-close/>
+				<input class="accent button float-left" type="button" value="Close" data-close/>
 				<?php } ?>
 			</div>
 		</form>
 	</div>
 	<div id="pwtc-ride-leader-download-div" class="button-group">
-  		<a class="button" title="Download ride leaders."><i class="fa fa-download"></i> Ride Leaders</a>
+  		<a class="button" title="Download ride leader CSV file."><i class="fa fa-download"></i> Ride Leaders</a>
 		<form class="download-frm" method="post">
 			<input type="hidden" name="pwtc-ride-leaders-download" value="yes"/>
 			<input type="hidden" name="role" value="ride_leader"/>
@@ -1010,7 +1010,7 @@ class PwtcMapdb {
 						'first_name' => $member_info->first_name,
 						'last_name' => $member_info->last_name,
 						'email' => $member_info->user_email,
-						'phone' => ''
+						'phone' => 'n/a'
 					];
 				}
 			}
@@ -1141,7 +1141,7 @@ class PwtcMapdb {
 
 	public static function download_ride_leaders_list() {
 		if (current_user_can(self::VIEW_LEADERS_CAP)) {
-			if (isset($_POST['pwtc-ride-leaders-download'])) {
+			if (isset($_POST['pwtc-ride-leaders-download']) and isset($_POST['role'])) {
 				$query_args = self::get_user_query_args();
 				$today = date('Y-m-d', current_time('timestamp'));
 				header('Content-Description: File Transfer');
