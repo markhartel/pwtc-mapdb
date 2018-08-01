@@ -657,7 +657,7 @@ class PwtcMapdb {
 			<?php } ?>
 
 			function populate_members_table(members) {
-				var header = '<table class="pwtc-mapdb-rwd-table"><tr><th>Last Name</th><th>First Name</th><th>Email</th><th>Phone</th>' +
+				var header = '<table class="pwtc-mapdb-rwd-table"><tr><th>Last Name</th><th>First Name</th><th>Email</th>' +
 				<?php if ($can_view_leaders or $can_edit_leaders) { ?>
 				'<th>Actions</th>' +
 				<?php } ?>
@@ -668,13 +668,12 @@ class PwtcMapdb {
 					'<td data-th="Last Name">' + item.last_name + '</td>' + 
 					'<td data-th="First Name">' + item.first_name + '</td>' +
 					'<td data-th="Email">' + item.email + '</td>' +
-					'<td data-th="Phone">' + item.phone + '</td>' +
 					<?php if ($can_view_leaders or $can_edit_leaders) { ?>
 					'<td data-th="Actions">' +
 						<?php if ($can_edit_leaders) { ?>
-						'<a title="Edit ride leader profile."><i class="fa fa-pencil-square"></i></a> ' +
+						'<a title="Edit ride leader contact info."><i class="fa fa-pencil-square"></i></a> ' +
 						<?php } else { ?>
-						'<a title="View ride leader profile."><i class="fa fa-eye"></i></a> ' +
+						'<a title="View ride leader contact info."><i class="fa fa-eye"></i></a> ' +
 						<?php } ?>
 					'</td>' +
 					<?php } ?>
@@ -747,7 +746,7 @@ class PwtcMapdb {
 					}
 					else {
 						$('#pwtc-ride-leaders-div').append(
-							'<div class="callout small warning"><p>No members found.</p></div>');
+							'<div class="callout small warning"><p>No persons found.</p></div>');
 					}
 				}
 			}   
