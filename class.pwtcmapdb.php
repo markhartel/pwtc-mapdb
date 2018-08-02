@@ -18,25 +18,9 @@ class PwtcMapdb {
 	const COPY_ANCHOR_LABEL = '<i class="fa fa-clipboard"></i>';
 	//const FILE_ANCHOR_LABEL = '<i class="fa fa-download"></i>';
 	//const LINK_ANCHOR_LABEL = '<i class="fa fa-link"></i>';
-	const EDIT_ANCHOR_LABEL = '<i class="fa fa-pencil-square-o"></i>';
+	const EDIT_ANCHOR_LABEL = '<i class="fa fa-pencil-square"></i>';
 	const EDIT_CAPABILITY = 'edit_others_rides';
 
-/*
-	const MAP_POST_TYPE = 'route';
-	const START_LOCATION_FIELD = 'start_location';
-	const TERRAIN_FIELD = 'route_terrain';
-	const LENGTH_FIELD = 'route_length';
-	const MAX_LENGTH_FIELD = 'max_route_length';
-	const MAP_TYPE_FIELD = 'map_type';
-	const MAP_LINK_FIELD = 'map_link';
-	const MAP_FILE_FIELD = 'map_file';
-	const MAP_TYPE_QUERY = 'map_type';
-	const COPY_ANCHOR_LABEL = '[C]';
-	//const FILE_ANCHOR_LABEL = 'File';
-	//const LINK_ANCHOR_LABEL = 'Link';
-	const EDIT_ANCHOR_LABEL = 'Edit';
-	const EDIT_CAPABILITY = 'edit_others_posts';
-*/
     private static $initiated = false;
 
 	public static function init() {
@@ -193,21 +177,6 @@ class PwtcMapdb {
 			}
 
 			$url = '';
-/*
-			$type = get_field(self::MAP_TYPE_FIELD);
-			if ($type == 'file') {
-				$file = get_field(self::MAP_FILE_FIELD);
-				//$modtime = get_post_modified_time('M Y', false, $file['id']);
-				//self::write_log ($file);
-				//$url = '<a title="Download map file." target="_blank" href="' . $file['url'] . '">' . self::FILE_ANCHOR_LABEL . '</a>';
-				$url = '<a title="Download map file." target="_blank" href="' . $file['url'] . '">';
-			}
-			else if ($type == 'link') {
-				$link = get_field(self::MAP_LINK_FIELD);
-				//$url = '<a title="Open map link." target="_blank" href="' . $link . '">' . self::LINK_ANCHOR_LABEL . '</a>';
-				$url = '<a title="Open map link." target="_blank" href="' . $link . '">';
-			}
-*/	
 
 			while (have_rows(self::MAP_FIELD) ): the_row();
 				$type = get_sub_field(self::MAP_TYPE_FIELD);
@@ -363,7 +332,7 @@ class PwtcMapdb {
 					header += '<th>Actions</th>';
 				}
 				header += '</tr></table>';
-				$('.pwtc-mapdb-maps-div').append(header);
+				$('#pwtc-mapdb-maps-div').append(header);
 				maps.forEach(function(item) {
 					var data = '<tr postid="' + item.ID + '">' +
 					'<td data-th="Title">' + copylink + ' ' + item.media + item.title + '</a></td>' +
@@ -373,9 +342,9 @@ class PwtcMapdb {
 						data += '<td data-th="Actions">' + item.edit + '</td>'
 					}
 					data += '</tr>';
-					$('.pwtc-mapdb-maps-div table').append(data);    
+					$('#pwtc-mapdb-maps-div table').append(data);    
 				});
-				$('.pwtc-mapdb-maps-div table .copy-btn').on('click', function(evt) {
+				$('#pwtc-mapdb-maps-div table .copy-btn').on('click', function(evt) {
 					//var title = $(this).parent().parent().find('td').first().find('span').first()[0];
 					var title = $(this).parent().find('a').first().next()[0];
 					if (window.getSelection().rangeCount > 0) window.getSelection().removeAllRanges();
@@ -397,7 +366,7 @@ class PwtcMapdb {
 				var limit = <?php echo $a['limit'] ?>;
 				var pagenum = (offset/limit) + 1;
 				var numpages = Math.ceil(count/limit);
-				$('.pwtc-mapdb-maps-div').append(
+				$('#pwtc-mapdb-maps-div').append(
 					'<form class="page-frm">' +
                     '<input class="prev-btn button" style="margin: 0" type="button" value="< Prev"/>' +
 					'<span style="margin: 0 10px">Page ' + pagenum + ' of ' + numpages + '</span>' +
@@ -407,38 +376,38 @@ class PwtcMapdb {
 					'<input name="count" type="hidden" value="' + count + '"/>' +
 					'</form>'
 				);
-				$('.pwtc-mapdb-maps-div .page-frm .prev-btn').on('click', function(evt) {
+				$('#pwtc-mapdb-maps-div .page-frm .prev-btn').on('click', function(evt) {
 					evt.preventDefault();
 					load_maps_table('prev');
 				});
 				if (pagenum == 1) {
-					$('.pwtc-mapdb-maps-div .page-frm .prev-btn').attr("disabled", "disabled");
+					$('#pwtc-mapdb-maps-div .page-frm .prev-btn').attr("disabled", "disabled");
 				}
 				else {
-					$('.pwtc-mapdb-maps-div .page-frm .prev-btn').removeAttr("disabled");
+					$('#pwtc-mapdb-maps-div .page-frm .prev-btn').removeAttr("disabled");
 				}
-				$('.pwtc-mapdb-maps-div .page-frm .next-btn').on('click', function(evt) {
+				$('#pwtc-mapdb-maps-div .page-frm .next-btn').on('click', function(evt) {
 					evt.preventDefault();
 					load_maps_table('next');
 				});
 				if (pagenum == numpages) {
-					$('.pwtc-mapdb-maps-div .page-frm .next-btn').attr("disabled", "disabled");
+					$('#pwtc-mapdb-maps-div .page-frm .next-btn').attr("disabled", "disabled");
 				}
 				else {
-					$('.pwtc-mapdb-maps-div .page-frm .next-btn').removeAttr("disabled");
+					$('#pwtc-mapdb-maps-div .page-frm .next-btn').removeAttr("disabled");
 				}
 			}
 
 			function lookup_maps_cb(response) {
 				var res = JSON.parse(response);
-				$('.pwtc-mapdb-maps-div').empty();
+				$('#pwtc-mapdb-maps-div').empty();
 				if (res.error) {
-					$('.pwtc-mapdb-maps-div').append(
+					$('#pwtc-mapdb-maps-div').append(
 						'<div><strong>Error:</strong> ' + res.error + '</div>');
 				}
 				else {
 					if (res.message !== undefined) {
-						$('.pwtc-mapdb-maps-div').append(
+						$('#pwtc-mapdb-maps-div').append(
 							'<div><strong>Warning:</strong> ' + res.message + '</div>');
 					}
 					if (res.maps.length > 0) {
@@ -448,33 +417,26 @@ class PwtcMapdb {
 						}
 					}
 					else {
-						$('.pwtc-mapdb-maps-div').append('<div>No maps found.</div>');					
+						$('#pwtc-mapdb-maps-div').append('<div>No maps found.</div>');					
 					}
 				}
 				$('body').removeClass('pwtc-mapdb-waiting');
 			}   
 
 			function load_maps_table(mode) {
-				var title = $(".pwtc-mapdb-search-div .search-frm input[name='title']").val().trim();
-				//var location = $(".pwtc-mapdb-search-div .search-frm input[name='location']").val().trim();
-				var location = '';
-				var terrain = $('.pwtc-mapdb-search-div .search-frm .terrain').val();
-				var distance = $('.pwtc-mapdb-search-div .search-frm .distance').val();
-				//var media = $('.pwtc-mapdb-search-div .search-frm .media').val();
-				var media = '0';
-				var action = $('.pwtc-mapdb-search-div .search-frm').attr('action');
+				var action = $('#pwtc-mapdb-search-div .search-frm').attr('action');
 				var data = {
 					'action': 'pwtc_mapdb_lookup_maps',
-					'title': title,
-					'location': location,
-					'terrain': terrain,
-					'distance': distance,
-					'media': media,
 					'limit': <?php echo $a['limit'] ?>
 				};
 				if (mode != 'search') {
-					var offset = $(".pwtc-mapdb-maps-div .page-frm input[name='offset']").val();
-					var count = $(".pwtc-mapdb-maps-div .page-frm input[name='count']").val();
+					data.title = $("#pwtc-mapdb-search-div .search-frm input[name='title_sav']").val();
+					data.location = '';
+					data.terrain = $("#pwtc-mapdb-search-div .search-frm input[name='terrain_sav']").val();
+					data.distance = $("#pwtc-mapdb-search-div .search-frm input[name='distance_sav']").val();
+					data.media = '0';
+					var offset = $("#pwtc-mapdb-maps-div .page-frm input[name='offset']").val();
+					var count = $("#pwtc-mapdb-maps-div .page-frm input[name='count']").val();
 					data.offset = offset;
 					data.count = count;
 					if (mode == 'prev') {
@@ -483,25 +445,33 @@ class PwtcMapdb {
 					else if (mode == 'next') {
 						data.next = 1;						
 					}
-					$('.pwtc-mapdb-maps-div .page-frm .page-msg').html('<i class="fa fa-spinner fa-pulse"></i> Loading...');
+					$('#pwtc-mapdb-maps-div .page-frm .page-msg').html('<i class="fa fa-spinner fa-pulse"></i> Loading...');
 				}
 				else {
-					$('.pwtc-mapdb-maps-div').html('<i class="fa fa-spinner fa-pulse"></i> Loading...');
+					data.title = $("#pwtc-mapdb-search-div .search-frm input[name='title']").val().trim();
+					data.location = '';
+					data.terrain = $('#pwtc-mapdb-search-div .search-frm .terrain').val();
+					data.distance = $('#pwtc-mapdb-search-div .search-frm .distance').val();
+					data.media = '0';
+					$("#pwtc-mapdb-search-div .search-frm input[name='title_sav']").val(data.title);
+					$("#pwtc-mapdb-search-div .search-frm input[name='terrain_sav']").val(data.terrain);
+					$("#pwtc-mapdb-search-div .search-frm input[name='distance_sav']").val(data.distance);
+					$('#pwtc-mapdb-maps-div').html('<i class="fa fa-spinner fa-pulse"></i> Loading...');
 				}
 				$('body').addClass('pwtc-mapdb-waiting');
 				$.post(action, data, lookup_maps_cb); 
 			}
 
-			$('.pwtc-mapdb-search-div .search-frm').on('submit', function(evt) {
+			$('#pwtc-mapdb-search-div .search-frm').on('submit', function(evt) {
 				evt.preventDefault();
 				load_maps_table('search');
 			});
 
-			$('.pwtc-mapdb-search-div .search-frm .reset-btn').on('click', function(evt) {
+			$('#pwtc-mapdb-search-div .search-frm .reset-btn').on('click', function(evt) {
 				evt.preventDefault();
-				$(".pwtc-mapdb-search-div .search-frm input[type='text']").val(''); 
-				$('.pwtc-mapdb-search-div .search-frm select').val('0');
-				$('.pwtc-mapdb-maps-div').empty();
+				$("#pwtc-mapdb-search-div .search-frm input[type='text']").val(''); 
+				$('#pwtc-mapdb-search-div .search-frm select').val('0');
+				$('#pwtc-mapdb-maps-div').empty();
 				load_maps_table('search');
 			});
 
@@ -509,12 +479,15 @@ class PwtcMapdb {
 		});
 	</script>
 
-	<div class='pwtc-mapdb-search-div'>
+	<div id='pwtc-mapdb-search-div'>
 	<ul class="accordion" data-accordion data-allow-all-closed="true">
 		<li class="accordion-item" data-accordion-item>
             <a href="#" class="accordion-title"><i class="fa fa-search"></i> Click Here To Search</a>
             <div class="accordion-content" data-tab-content>
 				<form class="search-frm" action="<?php echo admin_url('admin-ajax.php'); ?>" method="post">
+				<input type="hidden" name="title_sav" value=""/>
+				<input type="hidden" name="distance_sav" value=""/>
+				<input type="hidden" name="terrain_sav" value=""/>
 				<div>
 				<div class="row">
                     <div class="small-12 medium-4 columns">
@@ -557,38 +530,7 @@ class PwtcMapdb {
 		</li>
 	</ul>
 	</div>
-
-<!--
-	<div class='pwtc-mapdb-search-div pwtc-mapdb-search-sec'>
-	<p>To browse the map library, press the <strong>Search</strong> button. 
-	To narrow your search, fill out the form below before searching.</p>
-	<form class="search-frm pwtc-mapdb-stacked-form" action="<?php echo admin_url('admin-ajax.php'); ?>" method="post">
-		<span>Title</span>
-		<input type="text" name="title"/>
-		<span>Terrain</span>
-		<select class="terrain">
-            <option value="0" selected>Any</option> 
-            <option value="a">A (flat)</option>
-            <option value="b">B (gently rolling)</option>
-            <option value="c">C (short steep hills)</option>
-            <option value="d">D (longer hills)</option>
-            <option value="e">E (mountainous)</option>
-        </select>
-		<span>Distance</span>		
-		<select class="distance">
-            <option value="0" selected>Any</option> 
-            <option value="1">0-25 miles</option>
-            <option value="2">25-50 miles</option>
-            <option value="3">50-75 miles</option>
-            <option value="4">75-100 miles</option>
-            <option value="5">&gt; 100 miles</option>
-        </select>		
-		<input class="dark button" type="submit" value="Search"/>
-		<input class="reset-btn dark button" type="button" value="Reset"/>
-	</form>
-	</div>
--->
-	<div class="pwtc-mapdb-maps-div"></div>
+	<div id="pwtc-mapdb-maps-div"></div>
 	<?php
 			return ob_get_clean();
 		}
@@ -657,16 +599,16 @@ class PwtcMapdb {
 			<?php } ?>
 
 			function populate_members_table(members) {
-				var header = '<table class="pwtc-mapdb-rwd-table"><tr><th>Last Name</th><th>First Name</th><th>Email</th>' +
+				var header = '<table class="pwtc-mapdb-rwd-table"><tr><th>Name</th><th>Email</th>' +
 				<?php if ($can_view_leaders or $can_edit_leaders) { ?>
 				'<th>Actions</th>' +
 				<?php } ?>
 				'</tr></table>';
 				$('#pwtc-ride-leaders-div').append(header);
 				members.forEach(function(item) {
-					var data = '<tr userid="' + item.ID + '" username="' + item.first_name + ' ' + item.last_name + '">' +
-					'<td data-th="Last Name">' + item.last_name + '</td>' + 
-					'<td data-th="First Name">' + item.first_name + '</td>' +
+					var data = '<tr userid="' + item.ID + '">' +
+					'<td data-th="Name">' + item.last_name + ' ' + item.last_name + 
+					(item.is_ride_leader ? ' <i class="fa fa-bicycle" title="Ride Leader"></i>' : '') + '</td>' + 
 					'<td data-th="Email">' + item.email + '</td>' +
 					<?php if ($can_view_leaders or $can_edit_leaders) { ?>
 					'<td data-th="Actions">' +
@@ -691,7 +633,7 @@ class PwtcMapdb {
 						'userid': userid
 					};
 					$.post(action, data, display_user_profile_cb);
-					$('#pwtc-ride-leader-wait .wait-message').html('Loading ride leader profile.');
+					$('#pwtc-ride-leader-wait .wait-message').html('Loading ride leader contact info.');
 					$('#pwtc-ride-leader-wait').foundation('open');
 				});
 				<?php } ?>
@@ -807,7 +749,7 @@ class PwtcMapdb {
 			$('#pwtc-ride-leader-search-div .search-frm .reset-btn').on('click', function(evt) {
 				evt.preventDefault();
 				$("#pwtc-ride-leader-search-div .search-frm input[type='text']").val('');
-				$("#pwtc-ride-leader-search-div .search-frm .role").val('ride_leader'); 
+				$("#pwtc-ride-leader-search-div .search-frm .role").val('all'); 
 				$('#pwtc-ride-leaders-div').empty();
 				load_members_table('search');
 			});
@@ -827,7 +769,7 @@ class PwtcMapdb {
 					'is_ride_leader': $("#pwtc-ride-leader-profile .profile-frm .is_ride_leader").val()
 				};
 				$.post(action, data, update_user_profile_cb);
-				$('#pwtc-ride-leader-wait .wait-message').html('Updating ride leader profile.');
+				$('#pwtc-ride-leader-wait .wait-message').html('Updating ride leader contact info.');
 				$('#pwtc-ride-leader-wait').foundation('open');
 			});
 			<?php } else if ($can_view_leaders) { ?>
@@ -956,8 +898,8 @@ class PwtcMapdb {
 								<div class="small-12 medium-3 columns">
                                 	<label>Show
 							        	<select class="role">
-											<option value="ride_leader" selected>Ride Leaders</option>
-											<option value="!ride_leader">Others</option>
+											<option value="all" selected>All Members</option>
+											<option value="ride_leader">Ride Leaders Only</option>
                                         </select>                                
                                 	</label>
                             	</div>
@@ -1009,7 +951,8 @@ class PwtcMapdb {
 						'first_name' => $member_info->first_name,
 						'last_name' => $member_info->last_name,
 						'email' => $member_info->user_email,
-						'phone' => 'n/a'
+						'phone' => 'n/a',
+						'is_ride_leader' => in_array('ride_leader', $member_info->roles)
 					];
 				}
 			}
