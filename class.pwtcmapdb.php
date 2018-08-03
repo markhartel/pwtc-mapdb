@@ -607,7 +607,7 @@ class PwtcMapdb {
 				$('#pwtc-ride-leaders-div').append(header);
 				members.forEach(function(item) {
 					var data = '<tr userid="' + item.ID + '">' +
-					'<td data-th="Name">' + item.last_name + ' ' + item.last_name + 
+					'<td data-th="Name">' + item.first_name + ' ' + item.last_name + 
 					(item.is_ride_leader ? ' <i class="fa fa-bicycle" title="Ride Leader"></i>' : '') + '</td>' + 
 					'<td data-th="Email">' + item.email + '</td>' +
 					<?php if ($can_view_leaders or $can_edit_leaders) { ?>
@@ -875,7 +875,7 @@ class PwtcMapdb {
 						<input type="hidden" name="email_sav" value=""/>
 						<input type="hidden" name="role_sav" value=""/>
 						<?php if (!$can_view_leaders) { ?>
-						<input class="role" type="hidden" name="role" value="ride_leader"/>
+						<input class="role" type="hidden" name="role" value="all"/>
 						<?php } ?>
 						<div>
 							<div class="row">
