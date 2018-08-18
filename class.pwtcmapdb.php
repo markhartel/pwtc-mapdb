@@ -317,7 +317,7 @@ class PwtcMapdb {
 		$a = shortcode_atts(array('limit' => 0), $atts);
 		$current_user = wp_get_current_user();
 		if ( 0 == $current_user->ID ) {
-			return 'Please log in to search the map library.';
+			return '<div class="callout small warning"><p>Please log in to view the map library.</p></div>';
 		}
 		else {
 			ob_start();
@@ -538,14 +538,20 @@ class PwtcMapdb {
 
 	// Generates the [pwtc_ride_leader_dir] shortcode.
 	public static function shortcode_ride_leader_dir($atts) {
-		$a = shortcode_atts(array('limit' => 10), $atts);
+		$a = shortcode_atts(array('limit' => 10, 'mode' => 'readonly'), $atts);
 		$current_user = wp_get_current_user();
 		if ( 0 == $current_user->ID ) {
-			return 'Please log in to view the ride leader directory.';
+			return '<div class="callout small warning"><p>Please log in to view the member list.</p></div>';
 		}
 		else {
-			$can_view_leaders = current_user_can(self::VIEW_LEADERS_CAP);
-			$can_edit_leaders = current_user_can(self::EDIT_LEADERS_CAP);
+			if ($a['mode'] == 'edit') {
+				$can_view_leaders = current_user_can(self::VIEW_LEADERS_CAP);
+				$can_edit_leaders = current_user_can(self::EDIT_LEADERS_CAP);
+			}
+			else {
+				$can_view_leaders = false;
+				$can_edit_leaders = false;
+			}
 			ob_start();
 	?>
 	<script type="text/javascript">
@@ -599,7 +605,7 @@ class PwtcMapdb {
 			<?php } ?>
 
 			function populate_members_table(members) {
-				var header = '<table class="pwtc-mapdb-rwd-table"><tr><th>Name</th><th>Email</th>' +
+				var header = '<table class="pwtc-mapdb-rwd-table"><tr><th>Member Name</th><th>Account Email</th>' +
 				<?php if ($can_view_leaders or $can_edit_leaders) { ?>
 				'<th>Actions</th>' +
 				<?php } ?>
@@ -688,7 +694,7 @@ class PwtcMapdb {
 					}
 					else {
 						$('#pwtc-ride-leaders-div').append(
-							'<div class="callout small warning"><p>No persons found.</p></div>');
+							'<div class="callout small warning"><p>No members found.</p></div>');
 					}
 				}
 			}   
@@ -788,7 +794,7 @@ class PwtcMapdb {
 		});
 	</script>
 	<?php if ($can_view_leaders or $can_edit_leaders) { ?>
-	<div id="pwtc-ride-leader-error" class="reveal" data-close-on-click="false" data-reveal>
+	<div id="pwtc-ride-leader-error" class="small reveal" data-close-on-click="false" data-v-offset="100" data-reveal>
 		<form class="profile-frm">
 		    <div class="row column">
 				<div class="callout alert"><p class="error-msg"></p></div>
@@ -798,7 +804,7 @@ class PwtcMapdb {
 			</div>
 		</form>
 	</div>
-	<div id="pwtc-ride-leader-wait" class="reveal" data-close-on-click="false" data-reveal>
+	<div id="pwtc-ride-leader-wait" class="small reveal" data-close-on-click="false" data-v-offset="100" data-reveal>
 		<div class="callout warning">
 			<p><i class="fa fa-spinner fa-pulse"></i> Please wait...</p>
 			<p class="wait-message"></p>
@@ -810,29 +816,30 @@ class PwtcMapdb {
 			<div class="row column">
 				<div class="callout primary">
 					<p class="header-msg"></p>
+					<p><i>The content of these fields are displayed in the ride calendar and used by a rider to contact this ride leader for addition information.</i></p>
 				</div>
 			</div>
 			<div class="row">
 				<div class="small-12 medium-6 columns">
-					<label>Use Contact Email?
+					<label>Display Contact Email?
 						<select class="use_contact_email">
-							<option value="no" selected>No, use account email</option>
+							<option value="no" selected>No, display account email</option>
 							<option value="yes">Yes</option>
 						</select>
 					</label>
 				</div>
 				<div class="small-12 medium-6 columns">
-					<label>Contact Email
+					<label>Contact Email <i class="fa fa-envelope"></i>
 						<input type="text" name="contact_email"/>
 					</label>
 				</div>
 				<div class="small-12 medium-6 columns">
-					<label>Contact Voice Phone
+					<label>Contact Voice Phone <i class="fa fa-phone"></i>
 						<input type="text" name="voice_phone"/>
 					</label>
 				</div>
 				<div class="small-12 medium-6 columns">
-					<label>Contact Text Phone
+					<label>Contact Text Phone <i class="fa fa-mobile"></i>
 						<input type="text" name="text_phone"/>
 					</label>
 				</div>
@@ -968,7 +975,7 @@ class PwtcMapdb {
 		}
 		else {
 			$response = array(
-				'error' => 'User ID argment missing.'
+				'error' => 'Limit argument missing.'
 			);		
 		}
         echo wp_json_encode($response);
@@ -976,7 +983,12 @@ class PwtcMapdb {
 	}
 
 	public static function ride_leader_fetch_profile_callback() {
-		if (isset($_POST['userid'])) {
+		if (!current_user_can(PwtcMapdb::VIEW_LEADERS_CAP)) {
+			$response = array(
+				'error' => 'You are not allowed to fetch a ride leader profile.'
+			);		
+		}
+		else if (isset($_POST['userid'])) {
 			$userid = intval($_POST['userid']);
 			$member_info = get_userdata($userid);
 			if ($member_info === false) {
@@ -1005,7 +1017,7 @@ class PwtcMapdb {
 		}
 		else {
 			$response = array(
-				'error' => 'User ID argment missing.'
+				'error' => 'User ID argument missing.'
 			);		
 		}
 		echo wp_json_encode($response);
@@ -1013,7 +1025,12 @@ class PwtcMapdb {
 	}
 
 	public static function ride_leader_update_profile_callback() {
-		if (isset($_POST['userid'])) {
+		if (!current_user_can(PwtcMapdb::EDIT_LEADERS_CAP)) {
+			$response = array(
+				'error' => 'You are not allowed to update a ride leader profile.'
+			);		
+		}
+		else if (isset($_POST['userid'])) {
 			$userid = intval($_POST['userid']);
 			$member_info = get_userdata($userid);
 			if ($member_info === false) {
@@ -1074,7 +1091,7 @@ class PwtcMapdb {
 		}
 		else {
 			$response = array(
-				'error' => 'User ID argment missing.'
+				'error' => 'User ID argument missing.'
 			);		
 		}
         echo wp_json_encode($response);
@@ -1088,15 +1105,15 @@ class PwtcMapdb {
 				$today = date('Y-m-d', current_time('timestamp'));
 				header('Content-Description: File Transfer');
 				header("Content-type: text/csv");
-				header("Content-Disposition: attachment; filename={$today}_members.csv");
+				header("Content-Disposition: attachment; filename={$today}_ride_leaders.csv");
 				$fp = fopen('php://output', 'w');
-				fputcsv($fp, ['Last Name', 'First Name', 'Email']);
+				fputcsv($fp, ['Email Address', 'First Name', 'Last Name']);
 				$user_query = new WP_User_Query( $query_args );
 				$members = $user_query->get_results();
 				if ( !empty($members) ) {
 					foreach ( $members as $member ) {
 						$member_info = get_userdata($member->ID);
-						fputcsv($fp, [$member_info->last_name, $member_info->first_name, $member_info->user_email]);
+						fputcsv($fp, [$member_info->user_email, $member_info->first_name, $member_info->last_name]);
 					}
 				}
 				fclose($fp);
