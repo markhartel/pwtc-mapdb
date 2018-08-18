@@ -614,14 +614,14 @@ class PwtcMapdb {
 				members.forEach(function(item) {
 					var data = '<tr userid="' + item.ID + '">' +
 					'<td data-th="Name">' + item.first_name + ' ' + item.last_name + 
-					(item.is_ride_leader ? ' <i class="fa fa-bicycle" title="Ride Leader"></i>' : '') + '</td>' + 
+					(item.is_ride_leader ? ' <i class="fa fa-bicycle" title="This member is a ride leader."></i>' : '') + '</td>' + 
 					'<td data-th="Email">' + item.email + '</td>' +
 					<?php if ($can_view_leaders or $can_edit_leaders) { ?>
 					'<td data-th="Actions">' +
 						<?php if ($can_edit_leaders) { ?>
-						'<a title="Edit ride leader contact info."><i class="fa fa-pencil-square"></i></a> ' +
+						'<a title="Edit ride leader status and contact information."><i class="fa fa-pencil-square"></i></a> ' +
 						<?php } else { ?>
-						'<a title="View ride leader contact info."><i class="fa fa-eye"></i></a> ' +
+						'<a title="View ride leader status and contact information."><i class="fa fa-eye"></i></a> ' +
 						<?php } ?>
 					'</td>' +
 					<?php } ?>
@@ -639,7 +639,7 @@ class PwtcMapdb {
 						'userid': userid
 					};
 					$.post(action, data, display_user_profile_cb);
-					$('#pwtc-ride-leader-wait .wait-message').html('Loading ride leader contact info.');
+					$('#pwtc-ride-leader-wait .wait-message').html('Loading ride leader status and contact information.');
 					$('#pwtc-ride-leader-wait').foundation('open');
 				});
 				<?php } ?>
@@ -768,6 +768,7 @@ class PwtcMapdb {
 				var data = {
 					'action': 'pwtc_ride_leader_update_profile',
 					'userid': userid,
+					'nonce': '<?php echo wp_create_nonce('pwtc_ride_leader_update_profile'); ?>',
 					'contact_email': $("#pwtc-ride-leader-profile .profile-frm input[name='contact_email']").val().trim(),
 					'voice_phone': $("#pwtc-ride-leader-profile .profile-frm input[name='voice_phone']").val().trim(),
 					'text_phone': $("#pwtc-ride-leader-profile .profile-frm input[name='text_phone']").val().trim(),
@@ -775,7 +776,7 @@ class PwtcMapdb {
 					'is_ride_leader': $("#pwtc-ride-leader-profile .profile-frm .is_ride_leader").val()
 				};
 				$.post(action, data, update_user_profile_cb);
-				$('#pwtc-ride-leader-wait .wait-message').html('Updating ride leader contact info.');
+				$('#pwtc-ride-leader-wait .wait-message').html('Updating ride leader status and contact information.');
 				$('#pwtc-ride-leader-wait').foundation('open');
 			});
 			<?php } else if ($can_view_leaders) { ?>
@@ -816,7 +817,21 @@ class PwtcMapdb {
 			<div class="row column">
 				<div class="callout primary">
 					<p class="header-msg"></p>
-					<p><i>The content of these fields are displayed in the ride calendar and used by a rider to contact this ride leader for addition information.</i></p>
+				</div>
+			</div>
+			<div class="row">
+				<div class="small-12 medium-6 columns">
+					<label>Is Ride Leader?
+						<select class="is_ride_leader">
+							<option value="no" selected>No</option>
+							<option value="yes">Yes</option>
+						</select>
+					</label>
+				</div>
+			</div>
+			<div class="row column">
+				<div class="callout small secondary">
+					<p><i>These entries are displayed in the ride calendar and used by riders to contact ride leaders for additional information.</i></p>
 				</div>
 			</div>
 			<div class="row">
@@ -841,14 +856,6 @@ class PwtcMapdb {
 				<div class="small-12 medium-6 columns">
 					<label>Contact Text Phone <i class="fa fa-mobile"></i>
 						<input type="text" name="text_phone"/>
-					</label>
-				</div>
-				<div class="small-12 medium-6 columns">
-					<label>Is Ride Leader?
-						<select class="is_ride_leader">
-							<option value="no" selected>No</option>
-							<option value="yes">Yes</option>
-						</select>
 					</label>
 				</div>
 			</div>
@@ -1030,68 +1037,75 @@ class PwtcMapdb {
 				'error' => 'You are not allowed to update a ride leader profile.'
 			);		
 		}
-		else if (isset($_POST['userid'])) {
-			$userid = intval($_POST['userid']);
-			$member_info = get_userdata($userid);
-			if ($member_info === false) {
+		else if (isset($_POST['userid']) and isset($_POST['nonce'])) {
+			if (!wp_verify_nonce($_POST['nonce'], 'pwtc_ride_leader_update_profile')) {
 				$response = array(
-					'userid' => $userid,
-					'error' => 'Fetch of profile for user ID ' . $userid . ' failed.'
+					'error' => 'Access security check failed.'
 				);
 			}
 			else {
-				$refresh = false;
-				if (isset($_POST['use_contact_email'])) {
-					$use_contact_email = get_field('use_contact_email', 'user_'.$userid);
-					if ($use_contact_email and $_POST['use_contact_email'] == 'no') {
-						update_field('use_contact_email', false, 'user_'.$userid);
-					}
-					else if (!$use_contact_email and $_POST['use_contact_email'] == 'yes') {
-						update_field('use_contact_email', true, 'user_'.$userid);
-					}
+				$userid = intval($_POST['userid']);
+				$member_info = get_userdata($userid);
+				if ($member_info === false) {
+					$response = array(
+						'userid' => $userid,
+						'error' => 'Fetch of profile for user ID ' . $userid . ' failed.'
+					);
 				}
-				if (isset($_POST['voice_phone'])) {
-					$voice_phone = get_field('cell_phone', 'user_'.$userid);
-					if ($voice_phone != $_POST['voice_phone']) {
-						update_field('cell_phone', $_POST['voice_phone'], 'user_'.$userid);
-					}
-				}
-				if (isset($_POST['text_phone'])) {
-					$text_phone = get_field('home_phone', 'user_'.$userid);
-					if ($text_phone != $_POST['text_phone']) {
-						update_field('home_phone', $_POST['text_phone'], 'user_'.$userid);
-					}
-				}
-				if (isset($_POST['contact_email'])) {
-					$contact_email = get_field('contact_email', 'user_'.$userid);
-					if ($contact_email != $_POST['contact_email']) {
-						update_field('contact_email', $_POST['contact_email'], 'user_'.$userid);
-					}
-				}
-				if (isset($_POST['is_ride_leader'])) {
-					$is_ride_leader = $_POST['is_ride_leader'];
-					if (in_array('ride_leader', $member_info->roles)) {
-						if ($is_ride_leader == 'no') {
-							$member_info->remove_role('ride_leader');
-							$refresh = true;
+				else {
+					$refresh = false;
+					if (isset($_POST['use_contact_email'])) {
+						$use_contact_email = get_field('use_contact_email', 'user_'.$userid);
+						if ($use_contact_email and $_POST['use_contact_email'] == 'no') {
+							update_field('use_contact_email', false, 'user_'.$userid);
+						}
+						else if (!$use_contact_email and $_POST['use_contact_email'] == 'yes') {
+							update_field('use_contact_email', true, 'user_'.$userid);
 						}
 					}
-					else {
-						if ($is_ride_leader == 'yes') {
-							$member_info->add_role('ride_leader');
-							$refresh = true;
+					if (isset($_POST['voice_phone'])) {
+						$voice_phone = get_field('cell_phone', 'user_'.$userid);
+						if ($voice_phone != $_POST['voice_phone']) {
+							update_field('cell_phone', $_POST['voice_phone'], 'user_'.$userid);
 						}
 					}
+					if (isset($_POST['text_phone'])) {
+						$text_phone = get_field('home_phone', 'user_'.$userid);
+						if ($text_phone != $_POST['text_phone']) {
+							update_field('home_phone', $_POST['text_phone'], 'user_'.$userid);
+						}
+					}
+					if (isset($_POST['contact_email'])) {
+						$contact_email = get_field('contact_email', 'user_'.$userid);
+						if ($contact_email != $_POST['contact_email']) {
+							update_field('contact_email', $_POST['contact_email'], 'user_'.$userid);
+						}
+					}
+					if (isset($_POST['is_ride_leader'])) {
+						$is_ride_leader = $_POST['is_ride_leader'];
+						if (in_array('ride_leader', $member_info->roles)) {
+							if ($is_ride_leader == 'no') {
+								$member_info->remove_role('ride_leader');
+								$refresh = true;
+							}
+						}
+						else {
+							if ($is_ride_leader == 'yes') {
+								$member_info->add_role('ride_leader');
+								$refresh = true;
+							}
+						}
+					}
+					$response = array(
+						'userid' => $userid,
+						'refresh' => $refresh
+					);
 				}
-				$response = array(
-					'userid' => $userid,
-					'refresh' => $refresh
-				);
 			}
 		}
 		else {
 			$response = array(
-				'error' => 'User ID argument missing.'
+				'error' => 'User ID or nonce argument missing.'
 			);		
 		}
         echo wp_json_encode($response);
