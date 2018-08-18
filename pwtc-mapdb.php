@@ -1,8 +1,8 @@
 <?php
 /*
 Plugin Name: PWTC Map DB
-Description: Provides searchable access to the map library database for PWTC club members.
-Version: 1.2
+Description: Provides searchable access to the PWTC map library and ride leader list.
+Version: 1.3
 Author: Mark Hartel
 */
 
@@ -12,7 +12,7 @@ if ( !function_exists( 'add_action' ) ) {
 	exit;
 }
 
-define( 'PWTC_MAPDB__VERSION', '1.1' );
+define( 'PWTC_MAPDB__VERSION', '1.3' );
 define( 'PWTC_MAPDB__MINIMUM_WP_VERSION', '3.2' );
 define( 'PWTC_MAPDB__PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 define( 'PWTC_MAPDB__PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
