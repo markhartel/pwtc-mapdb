@@ -215,15 +215,16 @@ class PwtcMapdb {
 	}
 
 	public static function lookup_maps_callback() {
-		if (false) {
+		$current_user = wp_get_current_user();
+		if ( 0 == $current_user->ID ) {
 			$response = array(
-				'error' => 'You are not allowed to search the map library.'
+				'error' => 'Map fetch failed - user access denied.'
 			);
-			echo wp_json_encode($response);
+			echo wp_json_encode($response);		
 		}
 		else if (!isset($_POST['title']) or !isset($_POST['location']) or !isset($_POST['terrain']) or !isset($_POST['distance']) or !isset($_POST['media']) or !isset($_POST['limit'])) {
 			$response = array(
-				'error' => 'Input parameters needed to search map library are missing.'
+				'error' => 'Map fetch failed - AJAX arguments missing.'
 			);
 			echo wp_json_encode($response);
 		}
@@ -619,9 +620,9 @@ class PwtcMapdb {
 					<?php if ($can_view_leaders or $can_edit_leaders) { ?>
 					'<td data-th="Actions">' +
 						<?php if ($can_edit_leaders) { ?>
-						'<a title="Edit ride leader status and contact information."><i class="fa fa-pencil-square"></i></a> ' +
+						'<a title="Edit ride leader profile information."><i class="fa fa-pencil-square"></i></a> ' +
 						<?php } else { ?>
-						'<a title="View ride leader status and contact information."><i class="fa fa-eye"></i></a> ' +
+						'<a title="View ride leader profile information."><i class="fa fa-eye"></i></a> ' +
 						<?php } ?>
 					'</td>' +
 					<?php } ?>
@@ -639,7 +640,7 @@ class PwtcMapdb {
 						'userid': userid
 					};
 					$.post(action, data, display_user_profile_cb);
-					$('#pwtc-ride-leader-wait .wait-message').html('Loading ride leader status and contact information.');
+					$('#pwtc-ride-leader-wait .wait-message').html('Loading ride leader profile information.');
 					$('#pwtc-ride-leader-wait').foundation('open');
 				});
 				<?php } ?>
@@ -776,7 +777,7 @@ class PwtcMapdb {
 					'is_ride_leader': $("#pwtc-ride-leader-profile .profile-frm .is_ride_leader").val()
 				};
 				$.post(action, data, update_user_profile_cb);
-				$('#pwtc-ride-leader-wait .wait-message').html('Updating ride leader status and contact information.');
+				$('#pwtc-ride-leader-wait .wait-message').html('Updating ride leader profile information.');
 				$('#pwtc-ride-leader-wait').foundation('open');
 			});
 			<?php } else if ($can_view_leaders) { ?>
@@ -936,7 +937,13 @@ class PwtcMapdb {
 	}
 
     public static function ride_leader_lookup_callback() {
-		if (isset($_POST['limit'])) {
+		$current_user = wp_get_current_user();
+		if ( 0 == $current_user->ID ) {
+			$response = array(
+				'error' => 'Member fetch failed - user access denied.'
+			);		
+		}
+		else if (isset($_POST['limit'])) {
 			$query_args = self::get_user_query_args();
 
 			$limit = intval($_POST['limit']);
@@ -982,7 +989,7 @@ class PwtcMapdb {
 		}
 		else {
 			$response = array(
-				'error' => 'Limit argument missing.'
+				'error' => 'Member fetch failed - AJAX arguments missing.'
 			);		
 		}
         echo wp_json_encode($response);
@@ -992,7 +999,7 @@ class PwtcMapdb {
 	public static function ride_leader_fetch_profile_callback() {
 		if (!current_user_can(PwtcMapdb::VIEW_LEADERS_CAP)) {
 			$response = array(
-				'error' => 'You are not allowed to fetch a ride leader profile.'
+				'error' => 'Profile fetch failed - user access denied.'
 			);		
 		}
 		else if (isset($_POST['userid'])) {
@@ -1001,7 +1008,7 @@ class PwtcMapdb {
 			if ($member_info === false) {
 				$response = array(
 					'userid' => $userid,
-					'error' => 'Fetch of profile for user ID ' . $userid . ' failed.'
+					'error' => 'Profile fetch failed - user ID ' . $userid . ' not valid.'
 				);
 			}
 			else {
@@ -1024,7 +1031,7 @@ class PwtcMapdb {
 		}
 		else {
 			$response = array(
-				'error' => 'User ID argument missing.'
+				'error' => 'Profile fetch failed - AJAX arguments missing.'
 			);		
 		}
 		echo wp_json_encode($response);
@@ -1034,13 +1041,13 @@ class PwtcMapdb {
 	public static function ride_leader_update_profile_callback() {
 		if (!current_user_can(PwtcMapdb::EDIT_LEADERS_CAP)) {
 			$response = array(
-				'error' => 'You are not allowed to update a ride leader profile.'
+				'error' => 'Profile update failed - user access denied.'
 			);		
 		}
 		else if (isset($_POST['userid']) and isset($_POST['nonce'])) {
 			if (!wp_verify_nonce($_POST['nonce'], 'pwtc_ride_leader_update_profile')) {
 				$response = array(
-					'error' => 'Access security check failed.'
+					'error' => 'Profile update failed - access security check failed.'
 				);
 			}
 			else {
@@ -1049,7 +1056,7 @@ class PwtcMapdb {
 				if ($member_info === false) {
 					$response = array(
 						'userid' => $userid,
-						'error' => 'Fetch of profile for user ID ' . $userid . ' failed.'
+						'error' => 'Profile update failed - user ID ' . $userid . ' not valid.'
 					);
 				}
 				else {
@@ -1105,7 +1112,7 @@ class PwtcMapdb {
 		}
 		else {
 			$response = array(
-				'error' => 'User ID or nonce argument missing.'
+				'error' => 'Profile update failed - AJAX arguments missing.'
 			);		
 		}
         echo wp_json_encode($response);
