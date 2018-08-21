@@ -404,12 +404,12 @@ class PwtcMapdb {
 				$('#pwtc-mapdb-maps-div').empty();
 				if (res.error) {
 					$('#pwtc-mapdb-maps-div').append(
-						'<div><strong>Error:</strong> ' + res.error + '</div>');
+						'<div class="callout small alert"><p>' + res.error + '</p></div>');
 				}
 				else {
 					if (res.message !== undefined) {
 						$('#pwtc-mapdb-maps-div').append(
-							'<div><strong>Warning:</strong> ' + res.message + '</div>');
+							'<div class="callout small warning"><p>' + res.message + '</p></div>');
 					}
 					if (res.maps.length > 0) {
 						populate_maps_table(res.maps, res.can_edit);
@@ -418,7 +418,8 @@ class PwtcMapdb {
 						}
 					}
 					else {
-						$('#pwtc-mapdb-maps-div').append('<div>No maps found.</div>');					
+						$('#pwtc-mapdb-maps-div').append(
+							'<div class="callout small warning"><p>No maps found.</p></div>');
 					}
 				}
 				$('body').removeClass('pwtc-mapdb-waiting');
