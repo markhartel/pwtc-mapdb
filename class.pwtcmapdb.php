@@ -833,7 +833,7 @@ class PwtcMapdb {
 			</div>
 			<div class="row column">
 				<div class="callout small secondary">
-					<p><i>These entries are displayed in the ride calendar and used by riders to contact ride leaders for additional information.</i></p>
+					<p><i>These entries are displayed in the ride calendar for use by riders to contact the ride leader for additional information. Set an entry blank to not display.</i></p>
 				</div>
 			</div>
 			<div class="row">
@@ -846,17 +846,17 @@ class PwtcMapdb {
 					</label>
 				</div>
 				<div class="small-12 medium-6 columns">
-					<label>Contact Email <i class="fa fa-envelope"></i>
+					<label><i class="fa fa-envelope"></i> Contact Email
 						<input type="text" name="contact_email"/>
 					</label>
 				</div>
 				<div class="small-12 medium-6 columns">
-					<label>Contact Voice Phone <i class="fa fa-phone"></i>
+					<label><i class="fa fa-phone"></i> Contact Voice Phone
 						<input type="text" name="voice_phone"/>
 					</label>
 				</div>
 				<div class="small-12 medium-6 columns">
-					<label>Contact Text Phone <i class="fa fa-mobile"></i>
+					<label><i class="fa fa-mobile"></i> Contact Text Phone
 						<input type="text" name="text_phone"/>
 					</label>
 				</div>
