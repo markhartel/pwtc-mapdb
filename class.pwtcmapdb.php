@@ -1045,11 +1045,33 @@ class PwtcMapdb {
 				'error' => 'Profile update failed - user access denied.'
 			);		
 		}
-		else if (isset($_POST['userid']) and isset($_POST['nonce'])) {
+		else if (isset($_POST['userid']) and isset($_POST['nonce']) and
+			isset($_POST['use_contact_email']) and isset($_POST['voice_phone']) and
+			isset($_POST['text_phone']) and isset($_POST['contact_email']) and
+			isset($_POST['is_ride_leader'])) {
+			$phone_regexp = '/^\d{3}-\d{3}-\d{4}$/';
 			if (!wp_verify_nonce($_POST['nonce'], 'pwtc_ride_leader_update_profile')) {
 				$response = array(
 					'error' => 'Profile update failed - access security check failed.'
 				);
+			}
+			else if ($_POST['contact_email'] != '' and 
+				!filter_var($_POST['contact_email'], FILTER_VALIDATE_EMAIL)) {
+				$response = array(
+					'error' => 'Profile update failed - contact email is not a valid email address.'
+				);				
+			}
+			else if ($_POST['voice_phone'] != '' and 
+				preg_match($phone_regexp, $_POST['voice_phone']) !== 1) {
+				$response = array(
+					'error' => 'Profile update failed - voice phone is not a valid phone number (000-000-0000).'
+				);				
+			}
+			else if ($_POST['text_phone'] != '' and 
+				preg_match($phone_regexp, $_POST['text_phone']) !== 1) {
+				$response = array(
+					'error' => 'Profile update failed - text phone is not a valid phone number (000-000-0000).'
+				);				
 			}
 			else {
 				$userid = intval($_POST['userid']);
@@ -1057,51 +1079,41 @@ class PwtcMapdb {
 				if ($member_info === false) {
 					$response = array(
 						'userid' => $userid,
-						'error' => 'Profile update failed - user ID ' . $userid . ' not valid.'
+						'error' => 'Profile update failed - user ID ' . $userid . ' is not valid.'
 					);
 				}
 				else {
 					$refresh = false;
-					if (isset($_POST['use_contact_email'])) {
-						$use_contact_email = get_field('use_contact_email', 'user_'.$userid);
-						if ($use_contact_email and $_POST['use_contact_email'] == 'no') {
-							update_field('use_contact_email', false, 'user_'.$userid);
-						}
-						else if (!$use_contact_email and $_POST['use_contact_email'] == 'yes') {
-							update_field('use_contact_email', true, 'user_'.$userid);
+					$use_contact_email = get_field('use_contact_email', 'user_'.$userid);
+					if ($use_contact_email and $_POST['use_contact_email'] == 'no') {
+						update_field('use_contact_email', false, 'user_'.$userid);
+					}
+					else if (!$use_contact_email and $_POST['use_contact_email'] == 'yes') {
+						update_field('use_contact_email', true, 'user_'.$userid);
+					}
+					$voice_phone = get_field('cell_phone', 'user_'.$userid);
+					if ($voice_phone != $_POST['voice_phone']) {
+						update_field('cell_phone', $_POST['voice_phone'], 'user_'.$userid);
+					}
+					$text_phone = get_field('home_phone', 'user_'.$userid);
+					if ($text_phone != $_POST['text_phone']) {
+						update_field('home_phone', $_POST['text_phone'], 'user_'.$userid);
+					}
+					$contact_email = get_field('contact_email', 'user_'.$userid);
+					if ($contact_email != $_POST['contact_email']) {
+						update_field('contact_email', $_POST['contact_email'], 'user_'.$userid);
+					}
+					$is_ride_leader = $_POST['is_ride_leader'];
+					if (in_array('ride_leader', $member_info->roles)) {
+						if ($is_ride_leader == 'no') {
+							$member_info->remove_role('ride_leader');
+							$refresh = true;
 						}
 					}
-					if (isset($_POST['voice_phone'])) {
-						$voice_phone = get_field('cell_phone', 'user_'.$userid);
-						if ($voice_phone != $_POST['voice_phone']) {
-							update_field('cell_phone', $_POST['voice_phone'], 'user_'.$userid);
-						}
-					}
-					if (isset($_POST['text_phone'])) {
-						$text_phone = get_field('home_phone', 'user_'.$userid);
-						if ($text_phone != $_POST['text_phone']) {
-							update_field('home_phone', $_POST['text_phone'], 'user_'.$userid);
-						}
-					}
-					if (isset($_POST['contact_email'])) {
-						$contact_email = get_field('contact_email', 'user_'.$userid);
-						if ($contact_email != $_POST['contact_email']) {
-							update_field('contact_email', $_POST['contact_email'], 'user_'.$userid);
-						}
-					}
-					if (isset($_POST['is_ride_leader'])) {
-						$is_ride_leader = $_POST['is_ride_leader'];
-						if (in_array('ride_leader', $member_info->roles)) {
-							if ($is_ride_leader == 'no') {
-								$member_info->remove_role('ride_leader');
-								$refresh = true;
-							}
-						}
-						else {
-							if ($is_ride_leader == 'yes') {
-								$member_info->add_role('ride_leader');
-								$refresh = true;
-							}
+					else {
+						if ($is_ride_leader == 'yes') {
+							$member_info->add_role('ride_leader');
+							$refresh = true;
 						}
 					}
 					$response = array(
@@ -1113,7 +1125,7 @@ class PwtcMapdb {
 		}
 		else {
 			$response = array(
-				'error' => 'Profile update failed - AJAX arguments missing.'
+				'error' => 'Profile update failed - AJAX arguments are missing.'
 			);		
 		}
         echo wp_json_encode($response);
