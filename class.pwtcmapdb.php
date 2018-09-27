@@ -607,7 +607,7 @@ class PwtcMapdb {
 			<?php } ?>
 
 			function populate_members_table(members) {
-				var header = '<table class="pwtc-mapdb-rwd-table"><tr><th>Member Name</th><th>Account Email</th>' +
+				var header = '<table class="pwtc-mapdb-rwd-table"><tr><th>Member Name</th><th>Account Email</th><th>Account Phone</th>' +
 				<?php if ($can_view_leaders or $can_edit_leaders) { ?>
 				'<th>Actions</th>' +
 				<?php } ?>
@@ -618,6 +618,7 @@ class PwtcMapdb {
 					'<td data-th="Name">' + item.first_name + ' ' + item.last_name + 
 					(item.is_ride_leader ? ' <i class="fa fa-bicycle" title="This member is a ride leader."></i>' : '') + '</td>' + 
 					'<td data-th="Email">' + item.email + '</td>' +
+					'<td data-th="Phone">' + item.phone + '</td>' +
 					<?php if ($can_view_leaders or $can_edit_leaders) { ?>
 					'<td data-th="Actions">' +
 						<?php if ($can_edit_leaders) { ?>
@@ -973,7 +974,7 @@ class PwtcMapdb {
 						'first_name' => $member_info->first_name,
 						'last_name' => $member_info->last_name,
 						'email' => $member_info->user_email,
-						'phone' => 'n/a',
+						'phone' => $member_info->billing_phone,
 						'is_ride_leader' => in_array('ride_leader', $member_info->roles)
 					];
 				}
