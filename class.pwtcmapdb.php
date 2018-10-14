@@ -47,6 +47,9 @@ class PwtcMapdb {
 		add_shortcode('pwtc_ride_leader_dir', 
 			array( 'PwtcMapdb', 'shortcode_ride_leader_dir'));
 
+		add_shortcode('pwtc_membership_report', 
+			array( 'PwtcMapdb', 'shortcode_membership_report'));
+
 		add_action( 'wp_ajax_pwtc_ride_leader_lookup', 
 			array( 'PwtcMapdb', 'ride_leader_lookup_callback') );
 			
@@ -1165,6 +1168,24 @@ class PwtcMapdb {
 			'role__in' => ['current_member', 'expired_member']
 		];
 
+		if (false) {
+			if (!isset($query_args['meta_query'])) {
+				$query_args['meta_query'] = [];
+			}
+			$query_args['meta_query'][] = [
+				'relation' => 'OR',
+				[
+					'key'     => 'directory_excluded',
+					'value'   => '0',
+					'compare' => '='   	
+				],
+				[
+					'key'     => 'directory_excluded',
+					'compare' => 'NOT EXISTS'   	
+				]
+			];
+		}
+
 		if (isset($_POST['first_name'])) {
 			if (!isset($query_args['meta_query'])) {
 				$query_args['meta_query'] = [];
@@ -1211,6 +1232,37 @@ class PwtcMapdb {
 		}
 
 		return $query_args;
+	}
+
+	// Generates the [pwtc_membership_report] shortcode.
+	public static function shortcode_membership_report($atts) {
+		//$a = shortcode_atts(array('limit' => 10, 'mode' => 'readonly'), $atts);
+		$current_user = wp_get_current_user();
+		if ( 0 == $current_user->ID ) {
+			return '<div class="callout small warning"><p>Please log in to view the membership report.</p></div>';
+		}
+		else {
+			$the_query = new WP_Query(array('post_type' => 'wc_user_membership'));
+			if ( $the_query->have_posts() ) {
+				ob_start();
+				?>
+				<table><tr><th>Title</th><th>Author</th><th>Status</th></tr>
+				<?php
+				while ( $the_query->have_posts() ) {
+					$the_query->the_post();
+					?>
+					<tr><td><?php echo get_the_title(); ?></td><td><?php echo get_the_author(); ?></td><td><?php echo get_post_status(); ?></td></tr>
+					<?php						
+				}
+				?>
+				</table>
+				<?php						
+				wp_reset_postdata();
+				return ob_get_clean();
+			} else {
+				return '<div class="callout small warning"><p>No memberships found.</p></div>';
+			}
+		}
 	}
 	
 	/*************************************************************/
