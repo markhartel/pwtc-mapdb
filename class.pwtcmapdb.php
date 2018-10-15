@@ -1242,7 +1242,11 @@ class PwtcMapdb {
 			return '<div class="callout small warning"><p>Please log in to view the membership report.</p></div>';
 		}
 		else {
-			$the_query = new WP_Query(array('post_type' => 'wc_user_membership'));
+			$query_args = [
+				'posts_per_page' => -1,
+				'post_type' => 'wc_user_membership',
+			];			
+			$the_query = new WP_Query($query_args);
 			if ( $the_query->have_posts() ) {
 				ob_start();
 				?>
