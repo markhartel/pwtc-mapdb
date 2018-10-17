@@ -1243,7 +1243,8 @@ class PwtcMapdb {
 		}
 		else {
 			$query_args = [
-				'posts_per_page' => -1,
+				'nopaging'    => true,
+				'post_status' => 'any',
 				'post_type' => 'wc_user_membership',
 			];			
 			$the_query = new WP_Query($query_args);
