@@ -651,11 +651,12 @@ class PwtcMapdb {
 				<?php } ?>
             }
 
-			function create_paging_form(pagenum, numpages) {
+			function create_paging_form(pagenum, numpages, totalusers) {
 				$('#pwtc-ride-leaders-div').append(
 					'<form class="page-frm">' +
                     '<input class="prev-btn button" style="margin: 0" type="button" value="< Prev"/>' +
-					'<span style="margin: 0 10px">Page ' + pagenum + ' of ' + numpages + '</span>' +
+					'<span style="margin: 0 10px">Page ' + pagenum + ' of ' + numpages + 
+					' (' + totalusers + ' records)</span>' +
                     '<input class="next-btn button" style="margin: 0" type="button" value="Next >"/>' +
 					'<span class="page-msg" style="margin: 0 10px"></span>' +
 					'<input name="pagenum" type="hidden" value="' + pagenum + '"/>' +
@@ -695,7 +696,7 @@ class PwtcMapdb {
 					if (res.members.length > 0) {
 						populate_members_table(res.members);
 						if (res.total_pages > 1) {
-							create_paging_form(res.page_number, res.total_pages);
+							create_paging_form(res.page_number, res.total_pages, res.total_users);
 						}
 					}
 					else {
@@ -949,7 +950,7 @@ class PwtcMapdb {
 			);		
 		}
 		else if (isset($_POST['limit'])) {
-			$query_args = self::get_user_query_args();
+			$query_args = self::get_user_query_args(true);
 
 			$limit = intval($_POST['limit']);
 			$query_args['number'] = $limit;
@@ -989,7 +990,8 @@ class PwtcMapdb {
 			$response = array(
 				'members' => $member_names,
 				'total_pages' => $total_pages,
-				'page_number' => $page_number
+				'page_number' => $page_number,
+				'total_users' => $total_users
 			);
 		}
 		else {
@@ -1139,7 +1141,7 @@ class PwtcMapdb {
 	public static function download_ride_leaders_list() {
 		if (current_user_can(self::VIEW_LEADERS_CAP)) {
 			if (isset($_POST['pwtc-ride-leaders-download']) and isset($_POST['role'])) {
-				$query_args = self::get_user_query_args();
+				$query_args = self::get_user_query_args(true);
 				$today = date('Y-m-d', current_time('timestamp'));
 				header('Content-Description: File Transfer');
 				header("Content-type: text/csv");
@@ -1160,7 +1162,7 @@ class PwtcMapdb {
 		}
 	}
 
-	public static function get_user_query_args() {
+	public static function get_user_query_args($exclude = false) {
         $query_args = [
             'meta_key' => 'last_name',
             'orderby' => 'meta_value',
@@ -1168,7 +1170,7 @@ class PwtcMapdb {
 			'role__in' => ['current_member', 'expired_member']
 		];
 
-		if (false) {
+		if ($exclude) {
 			if (!isset($query_args['meta_query'])) {
 				$query_args['meta_query'] = [];
 			}
@@ -1251,16 +1253,27 @@ class PwtcMapdb {
 			if ( $the_query->have_posts() ) {
 				ob_start();
 				?>
-				<table><tr><th>Title</th><th>Author</th><th>Status</th></tr>
+				<div><table>
+				<tr>
+				<th>Member</th>
+				<th>Status</th>
+				<th>Start Date</th>
+				<th>End Date</th>
+				</tr>
 				<?php
 				while ( $the_query->have_posts() ) {
 					$the_query->the_post();
 					?>
-					<tr><td><?php echo get_the_title(); ?></td><td><?php echo get_the_author(); ?></td><td><?php echo get_post_status(); ?></td></tr>
+					<tr>
+					<td><?php echo get_the_author(); ?></td>
+					<td><?php echo get_post_status(); ?></td>
+					<td><?php echo get_post_meta(get_the_ID(), '_start_date', true); ?></td>
+					<td><?php echo get_post_meta(get_the_ID(), '_end_date', true); ?></td>
+					</tr>
 					<?php						
 				}
 				?>
-				</table>
+				</table></div>
 				<?php						
 				wp_reset_postdata();
 				return ob_get_clean();
