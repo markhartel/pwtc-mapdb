@@ -543,7 +543,7 @@ class PwtcMapdb {
 
 	// Generates the [pwtc_ride_leader_dir] shortcode.
 	public static function shortcode_ride_leader_dir($atts) {
-		$a = shortcode_atts(array('limit' => 10, 'mode' => 'readonly'), $atts);
+		$a = shortcode_atts(array('limit' => 10, 'mode' => 'readonly', 'privacy' => 'off'), $atts);
 		$current_user = wp_get_current_user();
 		if ( 0 == $current_user->ID ) {
 			return '<div class="callout small warning"><p>Please log in to view the member list.</p></div>';
@@ -710,6 +710,7 @@ class PwtcMapdb {
                 var action = "<?php echo admin_url('admin-ajax.php'); ?>";
 				var data = {
 					'action': 'pwtc_ride_leader_lookup',
+					'privacy': '<?php echo $a['privacy'] ?>',
 					'limit': <?php echo $a['limit'] ?>
 				};
 				if (mode != 'search') {
@@ -882,6 +883,7 @@ class PwtcMapdb {
 		<form class="download-frm" method="post">
 			<input type="hidden" name="pwtc-ride-leaders-download" value="yes"/>
 			<input type="hidden" name="role" value="ride_leader"/>
+			<input type="hidden" name="privacy" value="<?php echo $a['privacy'] ?>"/>
 		</form>	
 	</div>
 	<?php } ?>
@@ -950,7 +952,17 @@ class PwtcMapdb {
 			);		
 		}
 		else if (isset($_POST['limit'])) {
-			$query_args = self::get_user_query_args(true);
+			$exclude = false;
+			$hide = false;
+			if (isset($_POST['privacy'])) {
+				if ($_POST['privacy'] == 'exclude') {
+					$exclude = true;
+				}
+				else if ($_POST['privacy'] == 'hide') {
+					$hide = true;
+				}
+			}
+			$query_args = self::get_user_query_args($exclude);
 
 			$limit = intval($_POST['limit']);
 			$query_args['number'] = $limit;
@@ -973,12 +985,20 @@ class PwtcMapdb {
 			if ( !empty($members) ) {
 				foreach ( $members as $member ) {
 					$member_info = get_userdata( $member->ID );
+					if ($hide and get_field('directory_excluded', 'user_'.$member->ID)) {
+						$email = '*****';
+						$phone = '*****';
+					}
+					else {
+						$email = $member_info->user_email;
+						$phone = $member_info->billing_phone;
+					}
 					$member_names[] = [
 						'ID' => $member->ID,
 						'first_name' => $member_info->first_name,
 						'last_name' => $member_info->last_name,
-						'email' => $member_info->user_email,
-						'phone' => $member_info->billing_phone,
+						'email' => $email,
+						'phone' => $phone,
 						'is_ride_leader' => in_array('ride_leader', $member_info->roles)
 					];
 				}
@@ -1141,7 +1161,7 @@ class PwtcMapdb {
 	public static function download_ride_leaders_list() {
 		if (current_user_can(self::VIEW_LEADERS_CAP)) {
 			if (isset($_POST['pwtc-ride-leaders-download']) and isset($_POST['role'])) {
-				$query_args = self::get_user_query_args(true);
+				$query_args = self::get_user_query_args();
 				$today = date('Y-m-d', current_time('timestamp'));
 				header('Content-Description: File Transfer');
 				header("Content-type: text/csv");
