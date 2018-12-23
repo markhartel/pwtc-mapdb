@@ -44,8 +44,8 @@ class PwtcMapdb {
 		add_shortcode('pwtc_search_mapdb', 
 			array( 'PwtcMapdb', 'shortcode_search_mapdb'));
 
-		add_shortcode('pwtc_ride_leader_dir', 
-			array( 'PwtcMapdb', 'shortcode_ride_leader_dir'));
+		add_shortcode('pwtc_membership_dir', 
+			array( 'PwtcMapdb', 'shortcode_membership_dir'));
 
 		add_shortcode('pwtc_membership_report', 
 			array( 'PwtcMapdb', 'shortcode_membership_report'));
@@ -541,8 +541,8 @@ class PwtcMapdb {
 		}
 	}
 
-	// Generates the [pwtc_ride_leader_dir] shortcode.
-	public static function shortcode_ride_leader_dir($atts) {
+	// Generates the [pwtc_membership_dir] shortcode.
+	public static function shortcode_membership_dir($atts) {
 		$a = shortcode_atts(array('limit' => 10, 'mode' => 'readonly', 'privacy' => 'off'), $atts);
 		$current_user = wp_get_current_user();
 		if ( 0 == $current_user->ID ) {
@@ -619,7 +619,8 @@ class PwtcMapdb {
 				members.forEach(function(item) {
 					var data = '<tr userid="' + item.ID + '">' +
 					'<td data-th="Name">' + item.first_name + ' ' + item.last_name + 
-					(item.is_ride_leader ? ' <i class="fa fa-bicycle" title="This member is a ride leader."></i>' : '') + '</td>' + 
+					(item.is_expired ? ' <i class="fa fa-warning" title="Membership Expired"></i>' : '') +
+					(item.is_ride_leader ? ' <i class="fa fa-bicycle" title="Ride Leader"></i>' : '') + '</td>' + 
 					'<td data-th="Email">' + item.email + '</td>' +
 					'<td data-th="Phone">' + item.phone + '</td>' +
 					<?php if ($can_view_leaders or $can_edit_leaders) { ?>
@@ -999,6 +1000,7 @@ class PwtcMapdb {
 						'last_name' => $member_info->last_name,
 						'email' => $email,
 						'phone' => $phone,
+						'is_expired' => in_array('expired_member', $member_info->roles),
 						'is_ride_leader' => in_array('ride_leader', $member_info->roles)
 					];
 				}
