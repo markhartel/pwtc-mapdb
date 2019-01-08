@@ -81,7 +81,7 @@ class PwtcMapdb {
 	public static function get_query_args($title, $location, $terrain, $min_dist, $max_dist, $media) {
 		$args = array(
 			'post_type' => self::MAP_POST_TYPE,
-			//'post_status' => 'publish',
+			'post_status' => 'publish',
 			'orderby'   => 'title',
 			'order'     => 'ASC'
 		);
