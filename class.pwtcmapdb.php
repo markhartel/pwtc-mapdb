@@ -1350,23 +1350,16 @@ class PwtcMapdb {
 			if ( $the_query->have_posts() ) {
 				ob_start();
 				?>
-				<div><table>
-				<tr>
-				<th>Member</th>
-				<th>Start Date</th>
-				</tr>
+				<div>PWTC new members:<ul>
 				<?php
 				while ( $the_query->have_posts() ) {
 					$the_query->the_post();
 					?>
-					<tr>
-					<td><?php echo get_the_author(); ?></td>
-					<td><?php echo get_post_meta(get_the_ID(), '_start_date', true); ?></td>
-					</tr>
+					<li><?php echo get_the_author(); ?> (<?php echo get_post_meta(get_the_ID(), '_start_date', true); ?>)</li>
 					<?php						
 				}
 				?>
-				</table></div>
+				</ul></div>
 				<?php						
 				wp_reset_postdata();
 				return ob_get_clean();
