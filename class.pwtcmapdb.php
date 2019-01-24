@@ -1343,7 +1343,7 @@ class PwtcMapdb {
 				'post_status' => 'any',
 				'post_type'   => 'wc_user_membership',
 				'meta_key'    => '_start_date',
-				'orderby'     => 'meta_value_datetime',
+				'orderby'     => 'meta_value',
 				'order'       => 'DESC',
 			];			
 			$the_query = new WP_Query($query_args);
