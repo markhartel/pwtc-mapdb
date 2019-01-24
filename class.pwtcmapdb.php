@@ -44,11 +44,14 @@ class PwtcMapdb {
 		add_shortcode('pwtc_search_mapdb', 
 			array( 'PwtcMapdb', 'shortcode_search_mapdb'));
 
-		add_shortcode('pwtc_membership_dir', 
+		add_shortcode('pwtc_membership_directory', 
 			array( 'PwtcMapdb', 'shortcode_membership_dir'));
 
-		add_shortcode('pwtc_membership_report', 
-			array( 'PwtcMapdb', 'shortcode_membership_report'));
+		add_shortcode('pwtc_membership_statistics', 
+			array( 'PwtcMapdb', 'shortcode_membership_statistics'));
+
+		add_shortcode('pwtc_membership_new_members', 
+			array( 'PwtcMapdb', 'shortcode_membership_new_members'));
 
 		add_action( 'wp_ajax_pwtc_ride_leader_lookup', 
 			array( 'PwtcMapdb', 'ride_leader_lookup_callback') );
@@ -541,7 +544,7 @@ class PwtcMapdb {
 		}
 	}
 
-	// Generates the [pwtc_membership_dir] shortcode.
+	// Generates the [pwtc_membership_directory] shortcode.
 	public static function shortcode_membership_dir($atts) {
 		$a = shortcode_atts(array('limit' => 10, 'mode' => 'readonly', 'privacy' => 'off'), $atts);
 		$current_user = wp_get_current_user();
@@ -1258,14 +1261,25 @@ class PwtcMapdb {
 		return $query_args;
 	}
 
-	// Generates the [pwtc_membership_report] shortcode.
-	public static function shortcode_membership_report($atts) {
+	// Generates the [pwtc_membership_statistics] shortcode.
+	public static function shortcode_membership_statistics($atts) {
 		//$a = shortcode_atts(array('limit' => 10, 'mode' => 'readonly'), $atts);
 		$current_user = wp_get_current_user();
 		if ( 0 == $current_user->ID ) {
-			return '<div class="callout small warning"><p>Please log in to view the membership report.</p></div>';
+			return '<div class="callout small warning"><p>Please log in to view the membership statistics.</p></div>';
 		}
 		else {
+			$active = self::count_membership('active');
+			$expired = self::count_membership('expired');
+			ob_start();
+			?>
+			<div>PWTC membership statistics as of today:<ul>
+			<li><?php echo $active; ?> active members</li>
+			<li><?php echo $expired; ?> expired members</li>
+			</ul></div>
+			<?php
+			return ob_get_clean();
+		    /*
 			$query_args = [
 				'nopaging'    => true,
 				'post_status' => 'any',
@@ -1301,6 +1315,64 @@ class PwtcMapdb {
 				return ob_get_clean();
 			} else {
 				return '<div class="callout small warning"><p>No memberships found.</p></div>';
+			}
+			*/
+		}
+	}
+
+	public static function count_membership($status) {
+		$query_args = [
+			'nopaging'    => true,
+			'post_status' => 'wcm-'.$status,
+			'post_type' => 'wc_user_membership',
+		];			
+		$the_query = new WP_Query($query_args);
+		return $the_query->found_posts;
+	}
+
+	// Generates the [pwtc_membership_new_members] shortcode.
+	public static function shortcode_membership_new_members($atts) {
+		$a = shortcode_atts(array('lookback' => 1), $atts);
+		$current_user = wp_get_current_user();
+		if ( 0 == $current_user->ID ) {
+			return '<div class="callout small warning"><p>Please log in to view the new members.</p></div>';
+		}
+		else {
+			$query_args = [
+				'nopaging'    => true,
+				'post_status' => 'any',
+				'post_type'   => 'wc_user_membership',
+				'meta_key'    => '_start_date',
+				'orderby'     => 'meta_value_datetime',
+				'order'       => 'DESC',
+			];			
+			$the_query = new WP_Query($query_args);
+			if ( $the_query->have_posts() ) {
+				ob_start();
+				?>
+				<div><table>
+				<tr>
+				<th>Member</th>
+				<th>Start Date</th>
+				</tr>
+				<?php
+				while ( $the_query->have_posts() ) {
+					$the_query->the_post();
+					?>
+					<tr>
+					<td><?php echo get_the_author(); ?></td>
+					<td><?php echo get_post_meta(get_the_ID(), '_start_date', true); ?></td>
+					</tr>
+					<?php						
+				}
+				?>
+				</table></div>
+				<?php						
+				wp_reset_postdata();
+				return ob_get_clean();
+			} 
+			else {
+				return '<div class="callout small warning"><p>No new members found.</p></div>';
 			}
 		}
 	}
