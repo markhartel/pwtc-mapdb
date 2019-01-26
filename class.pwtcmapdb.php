@@ -50,6 +50,9 @@ class PwtcMapdb {
 		add_shortcode('pwtc_membership_statistics', 
 			array( 'PwtcMapdb', 'shortcode_membership_statistics'));
 
+		add_shortcode('pwtc_membership_families', 
+			array( 'PwtcMapdb', 'shortcode_membership_families'));
+
 		add_shortcode('pwtc_membership_new_members', 
 			array( 'PwtcMapdb', 'shortcode_membership_new_members'));
 
@@ -1275,8 +1278,7 @@ class PwtcMapdb {
 			$complimentary = self::count_membership('complimentary');
 			$paused = self::count_membership('paused');
 			$cancelled = self::count_membership('cancelled');
-			$families = self::count_family_memberships();
-			$family_members = self::count_family_members();
+			$total = $active + $expired + $delayed + $complimentary + $paused + $cancelled;
 			ob_start();
 			?>
 			<div>PWTC membership statistics as of <?php echo $today; ?>:<ul>
@@ -1294,49 +1296,9 @@ class PwtcMapdb {
 			<?php if ($cancelled > 0) { ?>
 			<li><?php echo $cancelled; ?> cancelled members</li>
 			<?php } ?>
-			<li><?php echo $families; ?> family memberships</li>
-			<li><?php echo $family_members; ?> family members</li>
-			</ul></div>
+			</ul><?php echo $total; ?> total members.</div>
 			<?php
 			return ob_get_clean();
-		    /*
-			$query_args = [
-				'nopaging'    => true,
-				'post_status' => 'any',
-				'post_type' => 'wc_user_membership',
-			];			
-			$the_query = new WP_Query($query_args);
-			if ( $the_query->have_posts() ) {
-				ob_start();
-				?>
-				<div><table>
-				<tr>
-				<th>Member</th>
-				<th>Status</th>
-				<th>Start Date</th>
-				<th>End Date</th>
-				</tr>
-				<?php
-				while ( $the_query->have_posts() ) {
-					$the_query->the_post();
-					?>
-					<tr>
-					<td><?php echo get_the_author(); ?></td>
-					<td><?php echo get_post_status(); ?></td>
-					<td><?php echo get_post_meta(get_the_ID(), '_start_date', true); ?></td>
-					<td><?php echo get_post_meta(get_the_ID(), '_end_date', true); ?></td>
-					</tr>
-					<?php						
-				}
-				?>
-				</table></div>
-				<?php						
-				wp_reset_postdata();
-				return ob_get_clean();
-			} else {
-				return '<div class="callout small warning"><p>No memberships found.</p></div>';
-			}
-			*/
 		}
 	}
 
@@ -1348,6 +1310,27 @@ class PwtcMapdb {
 		];			
 		$the_query = new WP_Query($query_args);
 		return $the_query->found_posts;
+	}
+
+	// Generates the [pwtc_membership_families] shortcode.
+	public static function shortcode_membership_families($atts) {
+		$current_user = wp_get_current_user();
+		if ( 0 == $current_user->ID ) {
+			return '<div class="callout small warning"><p>Please log in to view the family member statistics.</p></div>';
+		}
+		else {
+			$today = date('F j Y', current_time('timestamp'));
+			$families = self::count_family_memberships();
+			$family_members = self::count_family_members();
+			ob_start();
+			?>
+			<div>PWTC family member statistics as of <?php echo $today; ?>:<ul>
+			<li><?php echo $families; ?> family memberships</li>
+			<li><?php echo $family_members; ?> family members</li>
+			</ul></div>
+			<?php
+			return ob_get_clean();
+		}
 	}
 
 	public static function count_family_memberships() {
@@ -1414,7 +1397,7 @@ class PwtcMapdb {
 						break;
 					}
 					?>
-					<li><?php echo get_the_author(); ?> (<?php echo $start->format('F Y'); ?>)</li>
+					<li><?php echo get_the_author(); ?> (<?php echo $start->format('M j'); ?>)</li>
 					<?php						
 				}
 				?>
