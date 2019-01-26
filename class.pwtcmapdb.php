@@ -1410,7 +1410,7 @@ class PwtcMapdb {
 				while ( $the_query->have_posts() ) {
 					$the_query->the_post();
 					$start = new DateTime(get_post_meta(get_the_ID(), '_start_date', true), $timezone);
-					if ($start->getTimestamp() >= $month->getTimestamp()) {
+					if ($start->getTimestamp() < $month->getTimestamp()) {
 						break;
 					}
 					?>
