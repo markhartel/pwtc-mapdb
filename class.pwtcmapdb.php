@@ -583,6 +583,20 @@ class PwtcMapdb {
 					$('#pwtc-ride-leader-error').foundation('open');
 				}
 				else {
+					$('#pwtc-member-address .address-data').empty();
+					$('#pwtc-member-address .contact-data').empty();
+					$('#pwtc-member-address .address-data').append(
+						'<div>' + res.first_name + ' ' + res.last_name + '</div>');
+					$('#pwtc-member-address .address-data').append(
+						'<div>' + res.street1 + '</div>');
+					$('#pwtc-member-address .address-data').append(
+						'<div>' + res.city + ' ' + res.state + ' ' + res.zipcode + '</div>');
+					$('#pwtc-member-address .contact-data').append(
+						'<div>' + res.email + '</div>');
+					$('#pwtc-member-address .contact-data').append(
+						'<div>' + res.phone + '</div>');
+					$('#pwtc-member-address .contact-data').append(
+						'<div>Rider ID: ' + res.riderid + '</div>');
 					$('#pwtc-member-address').foundation('open');
 				}
 			}
@@ -637,7 +651,7 @@ class PwtcMapdb {
 
 			function populate_members_table(members) {
 				var header = '<table class="pwtc-mapdb-rwd-table"><tr><th>Member Name</th><th>Account Email</th><th>Account Phone</th>' +
-				<?php if ($can_view_leaders or $can_edit_leaders) { ?>
+				<?php if ($can_view_leaders or $can_edit_leaders or $can_view_address) { ?>
 				'<th>Actions</th>' +
 				<?php } ?>
 				'</tr></table>';
@@ -656,7 +670,7 @@ class PwtcMapdb {
 						<?php } ?>
 						<?php if ($can_edit_leaders) { ?>
 						'<a class="edit_leaders" title="Edit ride leader profile information."><i class="fa fa-pencil-square"></i></a> ' +
-						<?php } else { ?>
+						<?php } else if ($can_view_leaders) { ?>
 						'<a class="edit_leaders" title="View ride leader profile information."><i class="fa fa-eye"></i></a> ' +
 						<?php } ?>
 					'</td>' +
@@ -865,6 +879,10 @@ class PwtcMapdb {
 	<div id="pwtc-member-address" class="small reveal" data-close-on-click="false" data-v-offset="100" data-reveal>
 		<form class="profile-frm">
 			<div class="row column">
+				<div class="callout primary">
+					<p class="address-data"></p>
+					<p class="contact-data"></p>
+				</div>
 			</div>
 			<div class="row column clearfix">
 				<input class="accent button float-left" type="button" value="Close" data-close/>
@@ -1140,7 +1158,15 @@ class PwtcMapdb {
 					'userid' => $userid,
 					'first_name' => $member_info->first_name,
 					'last_name' => $member_info->last_name,
-					'email' => $member_info->user_email
+					'email' => $member_info->user_email,
+					'riderid' => get_field('rider_id', 'user_'.$userid),
+					'street1' => get_user_meta($userid, 'billing_address_1', true),
+					'street2' => get_user_meta($userid, 'billing_address_2', true), 
+					'city' => get_user_meta($userid, 'billing_city', true), 
+					'state' => get_user_meta($userid, 'billing_state', true), 
+					'country' => get_user_meta($userid, 'billing_country', true), 
+					'zipcode' => get_user_meta($userid, 'billing_postcode', true), 
+					'phone' => get_user_meta($userid, 'billing_phone', true) 
 				);
 			}
 		}
