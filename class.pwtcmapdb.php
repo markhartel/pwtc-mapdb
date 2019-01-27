@@ -2,6 +2,7 @@
 
 class PwtcMapdb {
 
+	const VIEW_ADDRESS_CAP = 'pwtc_view_address';
 	const VIEW_LEADERS_CAP = 'pwtc_view_leaders';
 	const EDIT_LEADERS_CAP = 'pwtc_edit_leaders';
 
@@ -58,7 +59,10 @@ class PwtcMapdb {
 
 		add_action( 'wp_ajax_pwtc_ride_leader_lookup', 
 			array( 'PwtcMapdb', 'ride_leader_lookup_callback') );
-			
+
+		add_action( 'wp_ajax_pwtc_member_fetch_address', 
+			array( 'PwtcMapdb', 'member_fetch_address_callback') );
+
 		add_action( 'wp_ajax_pwtc_ride_leader_fetch_profile', 
 			array( 'PwtcMapdb', 'ride_leader_fetch_profile_callback') );
 			
@@ -556,10 +560,12 @@ class PwtcMapdb {
 		}
 		else {
 			if ($a['mode'] == 'edit') {
+				$can_view_address = current_user_can(self::VIEW_ADDRESS_CAP);
 				$can_view_leaders = current_user_can(self::VIEW_LEADERS_CAP);
 				$can_edit_leaders = current_user_can(self::EDIT_LEADERS_CAP);
 			}
 			else {
+				$can_view_address = current_user_can(self::VIEW_ADDRESS_CAP);
 				$can_view_leaders = false;
 				$can_edit_leaders = false;
 			}
@@ -567,6 +573,20 @@ class PwtcMapdb {
 	?>
 	<script type="text/javascript">
 		jQuery(document).ready(function($) { 
+
+			<?php if ($can_view_address) { ?>
+			function display_user_address_cb(response) {
+				$('#pwtc-ride-leader-wait').foundation('close');
+				var res = JSON.parse(response);
+				if (res.error) {
+					$("#pwtc-ride-leader-error .error-msg").html(res.error);
+					$('#pwtc-ride-leader-error').foundation('open');
+				}
+				else {
+					$('#pwtc-member-address').foundation('open');
+				}
+			}
+			<?php } ?>
 
 			<?php if ($can_view_leaders or $can_edit_leaders) { ?>
 			function display_user_profile_cb(response) {
@@ -629,20 +649,36 @@ class PwtcMapdb {
 					(item.is_ride_leader ? ' <i class="fa fa-bicycle" title="Ride Leader"></i>' : '') + '</td>' + 
 					'<td data-th="Email">' + item.email + '</td>' +
 					'<td data-th="Phone">' + item.phone + '</td>' +
-					<?php if ($can_view_leaders or $can_edit_leaders) { ?>
+					<?php if ($can_view_leaders or $can_edit_leaders or $can_view_address) { ?>
 					'<td data-th="Actions">' +
+						<?php if ($can_view_address) { ?>
+						'<a class="view_address" title="View member address information."><i class="fa fa-home"></i></a> ' +	
+						<?php } ?>
 						<?php if ($can_edit_leaders) { ?>
-						'<a title="Edit ride leader profile information."><i class="fa fa-pencil-square"></i></a> ' +
+						'<a class="edit_leaders" title="Edit ride leader profile information."><i class="fa fa-pencil-square"></i></a> ' +
 						<?php } else { ?>
-						'<a title="View ride leader profile information."><i class="fa fa-eye"></i></a> ' +
+						'<a class="edit_leaders" title="View ride leader profile information."><i class="fa fa-eye"></i></a> ' +
 						<?php } ?>
 					'</td>' +
 					<?php } ?>
 					'</tr>';
 					$('#pwtc-ride-leaders-div table').append(data);    
 				});
+				<?php if ($can_view_address) { ?>
+				$('#pwtc-ride-leaders-div table .view_address').on('click', function(e) {
+					var userid = $(this).parent().parent().attr('userid');
+					var action = "<?php echo admin_url('admin-ajax.php'); ?>";
+					var data = {
+						'action': 'pwtc_member_fetch_address',
+						'userid': userid
+					};
+					$.post(action, data, display_user_address_cb);
+					$('#pwtc-ride-leader-wait .wait-message').html('Loading member address information.');
+					$('#pwtc-ride-leader-wait').foundation('open');
+				});
+				<?php } ?>
 				<?php if ($can_view_leaders or $can_edit_leaders) { ?>
-				$('#pwtc-ride-leaders-div table a').on('click', function(e) {
+				$('#pwtc-ride-leaders-div table .edit_leaders').on('click', function(e) {
 					$("#pwtc-ride-leader-profile input[type='text']").val('');
 					var userid = $(this).parent().parent().attr('userid');
 					$("#pwtc-ride-leader-profile input[name='userid']").val(userid);
@@ -809,7 +845,6 @@ class PwtcMapdb {
 
 		});
 	</script>
-	<?php if ($can_view_leaders or $can_edit_leaders) { ?>
 	<div id="pwtc-ride-leader-error" class="small reveal" data-close-on-click="false" data-v-offset="100" data-reveal>
 		<form class="profile-frm">
 		    <div class="row column">
@@ -826,6 +861,18 @@ class PwtcMapdb {
 			<p class="wait-message"></p>
 		</div>
 	</div>
+	<?php if ($can_view_address) { ?>
+	<div id="pwtc-member-address" class="small reveal" data-close-on-click="false" data-v-offset="100" data-reveal>
+		<form class="profile-frm">
+			<div class="row column">
+			</div>
+			<div class="row column clearfix">
+				<input class="accent button float-left" type="button" value="Close" data-close/>
+			</div>
+		</form>
+	</div>
+	<?php } ?>
+	<?php if ($can_view_leaders or $can_edit_leaders) { ?>
 	<div id="pwtc-ride-leader-profile" class="small reveal" data-close-on-click="false" data-v-offset="100" data-reveal>
 		<form class="profile-frm">
 			<input type="hidden" name="userid"/>
@@ -1073,6 +1120,39 @@ class PwtcMapdb {
         wp_die();
 	}
 
+	public static function member_fetch_address_callback() {
+		if (!current_user_can(PwtcMapdb::VIEW_ADDRESS_CAP)) {
+			$response = array(
+				'error' => 'Address fetch failed - user access denied.'
+			);		
+		}
+		else if (isset($_POST['userid'])) {
+			$userid = intval($_POST['userid']);
+			$member_info = get_userdata($userid);
+			if ($member_info === false) {
+				$response = array(
+					'userid' => $userid,
+					'error' => 'Address fetch failed - user ID ' . $userid . ' not valid.'
+				);
+			}
+			else {
+				$response = array(
+					'userid' => $userid,
+					'first_name' => $member_info->first_name,
+					'last_name' => $member_info->last_name,
+					'email' => $member_info->user_email
+				);
+			}
+		}
+		else {
+			$response = array(
+				'error' => 'Address fetch failed - AJAX arguments missing.'
+			);		
+		}
+		echo wp_json_encode($response);
+        wp_die();
+	}
+
 	public static function ride_leader_update_profile_callback() {
 		if (!current_user_can(PwtcMapdb::EDIT_LEADERS_CAP)) {
 			$response = array(
@@ -1296,7 +1376,7 @@ class PwtcMapdb {
 			<?php if ($cancelled > 0) { ?>
 			<li><?php echo $cancelled; ?> cancelled members</li>
 			<?php } ?>
-			</ul><?php echo $total; ?> total members.</div>
+			</ul></div>
 			<?php
 			return ob_get_clean();
 		}
@@ -1418,6 +1498,7 @@ class PwtcMapdb {
 
 	public static function add_caps_admin_role() {
 		$admin = get_role('administrator');
+		$admin->add_cap(self::VIEW_ADDRESS_CAP);
 		$admin->add_cap(self::VIEW_LEADERS_CAP);
 		$admin->add_cap(self::EDIT_LEADERS_CAP);
 		self::write_log('PWTC MapDB plugin added capabilities to administrator role');
@@ -1425,6 +1506,7 @@ class PwtcMapdb {
 
 	public static function remove_caps_admin_role() {
 		$admin = get_role('administrator');
+		$admin->remove_cap(self::VIEW_ADDRESS_CAP);
 		$admin->remove_cap(self::VIEW_LEADERS_CAP);
 		$admin->remove_cap(self::EDIT_LEADERS_CAP);
 		self::write_log('PWTC MapDB plugin removed capabilities from administrator role');
