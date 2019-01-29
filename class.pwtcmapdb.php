@@ -590,7 +590,7 @@ class PwtcMapdb {
 					$('#pwtc-member-address .address-data').append(
 						'<div>' + res.street1 + '</div>');
 					$('#pwtc-member-address .address-data').append(
-						'<div>' + res.city + ' ' + res.state + ' ' + res.zipcode + '</div>');
+						'<div>' + res.city + ', ' + res.state + ' ' + res.zipcode + '</div>');
 					$('#pwtc-member-address .contact-data').append(
 						'<div>' + res.email + '</div>');
 					$('#pwtc-member-address .contact-data').append(
@@ -666,7 +666,7 @@ class PwtcMapdb {
 					<?php if ($can_view_leaders or $can_edit_leaders or $can_view_address) { ?>
 					'<td data-th="Actions">' +
 						<?php if ($can_view_address) { ?>
-						'<a class="view_address" title="View member address information."><i class="fa fa-home"></i></a> ' +	
+						'<a class="view_address" title="View member contact information."><i class="fa fa-home"></i></a> ' +	
 						<?php } ?>
 						<?php if ($can_edit_leaders) { ?>
 						'<a class="edit_leaders" title="Edit ride leader profile information."><i class="fa fa-pencil-square"></i></a> ' +
@@ -1154,12 +1154,16 @@ class PwtcMapdb {
 				);
 			}
 			else {
+				$riderid = get_field('rider_id', 'user_'.$userid);
+				if (!$riderid) {
+					$riderid = '';
+				}
 				$response = array(
 					'userid' => $userid,
 					'first_name' => $member_info->first_name,
 					'last_name' => $member_info->last_name,
 					'email' => $member_info->user_email,
-					'riderid' => get_field('rider_id', 'user_'.$userid),
+					'riderid' => $riderid,
 					'street1' => get_user_meta($userid, 'billing_address_1', true),
 					'street2' => get_user_meta($userid, 'billing_address_2', true), 
 					'city' => get_user_meta($userid, 'billing_city', true), 
