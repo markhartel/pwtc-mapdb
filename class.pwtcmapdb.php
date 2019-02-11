@@ -590,7 +590,9 @@ class PwtcMapdb {
 					$('#pwtc-member-address .address-data').append(
 						'<div>' + res.street1 + '</div>');
 					$('#pwtc-member-address .address-data').append(
-						'<div>' + res.city + ', ' + res.state + ' ' + res.zipcode + '</div>');
+						'<div>' + res.street2 + '</div>');
+					$('#pwtc-member-address .address-data').append(
+						'<div>' + res.city + ' ' + res.state + ' ' + res.zipcode + '</div>');
 					$('#pwtc-member-address .contact-data').append(
 						'<div>' + res.email + '</div>');
 					$('#pwtc-member-address .contact-data').append(
