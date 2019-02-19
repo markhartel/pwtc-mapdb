@@ -72,7 +72,18 @@ class PwtcMapdb {
 		add_action( 'template_redirect', 
 			array( 'PwtcMapdb', 'download_ride_leaders_list' ) );
 
+		add_filter( 'wc_memberships_members_area_my-memberships_actions', 		
+			array( 'PwtcMapdb', 'edit_my_memberships_actions' ) );
+		add_filter( 'wc_memberships_members_area_my-membership-details_actions', 
+			array( 'PwtcMapdb', 'edit_my_memberships_actions' ) );
+				
 	}
+
+	public static function edit_my_memberships_actions( $actions ) {
+		// remove the "Cancel" action for members
+		unset( $actions['cancel'] );
+		return $actions;
+	}	
 
 	/*************************************************************/
 	/* Script and style enqueue callback functions
