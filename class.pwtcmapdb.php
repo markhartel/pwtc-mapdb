@@ -72,8 +72,10 @@ class PwtcMapdb {
 		add_action( 'template_redirect', 
 			array( 'PwtcMapdb', 'download_ride_leaders_list' ) );
 
+		/*
 		add_filter( 'wc_memberships_for_teams_new_team_data', 		
 			array( 'PwtcMapdb', 'rename_new_team_to_owner' ) );
+		*/
 		
 		/*
 		add_filter( 'wc_memberships_members_area_my-memberships_actions', 		
@@ -83,6 +85,7 @@ class PwtcMapdb {
 		*/				
 	}
 
+	/*
 	public static function rename_new_team_to_owner( $team_post_data ) {
 		$user_data = get_userdata($team_post_data['post_author']);
 		if (!$user_data) {
@@ -93,6 +96,7 @@ class PwtcMapdb {
 		}
 		return $team_post_data;
 	}	
+	*/
 
 	/*
 	public static function edit_my_memberships_actions( $actions ) {
