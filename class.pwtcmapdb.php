@@ -116,10 +116,15 @@ class PwtcMapdb {
 		if ( sizeof( WC()->cart->get_cart() ) > 0 ) {
 			foreach ( WC()->cart->get_cart() as $cart_item_key => $values ) {
 				$product = $values['data'];
+				if (has_term('Memberships', 'product_cat', $product->get_id())) {
+					$membership_cnt++;
+				}
+				/*
 				$categories = $product->get_category_ids();
 				if (in_array('memberships', $categories)) {
 					$membership_cnt++;
 				}
+				*/
 			}
 		}
 		if ($membership_cnt > 1) {
