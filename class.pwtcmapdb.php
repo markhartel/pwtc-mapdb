@@ -82,7 +82,10 @@ class PwtcMapdb {
 			array( 'PwtcMapdb', 'edit_my_memberships_actions' ) );
 		add_filter( 'wc_memberships_members_area_my-membership-details_actions', 
 			array( 'PwtcMapdb', 'edit_my_memberships_actions' ) );
-		*/				
+		*/	
+		
+		add_action('woocommerce_checkout_process', 
+			array( 'PwtcMapdb', 'validate_checkout_callback' ));
 	}
 
 	/*
@@ -105,6 +108,10 @@ class PwtcMapdb {
 		return $actions;
 	}	
 	*/
+
+	public static function validate_checkout_callback() {
+		wc_add_notice( 'Checkout is not allowed.', 'error' );
+	}
 
 	/*************************************************************/
 	/* Script and style enqueue callback functions
