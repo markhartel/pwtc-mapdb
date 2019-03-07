@@ -84,10 +84,12 @@ class PwtcMapdb {
 			array( 'PwtcMapdb', 'edit_my_memberships_actions' ) );
 		*/	
 		
+		/*
 		add_action('woocommerce_before_cart', 
 			array( 'PwtcMapdb', 'validate_checkout_callback' ));
 		add_action('woocommerce_checkout_process', 
 			array( 'PwtcMapdb', 'validate_checkout_callback' ));
+		*/
 	}
 
 	/*
@@ -111,6 +113,7 @@ class PwtcMapdb {
 	}	
 	*/
 
+	/*
 	public static function validate_checkout_callback() {
 		$membership_cnt = 0;
 		if ( sizeof( WC()->cart->get_cart() ) > 0 ) {
@@ -119,12 +122,10 @@ class PwtcMapdb {
 				if (has_term('Memberships', 'product_cat', $product->get_id())) {
 					$membership_cnt++;
 				}
-				/*
-				$categories = $product->get_category_ids();
-				if (in_array('memberships', $categories)) {
-					$membership_cnt++;
-				}
-				*/
+				//$categories = $product->get_category_ids();
+				//if (in_array('memberships', $categories)) {
+				//	$membership_cnt++;
+				//}
 			}
 		}
 		if ($membership_cnt > 1) {
@@ -137,6 +138,7 @@ class PwtcMapdb {
 			}
 		}
 	}
+	*/
 
 	/*************************************************************/
 	/* Script and style enqueue callback functions
