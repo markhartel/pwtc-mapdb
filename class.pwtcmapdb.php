@@ -1459,7 +1459,7 @@ class PwtcMapdb {
 			$total = $active + $expired + $delayed + $complimentary + $paused + $cancelled;
 			ob_start();
 			?>
-			<div>PWTC membership statistics as of <?php echo $today; ?>:<ul>
+			<div>Membership statistics as of <?php echo $today; ?>:<ul>
 			<li><?php echo $active; ?> active members</li>
 			<li><?php echo $expired; ?> expired members</li>
 			<?php if ($complimentary > 0) { ?>
@@ -1502,7 +1502,7 @@ class PwtcMapdb {
 			$family_members = self::count_family_members();
 			ob_start();
 			?>
-			<div>PWTC family member statistics as of <?php echo $today; ?>:<ul>
+			<div>Family member statistics as of <?php echo $today; ?>:<ul>
 			<li><?php echo $families; ?> family memberships</li>
 			<li><?php echo $family_members; ?> family members</li>
 			</ul></div>
@@ -1566,7 +1566,7 @@ class PwtcMapdb {
 			if ( $the_query->have_posts() ) {
 				ob_start();
 				?>
-				<div>New PWTC members since <?php echo $month->format('F Y'); ?>:<ul>
+				<div>New members since <?php echo $month->format('F Y'); ?>:<ul>
 				<?php
 				while ( $the_query->have_posts() ) {
 					$the_query->the_post();
