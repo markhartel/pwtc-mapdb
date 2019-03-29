@@ -1130,8 +1130,18 @@ class PwtcMapdb {
 						$phone = '*****';
 					}
 					else {
-						$email = $member_info->user_email;
-						$phone = $member_info->billing_phone;
+						if (!empty($member_info->user_email)) {
+							$email = '<a href="mailto:' . $member_info->user_email . '">' . $member_info->user_email . '</a>';
+						}
+						else {
+							$email = '';
+						}
+						if (!empty($member_info->billing_phone)) {
+							$phone = '<a href="tel:' . $member_info->billing_phone . '">' . $member_info->billing_phone . '</a>';
+						}
+						else {
+							$phone = '';
+						}
 					}
 					$member_names[] = [
 						'ID' => $member->ID,
