@@ -665,6 +665,8 @@ class PwtcMapdb {
 						'<div>' + res.phone + '</div>');
 					$('#pwtc-member-address .contact-data').append(
 						'<div>Rider ID: ' + res.riderid + '</div>');
+					$('#pwtc-member-address .contact-data').append(
+						'<div>Family:' + res.family + '</div>');
 					$('#pwtc-member-address').foundation('open');
 				}
 			}
@@ -1232,6 +1234,18 @@ class PwtcMapdb {
 				);
 			}
 			else {
+				$family = '';
+				if (function_exists('wc_memberships_for_teams_get_teams')) {
+					$teams = wc_memberships_for_teams_get_teams($userid);
+					if ($teams && !empty($teams)) {
+						foreach ( $teams as $team ) {
+							$family .= ' ' . $team->get_name();
+							if ($team->is_user_owner($userid)) {
+								$family .= ' (owner)';
+							}
+						}
+					}
+				}
 				$riderid = get_field('rider_id', 'user_'.$userid);
 				if (!$riderid) {
 					$riderid = '';
@@ -1248,7 +1262,8 @@ class PwtcMapdb {
 					'state' => get_user_meta($userid, 'billing_state', true), 
 					'country' => get_user_meta($userid, 'billing_country', true), 
 					'zipcode' => get_user_meta($userid, 'billing_postcode', true), 
-					'phone' => get_user_meta($userid, 'billing_phone', true) 
+					'phone' => get_user_meta($userid, 'billing_phone', true),
+					'family' => $family
 				);
 			}
 		}
