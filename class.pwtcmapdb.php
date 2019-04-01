@@ -57,6 +57,9 @@ class PwtcMapdb {
 		add_shortcode('pwtc_membership_new_members', 
 			array( 'PwtcMapdb', 'shortcode_membership_new_members'));
 
+		add_shortcode('pwtc_membership_renew_nag', 
+			array( 'PwtcMapdb', 'shortcode_membership_renew_nag'));
+
 		add_action( 'wp_ajax_pwtc_ride_leader_lookup', 
 			array( 'PwtcMapdb', 'ride_leader_lookup_callback') );
 
@@ -1614,6 +1617,59 @@ class PwtcMapdb {
 			}
 		}
 	}
+
+	// Generates the [pwtc_membership_renew_nag] shortcode.
+	public static function shortcode_membership_renew_nag($atts) {
+		$current_user = wp_get_current_user();
+		if ( 0 == $current_user->ID ) {
+			return '';
+		}
+		if (!function_exists('wc_memberships_get_user_memberships')) {
+			return '';
+		}
+		$memberships = wc_memberships_get_user_memberships($current_user->ID);
+		if (empty($memberships)) {
+			return '';
+		}
+		if (count($memberships) > 1) {
+			ob_start();
+			?>
+			<div class="callout alert"><p>You have multiple memberships, please notify website admin to resolve</p></div>		
+			<?php
+			return ob_get_clean();
+		}
+		$membership = $memberships[0];
+		if (!$membership->is_expired()) {
+			return '';
+		}
+		$team = false;
+		if (function_exists('wc_memberships_for_teams_get_user_membership_team')) {
+			$team = wc_memberships_for_teams_get_user_membership_team($membership->get_id());
+		}
+		if ($team) {
+			if ($team->is_user_owner($current_user->ID)) {
+				ob_start();
+				?>
+				<div class="callout warning"><p>Your family membership has expired. <a href="<?php echo $team->get_renew_membership_url(); ?>">Click here to renew</a></p></div>		
+				<?php
+				return ob_get_clean();
+			}
+			else {
+				ob_start();
+				?>
+				<div class="callout warning"><p>Your family membership has expired, please ask the membership owner to renew</p></div>		
+				<?php
+				return ob_get_clean();	
+			}
+		}
+		else {
+			ob_start();
+			?>
+			<div class="callout warning"><p>Your individual membership has expired. <a href="<?php echo $membership->get_renew_membership_url(); ?>">Click here to renew</a></p></div>		
+			<?php
+			return ob_get_clean();
+		}
+	}	
 	
 	/*************************************************************/
 	/* Plugin installation and removal functions.
