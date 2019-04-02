@@ -1639,35 +1639,64 @@ class PwtcMapdb {
 			return ob_get_clean();
 		}
 		$membership = $memberships[0];
+		/*
 		if (!$membership->is_expired()) {
 			return '';
 		}
+		*/
 		$team = false;
 		if (function_exists('wc_memberships_for_teams_get_user_membership_team')) {
 			$team = wc_memberships_for_teams_get_user_membership_team($membership->get_id());
 		}
 		if ($team) {
 			if ($team->is_user_owner($current_user->ID)) {
+				if ($membership->is_expired()) {
+					ob_start();
+					?>
+					<div class="callout warning"><p>Your family membership has expired. <a href="<?php echo $team->get_renew_membership_url(); ?>">Click here to renew</a></p></div>		
+					<?php
+					return ob_get_clean();
+				}
+				else {
+					ob_start();
+					?>
+					<div class="callout success"><p>Your family membership expires on <?php echo $team->get_local_membership_end_date(); ?></p></div>		
+					<?php
+					return ob_get_clean();
+				}
+			}
+			else {
+				if ($membership->is_expired()) {
+					ob_start();
+					?>
+					<div class="callout warning"><p>Your family membership has expired, please ask the membership owner to renew</p></div>		
+					<?php
+					return ob_get_clean();	
+				}
+				else {
+					ob_start();
+					?>
+					<div class="callout success"><p>Your family membership expires on <?php echo $team->get_local_membership_end_date(); ?></p></div>		
+					<?php
+					return ob_get_clean();
+				}
+			}
+		}
+		else {
+			if ($membership->is_expired()) {
 				ob_start();
 				?>
-				<div class="callout warning"><p>Your family membership has expired. <a href="<?php echo $team->get_renew_membership_url(); ?>">Click here to renew</a></p></div>		
+				<div class="callout warning"><p>Your individual membership has expired. <a href="<?php echo $membership->get_renew_membership_url(); ?>">Click here to renew</a></p></div>		
 				<?php
 				return ob_get_clean();
 			}
 			else {
 				ob_start();
 				?>
-				<div class="callout warning"><p>Your family membership has expired, please ask the membership owner to renew</p></div>		
+				<div class="callout success"><p>Your individual membership expires on <?php echo $membership->get_local_end_date(); ?></p></div>		
 				<?php
-				return ob_get_clean();	
+				return ob_get_clean();
 			}
-		}
-		else {
-			ob_start();
-			?>
-			<div class="callout warning"><p>Your individual membership has expired. <a href="<?php echo $membership->get_renew_membership_url(); ?>">Click here to renew</a></p></div>		
-			<?php
-			return ob_get_clean();
 		}
 	}	
 	
