@@ -1692,11 +1692,20 @@ class PwtcMapdb {
 				return ob_get_clean();
 			}
 			else {
-				ob_start();
-				?>
-				<div class="callout success"><p>Your individual membership expires on <?php echo date('F j, Y', $membership->get_local_end_date('timestamp')); ?></p></div>		
-				<?php
-				return ob_get_clean();
+				if ($membership->has_end_date()) {
+					ob_start();
+					?>
+					<div class="callout success"><p>Your individual membership expires on <?php echo date('F j, Y', $membership->get_local_end_date('timestamp')); ?></p></div>		
+					<?php
+					return ob_get_clean();
+				}
+				else {
+					ob_start();
+					?>
+					<div class="callout success"><p>Your individual membership will never expire</p></div>		
+					<?php
+					return ob_get_clean();
+				}
 			}
 		}
 	}	
