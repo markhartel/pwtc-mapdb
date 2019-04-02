@@ -1661,7 +1661,7 @@ class PwtcMapdb {
 				else {
 					ob_start();
 					?>
-					<div class="callout success"><p>Your family membership "<?php echo $team->get_name(); ?>" expires on <?php echo date('F j Y', $team->get_local_membership_end_date('timestamp')); ?></p></div>		
+					<div class="callout success"><p>Your family membership "<?php echo $team->get_name(); ?>" expires on <?php echo date('F j, Y', $team->get_local_membership_end_date('timestamp')); ?></p></div>		
 					<?php
 					return ob_get_clean();
 				}
@@ -1677,7 +1677,7 @@ class PwtcMapdb {
 				else {
 					ob_start();
 					?>
-					<div class="callout success"><p>The family membership "<?php echo $team->get_name(); ?>" expires on <?php echo date('F j Y',$team->get_local_membership_end_date('timestamp')); ?></p></div>		
+					<div class="callout success"><p>The family membership "<?php echo $team->get_name(); ?>" expires on <?php echo date('F j, Y',$team->get_local_membership_end_date('timestamp')); ?></p></div>		
 					<?php
 					return ob_get_clean();
 				}
@@ -1694,7 +1694,7 @@ class PwtcMapdb {
 			else {
 				ob_start();
 				?>
-				<div class="callout success"><p>Your individual membership expires on <?php echo date('F j Y', $membership->get_local_end_date('timestamp')); ?></p></div>		
+				<div class="callout success"><p>Your individual membership expires on <?php echo date('F j, Y', $membership->get_local_end_date('timestamp')); ?></p></div>		
 				<?php
 				return ob_get_clean();
 			}
