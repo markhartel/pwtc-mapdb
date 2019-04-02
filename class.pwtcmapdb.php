@@ -1620,6 +1620,7 @@ class PwtcMapdb {
 
 	// Generates the [pwtc_membership_renew_nag] shortcode.
 	public static function shortcode_membership_renew_nag($atts) {
+		$a = shortcode_atts(array('renewonly' => 'no'), $atts);
 		$current_user = wp_get_current_user();
 		if ( 0 == $current_user->ID ) {
 			return '';
@@ -1639,11 +1640,11 @@ class PwtcMapdb {
 			return ob_get_clean();
 		}
 		$membership = $memberships[0];
-		/*
-		if (!$membership->is_expired()) {
-			return '';
+		if ($a['renewonly'] == 'yes') {
+			if (!$membership->is_expired()) {
+				return '';
+			}
 		}
-		*/
 		$team = false;
 		if (function_exists('wc_memberships_for_teams_get_user_membership_team')) {
 			$team = wc_memberships_for_teams_get_user_membership_team($membership->get_id());
@@ -1653,14 +1654,14 @@ class PwtcMapdb {
 				if ($membership->is_expired()) {
 					ob_start();
 					?>
-					<div class="callout warning"><p>Your family membership has expired. <a href="<?php echo $team->get_renew_membership_url(); ?>">Click here to renew</a></p></div>		
+					<div class="callout warning"><p>Your family membership "<?php echo $team->get_name(); ?>" has expired. <a href="<?php echo $team->get_renew_membership_url(); ?>">Click here to renew</a></p></div>		
 					<?php
 					return ob_get_clean();
 				}
 				else {
 					ob_start();
 					?>
-					<div class="callout success"><p>Your family membership expires on <?php echo $team->get_local_membership_end_date(); ?></p></div>		
+					<div class="callout success"><p>Your family membership "<?php echo $team->get_name(); ?>" expires on <?php echo date('F j Y', $team->get_local_membership_end_date('timestamp')); ?></p></div>		
 					<?php
 					return ob_get_clean();
 				}
@@ -1669,14 +1670,14 @@ class PwtcMapdb {
 				if ($membership->is_expired()) {
 					ob_start();
 					?>
-					<div class="callout warning"><p>Your family membership has expired, please ask the membership owner to renew</p></div>		
+					<div class="callout warning"><p>The family membership "<?php echo $team->get_name(); ?>" has expired, please ask the membership owner to renew</p></div>		
 					<?php
 					return ob_get_clean();	
 				}
 				else {
 					ob_start();
 					?>
-					<div class="callout success"><p>Your family membership expires on <?php echo $team->get_local_membership_end_date(); ?></p></div>		
+					<div class="callout success"><p>The family membership "<?php echo $team->get_name(); ?>" expires on <?php echo date('F j Y',$team->get_local_membership_end_date('timestamp')); ?></p></div>		
 					<?php
 					return ob_get_clean();
 				}
@@ -1693,7 +1694,7 @@ class PwtcMapdb {
 			else {
 				ob_start();
 				?>
-				<div class="callout success"><p>Your individual membership expires on <?php echo $membership->get_local_end_date(); ?></p></div>		
+				<div class="callout success"><p>Your individual membership expires on <?php echo date('F j Y', $membership->get_local_end_date('timestamp')); ?></p></div>		
 				<?php
 				return ob_get_clean();
 			}
