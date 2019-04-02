@@ -1630,7 +1630,16 @@ class PwtcMapdb {
 		}
 		$memberships = wc_memberships_get_user_memberships($current_user->ID);
 		if (empty($memberships)) {
-			return '';
+			if ($a['renewonly'] == 'yes') {
+				return '';
+			}
+			else {
+				ob_start();
+				?>
+				<div class="callout success"><p>You have no membership</p></div>		
+				<?php
+				return ob_get_clean();
+			}
 		}
 		if (count($memberships) > 1) {
 			ob_start();
@@ -1670,14 +1679,14 @@ class PwtcMapdb {
 				if ($membership->is_expired()) {
 					ob_start();
 					?>
-					<div class="callout warning"><p>The family membership "<?php echo $team->get_name(); ?>" has expired, please ask the membership owner to renew</p></div>		
+					<div class="callout warning"><p>Your family membership "<?php echo $team->get_name(); ?>" has expired, please ask the membership owner to renew</p></div>		
 					<?php
 					return ob_get_clean();	
 				}
 				else {
 					ob_start();
 					?>
-					<div class="callout success"><p>The family membership "<?php echo $team->get_name(); ?>" expires on <?php echo date('F j, Y',$team->get_local_membership_end_date('timestamp')); ?></p></div>		
+					<div class="callout success"><p>Your family membership "<?php echo $team->get_name(); ?>" expires on <?php echo date('F j, Y',$team->get_local_membership_end_date('timestamp')); ?></p></div>		
 					<?php
 					return ob_get_clean();
 				}
