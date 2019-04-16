@@ -60,6 +60,9 @@ class PwtcMapdb {
 		add_shortcode('pwtc_membership_renew_nag', 
 			array( 'PwtcMapdb', 'shortcode_membership_renew_nag'));
 
+		add_shortcode('pwtc_membership_accept_release', 
+			array( 'PwtcMapdb', 'shortcode_membership_accept_release'));
+
 		add_action( 'wp_ajax_pwtc_ride_leader_lookup', 
 			array( 'PwtcMapdb', 'ride_leader_lookup_callback') );
 
@@ -1718,6 +1721,24 @@ class PwtcMapdb {
 			}
 		}
 	}	
+
+	// Generates the [pwtc_membership_accept_release] shortcode.
+	public static function shortcode_membership_accept_release($atts) {
+		$a = shortcode_atts(array('renewonly' => 'no'), $atts);
+		$current_user = wp_get_current_user();
+		if ( 0 == $current_user->ID ) {
+			return '';
+		}
+		$userid = $current_user->ID;
+		if (get_field('release_accepted', 'user_'.$userid)) {
+			return '';
+		}
+		ob_start();
+		?>
+		<div class="callout warning"><p>Please read and accept the Club's <a href="/terms-and-conditions" target="_blank">terms and conditions</a>.<form method="POST"><button class="button" type="submit" name="pwtc_membership_accept_release">I Accept</button><input type="hidden" name="user_id" value="<?php echo $userid; ?>"/></form></p></div>		
+		<?php
+		return ob_get_clean();
+	}
 	
 	/*************************************************************/
 	/* Plugin installation and removal functions.
