@@ -1724,18 +1724,20 @@ class PwtcMapdb {
 
 	// Generates the [pwtc_membership_accept_release] shortcode.
 	public static function shortcode_membership_accept_release($atts) {
-		$a = shortcode_atts(array('renewonly' => 'no'), $atts);
 		$current_user = wp_get_current_user();
 		if ( 0 == $current_user->ID ) {
 			return '';
 		}
 		$userid = $current_user->ID;
+		if (isset($_POST['pwtc_membership_accept_release'])) {
+			update_field('release_accepted', true, 'user_'.$userid);
+		}
 		if (get_field('release_accepted', 'user_'.$userid)) {
 			return '';
 		}
 		ob_start();
 		?>
-		<div class="callout warning"><p>Please read and accept the Club's <a href="/terms-and-conditions" target="_blank">terms and conditions</a>.<form method="POST"><button class="button" type="submit" name="pwtc_membership_accept_release">I Accept</button><input type="hidden" name="user_id" value="<?php echo $userid; ?>"/></form></p></div>		
+		<div class="callout warning"><p>Please read and accept the Club's <a href="/terms-and-conditions" target="_blank">terms and conditions</a>.<form method="POST"><button class="button" type="submit" name="pwtc_membership_accept_release">I Accept</button></form></p></div>		
 		<?php
 		return ob_get_clean();
 	}
