@@ -1145,7 +1145,9 @@ class PwtcMapdb {
 							$email = '';
 						}
 						if (!empty($member_info->billing_phone)) {
-							$phone = '<a href="tel:' . $member_info->billing_phone . '">' . $member_info->billing_phone . '</a>';
+							$phone = '<a href="tel:' . 
+								pwtc_mapdb_strip_phone_number($member_info->billing_phone) . '">' . 
+								pwtc_mapdb_format_phone_number($member_info->billing_phone) . '</a>';
 						}
 						else {
 							$phone = '';
@@ -1256,6 +1258,10 @@ class PwtcMapdb {
 				if (!$riderid) {
 					$riderid = '';
 				}
+				$phone = get_user_meta($userid, 'billing_phone', true);
+				if (!empty($phone)) {
+					$phone = pwtc_mapdb_format_phone_number($phone);
+				}
 				$response = array(
 					'userid' => $userid,
 					'first_name' => $member_info->first_name,
@@ -1268,7 +1274,7 @@ class PwtcMapdb {
 					'state' => get_user_meta($userid, 'billing_state', true), 
 					'country' => get_user_meta($userid, 'billing_country', true), 
 					'zipcode' => get_user_meta($userid, 'billing_postcode', true), 
-					'phone' => get_user_meta($userid, 'billing_phone', true),
+					'phone' => $phone,
 					'family' => $family
 				);
 			}

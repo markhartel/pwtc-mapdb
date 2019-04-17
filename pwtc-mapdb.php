@@ -21,6 +21,7 @@ register_activation_hook( __FILE__, array( 'PwtcMapdb', 'plugin_activation' ) );
 register_deactivation_hook( __FILE__, array( 'PwtcMapdb', 'plugin_deactivation' ) );
 register_uninstall_hook( __FILE__, array( 'PwtcMapdb', 'plugin_uninstall' ) );
 
+require_once( PWTC_MAPDB__PLUGIN_DIR . 'pwtc-mapdb-hooks.php' );
 require_once( PWTC_MAPDB__PLUGIN_DIR . 'class.pwtcmapdb.php' );
 
 add_action( 'init', array( 'PwtcMapdb', 'init' ) );
