@@ -63,6 +63,9 @@ class PwtcMapdb {
 		add_shortcode('pwtc_membership_accept_release', 
 			array( 'PwtcMapdb', 'shortcode_membership_accept_release'));
 
+		add_shortcode('pwtc_membership_leader_contact', 
+			array( 'PwtcMapdb', 'shortcode_membership_leader_contact'));
+
 		add_action( 'wp_ajax_pwtc_ride_leader_lookup', 
 			array( 'PwtcMapdb', 'ride_leader_lookup_callback') );
 
@@ -1744,6 +1747,60 @@ class PwtcMapdb {
 		ob_start();
 		?>
 		<div class="callout warning"><p>Please read and accept the Club's <a href="/terms-and-conditions" target="_blank">terms and conditions</a>.<form method="POST"><button class="button" type="submit" name="pwtc_membership_accept_release">I Accept</button></form></p></div>		
+		<?php
+		return ob_get_clean();
+	}
+
+	// Generates the [pwtc_membership_leader_contact] shortcode.
+	public static function shortcode_membership_leader_contact($atts) {
+		$current_user = wp_get_current_user();
+		if ( 0 == $current_user->ID ) {
+			return '';
+		}
+		$userid = $current_user->ID;
+		$user_info = get_userdata( $userid );
+		if (!in_array('ride_leader', $user_info->roles)) {
+			return '';
+		}
+		ob_start();
+		?>
+		<div>
+			<form>
+				<div class="row column">
+					<div class="callout small secondary">
+						<p><i>These entries are displayed in the ride calendar for use by riders to contact the ride leader for additional information. Set an entry blank to not display.</i></p>
+					</div>
+				</div>
+				<div class="row">
+					<div class="small-12 medium-6 columns">
+						<label>Display Contact Email?
+							<select class="use_contact_email">
+								<option value="no" selected>No, display account email</option>
+								<option value="yes">Yes</option>
+							</select>
+						</label>
+					</div>
+					<div class="small-12 medium-6 columns">
+						<label><i class="fa fa-envelope"></i> Contact Email
+							<input type="text" name="contact_email"/>
+						</label>
+					</div>
+					<div class="small-12 medium-6 columns">
+						<label><i class="fa fa-phone"></i> Contact Voice Phone
+							<input type="text" name="voice_phone"/>
+						</label>
+					</div>
+					<div class="small-12 medium-6 columns">
+						<label><i class="fa fa-mobile"></i> Contact Text Phone
+							<input type="text" name="text_phone"/>
+						</label>
+					</div>
+				</div>
+				<div class="row column clearfix">
+					<input class="button float-left" type="submit" value="Submit"/>
+				</div>
+			</form>
+		</div>
 		<?php
 		return ob_get_clean();
 	}
