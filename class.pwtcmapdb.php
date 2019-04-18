@@ -1757,7 +1757,7 @@ class PwtcMapdb {
 		if ( 0 == $current_user->ID ) {
 			ob_start();
 			?>
-			<div class="callout warning"><p>You must be logged in to edit your ride leader contact information</p></div>		
+			<div class="callout warning"><p>You must be logged in to edit your ride leader contact information.</p></div>		
 			<?php
 			return ob_get_clean();
 		}
@@ -1766,7 +1766,7 @@ class PwtcMapdb {
 		if (!in_array('ride_leader', $user_info->roles)) {
 			ob_start();
 			?>
-			<div class="callout warning"><p>You must be a ride leader to edit your contact information</p></div>		
+			<div class="callout warning"><p>You must be a ride leader to edit your contact information.</p></div>		
 			<?php
 			return ob_get_clean();
 		}
@@ -1793,13 +1793,13 @@ class PwtcMapdb {
 		$use_contact_email = get_field('use_contact_email', 'user_'.$userid);
 		ob_start();
 		?>
-		<div>
+		<div class="callout">
 			<form method="POST">
 				<div class="row">
 					<div class="small-12 medium-6 columns">
-						<label>Display Contact Email?
+						<label>Use Contact Email?
 							<select name="use_contact_email">
-								<option value="no" <?php echo $use_contact_email ? '': 'selected'; ?>>No, display account email</option>
+								<option value="no" <?php echo $use_contact_email ? '': 'selected'; ?>>No, use account email instead</option>
 								<option value="yes"  <?php echo $use_contact_email ? 'selected': ''; ?>>Yes</option>
 							</select>
 						</label>
