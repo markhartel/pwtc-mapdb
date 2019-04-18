@@ -1755,44 +1755,68 @@ class PwtcMapdb {
 	public static function shortcode_membership_leader_contact($atts) {
 		$current_user = wp_get_current_user();
 		if ( 0 == $current_user->ID ) {
-			return '';
+			ob_start();
+			?>
+			<div class="callout warning"><p>You must be logged in to edit your ride leader contact information</p></div>		
+			<?php
+			return ob_get_clean();
 		}
 		$userid = $current_user->ID;
 		$user_info = get_userdata( $userid );
 		if (!in_array('ride_leader', $user_info->roles)) {
-			return '';
+			ob_start();
+			?>
+			<div class="callout warning"><p>You must be a ride leader to edit your contact information</p></div>		
+			<?php
+			return ob_get_clean();
 		}
+		if (isset($_POST['use_contact_email'])) {
+			if ($_POST['use_contact_email'] == 'yes') {
+				update_field('use_contact_email', true, 'user_'.$userid);
+			}
+			else {
+				update_field('use_contact_email', false, 'user_'.$userid);
+			}
+		}
+		if (isset($_POST['contact_email'])) {
+			update_field('contact_email', sanitize_email($_POST['contact_email']), 'user_'.$userid);
+		}
+		if (isset($_POST['voice_phone'])) {
+			update_field('cell_phone', pwtc_mapdb_format_phone_number($_POST['voice_phone']), 'user_'.$userid);
+		}
+		if (isset($_POST['text_phone'])) {
+			update_field('home_phone', pwtc_mapdb_format_phone_number($_POST['text_phone']), 'user_'.$userid);
+		}
+		$voice_phone = pwtc_mapdb_format_phone_number(get_field('cell_phone', 'user_'.$userid));
+		$text_phone = pwtc_mapdb_format_phone_number(get_field('home_phone', 'user_'.$userid));
+		$contact_email = get_field('contact_email', 'user_'.$userid);
+		$use_contact_email = get_field('use_contact_email', 'user_'.$userid);
 		ob_start();
 		?>
 		<div>
 			<form>
-				<div class="row column">
-					<div class="callout small secondary">
-						<p><i>These entries are displayed in the ride calendar for use by riders to contact the ride leader for additional information. Set an entry blank to not display.</i></p>
-					</div>
-				</div>
 				<div class="row">
 					<div class="small-12 medium-6 columns">
 						<label>Display Contact Email?
-							<select class="use_contact_email">
-								<option value="no" selected>No, display account email</option>
-								<option value="yes">Yes</option>
+							<select name="use_contact_email">
+								<option value="no" <?php echo $use_contact_email ? '': 'selected'; ?>>No, display account email</option>
+								<option value="yes"  <?php echo $use_contact_email ? 'selected': ''; ?>>Yes</option>
 							</select>
 						</label>
 					</div>
 					<div class="small-12 medium-6 columns">
 						<label><i class="fa fa-envelope"></i> Contact Email
-							<input type="text" name="contact_email"/>
+							<input type="text" name="contact_email" value="<?php echo $contact_email; ?>"/>
 						</label>
 					</div>
 					<div class="small-12 medium-6 columns">
 						<label><i class="fa fa-phone"></i> Contact Voice Phone
-							<input type="text" name="voice_phone"/>
+							<input type="text" name="voice_phone" value="<?php echo $voice_phone; ?>"/>
 						</label>
 					</div>
 					<div class="small-12 medium-6 columns">
 						<label><i class="fa fa-mobile"></i> Contact Text Phone
-							<input type="text" name="text_phone"/>
+							<input type="text" name="text_phone" value="<?php echo $text_phone; ?>"/>
 						</label>
 					</div>
 				</div>
