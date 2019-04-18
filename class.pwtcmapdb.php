@@ -1794,7 +1794,7 @@ class PwtcMapdb {
 		ob_start();
 		?>
 		<div>
-			<form>
+			<form method="POST">
 				<div class="row">
 					<div class="small-12 medium-6 columns">
 						<label>Display Contact Email?
