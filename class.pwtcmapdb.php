@@ -1499,8 +1499,8 @@ class PwtcMapdb {
 			$cancelled = self::count_membership('wcm-cancelled');
 			ob_start();
 			?>
-			<div>Membership statistics as of <?php echo $today; ?>:<ul>
-			<li><?php echo $total; ?> total members</li>
+			<div>Membership statistics as of <?php echo $today; ?><br>
+			<?php echo $total; ?> total members:<ul>
 			<li><?php echo $active; ?> active members</li>
 			<li><?php echo $expired; ?> expired members</li>
 			<?php if ($complimentary != '0') { ?>
