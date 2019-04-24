@@ -1490,28 +1490,29 @@ class PwtcMapdb {
 		}
 		else {
 			$today = date('F j Y', current_time('timestamp'));
-			$active = self::count_membership('active');
-			$expired = self::count_membership('expired');
-			$delayed = self::count_membership('delayed');
-			$complimentary = self::count_membership('complimentary');
-			$paused = self::count_membership('paused');
-			$cancelled = self::count_membership('cancelled');
-			$total = $active + $expired + $delayed + $complimentary + $paused + $cancelled;
+			$total = self::count_membership('all');
+			$active = self::count_membership('wcm-active');
+			$expired = self::count_membership('wcm-expired');
+			$delayed = self::count_membership('wcm-delayed');
+			$complimentary = self::count_membership('wcm-complimentary');
+			$paused = self::count_membership('wcm-paused');
+			$cancelled = self::count_membership('wcm-cancelled');
 			ob_start();
 			?>
 			<div>Membership statistics as of <?php echo $today; ?>:<ul>
+			<li><?php echo $total; ?> total members</li>
 			<li><?php echo $active; ?> active members</li>
 			<li><?php echo $expired; ?> expired members</li>
-			<?php if ($complimentary > 0) { ?>
+			<?php if ($complimentary != '0') { ?>
 			<li><?php echo $complimentary; ?> complimentary members</li>
 			<?php } ?>
-			<?php if ($delayed > 0) { ?>
+			<?php if ($delayed != '0') { ?>
 			<li><?php echo $delayed; ?> delayed members</li>
 			<?php } ?>
-			<?php if ($paused > 0) { ?>
+			<?php if ($paused != '0') { ?>
 			<li><?php echo $paused; ?> paused members</li>
 			<?php } ?>
-			<?php if ($cancelled > 0) { ?>
+			<?php if ($cancelled != '0') { ?>
 			<li><?php echo $cancelled; ?> cancelled members</li>
 			<?php } ?>
 			</ul></div>
@@ -1523,11 +1524,14 @@ class PwtcMapdb {
 	public static function count_membership($status) {
 		$query_args = [
 			'nopaging'    => true,
-			'post_status' => 'wcm-'.$status,
+			'post_status' => $status,
 			'post_type' => 'wc_user_membership',
 		];			
 		$the_query = new WP_Query($query_args);
-		return $the_query->found_posts;
+		if (empty($the_query)) {
+			return 'Unknown';
+		}
+		return '' . $the_query->found_posts;
 	}
 
 	// Generates the [pwtc_membership_families] shortcode.
@@ -1558,17 +1562,23 @@ class PwtcMapdb {
 			'post_type' => 'wc_memberships_team',
 		];			
 		$the_query = new WP_Query($query_args);
-		return $the_query->found_posts;
+		if (empty($the_query)) {
+			return 'Unknown';
+		}
+		return '' . $the_query->found_posts;
 	}
 
 	public static function count_family_members() {
-		$count = 0;
 		$query_args = [
 			'nopaging'    => true,
 			'post_status' => 'any',
 			'post_type' => 'wc_memberships_team',
 		];			
 		$the_query = new WP_Query($query_args);
+		if (empty($the_query)) {
+			return 'Unknown';
+		}
+		$count = 0;
 		if ( $the_query->have_posts() ) {
 			while ( $the_query->have_posts() ) {
 				$the_query->the_post();
@@ -1577,7 +1587,7 @@ class PwtcMapdb {
 			}
 			wp_reset_postdata();
 		}
-		return $count;
+		return '' . $count;
 	}
 
 	// Generates the [pwtc_membership_new_members] shortcode.
@@ -1603,6 +1613,9 @@ class PwtcMapdb {
 				'order'       => 'DESC',
 			];			
 			$the_query = new WP_Query($query_args);
+			if (empty($the_query)) {
+				return '<div class="callout small warning"><p>Cannot access new members.</p></div>';
+			}
 			if ( $the_query->have_posts() ) {
 				ob_start();
 				?>
