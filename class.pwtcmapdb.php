@@ -1529,7 +1529,7 @@ class PwtcMapdb {
 		];			
 		$the_query = new WP_Query($query_args);
 		if (empty($the_query)) {
-			return 'Unknown';
+			return 'unknown';
 		}
 		return '' . $the_query->found_posts;
 	}
@@ -1546,10 +1546,9 @@ class PwtcMapdb {
 			$family_members = self::count_family_members();
 			ob_start();
 			?>
-			<div>Family member statistics as of <?php echo $today; ?>:<ul>
-			<li><?php echo $families; ?> family memberships</li>
-			<li><?php echo $family_members; ?> family members</li>
-			</ul></div>
+			<div>Family member statistics as of <?php echo $today; ?><br>
+			<?php echo $families; ?> family memberships with a total of <?php echo $family_members; ?> family members
+			</div>
 			<?php
 			return ob_get_clean();
 		}
@@ -1563,7 +1562,7 @@ class PwtcMapdb {
 		];			
 		$the_query = new WP_Query($query_args);
 		if (empty($the_query)) {
-			return 'Unknown';
+			return 'unknown';
 		}
 		return '' . $the_query->found_posts;
 	}
@@ -1576,7 +1575,7 @@ class PwtcMapdb {
 		];			
 		$the_query = new WP_Query($query_args);
 		if (empty($the_query)) {
-			return 'Unknown';
+			return 'unknown';
 		}
 		$count = 0;
 		if ( $the_query->have_posts() ) {
