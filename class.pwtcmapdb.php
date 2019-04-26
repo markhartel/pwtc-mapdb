@@ -673,9 +673,22 @@ class PwtcMapdb {
 					$('#pwtc-member-address .contact-data').append(
 						'<div>' + res.phone + '</div>');
 					$('#pwtc-member-address .contact-data').append(
-						'<div>Rider ID: ' + res.riderid + '</div>');
-					$('#pwtc-member-address .contact-data').append(
 						'<div>Family:' + res.family + '</div>');
+					$('#pwtc-member-address .contact-data').append(
+						'<div>Rider ID: ' + res.riderid + '</div>');
+					if (res.riderid.length > 0) {
+						$('#pwtc-member-address .contact-data').append(
+							'<div><a>Download rider card</a>' +
+							'<form class="download-frm" method="POST">' +
+							'<input type="hidden" name="rider_id" value="' + res.riderid + '"/>' +
+							'<input type="hidden" name="user_id" value="' + res.userid + '"/>' +
+							'<input type="hidden" name="pwtc_mileage_download_riderid"/>' +
+							'</form></div>'
+						);
+						$('#pwtc-member-address a').on('click', function(e) {
+							$('#pwtc-member-address .download-frm').submit();
+						});
+					}
 					$('#pwtc-member-address').foundation('open');
 				}
 			}
