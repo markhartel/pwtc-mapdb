@@ -678,7 +678,7 @@ class PwtcMapdb {
 						'<div>Rider ID: ' + res.riderid + '</div>');
 					if (res.riderid.length > 0) {
 						$('#pwtc-member-address .contact-data').append(
-							'<div><a>Download rider card</a>' +
+							'<div><a><i class="fa fa-download"></i> download rider card</a>' +
 							'<form class="download-frm" method="POST">' +
 							'<input type="hidden" name="rider_id" value="' + res.riderid + '"/>' +
 							'<input type="hidden" name="user_id" value="' + res.userid + '"/>' +
