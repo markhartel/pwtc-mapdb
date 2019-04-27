@@ -1437,7 +1437,7 @@ class PwtcMapdb {
 				$today = date('Y-m-d', current_time('timestamp'));
 				header('Content-Description: File Transfer');
 				header("Content-type: text/csv");
-				header("Content-Disposition: attachment; filename={$today}_users_list.csv");
+				header("Content-Disposition: attachment; filename={$today}_{$_POST['file']}.csv");
 				$fp = fopen('php://output', 'w');
 				fputcsv($fp, ['User ID', 'Email', 'First Name', 'Last Name']);
 				$user_query = new WP_User_Query( $query_args );
@@ -1908,6 +1908,7 @@ class PwtcMapdb {
 		$a = shortcode_atts(
 			array(
 				'label' => 'Users',
+				'file' => 'users',
 				'includes' => '',
 				'excludes' => ''
 			), $atts);
@@ -1918,6 +1919,7 @@ class PwtcMapdb {
 				<i class="fa fa-download"></i> <?php echo $a['label'] ?></button>
 			<input type="hidden" name="includes" value="<?php echo $a['includes'] ?>"/>
 			<input type="hidden" name="excludes" value="<?php echo $a['excludes'] ?>"/>
+			<input type="hidden" name="file" value="<?php echo $a['file'] ?>"/>
 		</form>	
 	  	<?php
 		return ob_get_clean();
