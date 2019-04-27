@@ -66,6 +66,9 @@ class PwtcMapdb {
 		add_shortcode('pwtc_membership_leader_contact', 
 			array( 'PwtcMapdb', 'shortcode_membership_leader_contact'));
 
+		add_shortcode('pwtc_membership_download_users', 
+			array( 'PwtcMapdb', 'shortcode_membership_download_users'));
+
 		add_action( 'wp_ajax_pwtc_ride_leader_lookup', 
 			array( 'PwtcMapdb', 'ride_leader_lookup_callback') );
 
@@ -79,7 +82,7 @@ class PwtcMapdb {
 			array( 'PwtcMapdb', 'ride_leader_update_profile_callback') );
 			
 		add_action( 'template_redirect', 
-			array( 'PwtcMapdb', 'download_ride_leaders_list' ) );
+			array( 'PwtcMapdb', 'download_users_list' ) );
 
 		/*
 		add_filter( 'wc_memberships_for_teams_new_team_data', 		
@@ -1405,22 +1408,44 @@ class PwtcMapdb {
         wp_die();
 	}
 
-	public static function download_ride_leaders_list() {
-		if (current_user_can(self::VIEW_LEADERS_CAP)) {
-			if (isset($_POST['pwtc-ride-leaders-download']) and isset($_POST['role'])) {
-				$query_args = self::get_user_query_args();
+	public static function parse_role_list($roles) {
+		$list = [];
+		$tok = strtok($roles, " ");
+		while ($tok !== false) {
+			$list[] = $tok;
+			$tok = strtok(" ");
+		}
+		return $list;
+	}
+
+	public static function download_users_list() {
+		if (current_user_can(self::VIEW_ADDRESS_CAP)) {
+			if (isset($_POST['pwtc-membership-download-users'])) {
+				$query_args = [
+					'meta_key' => 'last_name',
+					'orderby' => 'meta_value',
+					'order' => 'ASC'
+				];
+				$includes = self::parse_role_list($_POST['includes']);
+				if (!empty($includes)) {
+					$query_args['role__in'] = $includes;
+				}
+				$excludes = self::parse_role_list($_POST['excludes']);	
+				if (!empty($excludes)) {
+					$query_args['role__not_in'] = $excludes;
+				}
 				$today = date('Y-m-d', current_time('timestamp'));
 				header('Content-Description: File Transfer');
 				header("Content-type: text/csv");
-				header("Content-Disposition: attachment; filename={$today}_ride_leaders.csv");
+				header("Content-Disposition: attachment; filename={$today}_users_list.csv");
 				$fp = fopen('php://output', 'w');
-				fputcsv($fp, ['Email Address', 'First Name', 'Last Name']);
+				fputcsv($fp, ['User ID', 'Email', 'First Name', 'Last Name']);
 				$user_query = new WP_User_Query( $query_args );
 				$members = $user_query->get_results();
 				if ( !empty($members) ) {
 					foreach ( $members as $member ) {
-						$member_info = get_userdata($member->ID);
-						fputcsv($fp, [$member_info->user_email, $member_info->first_name, $member_info->last_name]);
+						//$member_info = get_userdata($member->ID);
+						fputcsv($fp, [$member->ID, $member->user_email, $member->first_name, $member->last_name]);
 					}
 				}
 				fclose($fp);
@@ -1592,6 +1617,10 @@ class PwtcMapdb {
 			'nopaging'    => true,
 			'post_status' => 'any',
 			'post_type' => 'wc_memberships_team',
+			'fields' => 'ids',
+			'cache_results'  => false,
+			'update_post_meta_cache' => false,
+			'update_post_term_cache' => false,		
 		];			
 		$the_query = new WP_Query($query_args);
 		if (empty($the_query)) {
@@ -1871,6 +1900,26 @@ class PwtcMapdb {
 			</form>
 		</div>
 		<?php
+		return ob_get_clean();
+	}
+
+	// Generates the [pwtc_membership_download_users] shortcode.
+	public static function shortcode_membership_download_users($atts) {
+		$a = shortcode_atts(
+			array(
+				'label' => 'Users',
+				'includes' => '',
+				'excludes' => ''
+			), $atts);
+		ob_start();
+		?>
+		<form method="post">
+			<button class="dark button" type="submit" name="pwtc-membership-download-users">
+				<i class="fa fa-download"></i> <?php echo $a['label'] ?></button>
+			<input type="hidden" name="includes" value="<?php echo $a['includes'] ?>"/>
+			<input type="hidden" name="excludes" value="<?php echo $a['excludes'] ?>"/>
+		</form>	
+	  	<?php
 		return ob_get_clean();
 	}
 	
