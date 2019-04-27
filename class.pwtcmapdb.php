@@ -676,7 +676,7 @@ class PwtcMapdb {
 						'<div>Family:' + res.family + '</div>');
 					$('#pwtc-member-address .contact-data').append(
 						'<div>Rider ID: ' + res.riderid + '</div>');
-					if (res.riderid.length > 0) {
+					if (res.riderid.length > 0 && res.valid_member) {
 						$('#pwtc-member-address .contact-data').append(
 							'<div><a><i class="fa fa-download"></i> download rider card</a>' +
 							'<form class="download-frm" method="POST">' +
@@ -1270,6 +1270,13 @@ class PwtcMapdb {
 						}
 					}
 				}
+				$valid_member = false;
+				if (function_exists('wc_memberships_get_user_memberships')) {
+					$memberships = wc_memberships_get_user_memberships($userid);
+					if (!empty($memberships)) {
+						$valid_member = true;
+					}
+				}		
 				$riderid = get_field('rider_id', 'user_'.$userid);
 				if (!$riderid) {
 					$riderid = '';
@@ -1291,7 +1298,8 @@ class PwtcMapdb {
 					'country' => get_user_meta($userid, 'billing_country', true), 
 					'zipcode' => get_user_meta($userid, 'billing_postcode', true), 
 					'phone' => $phone,
-					'family' => $family
+					'family' => $family,
+					'valid_member' => $valid_member
 				);
 			}
 		}
@@ -1510,6 +1518,8 @@ class PwtcMapdb {
 			$complimentary = self::count_membership('wcm-complimentary');
 			$paused = self::count_membership('wcm-paused');
 			$cancelled = self::count_membership('wcm-cancelled');
+			$pending = self::count_membership('wcm-pending');
+			$free_trial = self::count_membership('wcm-free_trial');
 			ob_start();
 			?>
 			<div>Membership statistics as of <?php echo $today; ?><br>
@@ -1528,6 +1538,12 @@ class PwtcMapdb {
 			<?php if ($cancelled != '0') { ?>
 			<li><?php echo $cancelled; ?> cancelled members</li>
 			<?php } ?>
+			<?php if ($pending != '0') { ?>
+			<li><?php echo $pending; ?> members with pending cancellation</li>
+			<?php } ?>
+			<?php if ($free_trial != '0') { ?>
+			<li><?php echo $free_trial; ?> members with free trial</li>
+			<?php } ?>
 			</ul></div>
 			<?php
 			return ob_get_clean();
@@ -1539,6 +1555,10 @@ class PwtcMapdb {
 			'nopaging'    => true,
 			'post_status' => $status,
 			'post_type' => 'wc_user_membership',
+			'fields' => 'ids',
+			'cache_results'  => false,
+			'update_post_meta_cache' => false,
+			'update_post_term_cache' => false,		
 		];			
 		$the_query = new WP_Query($query_args);
 		if (empty($the_query)) {
