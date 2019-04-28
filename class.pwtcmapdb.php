@@ -2002,6 +2002,7 @@ class PwtcMapdb {
 				ob_start();
 				?>
 				<table class="pwtc-mapdb-rwd-table">
+				<caption>Users With Multiple Memberships</caption>
 				<tr>
 				<th>User ID</th>
 				<th>Email</th>
