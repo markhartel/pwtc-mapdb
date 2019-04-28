@@ -2001,7 +2001,7 @@ class PwtcMapdb {
 			else {
 				ob_start();
 				?>
-				<table>
+				<table class="pwtc-mapdb-rwd-table">
 				<tr>
 				<th>User ID</th>
 				<th>Email</th>
@@ -2014,10 +2014,10 @@ class PwtcMapdb {
 					$user_info = get_userdata( $userid );
 					?>
 					<tr>
-					<td><?php echo $userid; ?></td>
-					<td><?php echo $user_info->user_email; ?></td>
-					<td><?php echo $user_info->first_name; ?></td>
-					<td><?php echo $user_info->last_name; ?></td>
+					<td data-th="ID"><?php echo $userid; ?></td>
+					<td data-th="Email"><?php echo $user_info->user_email; ?></td>
+					<td data-th="First"><?php echo $user_info->first_name; ?></td>
+					<td data-th="Last"><?php echo $user_info->last_name; ?></td>
 					</tr>
 					<?php
 				}
