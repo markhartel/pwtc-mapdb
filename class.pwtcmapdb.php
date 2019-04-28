@@ -1932,7 +1932,7 @@ class PwtcMapdb {
 		else if (!current_user_can(self::VIEW_ADDRESS_CAP)) {
 			ob_start();
 			?>
-			<div class="callout warning"><p>You do not have the access to download users.</p></div>
+			<div class="callout warning"><p>You do not have the rights to download users.</p></div>
 			<?php
 			return ob_get_clean();
 		}
@@ -1974,17 +1974,59 @@ class PwtcMapdb {
 
 	// Generates the [pwtc_membership_multimember_users] shortcode.
 	public static function shortcode_membership_multimember_users($atts) {
-		$results = self::fetch_users_with_multi_memberships(ARRAY_N);
-		ob_start();
-		foreach ($results as $item) {
-			$userid = $item[0];
-			$user_info = get_userdata( $userid );
-			$email = $user_info->user_email;
+		$current_user = wp_get_current_user();
+		if ( 0 == $current_user->ID ) {
+			ob_start();
 			?>
-			<div><?php echo $email; ?></div>
+			<div class="callout warning"><p>You must be logged in to detect multi-membership users.</p></div>
 			<?php
+			return ob_get_clean();
 		}
-		return ob_get_clean();
+		else if (!current_user_can(self::VIEW_ADDRESS_CAP)) {
+			ob_start();
+			?>
+			<div class="callout warning"><p>You do not have the rights to detect multi-membership users.</p></div>
+			<?php
+			return ob_get_clean();
+		}
+		else {
+			$results = self::fetch_users_with_multi_memberships(ARRAY_N);
+			if (empty($results)) {
+				ob_start();
+				?>
+				<div class="callout"><p>No multi-membership users detected.</p></div>
+				<?php
+				return ob_get_clean();	
+			}
+			else {
+				ob_start();
+				?>
+				<table>
+				<tr>
+				<th>User ID</th>
+				<th>Email</th>
+				<th>First Name</th>
+				<th>Last Name</th>
+				</tr>
+				<?php
+				foreach ($results as $item) {
+					$userid = $item[0];
+					$user_info = get_userdata( $userid );
+					?>
+					<tr>
+					<td><?php echo $userid; ?></td>
+					<td><?php echo $user_info->user_email; ?></td>
+					<td><?php echo $user_info->first_name; ?></td>
+					<td><?php echo $user_info->last_name; ?></td>
+					</tr>
+					<?php
+				}
+				?>
+				</table>
+				<?php
+				return ob_get_clean();
+			}
+		}
 	}
 	
 	/*************************************************************/
