@@ -1961,27 +1961,30 @@ class PwtcMapdb {
 	}
 
 	public static function fetch_users_with_multi_memberships($outtype) {
-    	global $wpdb;
-    	$results = $wpdb->get_results(
+		global $wpdb;
+		$post_type = 'wc_user_membership';
+		$stmt = $wpdb->prepare(
 			'select distinct a.post_author' . 
 			' from ' . $wpdb->posts . ' as a inner join ' . $wpdb->posts . ' as b' . 
 			' where a.post_author = b.post_author and a.ID <> b.ID' . 
-			' and a.post_type = "wc_user_membership"' . 
-			' and b.post_type = "wc_user_membership"', $outtype);
-		return $results;
+			' and a.post_type = %s and b.post_type = %s', $post_type, $post_type);
+    	//$results = $wpdb->get_results($stmt, $outtype);
+		//return $results;
+		return $stmt;
 	}
 
 	// Generates the [pwtc_membership_multimember_users] shortcode.
 	public static function shortcode_membership_multimember_users($atts) {
 		$results = self::fetch_users_with_multi_memberships(ARRAY_N);
 		ob_start();
-		foreach ($results as $item) {
-			$userid = $item[0];
-			$user_info = get_userdata( $userid );
+		//foreach ($results as $item) {
+		//	$userid = $item[0];
+		//	$user_info = get_userdata( $userid );
+		//	$email = $user_info->user_email;
 			?>
-			<div><?php $user_info->user_email; ?></div>
+			<div><?php echo $results; ?></div>
 			<?php
-		}
+		//}
 		return ob_get_clean();
 	}
 	
