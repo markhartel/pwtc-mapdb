@@ -1553,14 +1553,14 @@ class PwtcMapdb {
 		else {
 			$today = date('F j Y', current_time('timestamp'));
 			$total = self::count_membership('all');
-			$active = self::count_membership('wcm-active');
-			$expired = self::count_membership('wcm-expired');
-			$delayed = self::count_membership('wcm-delayed');
-			$complimentary = self::count_membership('wcm-complimentary');
-			$paused = self::count_membership('wcm-paused');
-			$cancelled = self::count_membership('wcm-cancelled');
-			$pending = self::count_membership('wcm-pending');
-			$free_trial = self::count_membership('wcm-free_trial');
+			$active = self::count_membership2('wcm-active');
+			$expired = self::count_membership2('wcm-expired');
+			$delayed = self::count_membership2('wcm-delayed');
+			$complimentary = self::count_membership2('wcm-complimentary');
+			$paused = self::count_membership2('wcm-paused');
+			$cancelled = self::count_membership2('wcm-cancelled');
+			$pending = self::count_membership2('wcm-pending');
+			$free_trial = self::count_membership2('wcm-free_trial');
 			ob_start();
 			?>
 			<div>Membership statistics as of <?php echo $today; ?><br>
@@ -1606,6 +1606,16 @@ class PwtcMapdb {
 			return 'unknown';
 		}
 		return '' . $the_query->found_posts;
+	}
+
+	public static function count_membership2($status) {
+		global $wpdb;
+		$post_type = 'wc_user_membership';
+		$stmt = $wpdb->prepare(
+			'select count(ID) from ' . $wpdb->posts .
+			' where post_type = %s and post_status = %s', $post_type, $status);
+    	$results = $wpdb->get_var($stmt);
+		return '' . $results;
 	}
 
 	// Generates the [pwtc_membership_families] shortcode.
@@ -1715,7 +1725,11 @@ class PwtcMapdb {
 				return ob_get_clean();
 			} 
 			else {
-				return '<div class="callout small warning"><p>No new members found.</p></div>';
+				ob_start();
+				?>
+				<div>No new members since <?php echo $month->format('F Y'); ?></div>
+				<?php						
+				return ob_get_clean();
 			}
 		}
 	}
@@ -1978,14 +1992,7 @@ class PwtcMapdb {
 		if ( 0 == $current_user->ID ) {
 			ob_start();
 			?>
-			<div class="callout warning"><p>You must be logged in to detect multi-membership users.</p></div>
-			<?php
-			return ob_get_clean();
-		}
-		else if (!current_user_can(self::VIEW_ADDRESS_CAP)) {
-			ob_start();
-			?>
-			<div class="callout warning"><p>You do not have the rights to detect multi-membership users.</p></div>
+			<div class="callout warning small"><p>You must be logged in to detect multi-membership users.</p></div>
 			<?php
 			return ob_get_clean();
 		}
@@ -1994,7 +2001,7 @@ class PwtcMapdb {
 			if (empty($results)) {
 				ob_start();
 				?>
-				<div class="callout"><p>No multi-membership users detected.</p></div>
+				<div class="callout small"><p>No multi-membership users detected.</p></div>
 				<?php
 				return ob_get_clean();	
 			}
