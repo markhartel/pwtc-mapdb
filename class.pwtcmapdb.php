@@ -1434,6 +1434,20 @@ class PwtcMapdb {
 				if (!empty($excludes)) {
 					$query_args['role__not_in'] = $excludes;
 				}
+				if ($_POST['noriderid'] == 'yes') {
+					$query_args['meta_query'] = [];
+					$query_args['meta_query'][] = [
+						'relation' => 'OR',
+						[
+							'key'     => 'rider_id',
+							'compare' => 'NOT EXISTS' 
+						],
+						[
+							'key'     => 'rider_id',
+							'value'   => ''    
+						] 
+					];			
+				}
 				$today = date('Y-m-d', current_time('timestamp'));
 				header('Content-Description: File Transfer');
 				header("Content-type: text/csv");
@@ -1444,7 +1458,6 @@ class PwtcMapdb {
 				$members = $user_query->get_results();
 				if ( !empty($members) ) {
 					foreach ( $members as $member ) {
-						//$member_info = get_userdata($member->ID);
 						fputcsv($fp, [$member->ID, $member->user_email, $member->first_name, $member->last_name]);
 					}
 				}
@@ -1905,24 +1918,43 @@ class PwtcMapdb {
 
 	// Generates the [pwtc_membership_download_users] shortcode.
 	public static function shortcode_membership_download_users($atts) {
-		$a = shortcode_atts(
-			array(
-				'label' => 'Users',
-				'file' => 'users',
-				'includes' => '',
-				'excludes' => ''
-			), $atts);
-		ob_start();
-		?>
-		<form method="post">
-			<button class="dark button" type="submit" name="pwtc-membership-download-users">
-				<i class="fa fa-download"></i> <?php echo $a['label'] ?></button>
-			<input type="hidden" name="includes" value="<?php echo $a['includes'] ?>"/>
-			<input type="hidden" name="excludes" value="<?php echo $a['excludes'] ?>"/>
-			<input type="hidden" name="file" value="<?php echo $a['file'] ?>"/>
-		</form>	
-	  	<?php
-		return ob_get_clean();
+		$current_user = wp_get_current_user();
+		if ( 0 == $current_user->ID ) {
+			ob_start();
+			?>
+			<div class="callout warning"><p>You must be logged in to download users.</p></div>
+			<?php
+			return ob_get_clean();
+		}
+		else if (!current_user_can(self::VIEW_ADDRESS_CAP)) {
+			ob_start();
+			?>
+			<div class="callout warning"><p>You do not have the access to download users.</p></div>
+			<?php
+			return ob_get_clean();
+		}
+		else {
+			$a = shortcode_atts(
+				array(
+					'label' => 'Users',
+					'file' => 'users',
+					'includes' => '',
+					'excludes' => '',
+					'noriderid' => 'no'
+				), $atts);
+			ob_start();
+			?>
+			<form method="post">
+				<button class="dark button" type="submit" name="pwtc-membership-download-users">
+					<i class="fa fa-download"></i> <?php echo $a['label'] ?></button>
+				<input type="hidden" name="includes" value="<?php echo $a['includes'] ?>"/>
+				<input type="hidden" name="excludes" value="<?php echo $a['excludes'] ?>"/>
+				<input type="hidden" name="file" value="<?php echo $a['file'] ?>"/>
+				<input type="hidden" name="noriderid" value="<?php echo $a['noriderid'] ?>"/>
+			</form>	
+			<?php
+			return ob_get_clean();
+		}
 	}
 	
 	/*************************************************************/
