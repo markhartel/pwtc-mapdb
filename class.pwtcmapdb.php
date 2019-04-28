@@ -1552,15 +1552,15 @@ class PwtcMapdb {
 		}
 		else {
 			$today = date('F j Y', current_time('timestamp'));
-			$total = self::count_membership('all');
+			$total = self::count_membership(['wcm-active','wcm-expired','wcm-delayed','wcm-complimentary']);
 			$active = self::count_membership('wcm-active');
 			$expired = self::count_membership('wcm-expired');
 			$delayed = self::count_membership('wcm-delayed');
 			$complimentary = self::count_membership('wcm-complimentary');
-			$paused = self::count_membership('wcm-paused');
-			$cancelled = self::count_membership('wcm-cancelled');
-			$pending = self::count_membership('wcm-pending');
-			$free_trial = self::count_membership('wcm-free_trial');
+			//$paused = self::count_membership('wcm-paused');
+			//$cancelled = self::count_membership('wcm-cancelled');
+			//$pending = self::count_membership('wcm-pending');
+			//$free_trial = self::count_membership('wcm-free_trial');
 			$multimembers = self::fetch_users_with_multi_memberships(true);
 			ob_start();
 			?>
@@ -1568,24 +1568,8 @@ class PwtcMapdb {
 			<?php echo $total; ?> total members:<ul>
 			<li><?php echo $active; ?> active members</li>
 			<li><?php echo $expired; ?> expired members</li>
-			<?php if ($complimentary != '0') { ?>
 			<li><?php echo $complimentary; ?> complimentary members</li>
-			<?php } ?>
-			<?php if ($delayed != '0') { ?>
 			<li><?php echo $delayed; ?> delayed members</li>
-			<?php } ?>
-			<?php if ($paused != '0') { ?>
-			<li><?php echo $paused; ?> paused members</li>
-			<?php } ?>
-			<?php if ($cancelled != '0') { ?>
-			<li><?php echo $cancelled; ?> cancelled members</li>
-			<?php } ?>
-			<?php if ($pending != '0') { ?>
-			<li><?php echo $pending; ?> members with pending cancellation</li>
-			<?php } ?>
-			<?php if ($free_trial != '0') { ?>
-			<li><?php echo $free_trial; ?> members with free trial</li>
-			<?php } ?>
 			</ul><?php echo $multimembers; ?> users with multiple memberships</div>
 			<?php
 			return ob_get_clean();
