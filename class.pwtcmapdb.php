@@ -1553,14 +1553,15 @@ class PwtcMapdb {
 		else {
 			$today = date('F j Y', current_time('timestamp'));
 			$total = self::count_membership('all');
-			$active = self::count_membership2('wcm-active');
-			$expired = self::count_membership2('wcm-expired');
-			$delayed = self::count_membership2('wcm-delayed');
-			$complimentary = self::count_membership2('wcm-complimentary');
-			$paused = self::count_membership2('wcm-paused');
-			$cancelled = self::count_membership2('wcm-cancelled');
-			$pending = self::count_membership2('wcm-pending');
-			$free_trial = self::count_membership2('wcm-free_trial');
+			$active = self::count_membership('wcm-active');
+			$expired = self::count_membership('wcm-expired');
+			$delayed = self::count_membership('wcm-delayed');
+			$complimentary = self::count_membership('wcm-complimentary');
+			$paused = self::count_membership('wcm-paused');
+			$cancelled = self::count_membership('wcm-cancelled');
+			$pending = self::count_membership('wcm-pending');
+			$free_trial = self::count_membership('wcm-free_trial');
+			$multimembers = self::fetch_users_with_multi_memberships(true);
 			ob_start();
 			?>
 			<div>Membership statistics as of <?php echo $today; ?><br>
@@ -1585,7 +1586,7 @@ class PwtcMapdb {
 			<?php if ($free_trial != '0') { ?>
 			<li><?php echo $free_trial; ?> members with free trial</li>
 			<?php } ?>
-			</ul></div>
+			</ul><?php echo $multimembers; ?> users with multiple memberships</div>
 			<?php
 			return ob_get_clean();
 		}
@@ -1974,15 +1975,24 @@ class PwtcMapdb {
 		}
 	}
 
-	public static function fetch_users_with_multi_memberships($outtype) {
+	public static function fetch_users_with_multi_memberships($count_only = false) {
 		global $wpdb;
 		$post_type = 'wc_user_membership';
+		$select_item = 'distinct a.post_author';
+		if ($count_only) {
+			$select_item = 'count(' . $select_item . ')';
+		}
 		$stmt = $wpdb->prepare(
-			'select distinct a.post_author' . 
+			'select ' . $select_item .
 			' from ' . $wpdb->posts . ' as a inner join ' . $wpdb->posts . ' as b' . 
 			' where a.post_author = b.post_author and a.ID <> b.ID' . 
 			' and a.post_type = %s and b.post_type = %s', $post_type, $post_type);
-    	$results = $wpdb->get_results($stmt, $outtype);
+		if ($count_only) {
+			$results = $wpdb->get_var($stmt);
+		}
+		else {
+			$results = $wpdb->get_results($stmt, ARRAY_N);
+		}
 		return $results;
 	}
 
@@ -2007,7 +2017,7 @@ class PwtcMapdb {
 			return ob_get_clean();
 		}
 		else {
-			$results = self::fetch_users_with_multi_memberships(ARRAY_N);
+			$results = self::fetch_users_with_multi_memberships();
 			if (empty($results)) {
 				ob_start();
 				?>
