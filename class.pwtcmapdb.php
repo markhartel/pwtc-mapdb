@@ -70,7 +70,7 @@ class PwtcMapdb {
 			array( 'PwtcMapdb', 'shortcode_membership_download_users'));
 
 		add_shortcode('pwtc_membership_multimember_users', 
-			array( 'PwtcMapdb', 'shortcode_membership_multimember_users'));
+			array( 'PwtcMapdb', 'shortcode_membership_fetch_table'));
 
 		add_action( 'wp_ajax_pwtc_ride_leader_lookup', 
 			array( 'PwtcMapdb', 'ride_leader_lookup_callback') );
@@ -1986,6 +1986,16 @@ class PwtcMapdb {
 		return $results;
 	}
 
+	public static function fetch_memberships($outtype) {
+		global $wpdb;
+		$post_type = 'wc_user_membership';
+		$stmt = $wpdb->prepare(
+			'select ID, post_author, post_status from ' . $wpdb->posts . 
+			' where post_type = %s', $post_type);
+    	$results = $wpdb->get_results($stmt, $outtype);
+		return $results;
+	}
+
 	// Generates the [pwtc_membership_multimember_users] shortcode.
 	public static function shortcode_membership_multimember_users($atts) {
 		$current_user = wp_get_current_user();
@@ -2026,6 +2036,52 @@ class PwtcMapdb {
 					<td data-th="Email"><?php echo $user_info->user_email; ?></td>
 					<td data-th="First"><?php echo $user_info->first_name; ?></td>
 					<td data-th="Last"><?php echo $user_info->last_name; ?></td>
+					</tr>
+					<?php
+				}
+				?>
+				</table>
+				<?php
+				return ob_get_clean();
+			}
+		}
+	}
+
+	public static function shortcode_membership_fetch_table($atts) {
+		$current_user = wp_get_current_user();
+		if ( 0 == $current_user->ID ) {
+			ob_start();
+			?>
+			<div class="callout warning small"><p>You must be logged in to fetch memberships users.</p></div>
+			<?php
+			return ob_get_clean();
+		}
+		else {
+			$results = self::fetch_memberships(ARRAY_N);
+			if (empty($results)) {
+				ob_start();
+				?>
+				<div class="callout small"><p>No memberships detected.</p></div>
+				<?php
+				return ob_get_clean();	
+			}
+			else {
+				ob_start();
+				?>
+				<table class="pwtc-mapdb-rwd-table">
+				<caption>Memberships Table</caption>
+				<tr>
+				<th>ID</th>
+				<th>Post Author</th>
+				<th>Post Status</th>
+				</tr>
+				<?php
+				foreach ($results as $item) {
+					?>
+					<tr>
+					<td data-th="ID"><?php echo $item[0]; ?></td>
+					<td data-th="Author"><?php echo $item[1]; ?></td>
+					<td data-th="Status"><?php echo $item[2]; ?></td>
 					</tr>
 					<?php
 				}
