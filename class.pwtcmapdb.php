@@ -70,7 +70,10 @@ class PwtcMapdb {
 			array( 'PwtcMapdb', 'shortcode_membership_download_users'));
 
 		add_shortcode('pwtc_membership_multimember_users', 
-			array( 'PwtcMapdb', 'shortcode_membership_fetch_table'));
+			array( 'PwtcMapdb', 'shortcode_membership_multimember_users'));
+
+		add_shortcode('pwtc_membership_fetch_posts', 
+			array( 'PwtcMapdb', 'shortcode_membership_fetch_posts'));
 
 		add_action( 'wp_ajax_pwtc_ride_leader_lookup', 
 			array( 'PwtcMapdb', 'ride_leader_lookup_callback') );
@@ -1552,15 +1555,13 @@ class PwtcMapdb {
 		}
 		else {
 			$today = date('F j Y', current_time('timestamp'));
-			$total = self::count_membership(['wcm-active','wcm-expired','wcm-delayed','wcm-complimentary']);
+			$total = self::count_membership(['wcm-active','wcm-expired','wcm-delayed','wcm-complimentary','wcm-paused','wcm-cancelled']);
 			$active = self::count_membership('wcm-active');
 			$expired = self::count_membership('wcm-expired');
 			$delayed = self::count_membership('wcm-delayed');
 			$complimentary = self::count_membership('wcm-complimentary');
-			//$paused = self::count_membership('wcm-paused');
-			//$cancelled = self::count_membership('wcm-cancelled');
-			//$pending = self::count_membership('wcm-pending');
-			//$free_trial = self::count_membership('wcm-free_trial');
+			$paused = self::count_membership('wcm-paused');
+			$cancelled = self::count_membership('wcm-cancelled');
 			$multimembers = self::fetch_users_with_multi_memberships(true);
 			ob_start();
 			?>
@@ -1570,6 +1571,8 @@ class PwtcMapdb {
 			<li><?php echo $expired; ?> expired members</li>
 			<li><?php echo $complimentary; ?> complimentary members</li>
 			<li><?php echo $delayed; ?> delayed members</li>
+			<li><?php echo $paused; ?> paused members</li>
+			<li><?php echo $cancelled; ?> cancelled members</li>
 			</ul><?php echo $multimembers; ?> users with multiple memberships</div>
 			<?php
 			return ob_get_clean();
@@ -1980,13 +1983,20 @@ class PwtcMapdb {
 		return $results;
 	}
 
-	public static function fetch_memberships($outtype) {
+	public static function fetch_posts($post_type, $post_id, $post_author) {
 		global $wpdb;
-		$post_type = 'wc_user_membership';
+		$id_where = '';
+		$author_where = '';
+		if (!empty($post_id)) {
+			$id_where = $wpdb->prepare(' and ID = %d', intval($post_id));
+		}
+		if (!empty($post_author)) {
+			$author_where = $wpdb->prepare(' and post_author = %d', intval($post_author));
+		}
 		$stmt = $wpdb->prepare(
-			'select ID, post_author, post_status from ' . $wpdb->posts . 
+			'select ID, post_author, post_status, post_type from ' . $wpdb->posts . 
 			' where post_type = %s', $post_type);
-    	$results = $wpdb->get_results($stmt, $outtype);
+    	$results = $wpdb->get_results($stmt . $id_where . $author_where, ARRAY_N);
 		return $results;
 	}
 
@@ -2041,21 +2051,28 @@ class PwtcMapdb {
 		}
 	}
 
-	public static function shortcode_membership_fetch_table($atts) {
+	// Generates the [pwtc_membership_fetch_posts] shortcode.
+	public static function shortcode_membership_fetch_posts($atts) {
 		$current_user = wp_get_current_user();
 		if ( 0 == $current_user->ID ) {
 			ob_start();
 			?>
-			<div class="callout warning small"><p>You must be logged in to fetch memberships users.</p></div>
+			<div class="callout warning small"><p>You must be logged in to fetch posts.</p></div>
 			<?php
 			return ob_get_clean();
 		}
 		else {
-			$results = self::fetch_memberships(ARRAY_N);
+			$a = shortcode_atts(
+				array(
+					'id' => '',
+					'author' => '',
+					'type' => ''
+				), $atts);
+			$results = self::fetch_posts($a['type'], $a['id'], $a['author']);
 			if (empty($results)) {
 				ob_start();
 				?>
-				<div class="callout small"><p>No memberships detected.</p></div>
+				<div class="callout small"><p>No posts found.</p></div>
 				<?php
 				return ob_get_clean();	
 			}
@@ -2063,11 +2080,12 @@ class PwtcMapdb {
 				ob_start();
 				?>
 				<table class="pwtc-mapdb-rwd-table">
-				<caption>Memberships Table</caption>
+				<caption>Posts Table</caption>
 				<tr>
 				<th>ID</th>
 				<th>Post Author</th>
 				<th>Post Status</th>
+				<th>Post Type</th>
 				</tr>
 				<?php
 				foreach ($results as $item) {
@@ -2076,6 +2094,7 @@ class PwtcMapdb {
 					<td data-th="ID"><?php echo $item[0]; ?></td>
 					<td data-th="Author"><?php echo $item[1]; ?></td>
 					<td data-th="Status"><?php echo $item[2]; ?></td>
+					<td data-th="Type"><?php echo $item[3]; ?></td>
 					</tr>
 					<?php
 				}
