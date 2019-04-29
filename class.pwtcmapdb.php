@@ -1555,6 +1555,7 @@ class PwtcMapdb {
 		}
 		else {
 			$today = date('F j Y', current_time('timestamp'));
+			self::count_membership('all'); //TODO: this is a hack!
 			$total = self::count_membership(['wcm-active','wcm-expired','wcm-delayed','wcm-complimentary','wcm-paused','wcm-cancelled']);
 			$active = self::count_membership('wcm-active');
 			$expired = self::count_membership('wcm-expired');
@@ -1970,10 +1971,12 @@ class PwtcMapdb {
 			$select_item = 'count(' . $select_item . ')';
 		}
 		$stmt = $wpdb->prepare(
-			'select ' . $select_item .
-			' from ' . $wpdb->posts . ' as a inner join ' . $wpdb->posts . ' as b' . 
-			' where a.post_author = b.post_author and a.ID <> b.ID' . 
-			' and a.post_type = %s and b.post_type = %s', $post_type, $post_type);
+			"select " . $select_item .
+			" from " . $wpdb->posts . " as a inner join " . $wpdb->posts . " as b" . 
+			" where a.post_author = b.post_author and a.ID <> b.ID" . 
+			" and a.post_type = %s and b.post_type = %s" . 
+			" and a.post_status not in ('auto-draft', 'trash')" . 
+			" and b.post_status not in ('auto-draft', 'trash')", $post_type, $post_type);
 		if ($count_only) {
 			$results = $wpdb->get_var($stmt);
 		}
