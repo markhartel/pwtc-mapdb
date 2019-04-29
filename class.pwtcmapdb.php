@@ -1459,12 +1459,12 @@ class PwtcMapdb {
 				header("Content-type: text/csv");
 				header("Content-Disposition: attachment; filename={$today}_{$_POST['file']}.csv");
 				$fp = fopen('php://output', 'w');
-				fputcsv($fp, ['User ID', 'Email', 'First Name', 'Last Name']);
+				fputcsv($fp, ['Username', 'Email', 'First Name', 'Last Name', 'User ID']);
 				$user_query = new WP_User_Query( $query_args );
 				$members = $user_query->get_results();
 				if ( !empty($members) ) {
 					foreach ( $members as $member ) {
-						fputcsv($fp, [$member->ID, $member->user_email, $member->first_name, $member->last_name]);
+						fputcsv($fp, [$member->user_login, $member->user_email, $member->first_name, $member->last_name, $member->ID]);
 					}
 				}
 				fclose($fp);
