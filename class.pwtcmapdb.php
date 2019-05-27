@@ -2,9 +2,9 @@
 
 class PwtcMapdb {
 
-	const VIEW_ADDRESS_CAP = 'pwtc_view_address';
-	const VIEW_LEADERS_CAP = 'pwtc_view_leaders';
-	const EDIT_LEADERS_CAP = 'pwtc_edit_leaders';
+	//const VIEW_ADDRESS_CAP = 'pwtc_view_address';
+	//const VIEW_LEADERS_CAP = 'pwtc_view_leaders';
+	//const EDIT_LEADERS_CAP = 'pwtc_edit_leaders';
 
 	const MAP_POST_TYPE = 'ride_maps';
 	const START_LOCATION_FIELD = 'start_location';
@@ -45,6 +45,7 @@ class PwtcMapdb {
 		add_shortcode('pwtc_search_mapdb', 
 			array( 'PwtcMapdb', 'shortcode_search_mapdb'));
 
+		/*
 		add_shortcode('pwtc_membership_directory', 
 			array( 'PwtcMapdb', 'shortcode_membership_dir'));
 
@@ -89,6 +90,7 @@ class PwtcMapdb {
 			
 		add_action( 'template_redirect', 
 			array( 'PwtcMapdb', 'download_users_list' ) );
+		/*
 
 		/*
 		add_filter( 'wc_memberships_for_teams_new_team_data', 		
@@ -634,6 +636,8 @@ class PwtcMapdb {
 			return ob_get_clean();
 		}
 	}
+
+	/*
 
 	// Generates the [pwtc_membership_directory] shortcode.
 	public static function shortcode_membership_dir($atts) {
@@ -2108,11 +2112,13 @@ class PwtcMapdb {
 			}
 		}
 	}
+	*/
 	
 	/*************************************************************/
 	/* Plugin installation and removal functions.
 	/*************************************************************/
 
+	/*
 	public static function add_caps_admin_role() {
 		$admin = get_role('administrator');
 		$admin->add_cap(self::VIEW_ADDRESS_CAP);
@@ -2145,7 +2151,8 @@ class PwtcMapdb {
 			$captain->remove_cap(self::EDIT_LEADERS_CAP);
 			pwtc_mileage_write_log('PWTC MapDB plugin removed capabilities from ride_captain role');
 		} 
-	}	
+	}
+	*/	
 
 	public static function plugin_activation() {
 		self::write_log( 'PWTC MapDB plugin activated' );
@@ -2153,14 +2160,14 @@ class PwtcMapdb {
 			deactivate_plugins(plugin_basename(__FILE__));
 			wp_die('PWTC MapDB plugin requires Wordpress version of at least ' . PWTC_MAPDB__MINIMUM_WP_VERSION);
 		}
-		self::add_caps_admin_role();
-		self::add_caps_rc_role();
+		//self::add_caps_admin_role();
+		//self::add_caps_rc_role();
 	}
 
 	public static function plugin_deactivation( ) {
 		self::write_log( 'PWTC MapDB plugin deactivated' );
-		self::remove_caps_admin_role();
-		self::remove_caps_rc_role();
+		//self::remove_caps_admin_role();
+		//self::remove_caps_rc_role();
 	}
 
 	public static function plugin_uninstall() {

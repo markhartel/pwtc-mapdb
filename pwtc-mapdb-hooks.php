@@ -1,5 +1,6 @@
 <?php
 
+/*
 function pwtc_mapdb_strip_phone_number($phoneNumber) {
     $phoneNumber = preg_replace('/[^0-9]/','',$phoneNumber);
     
@@ -33,3 +34,4 @@ function pwtc_mapdb_format_phone_number($phoneNumber) {
 
     return $phoneNumber;
 }
+*/
