@@ -90,7 +90,7 @@ class PwtcMapdb {
 			
 		add_action( 'template_redirect', 
 			array( 'PwtcMapdb', 'download_users_list' ) );
-		/*
+		*/
 
 		/*
 		add_filter( 'wc_memberships_for_teams_new_team_data', 		
