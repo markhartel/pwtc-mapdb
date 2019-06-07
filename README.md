@@ -1,9 +1,9 @@
-# pwtc-mapdb
+# PWTC Map DB
 
-This is a Wordpress plugin that provides searchable access to the map library and ride leader list for members of the [Portland Wheelmen Touring Club](http://pwtc.com).
+This is a Wordpress plugin that provides searchable access to the route map library for the [Portland Bicycling Club](https://portlandbicyclingclub.com).
 
 ## Installation
-Download this distribution as a zip file, login to the pwtc.com Wordpress website as admin and upload this zip file as a new plugin. This plugin will be named **PWTC Map DB**, activate it from the Plugins management page. After activation, this plugin will create shortcodes that allow you to add map library and ride leader list access forms to your pages.
+Download this distribution as a zip file, login to the pwtc.com Wordpress website as admin and upload this zip file as a new plugin. This plugin will be named **PWTC Map DB**, activate it from the Plugins management page.
 
 ### Plugin Uninstall
 Deactivate and then delete the **PWTC Map DB** plugin from the Plugins management page.
@@ -23,16 +23,9 @@ Argument|Description|Values|Default
 --------|-----------|------|-------
 limit|limit the number of maps shown per page|(number)|0 (unlimited)
 
-### Ride Leader List Shortcodes
-`[pwtc_ride_leader_dir]` *form that allow search and access of the ride leader list*
-
-Argument|Description|Values|Default
---------|-----------|------|-------
-limit|limit the number of members shown per page|(number)|10
-mode|set profile editor operating mode|readonly,edit|readonly
-
 ## Package Files Used By This Plugin
 - `README.md` *this file*
+- `pwtc-mapdb-hooks.php` *plugin hooks file*
 - `pwtc-mapdb.php` *plugin definition file*
 - `class.pwtcmapdb.php` *PHP class with server-side logic*
 - `reports-style.css` *stylesheet for report shortcodes*
