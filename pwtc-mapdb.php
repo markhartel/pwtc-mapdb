@@ -1,7 +1,7 @@
 <?php
 /*
 Plugin Name: PWTC Map DB
-Plugin URI: https://github.com/markhartel/pwtc-mileage
+Plugin URI: https://github.com/markhartel/pwtc-mapdb
 Description: Provides searchable access to the Portland Bicycling Club route map database.
 Version: 1.4
 Author: Mark Hartel
