@@ -47,9 +47,14 @@ class PwtcMapdb {
 	/*************************************************************/
 
 	public static function load_report_scripts() {
+/*
         wp_enqueue_style('pwtc_mapdb_report_css', 
 			PWTC_MAPDB__PLUGIN_URL . 'reports-style.css', array(),
 			filemtime(PWTC_MAPDB__PLUGIN_DIR . 'reports-style.css'));
+*/
+		wp_enqueue_style('pwtc_mapdb_report_css', 
+			PWTC_MAPDB__PLUGIN_URL . 'reports-style-v2.css', array());
+
 	}
 
 	/*************************************************************/
@@ -309,22 +314,22 @@ class PwtcMapdb {
 			function populate_maps_table(maps, can_edit) {
 				var copylink = '<a title="Copy map title to clipboard." class="copy-btn"><?php echo self::COPY_ANCHOR_LABEL ?></a>';
 				var header = '<table class="pwtc-mapdb-rwd-table">' +
-					'<tr><th>Title</th><th>Distance</th><th>Terrain</th>';
+					'<thead><tr><th>Title</th><th>Distance</th><th>Terrain</th>';
 				if (can_edit) {
 					header += '<th>Actions</th>';
 				}
-				header += '</tr></table>';
+				header += '</tr></thead><tbody></tbody></table>';
 				$('#pwtc-mapdb-maps-div').append(header);
 				maps.forEach(function(item) {
 					var data = '<tr postid="' + item.ID + '">' +
-					'<td data-th="Title">' + copylink + ' ' + item.media + item.title + '</a></td>' +
-					'<td data-th="Distance">' + item.distance + '</td>' +
-					'<td data-th="Terrain">' + item.terrain + '</td>';
+					'<td><span>Title</span>' + copylink + ' ' + item.media + item.title + '</a></td>' +
+					'<td><span>Distance</span>' + item.distance + '</td>' +
+					'<td><span>Terrain</span>' + item.terrain + '</td>';
 					if (can_edit) {
-						data += '<td data-th="Actions">' + item.edit + '</td>'
+						data += '<td><span>Actions</span>' + item.edit + '</td>'
 					}
 					data += '</tr>';
-					$('#pwtc-mapdb-maps-div table').append(data);    
+					$('#pwtc-mapdb-maps-div table tbody').append(data);    
 				});
 				$('#pwtc-mapdb-maps-div table .copy-btn').on('click', function(evt) {
 					//var title = $(this).parent().parent().find('td').first().find('span').first()[0];

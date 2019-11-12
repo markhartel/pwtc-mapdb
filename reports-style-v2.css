@@ -1,0 +1,119 @@
+
+  body.pwtc-mapdb-waiting * {
+    cursor: progress;
+  }
+  
+  .pwtc-mapdb-search-sec {
+    border: 1px solid;
+    border-radius: 5px;
+    padding: 0 10px;
+    margin: 10px 0;
+  }
+  
+  .pwtc-mapdb-stacked-form {
+    width: 200px;    
+  }
+  
+  .pwtc-mapdb-stacked-form input[type=text] {
+    width: 100%;
+    display: inline-block;
+    box-sizing: border-box;
+    margin: 4px 0;
+  }
+  
+  .pwtc-mapdb-stacked-form select {
+    width: 100%;
+    display: inline-block;
+    box-sizing: border-box;
+    margin: 4px 0;
+  }
+  
+  .pwtc-mapdb-stacked-form .pwtc-mapdb-checkbox-wrap {
+    width: 100%;
+    display: inline-block;
+    box-sizing: border-box;
+    margin: 4px 0;
+  }
+  
+  .pwtc-mapdb-stacked-form input[type=submit] {
+    margin: 4px 0;
+  }
+  
+  .pwtc-mapdb-stacked-form input[type=button] {
+    margin: 4px 0;
+  }
+  
+  .pwtc-mapdb-rwd-table {
+    background: #34495E;
+    color: #fff;
+    border-radius: .4em;
+  }
+  
+  .pwtc-mapdb-rwd-table a {
+    cursor: pointer;
+    text-decoration: underline;
+    color: #fff;
+  }
+  
+  .pwtc-mapdb-rwd-table caption {
+    background: #34495E;
+    text-align: center;
+    font-weight: bold;
+    border-radius: .4em;
+  }
+  
+  .pwtc-mapdb-rwd-table th {
+    color: #dd5;
+  }
+  
+  .pwtc-mapdb-rwd-table th, .pwtc-mapdb-rwd-table tr, .pwtc-mapdb-rwd-table td { 
+    background: #34495E !important;
+  }
+  
+  .pwtc-mapdb-rwd-table tr.highlight, .pwtc-mapdb-rwd-table tr.highlight td { 
+    background: grey !important; 
+  }
+  
+  /* Default span styling - hidden on desktop, see uglyduck.ca/responsive-tables/ */
+  .pwtc-mapdb-rwd-table td span {
+    color: #dd5;
+    display: none;
+    font-size: 10px;
+    font-weight: bold;
+    padding: 5px;
+    position: absolute;
+    text-transform: uppercase;
+    top: 0;
+    left: 0;
+  }
+  
+  /* Simple CSS for flexbox table on mobile, see uglyduck.ca/responsive-tables/  */
+  @media(max-width: 800px) {
+    .pwtc-mapdb-rwd-table {
+      background: #fff;
+    }
+    .pwtc-mapdb-rwd-table thead {
+        left: -9999px;
+        position: absolute;
+        visibility: hidden;
+    }
+    .pwtc-mapdb-rwd-table tr {
+        background: #34495E !important;
+        border-bottom: 0;
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+        margin-bottom: 40px;
+    }
+    .pwtc-mapdb-rwd-table td {
+        border: 1px solid;
+        margin: 0 -1px -1px 0;
+        padding-top: 35px; /* additional padding to avoid heading overlap */
+        position: relative;
+        width: 50%;
+    }
+    /* Show the heading span */
+    .pwtc-mapdb-rwd-table td span {
+        display: block;
+    }
+  }
