@@ -40,6 +40,13 @@ class PwtcMapdb {
 		// Register shortcode callbacks
 		add_shortcode('pwtc_search_mapdb', 
 			array( 'PwtcMapdb', 'shortcode_search_mapdb'));
+		
+		add_shortcode('pwtc_mapdb_rider_signup', 
+			array( 'PwtcMapdb', 'shortcode_rider_signup'));
+
+		add_shortcode('pwtc_mapdb_view_signup', 
+			array( 'PwtcMapdb', 'shortcode_view_signup'));
+
 	}
 
 	/*************************************************************/
@@ -522,6 +529,224 @@ class PwtcMapdb {
 	<?php
 			return ob_get_clean();
 		}
+	}
+	
+	// Generates the [pwtc_mapdb_rider_signup] shortcode.
+	public static function shortcode_rider_signup($atts) {
+		$a = shortcode_atts(array('time_limit' => -1), $atts);
+		$time_limit = $a['time_limit'];
+
+		if (!isset($_GET['post'])) {
+			return '<div class="callout small warning"><p>Page missing post ID.</p></div>';
+		}
+
+		$postid = intval($_GET['post']);
+		if ($postid == 0) {
+			return '<div class="callout small warning"><p>Page post ID is invalid.</p></div>';
+		}
+
+		$post = get_post($postid);
+		if (!$post) {
+			return '<div class="callout small warning"><p>Page post does not exist.</p></div>';
+		}
+
+		/*
+		if (get_post_type($post) != 'scheduled_rides') {
+			return '<div class="callout small warning"><p>Page post type is not a scheduled ride.</p></div>';
+		}
+		*/
+
+		$ride_title = get_the_title($postid);
+
+		$current_user = wp_get_current_user();
+		if ( 0 == $current_user->ID ) {
+			return '<div class="callout small warning"><p>Please log in to signup for a ride.</p></div>';
+		}
+
+		/*
+		$allow_signup = false;
+		$leaders = get_field('ride_leaders', $postid);
+		foreach($leaders as $leader) {
+			$allow_signup = get_field('allow_ride_signup', 'user_'.$leader['ID']);
+		}
+		if ( !$allow_signup ) {
+			return '<div class="callout small warning"><p>The leader for ride "' . $ride_title . '" does not allow online signup.</p></div>';
+		}
+		*/
+
+		/*
+		if (!in_array('current_member', (array) $current_user->roles)) {
+			return '<div class="callout small warning"><p>You must be a current member to signup for rides.</p></div>';
+		}
+		*/
+
+		if ($time_limit >= 0) {
+			$ride_date = DateTime::createFromFormat('Y-m-d H:i:s', get_field('date', $postid))->getTimestamp();
+			$now_date = new DateTime();
+			$now_date = $now_date->getTimestamp();
+			$now_date = $now_data - ($time_limit*60*60);
+			if ($now_date > $ride_date) {
+				return '<div class="callout small warning"><p>Cannot signup for ride "' . $ride_title . '" because it is too close to the start time.</p></div>';
+			}
+		}
+
+		if (isset($_POST['accept_user_signup'])) {
+			delete_post_meta($postid, '_signup_user_id', $current_user->ID);
+			add_post_meta($postid, '_signup_user_id', $current_user->ID);
+		}
+
+		if (isset($_POST['cancel_user_signup'])) {
+			delete_post_meta($postid, '_signup_user_id', $current_user->ID);
+		}
+
+		if (isset($_POST['contact_phone'])) {
+			//update_field('emergency_contact_phone', pwtc_members_format_phone_number($_POST['contact_phone']), 'user_'.$current_user->ID);
+		}
+
+		if (isset($_POST['contact_name'])) {
+			//update_field('emergency_contact_name', trim($_POST['contact_name']), 'user_'.$current_user->ID);
+		}
+
+		$signup_list = get_post_meta($postid, '_signup_user_id');
+		$accept_signup = true;
+		foreach($signup_list as $item) {
+			if ($item == $current_user->ID) {
+				$accept_signup = false;
+			}
+		}
+
+		$user_info = get_userdata($current_user->ID);
+		$rider_name = $user_info->first_name . ' ' . $user_info->last_name;
+		$contact_phone = '';
+		//$contact_phone = pwtc_members_format_phone_number(get_field('emergency_contact_phone', 'user_'.$current_user->ID));
+		$contact_name = '';
+		//$contact_name = trim(get_field('emergency_contact_name', 'user_'.$current_user->ID));
+
+		ob_start();
+	?>
+	<script type="text/javascript">
+		jQuery(document).ready(function($) { 
+		});
+	</script>
+
+	<div id='pwtc-mapdb-rider-signup-div'>
+		<?php if ($accept_signup) { ?>
+			<div class="callout">
+				<p>Hello <?php echo $rider_name; ?>, to sign up for the ride "<?php echo $ride_title; ?>," please enter your emergency contact information below and press the accept button. Doing so will indicate your acceptance of the Club's <a href="/terms-and-conditions" target="_blank">terms and conditions</a>.</p>
+				<form method="POST">
+					<div class="row">
+						<div class="small-12 medium-6 columns">
+							<label><i class="fa fa-phone"></i> Emergency Contact Phone
+								<input type="text" name="contact_phone" value="<?php echo $contact_phone; ?>"/>
+							</label>
+						</div>
+						<div class="small-12 medium-6 columns">
+							<label>Emergency Contact Name
+								<input type="text" name="contact_name" value="<?php echo $contact_name; ?>"/>
+							</label>
+						</div>
+					</div>
+					<div class="row column clearfix">
+						<input type="hidden" name="accept_user_signup" value="yes"/>
+						<input class="button float-left" type="submit" value="Accept Signup"/>
+					</div>
+				</form>
+			</div>
+		<?php } else { ?>
+			<div class="callout">
+				<p>Hello <?php echo $rider_name; ?>, you are currently signed up for the ride "<?php echo $ride_title; ?>." To cancel your sign up, please press the cancel button below.</p>
+				<form method="POST">
+					<div class="row column clearfix">
+						<input type="hidden" name="cancel_user_signup" value="yes"/>
+						<input class="button float-left" type="submit" value="Cancel Signup"/>
+					</div>
+				</form>
+			</div>
+		<?php } ?>
+	</div>
+	<?php
+		return ob_get_clean();
+	}
+	
+	// Generates the [pwtc_mapdb_view_signup] shortcode.
+	public static function shortcode_view_signup($atts) {
+		if (!isset($_GET['post'])) {
+			return '<div class="callout small warning"><p>Page missing post ID.</p></div>';
+		}
+
+		$postid = intval($_GET['post']);
+		if ($postid == 0) {
+			return '<div class="callout small warning"><p>Page post ID is invalid.</p></div>';
+		}
+
+		$post = get_post($postid);
+		if (!$post) {
+			return '<div class="callout small warning"><p>Page post does not exist.</p></div>';
+		}
+
+		/*
+		if (get_post_type($post) != 'scheduled_rides') {
+			return '<div class="callout small warning"><p>Page post type is not a scheduled ride.</p></div>';
+		}
+		*/
+
+		$current_user = wp_get_current_user();
+		if ( 0 == $current_user->ID ) {
+			return '<div class="callout small warning"><p>Please log in to view the rider signup list.</p></div>';
+		}
+
+		/*
+		if (!in_array('ride_leader', (array) $current_user->roles)) {
+			return '<div class="callout small warning"><p>You must be a ride leader to view the rider signup list.</p></div>';
+		}
+		*/
+
+		$signup_list = get_post_meta($postid, '_signup_user_id');
+		$ride_title = get_the_title($postid);
+
+		ob_start();
+	?>
+	<script type="text/javascript">
+		jQuery(document).ready(function($) { 
+		});
+	</script>
+
+	<div id='pwtc-mapdb-view-signup-div'>
+		<?php if (count($signup_list) > 0) { ?>
+			<p>The following riders are currently signed up for the ride "<?php echo $ride_title; ?>."</p>
+			<table class="pwtc-mapdb-rwd-table"><thead><tr><th>Name</th><th>Rider ID</th><th>Emergency Contact</th></tr></thead><tbody>
+			<?php foreach($signup_list as $item) { 
+				$user_info = get_userdata($item);
+				$name = $user_info->first_name . ' ' . $user_info->last_name;
+				$rider_id = '';
+				//$rider_id = get_field('rider_id', 'user_'.$item);
+				$contact_phone = '';
+				//$contact_phone = trim(get_field('emergency_contact_phone', 'user_'.$item));
+				if (!empty($contact_phone)) {
+					$contact_phone = '<a href="tel:' . 
+						pwtc_members_strip_phone_number($contact_phone) . '">' . 
+						pwtc_members_format_phone_number($contact_phone) . '</a>';
+				}
+				$contact_name = '';
+				//$contact_name = trim(get_field('emergency_contact_name', 'user_'.$item));
+				$contact = $contact_phone;
+				if (!empty($contact_name)) {
+					$contact .= '(' . $contact_name . ')';
+				}
+			?>
+				<tr>
+				<td><span>Name</span><?php echo $name; ?></td>
+				<td><span>Rider ID</span><?php echo $rider_id; ?></td>
+				<td><span>Emergency Contact</span><?php echo $contact; ?></td>
+				</tr>
+			<?php } ?>
+			</tbody></table>
+		<?php } else { ?>
+			<div class="callout small"><p>There are currently no riders signed up for the ride "<?php echo $ride_title; ?>."</p></div>
+		<?php } ?>
+	</div>
+	<?php
+		return ob_get_clean();
 	}
 	
 	/*************************************************************/
