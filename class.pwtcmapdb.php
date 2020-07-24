@@ -36,6 +36,9 @@ class PwtcMapdb {
 
 		add_action( 'wp_ajax_pwtc_mapdb_lookup_maps', 
 			array( 'PwtcMapdb', 'lookup_maps_callback') );
+		
+		add_action( 'template_redirect', 
+			array( 'PwtcMapdb', 'download_ride_signup' ) );
 
 		// Register shortcode callbacks
 		add_shortcode('pwtc_search_mapdb', 
@@ -46,6 +49,9 @@ class PwtcMapdb {
 
 		add_shortcode('pwtc_mapdb_view_signup', 
 			array( 'PwtcMapdb', 'shortcode_view_signup'));
+		
+		add_shortcode('pwtc_mapdb_download_signup', 
+			array( 'PwtcMapdb', 'shortcode_download_signup'));
 
 	}
 
@@ -537,22 +543,22 @@ class PwtcMapdb {
 		$time_limit = $a['time_limit'];
 
 		if (!isset($_GET['post'])) {
-			return '<div class="callout small warning"><p>Page missing post ID.</p></div>';
+			return '<div class="callout small alert"><p>Cannot render shortcode, missing post ID parameter.</p></div>';
 		}
 
 		$postid = intval($_GET['post']);
 		if ($postid == 0) {
-			return '<div class="callout small warning"><p>Page post ID is invalid.</p></div>';
+			return '<div class="callout small alert"><p>Cannot render shortcode, post ID is invalid.</p></div>';
 		}
 
 		$post = get_post($postid);
 		if (!$post) {
-			return '<div class="callout small warning"><p>Page post does not exist.</p></div>';
+			return '<div class="callout small alert"><p>Cannot render shortcode, post does not exist.</p></div>';
 		}
 
 		/*
 		if (get_post_type($post) != 'scheduled_rides') {
-			return '<div class="callout small warning"><p>Page post type is not a scheduled ride.</p></div>';
+			return '<div class="callout small alert"><p>Cannot render shortcode, post type is not a scheduled ride.</p></div>';
 		}
 		*/
 
@@ -560,7 +566,7 @@ class PwtcMapdb {
 
 		$current_user = wp_get_current_user();
 		if ( 0 == $current_user->ID ) {
-			return '<div class="callout small warning"><p>Please log in to signup for a ride.</p></div>';
+			return '<div class="callout small warning"><p>Please <a href="/wp-login.php">log in</a> to signup for this ride.</p></div>';
 		}
 
 		/*
@@ -571,6 +577,12 @@ class PwtcMapdb {
 		}
 		if ( !$allow_signup ) {
 			return '<div class="callout small warning"><p>The leader for ride "' . $ride_title . '" does not allow online signup.</p></div>';
+		}
+		*/
+
+		/*
+		if (get_field('is_canceled', $postid)) {
+			return '<div class="callout small warning"><p>The ride "' . $ride_title . '" has been canceled, no signup allowed.</p></div>';
 		}
 		*/
 
@@ -586,7 +598,7 @@ class PwtcMapdb {
 			$now_date = $now_date->getTimestamp();
 			$now_date = $now_data - ($time_limit*60*60);
 			if ($now_date > $ride_date) {
-				return '<div class="callout small warning"><p>Cannot signup for ride "' . $ride_title . '" because it is too close to the start time.</p></div>';
+				return '<div class="callout small warning"><p>You cannot signup for ride "' . $ride_title . '" because it is too close to the start time.</p></div>';
 			}
 		}
 
@@ -600,11 +612,18 @@ class PwtcMapdb {
 		}
 
 		if (isset($_POST['contact_phone'])) {
-			//update_field('emergency_contact_phone', pwtc_members_format_phone_number($_POST['contact_phone']), 'user_'.$current_user->ID);
+			if (function_exists('pwtc_members_format_phone_number')) {
+				$phone = pwtc_members_format_phone_number($_POST['contact_phone']);
+			}
+			else {
+				$phone = sanitize_text_field($_POST['contact_phone']);
+			}
+			update_field('emergency_contact_phone', $phone, 'user_'.$current_user->ID);
 		}
 
 		if (isset($_POST['contact_name'])) {
-			//update_field('emergency_contact_name', trim($_POST['contact_name']), 'user_'.$current_user->ID);
+			$name = sanitize_text_field($_POST['contact_name']);
+			update_field('emergency_contact_name', $name, 'user_'.$current_user->ID);
 		}
 
 		$signup_list = get_post_meta($postid, '_signup_user_id');
@@ -617,10 +636,8 @@ class PwtcMapdb {
 
 		$user_info = get_userdata($current_user->ID);
 		$rider_name = $user_info->first_name . ' ' . $user_info->last_name;
-		$contact_phone = '';
-		//$contact_phone = pwtc_members_format_phone_number(get_field('emergency_contact_phone', 'user_'.$current_user->ID));
-		$contact_name = '';
-		//$contact_name = trim(get_field('emergency_contact_name', 'user_'.$current_user->ID));
+		$contact_phone = get_field('emergency_contact_phone', 'user_'.$current_user->ID);
+		$contact_name = get_field('emergency_contact_name', 'user_'.$current_user->ID);
 
 		ob_start();
 	?>
@@ -671,28 +688,28 @@ class PwtcMapdb {
 	// Generates the [pwtc_mapdb_view_signup] shortcode.
 	public static function shortcode_view_signup($atts) {
 		if (!isset($_GET['post'])) {
-			return '<div class="callout small warning"><p>Page missing post ID.</p></div>';
+			return '<div class="callout small alert"><p>Cannot render shortcode, missing post ID parameter.</p></div>';
 		}
 
 		$postid = intval($_GET['post']);
 		if ($postid == 0) {
-			return '<div class="callout small warning"><p>Page post ID is invalid.</p></div>';
+			return '<div class="callout small alert"><p>Cannot render shortcode, post ID is invalid.</p></div>';
 		}
 
 		$post = get_post($postid);
 		if (!$post) {
-			return '<div class="callout small warning"><p>Page post does not exist.</p></div>';
+			return '<div class="callout small alert"><p>Cannot render shortcode, post does not exist.</p></div>';
 		}
 
 		/*
 		if (get_post_type($post) != 'scheduled_rides') {
-			return '<div class="callout small warning"><p>Page post type is not a scheduled ride.</p></div>';
+			return '<div class="callout small alert"><p>Cannot render shortcode, post type is not a scheduled ride.</p></div>';
 		}
 		*/
 
 		$current_user = wp_get_current_user();
 		if ( 0 == $current_user->ID ) {
-			return '<div class="callout small warning"><p>Please log in to view the rider signup list.</p></div>';
+			return '<div class="callout small warning"><p>Please <a href="/wp-login.php">log in</a> to view the rider signup list.</p></div>';
 		}
 
 		/*
@@ -717,22 +734,14 @@ class PwtcMapdb {
 			<table class="pwtc-mapdb-rwd-table"><thead><tr><th>Name</th><th>Rider ID</th><th>Emergency Contact</th></tr></thead><tbody>
 			<?php foreach($signup_list as $item) { 
 				$user_info = get_userdata($item);
-				$name = $user_info->first_name . ' ' . $user_info->last_name;
-				$rider_id = '';
-				//$rider_id = get_field('rider_id', 'user_'.$item);
-				$contact_phone = '';
-				//$contact_phone = trim(get_field('emergency_contact_phone', 'user_'.$item));
-				if (!empty($contact_phone)) {
-					$contact_phone = '<a href="tel:' . 
-						pwtc_members_strip_phone_number($contact_phone) . '">' . 
-						pwtc_members_format_phone_number($contact_phone) . '</a>';
+				if ($user_info) {
+					$name = $user_info->first_name . ' ' . $user_info->last_name;
 				}
-				$contact_name = '';
-				//$contact_name = trim(get_field('emergency_contact_name', 'user_'.$item));
-				$contact = $contact_phone;
-				if (!empty($contact_name)) {
-					$contact .= '(' . $contact_name . ')';
+				else {
+					$name = 'Unknown';
 				}
+				$rider_id = self::get_rider_id($item);
+				$contact = self::get_emergency_contact($item, true);
 			?>
 				<tr>
 				<td><span>Name</span><?php echo $name; ?></td>
@@ -744,9 +753,199 @@ class PwtcMapdb {
 		<?php } else { ?>
 			<div class="callout small"><p>There are currently no riders signed up for the ride "<?php echo $ride_title; ?>."</p></div>
 		<?php } ?>
+		<form method="POST">
+			<input type="hidden" name="ride_id" value="<?php echo $postid; ?>"/>
+			<button class="button" type="submit" name="pwtc_mapdb_download_signup"><i class="fa fa-download"></i> Signup Sheet</button>
+		</form>
 	</div>
 	<?php
 		return ob_get_clean();
+	}
+
+	// Generates the [pwtc_mapdb_download_signup] shortcode.
+	public static function shortcode_download_signup($atts) {
+		ob_start();
+	?>
+	<script type="text/javascript">
+		jQuery(document).ready(function($) { 
+		});
+	</script>
+
+	<div id='pwtc-mapdb-download-signup-div'>
+		<form method="POST">
+			<button class="button" type="submit" name="pwtc_mapdb_download_signup"><i class="fa fa-download"></i> Ride Signup Sheet</button>
+		</form>
+	</div>
+	<?php
+		return ob_get_clean();
+	}
+	
+	public static function download_ride_signup() {
+		if (isset($_POST['pwtc_mapdb_download_signup'])) {
+			if (!defined('PWTC_MILEAGE__PLUGIN_DIR')) {
+				return;
+			}
+			if (isset($_POST['ride_id'])) {
+				$rideid = intval($_POST['ride_id']);
+				if ($rideid == 0) {
+					return;
+				}
+				$post = get_post($rideid);
+				if (!$post) {
+					return;
+				}
+				/*
+				if (get_post_type($post) != 'scheduled_rides') {
+					return;
+				}
+				*/
+				$current_user = wp_get_current_user();
+				if ( 0 == $current_user->ID ) {
+					return;
+				}
+				$signup_list = get_post_meta($rideid, '_signup_user_id');
+				$ride_title = get_the_title($rideid);
+				$ride_date = '01/01/2020 10:00am';
+				//$date = DateTime::createFromFormat('Y-m-d H:i:s', get_field('date', $rideid));
+				//$ride_date = $date->format('m/d/Y g:ia');
+			}
+			else {
+				$signup_list = [];
+				$ride_title = '';
+				$ride_date = '';
+			}
+			$release_waiver = self::get_release_waiver();
+			$safety_waiver = self::get_safety_waiver();
+			$photo_waiver = self::get_photo_waiver();
+
+			header('Content-Description: File Transfer');
+			header("Content-type: application/pdf");
+			header("Content-Disposition: attachment; filename=ride_signup.pdf");
+			require(PWTC_MILEAGE__PLUGIN_DIR . 'fpdf.php');	
+			$pdf = new FPDF('L', 'mm', 'Letter');
+			$pdf->SetAutoPageBreak(false);
+			$x_margin = 10;
+			$y_margin = 10;
+			$logo_size = 30;
+			$font_size = 12;
+			$cell_h = 8;
+			$max_pages = 2;
+			$rider_count = 0;
+			for ($i = 1; $i <= $max_pages; $i++) {
+				$pdf->AddPage();
+				$pdf->SetXY($x_margin+$logo_size+$x_margin, $y_margin);
+				$pdf->SetFont('Arial', 'B', $font_size);
+				$pdf->Cell(200, $cell_h, 'PORTLAND BICYCLING CLUB WAIVER & RIDE SIGN IN SHEET', 0, 2,'C');
+				if ($i == 1) {
+					$pdf->SetFont('Arial', '', $font_size);
+					$pdf->Cell(220, $cell_h, 'Ride: '.$ride_title, 1, 2,'L');
+					$pdf->Cell(60, $cell_h, 'Date: '.$ride_date, 1, 0,'L');
+					$pdf->Cell(110, $cell_h, 'Leader:', 1, 0,'L');
+					$pdf->Cell(50, $cell_h, 'Distance:', 1, 0,'L');
+					$pdf->Image(PWTC_MILEAGE__PLUGIN_DIR . 'pbc_logo.png', $x_margin, $y_margin, $logo_size, $logo_size);
+					$waiver_y = $y_margin+35;
+					$table_y = $y_margin+75;
+					$rows_per_page = 13;
+				}
+				else {
+					$waiver_y = $y_margin+10;
+					$table_y = $y_margin+50;
+					$rows_per_page = 16;		
+				}
+				$pdf->SetFont('Arial', '', 6);
+				$pdf->SetXY($x_margin, $waiver_y);
+				$pdf->MultiCell(0, 3, $release_waiver);
+				$pdf->SetXY($x_margin, $waiver_y+15);
+				$pdf->MultiCell(0, 3, $safety_waiver);
+				$pdf->SetXY($x_margin, $waiver_y+30);
+				$pdf->MultiCell(0, 3, $photo_waiver);
+
+				$pdf->SetXY($x_margin, $table_y);
+				$pdf->SetFont('Arial', 'B', $font_size);
+				$pdf->Cell(10, $cell_h, 'No.', 1, 0,'C');
+				$pdf->Cell(30, $cell_h, 'Member #', 1, 0,'C');
+				$pdf->Cell(20, $cell_h, 'Miles', 1, 0,'C');
+				$pdf->Cell(70, $cell_h, 'Rider Name', 1, 0,'C');
+				$pdf->Cell(50, $cell_h, 'Signature', 1, 0,'C');
+				$pdf->Cell(80, $cell_h, 'Emergency Phone', 1, 0,'C');
+
+				$y_offset = $table_y;
+				for ($j = 1; $j <= $rows_per_page; $j++) {
+					$rider_name = '';
+					$rider_id = '';
+					$contact = '';
+					if ($rider_count < count($signup_list)) {
+						$userid = $signup_list[$rider_count];
+						$user_info = get_userdata($userid);
+						if ($user_info) {
+							$rider_name = $user_info->first_name . ' ' . $user_info->last_name;
+						}
+						else {
+							$rider_name = 'Unknown';
+						}	
+						$rider_id = self::get_rider_id($userid);
+						$contact = self::get_emergency_contact($userid, false);
+					}
+					$rider_count++;
+					$y_offset += $cell_h;
+					$pdf->SetXY($x_margin, $y_offset);
+					$pdf->SetFont('Arial', '', $font_size);
+					$pdf->Cell(10, $cell_h, $rider_count, 1, 0,'C');
+					$pdf->Cell(30, $cell_h, $rider_id, 1, 0,'C');
+					$pdf->Cell(20, $cell_h, '', 1, 0,'L');
+					$pdf->Cell(70, $cell_h, $rider_name, 1, 0,'L');
+					$pdf->Cell(50, $cell_h, '', 1, 0,'L');
+					$pdf->Cell(80, $cell_h, $contact, 1, 0,'L');
+				}
+			}
+			$pdf->Output('F', 'php://output');
+			die;
+		}
+	}	
+
+	public static function get_rider_id($userid) {
+		$rider_id = get_field('rider_id', 'user_'.$userid);
+		return $rider_id;
+	}
+
+	public static function get_emergency_contact($userid, $use_link) {
+		$contact_phone = trim(get_field('emergency_contact_phone', 'user_'.$userid));
+		if (!empty($contact_phone)) {
+			if (function_exists('pwtc_members_format_phone_number')) {
+				if ($use_link) {
+					$contact_phone = '<a href="tel:' . 
+						pwtc_members_strip_phone_number($contact_phone) . '">' . 
+						pwtc_members_format_phone_number($contact_phone) . '</a>';
+				}
+				else {
+					$contact_phone = pwtc_members_format_phone_number($contact_phone);
+				}
+			}
+		}
+		$contact_name = trim(get_field('emergency_contact_name', 'user_'.$userid));
+		$contact = $contact_phone;
+		if (!empty($contact_name)) {
+			$contact .= ' (' . $contact_name . ')';
+		}
+		return $contact;
+	}
+
+	public static function get_release_waiver() {
+		return <<<EOT
+Release Of All Claims: In return for being allowed to participate in rides or any other activities sponsored by the Portland Bicycling Club (PBC), the undersigned and his/her heirs, executors, successors and assigns hereby agree that under no circumstances will a claim be asserted for negligence or gross negligence, for any damages for personal injury, property damage or loss, wrongful death or any other injury or loss incurred during or arising out of participation in any PBC ride or activity in which the PBC is involved, against the PBC, its members, ride leader, officers, agents, and sponsors. I acknowledge that cycling is a dangerous sport and fully realize the dangers of participating in this event. I acknowledge that this event is extraordinarily challenging and that I am in sound medical condition capable of participating in the ride without risk to myself or others.
+EOT;
+	}
+
+	public static function get_safety_waiver() {
+		return <<<EOT
+I ACKNOWLEDGE AND AGREE THAT FOR MY PERSONAL SAFETY, I AM REQUIRED TO AND WILL WEAR AN ASTM, CPSC OR SNELL-APPROVED BICYCLE HELMET, AND RIDE SAFELY, LEGALLY AND COURTEOUSLY IN ANY PBC RIDE, AND THAT REFUSAL OF ANY OF THESE REQUIREMENTS GIVES PBC THE RIGHT TO ASK ME TO LEAVE THE RIDE. I FURTHER ACKNOWLEDGE AND AGREE THAT USE OF AN ELECTRIC-ASSISTED BICYCLE ("EBIKE") THAT FAILS TO MEET THE DEFINITION OF A LOW-SPEED E-BIKE AS DEFINED BY THE CONSUMER PRODUCTS SAFETY COMMISSION OR USE OF AN E-BIKE THAT DOES NOT PROVIDE BATTERY-POWERED ASSISTANCE WHILE PEDALING (A THROTTLE OR TWIST-ASSIST E-BIKE) WILL BE CONSIDERED AN EXCLUDED ACTIVITY FOR THE PURPOSES OF COVERAGE UNDER PBC'S GENERAL LIABILITY INSURANCE COVERAGE.
+EOT;
+	}
+
+	public static function get_photo_waiver() {
+		return <<<EOT
+Photographs and video may be taken during this ride. By signing this ride sheet, you agree that your image or likeness may be used in promotion and marketing of PBC and its events. If the named entrant is a minor, then, to participate in PBC activities, a legal guardian must sign for him/her in the space below, or the minor must be a club member and have a signed Release of Claims on file with the PBC.
+EOT;
 	}
 	
 	/*************************************************************/
