@@ -563,6 +563,7 @@ class PwtcMapdb {
 		*/
 
 		$ride_title = get_the_title($postid);
+		$ride_link = get_the_permalink($postid);
 
 		$current_user = wp_get_current_user();
 		if ( 0 == $current_user->ID ) {
@@ -666,6 +667,7 @@ class PwtcMapdb {
 					<div class="row column clearfix">
 						<input type="hidden" name="accept_user_signup" value="yes"/>
 						<input class="button float-left" type="submit" value="Accept Signup"/>
+						<a href="<?php echo $ride_link; ?>" class="button float-right">Close</a>
 					</div>
 				</form>
 			</div>
@@ -676,6 +678,7 @@ class PwtcMapdb {
 					<div class="row column clearfix">
 						<input type="hidden" name="cancel_user_signup" value="yes"/>
 						<input class="button float-left" type="submit" value="Cancel Signup"/>
+						<a href="<?php echo $ride_link; ?>" class="button float-right">Close</a>
 					</div>
 				</form>
 			</div>
@@ -720,6 +723,7 @@ class PwtcMapdb {
 
 		$signup_list = get_post_meta($postid, '_signup_user_id');
 		$ride_title = get_the_title($postid);
+		$ride_link = get_the_permalink($postid);
 
 		ob_start();
 	?>
@@ -753,10 +757,13 @@ class PwtcMapdb {
 		<?php } else { ?>
 			<div class="callout small"><p>There are currently no riders signed up for the ride "<?php echo $ride_title; ?>."</p></div>
 		<?php } ?>
-		<form method="POST">
-			<input type="hidden" name="ride_id" value="<?php echo $postid; ?>"/>
-			<button class="button" type="submit" name="pwtc_mapdb_download_signup"><i class="fa fa-download"></i> Signup Sheet</button>
-		</form>
+		<div class="row column clearfix">
+			<form method="POST">
+				<input type="hidden" name="ride_id" value="<?php echo $postid; ?>"/>
+				<button class="button float-left" type="submit" name="pwtc_mapdb_download_signup"><i class="fa fa-download"></i> Signup Sheet</button>
+				<a href="<?php echo $ride_link; ?>" class="button float-right">Close</a>
+			</form>
+		</div>
 	</div>
 	<?php
 		return ob_get_clean();
