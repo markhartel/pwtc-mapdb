@@ -708,14 +708,14 @@ class PwtcMapdb {
 
 		$current_user = wp_get_current_user();
 		if ( 0 == $current_user->ID ) {
-			return '<div class="callout small warning"><p>Please <a href="/wp-login.php">log in</a> to view the rider signup list.</p></div>';
+			return '<div class="callout small warning"><p>Please <a href="/wp-login.php">log in</a> to view the ride signup list.</p></div>';
 		}
 
-		/*
-		if (!in_array('ride_leader', (array) $current_user->roles)) {
-			return '<div class="callout small warning"><p>You must be a ride leader to view the rider signup list.</p></div>';
+		if (!user_can($current_user,'edit_published_rides')) {
+			if (!in_array('ride_leader', (array) $current_user->roles)) {
+				return '<div class="callout small warning"><p>You must be a ride leader to view the ride signup list.</p></div>';
+			}
 		}
-		*/
 
 		$signup_list = get_post_meta($postid, '_signup_user_id');
 		$ride_title = get_the_title($postid);
