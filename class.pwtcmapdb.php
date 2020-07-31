@@ -556,11 +556,9 @@ class PwtcMapdb {
 			return '<div class="callout small alert"><p>Cannot render shortcode, post does not exist.</p></div>';
 		}
 
-		/*
 		if (get_post_type($post) != 'scheduled_rides') {
 			return '<div class="callout small alert"><p>Cannot render shortcode, post type is not a scheduled ride.</p></div>';
 		}
-		*/
 
 		$ride_title = get_the_title($postid);
 		$ride_link = get_the_permalink($postid);
@@ -570,7 +568,6 @@ class PwtcMapdb {
 			return '<div class="callout small warning"><p>Please <a href="/wp-login.php">log in</a> to signup for this ride.</p></div>';
 		}
 
-		/*
 		$allow_signup = false;
 		$leaders = get_field('ride_leaders', $postid);
 		foreach($leaders as $leader) {
@@ -579,25 +576,20 @@ class PwtcMapdb {
 		if ( !$allow_signup ) {
 			return '<div class="callout small warning"><p>The leader for ride "' . $ride_title . '" does not allow online signup.</p></div>';
 		}
-		*/
 
-		/*
 		if (get_field('is_canceled', $postid)) {
 			return '<div class="callout small warning"><p>The ride "' . $ride_title . '" has been canceled, no signup allowed.</p></div>';
 		}
-		*/
 
-		/*
 		if (!in_array('current_member', (array) $current_user->roles)) {
 			return '<div class="callout small warning"><p>You must be a current member to signup for rides.</p></div>';
 		}
-		*/
 
 		if ($time_limit >= 0) {
 			$ride_date = DateTime::createFromFormat('Y-m-d H:i:s', get_field('date', $postid))->getTimestamp();
 			$now_date = new DateTime();
 			$now_date = $now_date->getTimestamp();
-			$now_date = $now_data - ($time_limit*60*60);
+			$now_date = $now_date - ($time_limit*60*60);
 			if ($now_date > $ride_date) {
 				return '<div class="callout small warning"><p>You cannot signup for ride "' . $ride_title . '" because it is too close to the start time.</p></div>';
 			}
@@ -704,11 +696,9 @@ class PwtcMapdb {
 			return '<div class="callout small alert"><p>Cannot render shortcode, post does not exist.</p></div>';
 		}
 
-		/*
 		if (get_post_type($post) != 'scheduled_rides') {
 			return '<div class="callout small alert"><p>Cannot render shortcode, post type is not a scheduled ride.</p></div>';
 		}
-		*/
 
 		$current_user = wp_get_current_user();
 		if ( 0 == $current_user->ID ) {
@@ -801,20 +791,17 @@ class PwtcMapdb {
 				if (!$post) {
 					return;
 				}
-				/*
 				if (get_post_type($post) != 'scheduled_rides') {
 					return;
 				}
-				*/
 				$current_user = wp_get_current_user();
 				if ( 0 == $current_user->ID ) {
 					return;
 				}
 				$signup_list = get_post_meta($rideid, '_signup_user_id');
 				$ride_title = get_the_title($rideid);
-				$ride_date = '01/01/2020 10:00am';
-				//$date = DateTime::createFromFormat('Y-m-d H:i:s', get_field('date', $rideid));
-				//$ride_date = $date->format('m/d/Y g:ia');
+				$date = DateTime::createFromFormat('Y-m-d H:i:s', get_field('date', $rideid));
+				$ride_date = $date->format('m/d/Y g:ia');
 			}
 			else {
 				$signup_list = [];
