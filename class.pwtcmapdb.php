@@ -664,8 +664,8 @@ class PwtcMapdb {
 					</div>
 					<div class="row column clearfix">
 						<input type="hidden" name="accept_user_signup" value="yes"/>
-						<input class="button float-left" type="submit" value="Accept Signup"/>
-						<a href="<?php echo $ride_link; ?>" class="button float-right">Close</a>
+						<button class="dark button float-left" type="submit"><i class="fa fa-user-plus"></i> Accept Signup</button>
+						<a href="<?php echo $ride_link; ?>" class="dark button float-right"><i class="fa fa-chevron-left"></i> Back to Ride</a>
 					</div>
 				</form>
 			</div>
@@ -675,8 +675,8 @@ class PwtcMapdb {
 				<form method="POST">
 					<div class="row column clearfix">
 						<input type="hidden" name="cancel_user_signup" value="yes"/>
-						<input class="button float-left" type="submit" value="Cancel Signup"/>
-						<a href="<?php echo $ride_link; ?>" class="button float-right">Close</a>
+						<button class="dark button float-left" type="submit"><i class="fa fa-user-times"></i> Cancel Signup</button>
+						<a href="<?php echo $ride_link; ?>" class="dark button float-right"><i class="fa fa-chevron-left"></i> Back to Ride</a>
 					</div>
 				</form>
 			</div>
@@ -756,8 +756,8 @@ class PwtcMapdb {
 		<div class="row column clearfix">
 			<form method="POST">
 				<input type="hidden" name="ride_id" value="<?php echo $postid; ?>"/>
-				<button class="button float-left" type="submit" name="pwtc_mapdb_download_signup"><i class="fa fa-download"></i> Signup Sheet</button>
-				<a href="<?php echo $ride_link; ?>" class="button float-right">Close</a>
+				<button class="dark button float-left" type="submit" name="pwtc_mapdb_download_signup"><i class="fa fa-download"></i> Signup Sheet</button>
+				<a href="<?php echo $ride_link; ?>" class="dark button float-right"><i class="fa fa-chevron-left"></i> Back to Ride</a>
 			</form>
 		</div>
 	</div>
