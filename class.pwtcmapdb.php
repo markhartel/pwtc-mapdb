@@ -572,6 +572,9 @@ class PwtcMapdb {
 		$leaders = get_field('ride_leaders', $postid);
 		foreach($leaders as $leader) {
 			$allow_signup = get_field('allow_ride_signup', 'user_'.$leader['ID']);
+			if ($allow_signup) {
+				break;
+			}
 		}
 		if ( !$allow_signup ) {
 			return '<div class="callout small warning"><p>The leader for ride "' . $ride_title . '" does not allow online signup.</p></div>';
@@ -589,9 +592,12 @@ class PwtcMapdb {
 			$ride_date = DateTime::createFromFormat('Y-m-d H:i:s', get_field('date', $postid))->getTimestamp();
 			$now_date = new DateTime();
 			$now_date = $now_date->getTimestamp();
+			if ($now_date > $ride_date) {
+				return '<div class="callout small warning"><p>You cannot signup for ride "' . $ride_title . '" because it has already started.</p></div>';
+			}
 			$now_date = $now_date - ($time_limit*60*60);
 			if ($now_date > $ride_date) {
-				return '<div class="callout small warning"><p>You cannot signup for ride "' . $ride_title . '" because it is too close to the start time.</p></div>';
+				return '<div class="callout small warning"><p>You cannot signup for ride "' . $ride_title . '" because it is within ' . $time_limit . ' hours of the start time.</p></div>';
 			}
 		}
 
