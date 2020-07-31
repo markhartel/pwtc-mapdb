@@ -776,7 +776,7 @@ class PwtcMapdb {
 
 	<div id='pwtc-mapdb-download-signup-div'>
 		<form method="POST">
-			<button class="button" type="submit" name="pwtc_mapdb_download_signup"><i class="fa fa-download"></i> Ride Signup Sheet</button>
+			<button class="dark button" type="submit" name="pwtc_mapdb_download_signup"><i class="fa fa-download"></i> Ride Signup Sheet</button>
 		</form>
 	</div>
 	<?php
