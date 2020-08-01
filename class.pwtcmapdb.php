@@ -584,8 +584,9 @@ class PwtcMapdb {
 			return '<div class="callout small warning"><p>The ride "' . $ride_title . '" has been canceled, no signup allowed.</p></div>';
 		}
 
-		if (!in_array('current_member', (array) $current_user->roles)) {
-			return '<div class="callout small warning"><p>You must be a current member to signup for rides.</p></div>';
+		if (!in_array('current_member', (array) $current_user->roles) and 
+		    !in_array('expired_member', (array) $current_user->roles)) {
+			return '<div class="callout small warning"><p>You must be a club member to signup for rides.</p></div>';
 		}
 
 		if ($time_limit >= 0) {
@@ -598,7 +599,7 @@ class PwtcMapdb {
 			//$now_time = $now_date->getTimestamp();
 			//if ($now_time > $ride_time) {
 			if ($now_date > $ride_date) {
-				return '<div class="callout small warning"><p>You cannot signup for ride "' . $ride_title . '" because it has already started. <em>The start time of the ride is ' . $ride_date_str . ' and the current time is ' . $now_date_str . '</em></p></div>';
+				return '<div class="callout small warning"><p>You cannot signup for ride "' . $ride_title . '" because it has already started. <em>The start time of the ride is ' . $ride_date_str . ' and the current time is ' . $now_date_str . '.</em></p></div>';
 			}
 			//$now_time = $now_time - ($time_limit*60*60);
 			//if ($now_time > $ride_time) {
@@ -606,7 +607,7 @@ class PwtcMapdb {
 				$interval = new DateInterval('PT' . $time_limit . 'H');	
 				$ride_date->sub($interval);
 				if ($now_date > $ride_date) {
-					return '<div class="callout small warning"><p>You cannot signup for ride "' . $ride_title . '" because it is within ' . $time_limit . ' hours of the start time. <em>The start time of the ride is ' . $ride_date_str . ' and the current time is ' . $now_date_str . '</em></p></div>';
+					return '<div class="callout small warning"><p>You cannot signup for ride "' . $ride_title . '" because it is within ' . $time_limit . ' hours of the start time. <em>The start time of the ride is ' . $ride_date_str . ' and the current time is ' . $now_date_str . '.</em></p></div>';
 				}
 			}
 		}
