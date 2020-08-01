@@ -589,15 +589,18 @@ class PwtcMapdb {
 		}
 
 		if ($time_limit >= 0) {
-			$ride_date = DateTime::createFromFormat('Y-m-d H:i:s', get_field('date', $postid))->getTimestamp();
+			$ride_date = DateTime::createFromFormat('Y-m-d H:i:s', get_field('date', $postid));
+			$ride_date_str = $ride_date->format('m/d/Y g:ia');
+			$ride_time = $ride_date->getTimestamp();
 			$now_date = new DateTime();
-			$now_date = $now_date->getTimestamp();
-			if ($now_date > $ride_date) {
-				return '<div class="callout small warning"><p>You cannot signup for ride "' . $ride_title . '" because it has already started.</p></div>';
+			$now_date_str = $now_date->format('m/d/Y g:ia');
+			$now_time = $now_date->getTimestamp();
+			if ($now_time > $ride_time) {
+				return '<div class="callout small warning"><p>You cannot signup for ride "' . $ride_title . '" because it has already started.</p><p>ride:' . $ride_date_str . ' now:' . $now_date_str . '</p></div>';
 			}
-			$now_date = $now_date - ($time_limit*60*60);
-			if ($now_date > $ride_date) {
-				return '<div class="callout small warning"><p>You cannot signup for ride "' . $ride_title . '" because it is within ' . $time_limit . ' hours of the start time.</p></div>';
+			$now_time = $now_time - ($time_limit*60*60);
+			if ($now_time > $ride_time) {
+				return '<div class="callout small warning"><p>You cannot signup for ride "' . $ride_title . '" because it is within ' . $time_limit . ' hours of the start time.</p><p>ride:' . $ride_date_str . ' now:' . $now_date_str . '</p></div>';
 			}
 		}
 
