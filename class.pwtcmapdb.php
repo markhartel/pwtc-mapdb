@@ -368,9 +368,9 @@ class PwtcMapdb {
 				var numpages = Math.ceil(count/limit);
 				$('#pwtc-mapdb-maps-div').append(
 					'<form class="page-frm">' +
-                    '<input class="prev-btn button" style="margin: 0" type="button" value="< Prev"/>' +
+                    '<input class="prev-btn dark button" style="margin: 0" type="button" value="< Prev"/>' +
 					'<span style="margin: 0 10px">Page ' + pagenum + ' of ' + numpages + '</span>' +
-                    '<input class="next-btn button" style="margin: 0" type="button" value="Next >"/>' +
+                    '<input class="next-btn dark button" style="margin: 0" type="button" value="Next >"/>' +
 					'<span class="page-msg" style="margin: 0 10px"></span>' +
 					'<input name="offset" type="hidden" value="' + offset + '"/>' +
 					'<input name="count" type="hidden" value="' + count + '"/>' +
