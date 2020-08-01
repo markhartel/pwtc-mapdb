@@ -541,6 +541,14 @@ class PwtcMapdb {
 	public static function shortcode_rider_signup($atts) {
 		$a = shortcode_atts(array('time_limit' => -1), $atts);
 		$time_limit = $a['time_limit'];
+		
+		if (!defined('PWTC_MILEAGE__PLUGIN_DIR')) {
+			return '<div class="callout small alert"><p>Cannot render shortcode, PWTC Mileage plugin is required.</p></div>';
+		}
+
+		if (!defined('PWTC_MEMBERS__PLUGIN_DIR')) {
+			return '<div class="callout small alert"><p>Cannot render shortcode, PWTC Members plugin is required.</p></div>';
+		}
 
 		if (!isset($_GET['post'])) {
 			return '<div class="callout small alert"><p>Cannot render shortcode, missing post ID parameter.</p></div>';
@@ -699,6 +707,14 @@ class PwtcMapdb {
 	
 	// Generates the [pwtc_mapdb_view_signup] shortcode.
 	public static function shortcode_view_signup($atts) {
+		if (!defined('PWTC_MILEAGE__PLUGIN_DIR')) {
+			return '<div class="callout small alert"><p>Cannot render shortcode, PWTC Mileage plugin is required.</p></div>';
+		}
+
+		if (!defined('PWTC_MEMBERS__PLUGIN_DIR')) {
+			return '<div class="callout small alert"><p>Cannot render shortcode, PWTC Members plugin is required.</p></div>';
+		}
+		
 		if (!isset($_GET['post'])) {
 			return '<div class="callout small alert"><p>Cannot render shortcode, missing post ID parameter.</p></div>';
 		}
@@ -778,6 +794,14 @@ class PwtcMapdb {
 
 	// Generates the [pwtc_mapdb_download_signup] shortcode.
 	public static function shortcode_download_signup($atts) {
+		if (!defined('PWTC_MILEAGE__PLUGIN_DIR')) {
+			return '<div class="callout small alert"><p>Cannot render shortcode, PWTC Mileage plugin is required.</p></div>';
+		}
+
+		if (!defined('PWTC_MEMBERS__PLUGIN_DIR')) {
+			return '<div class="callout small alert"><p>Cannot render shortcode, PWTC Members plugin is required.</p></div>';
+		}
+		
 		ob_start();
 	?>
 	<script type="text/javascript">
