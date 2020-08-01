@@ -589,10 +589,11 @@ class PwtcMapdb {
 		}
 
 		if ($time_limit >= 0) {
+			$timezone = new DateTimeZone(pwtc_get_timezone_string());
 			$ride_date = DateTime::createFromFormat('Y-m-d H:i:s', get_field('date', $postid));
 			$ride_date_str = $ride_date->format('m/d/Y g:ia');
 			$ride_time = $ride_date->getTimestamp();
-			$now_date = new DateTime();
+			$now_date = new DateTime(null, $timezone);
 			$now_date_str = $now_date->format('m/d/Y g:ia');
 			$now_time = $now_date->getTimestamp();
 			if ($now_time > $ride_time) {
