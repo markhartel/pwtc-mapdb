@@ -597,11 +597,11 @@ class PwtcMapdb {
 			$now_date_str = $now_date->format('m/d/Y g:ia');
 			$now_time = $now_date->getTimestamp();
 			if ($now_time > $ride_time) {
-				return '<div class="callout small warning"><p>You cannot signup for ride "' . $ride_title . '" because it has already started.</p><p>ride:' . $ride_date_str . ' now:' . $now_date_str . '</p></div>';
+				return '<div class="callout small warning"><p>You cannot signup for ride "' . $ride_title . '" because it has already started. <em>The start time of the ride is ' . $ride_date_str . ' and the current time is ' . $now_date_str . '</em></p></div>';
 			}
 			$now_time = $now_time - ($time_limit*60*60);
 			if ($now_time > $ride_time) {
-				return '<div class="callout small warning"><p>You cannot signup for ride "' . $ride_title . '" because it is within ' . $time_limit . ' hours of the start time.</p><p>ride:' . $ride_date_str . ' now:' . $now_date_str . '</p></div>';
+				return '<div class="callout small warning"><p>You cannot signup for ride "' . $ride_title . '" because it is within ' . $time_limit . ' hours of the start time. <em>The start time of the ride is ' . $ride_date_str . ' and the current time is ' . $now_date_str . '</em></p></div>';
 			}
 		}
 
