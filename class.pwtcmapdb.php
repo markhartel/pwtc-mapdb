@@ -53,6 +53,9 @@ class PwtcMapdb {
 		add_shortcode('pwtc_mapdb_download_signup', 
 			array( 'PwtcMapdb', 'shortcode_download_signup'));
 
+		add_shortcode('pwtc_mapdb_leader_details', 
+			array( 'PwtcMapdb', 'shortcode_leader_details'));
+
 	}
 
 	/*************************************************************/
@@ -817,6 +820,114 @@ class PwtcMapdb {
 	<?php
 		return ob_get_clean();
 	}
+	
+	// Generates the [pwtc_mapdb_leader_details] shortcode.
+	public static function shortcode_leader_details($atts) {
+		if (!defined('PWTC_MEMBERS__PLUGIN_DIR')) {
+			ob_start();
+			?>
+			<div class="callout alert"><p>Cannot render shortcode, PWTC Members plugin is required.</p></div>
+			<?php
+			return ob_get_clean();
+		}
+		$current_user = wp_get_current_user();
+		if ( 0 == $current_user->ID ) {
+			ob_start();
+			?>
+			<div class="callout warning"><p>You must be logged in to edit your ride leader details information.</p></div>		
+			<?php
+			return ob_get_clean();
+		}
+		$userid = $current_user->ID;
+		$user_info = get_userdata( $userid );
+		if (!in_array('ride_leader', $user_info->roles)) {
+			ob_start();
+			?>
+			<div class="callout warning"><p>You must be a ride leader to edit your details information.</p></div>		
+			<?php
+			return ob_get_clean();
+		}
+		if (isset($_POST['use_contact_email'])) {
+			if ($_POST['use_contact_email'] == 'yes') {
+				update_field('use_contact_email', true, 'user_'.$userid);
+			}
+			else {
+				update_field('use_contact_email', false, 'user_'.$userid);
+			}
+		}
+		if (isset($_POST['allow_ride_signup'])) {
+			if ($_POST['allow_ride_signup'] == 'yes') {
+				update_field('allow_ride_signup', true, 'user_'.$userid);
+			}
+			else {
+				update_field('allow_ride_signup', false, 'user_'.$userid);
+			}
+		}
+		if (isset($_POST['contact_email'])) {
+			update_field('contact_email', sanitize_email($_POST['contact_email']), 'user_'.$userid);
+		}
+		if (isset($_POST['voice_phone'])) {
+			update_field('cell_phone', pwtc_members_format_phone_number($_POST['voice_phone']), 'user_'.$userid);
+		}
+		if (isset($_POST['text_phone'])) {
+			update_field('home_phone', pwtc_members_format_phone_number($_POST['text_phone']), 'user_'.$userid);
+		}
+		$voice_phone = pwtc_members_format_phone_number(get_field('cell_phone', 'user_'.$userid));
+		$text_phone = pwtc_members_format_phone_number(get_field('home_phone', 'user_'.$userid));
+		$contact_email = get_field('contact_email', 'user_'.$userid);
+		$use_contact_email = get_field('use_contact_email', 'user_'.$userid);
+		$allow_ride_signup = get_field('allow_ride_signup', 'user_'.$userid);
+		$signup_cutoff = '';
+		ob_start();
+		?>
+		<div class="callout">
+			<form method="POST">
+				<div class="row">
+					<div class="small-12 medium-6 columns">
+						<label>Use Contact Email?
+							<select name="use_contact_email">
+								<option value="no" <?php echo $use_contact_email ? '': 'selected'; ?>>No, use account email instead</option>
+								<option value="yes"  <?php echo $use_contact_email ? 'selected': ''; ?>>Yes</option>
+							</select>
+						</label>
+					</div>
+					<div class="small-12 medium-6 columns">
+						<label><i class="fa fa-envelope"></i> Contact Email
+							<input type="text" name="contact_email" value="<?php echo $contact_email; ?>"/>
+						</label>
+					</div>
+					<div class="small-12 medium-6 columns">
+						<label><i class="fa fa-phone"></i> Contact Voice Phone
+							<input type="text" name="voice_phone" value="<?php echo $voice_phone; ?>"/>
+						</label>
+					</div>
+					<div class="small-12 medium-6 columns">
+						<label><i class="fa fa-mobile"></i> Contact Text Phone
+							<input type="text" name="text_phone" value="<?php echo $text_phone; ?>"/>
+						</label>
+					</div>
+					<div class="small-12 medium-6 columns">
+						<label>Allow Online Ride Signup?
+							<select name="allow_ride_signup">
+								<option value="no" <?php echo $allow_ride_signup ? '': 'selected'; ?>>No</option>
+								<option value="yes"  <?php echo $allow_ride_signup ? 'selected': ''; ?>>Yes</option>
+							</select>
+						</label>
+					</div>
+					<div class="small-12 medium-6 columns">
+						<label>Signup Cutoff Time
+							<input type="text" name="signup_cutoff" value="<?php echo $signup_cutoff; ?>"/>
+						</label>
+					</div>
+				</div>
+				<div class="row column clearfix">
+					<input class="button float-left" type="submit" value="Submit"/>
+				</div>
+			</form>
+		</div>
+		<?php
+		return ob_get_clean();
+	}	
 	
 	public static function download_ride_signup() {
 		if (isset($_POST['pwtc_mapdb_download_signup'])) {
