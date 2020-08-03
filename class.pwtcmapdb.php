@@ -917,7 +917,7 @@ class PwtcMapdb {
 						</label>
 					</div>
 					<div class="small-12 medium-6 columns">
-						<label>Signup Cutoff Time (hours)
+						<label>Signup Cutoff Time (hours before start)
 							<input type="text" name="signup_cutoff" value="<?php echo $signup_cutoff; ?>"/>
 						</label>
 					</div>
