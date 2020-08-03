@@ -872,12 +872,15 @@ class PwtcMapdb {
 		if (isset($_POST['text_phone'])) {
 			update_field('home_phone', pwtc_members_format_phone_number($_POST['text_phone']), 'user_'.$userid);
 		}
+		if (isset($_POST['signup_cutoff'])) {
+			update_field('signup_cutoff_time', $_POST['signup_cutoff'], 'user_'.$userid);
+		}
 		$voice_phone = pwtc_members_format_phone_number(get_field('cell_phone', 'user_'.$userid));
 		$text_phone = pwtc_members_format_phone_number(get_field('home_phone', 'user_'.$userid));
 		$contact_email = get_field('contact_email', 'user_'.$userid);
 		$use_contact_email = get_field('use_contact_email', 'user_'.$userid);
 		$allow_ride_signup = get_field('allow_ride_signup', 'user_'.$userid);
-		$signup_cutoff = '';
+		$signup_cutoff = get_field('signup_cutoff_time', 'user_'.$userid);
 		ob_start();
 		?>
 		<div class="callout">
@@ -915,13 +918,13 @@ class PwtcMapdb {
 						</label>
 					</div>
 					<div class="small-12 medium-6 columns">
-						<label>Signup Cutoff Time
+						<label>Signup Cutoff Time (hours)
 							<input type="text" name="signup_cutoff" value="<?php echo $signup_cutoff; ?>"/>
 						</label>
 					</div>
 				</div>
 				<div class="row column clearfix">
-					<input class="button float-left" type="submit" value="Submit"/>
+					<input class="dark button float-left" type="submit" value="Submit"/>
 				</div>
 			</form>
 		</div>
