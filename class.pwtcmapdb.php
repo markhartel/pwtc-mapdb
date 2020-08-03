@@ -585,10 +585,8 @@ class PwtcMapdb {
 		foreach($leaders as $leader) {
 			$allow_signup = get_field('allow_ride_signup', 'user_'.$leader['ID']);
 			if ($allow_signup) {
-				$str = trim(get_field('signup_cutoff_time', 'user_'.$leader['ID']));
-				if (!empty($str)) {
-					$time_limit = abs(intval($str));
-				}
+				$str = get_field('signup_cutoff_time', 'user_'.$leader['ID']);
+				$time_limit = abs(intval($str));
 				break;
 			}
 		}
@@ -609,16 +607,11 @@ class PwtcMapdb {
 			$timezone = new DateTimeZone(pwtc_get_timezone_string());
 			$ride_date = DateTime::createFromFormat('Y-m-d H:i:s', get_field('date', $postid), $timezone);
 			$ride_date_str = $ride_date->format('m/d/Y g:ia');
-			//$ride_time = $ride_date->getTimestamp();
 			$now_date = new DateTime(null, $timezone);
 			$now_date_str = $now_date->format('m/d/Y g:ia');
-			//$now_time = $now_date->getTimestamp();
-			//if ($now_time > $ride_time) {
 			if ($now_date > $ride_date) {
 				return '<div class="callout small warning"><p>You cannot signup for ride "' . $ride_title . '" because it has already started. <em>The start time of the ride is ' . $ride_date_str . ' and the current time is ' . $now_date_str . '.</em></p></div>';
 			}
-			//$now_time = $now_time - ($time_limit*60*60);
-			//if ($now_time > $ride_time) {
 			if ($time_limit > 0) {
 				$interval = new DateInterval('PT' . $time_limit . 'H');	
 				$ride_date->sub($interval);
@@ -878,14 +871,15 @@ class PwtcMapdb {
 			update_field('home_phone', pwtc_members_format_phone_number($_POST['text_phone']), 'user_'.$userid);
 		}
 		if (isset($_POST['signup_cutoff'])) {
-			update_field('signup_cutoff_time', $_POST['signup_cutoff'], 'user_'.$userid);
+			$val = abs(intval($_POST['signup_cutoff']));
+			update_field('signup_cutoff_time', $val, 'user_'.$userid);
 		}
 		$voice_phone = pwtc_members_format_phone_number(get_field('cell_phone', 'user_'.$userid));
 		$text_phone = pwtc_members_format_phone_number(get_field('home_phone', 'user_'.$userid));
 		$contact_email = get_field('contact_email', 'user_'.$userid);
 		$use_contact_email = get_field('use_contact_email', 'user_'.$userid);
 		$allow_ride_signup = get_field('allow_ride_signup', 'user_'.$userid);
-		$signup_cutoff = get_field('signup_cutoff_time', 'user_'.$userid);
+		$signup_cutoff = abs(intval(get_field('signup_cutoff_time', 'user_'.$userid)));
 		ob_start();
 		?>
 		<div class="callout">
