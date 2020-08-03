@@ -542,8 +542,8 @@ class PwtcMapdb {
 	
 	// Generates the [pwtc_mapdb_rider_signup] shortcode.
 	public static function shortcode_rider_signup($atts) {
-		$a = shortcode_atts(array('time_limit' => -1), $atts);
-		$time_limit = $a['time_limit'];
+		//$a = shortcode_atts(array('time_limit' => -1), $atts);
+		//$time_limit = $a['time_limit'];
 		
 		if (!defined('PWTC_MILEAGE__PLUGIN_DIR')) {
 			return '<div class="callout small alert"><p>Cannot render shortcode, PWTC Mileage plugin is required.</p></div>';
@@ -580,10 +580,15 @@ class PwtcMapdb {
 		}
 
 		$allow_signup = false;
+		$time_limit = -1;
 		$leaders = get_field('ride_leaders', $postid);
 		foreach($leaders as $leader) {
 			$allow_signup = get_field('allow_ride_signup', 'user_'.$leader['ID']);
 			if ($allow_signup) {
+				$str = trim(get_field('signup_cutoff_time', 'user_'.$leader['ID']));
+				if (!empty($str)) {
+					$time_limit = abs(intval($str));
+				}
 				break;
 			}
 		}
