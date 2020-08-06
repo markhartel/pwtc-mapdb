@@ -622,12 +622,13 @@ class PwtcMapdb {
 		}
 
 		if (isset($_POST['accept_user_signup'])) {
-			delete_post_meta($postid, '_signup_user_id', $current_user->ID);
-			add_post_meta($postid, '_signup_user_id', $current_user->ID);
+			self::delete_all_signups($postid, $current_user->ID);
+			$value = json_encode(array('userid' => $current_user->ID, 'mileage' => ''));
+			add_post_meta($postid, '_signup_user_id', $value);
 		}
 
 		if (isset($_POST['cancel_user_signup'])) {
-			delete_post_meta($postid, '_signup_user_id', $current_user->ID);
+			self::delete_all_signups($postid, $current_user->ID);
 		}
 
 		if (isset($_POST['contact_phone'])) {
@@ -648,7 +649,8 @@ class PwtcMapdb {
 		$signup_list = get_post_meta($postid, '_signup_user_id');
 		$accept_signup = true;
 		foreach($signup_list as $item) {
-			if ($item == $current_user->ID) {
+			$arr = json_decode($item, true);
+			if ($arr['userid'] == $current_user->ID) {
 				$accept_signup = false;
 			}
 		}
@@ -761,15 +763,17 @@ class PwtcMapdb {
 			<p>The following riders are currently signed up for the ride "<?php echo $ride_title; ?>."</p>
 			<table class="pwtc-mapdb-rwd-table"><thead><tr><th>Name</th><th>Rider ID</th><th>Emergency Contact</th></tr></thead><tbody>
 			<?php foreach($signup_list as $item) { 
-				$user_info = get_userdata($item);
+				$arr = json_decode($item, true);
+				$userid = $arr['userid'];
+				$user_info = get_userdata($userid);
 				if ($user_info) {
 					$name = $user_info->first_name . ' ' . $user_info->last_name;
 				}
 				else {
 					$name = 'Unknown';
 				}
-				$rider_id = self::get_rider_id($item);
-				$contact = self::get_emergency_contact($item, true);
+				$rider_id = self::get_rider_id($userid);
+				$contact = self::get_emergency_contact($userid, true);
 			?>
 				<tr>
 				<td><span>Name</span><?php echo $name; ?></td>
@@ -929,8 +933,18 @@ class PwtcMapdb {
 		</div>
 		<?php
 		return ob_get_clean();
-	}	
+	}
 	
+	public static function delete_all_signups($postid, $userid) {
+		$signup_list = get_post_meta($postid, '_signup_user_id');
+		foreach($signup_list as $item) {
+			$arr = json_decode($item, true);
+			if ($arr['userid'] == $userid) {
+				delete_post_meta($postid, '_signup_user_id', $item);
+			}
+		}
+	}
+
 	public static function download_ride_signup() {
 		if (isset($_POST['pwtc_mapdb_download_signup'])) {
 			if (!defined('PWTC_MILEAGE__PLUGIN_DIR')) {
@@ -1023,7 +1037,8 @@ class PwtcMapdb {
 					$rider_id = '';
 					$contact = '';
 					if ($rider_count < count($signup_list)) {
-						$userid = $signup_list[$rider_count];
+						$arr = json_decode($signup_list[$rider_count], true);
+						$userid = $arr['userid'];
 						$user_info = get_userdata($userid);
 						if ($user_info) {
 							$rider_name = $user_info->first_name . ' ' . $user_info->last_name;
