@@ -755,16 +755,43 @@ class PwtcMapdb {
 	?>
 	<script type="text/javascript">
 		jQuery(document).ready(function($) { 
+
+			function remove_input_tags() {
+				$('#pwtc-mapdb-view-signup-div table tbody td[mileage] input').each(function() {
+					var cell = $(this).parent();
+					cell.html('<span>Mileage</span>' + cell.attr('mileage'));
+				});
+			}
+
+			$('#pwtc-mapdb-view-signup-div table tbody td[mileage]').on('click', function(evt) {
+				remove_input_tags();
+				var cell = $(this);
+				cell.html('<span>Mileage</span><input type="text" value="' + cell.attr('mileage') + '" style="width:50%" maxlength="3" /> <a>Save</a>');
+				var input = cell.find('input');
+				input.on('click', function(evt) {
+					evt.stopPropagation();
+				});
+				cell.find('a').on('click', function(evt) {
+					evt.stopPropagation();
+					cell.attr('mileage', function() {
+						return input.val();
+					});
+					remove_input_tags();
+				});
+				cell.find('input').focus();
+			});
 		});
+		
 	</script>
 
 	<div id='pwtc-mapdb-view-signup-div'>
 		<?php if (count($signup_list) > 0) { ?>
 			<p>The following riders are currently signed up for the ride "<?php echo $ride_title; ?>."</p>
-			<table class="pwtc-mapdb-rwd-table"><thead><tr><th>Name</th><th>Rider ID</th><th>Emergency Contact</th></tr></thead><tbody>
+			<table class="pwtc-mapdb-rwd-table"><thead><tr><th>Name</th><th>Rider ID</th><th>Mileage</th><th>Emergency Contact</th></tr></thead><tbody>
 			<?php foreach($signup_list as $item) { 
 				$arr = json_decode($item, true);
 				$userid = $arr['userid'];
+				$mileage = $arr['mileage'];
 				$user_info = get_userdata($userid);
 				if ($user_info) {
 					$name = $user_info->first_name . ' ' . $user_info->last_name;
@@ -778,6 +805,7 @@ class PwtcMapdb {
 				<tr>
 				<td><span>Name</span><?php echo $name; ?></td>
 				<td><span>Rider ID</span><?php echo $rider_id; ?></td>
+				<td userid="<?php echo $userid; ?>" mileage="<?php echo $mileage; ?>"><span>Mileage</span><?php echo $mileage; ?></td>
 				<td><span>Emergency Contact</span><?php echo $contact; ?></td>
 				</tr>
 			<?php } ?>
