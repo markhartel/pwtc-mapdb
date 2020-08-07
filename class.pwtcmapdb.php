@@ -766,19 +766,20 @@ class PwtcMapdb {
 			$('#pwtc-mapdb-view-signup-div table tbody td[mileage]').on('click', function(evt) {
 				remove_input_tags();
 				var cell = $(this);
-				cell.html('<span>Mileage</span><input type="text" value="' + cell.attr('mileage') + '" style="width:50%" maxlength="3" /> <a>Save</a>');
+				cell.html('<span>Mileage</span><input type="text" value="' + cell.attr('mileage') + '" maxlength="3" />');
 				var input = cell.find('input');
 				input.on('click', function(evt) {
 					evt.stopPropagation();
 				});
-				cell.find('a').on('click', function(evt) {
-					evt.stopPropagation();
-					cell.attr('mileage', function() {
-						return input.val();
-					});
-					remove_input_tags();
+				input.on('keypress', function(e) {
+    					if (e.which == 13) {
+						cell.attr('mileage', function() {
+							return input.val();
+						});
+						remove_input_tags();
+   					}
 				});
-				cell.find('input').focus();
+				input.focus();
 			});
 		});
 		
