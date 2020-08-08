@@ -55,6 +55,11 @@ class PwtcMapdb {
 
 		add_shortcode('pwtc_mapdb_leader_details', 
 			array( 'PwtcMapdb', 'shortcode_leader_details'));
+		
+		/* Register AJAX request/response callbacks */
+
+		add_action( 'wp_ajax_pwtc_mapdb_edit_mileage', 
+			array( 'PwtcMapdb', 'edit_mileage_callback') );
 
 	}
 
@@ -756,6 +761,24 @@ class PwtcMapdb {
 	<script type="text/javascript">
 		jQuery(document).ready(function($) { 
 
+			function edit_mileage_cb(response) {
+				var res = JSON.parse(response);
+				if (res.error) {
+				}
+				else {
+					if (res.postid == <?php echo $postid ?>) {
+						var cell = $('#pwtc-mapdb-view-signup-div table tbody td[userid="' + res.userid + '"]');
+						cell.attr('mileage', function() {
+							return res.mileage;
+						});
+						cell.html('<span>Mileage</span>' + res.mileage);
+					}
+					else {
+						
+					}
+				}
+			}
+				       
 			function remove_input_tags() {
 				$('#pwtc-mapdb-view-signup-div table tbody td[mileage] input').each(function() {
 					var cell = $(this).parent();
@@ -773,10 +796,14 @@ class PwtcMapdb {
 				});
 				input.on('keypress', function(e) {
     					if (e.which == 13) {
-						cell.attr('mileage', function() {
-							return input.val();
-						});
-						remove_input_tags();
+						var action = "<?php echo admin_url('admin-ajax.php'); ?>";
+						var data = {
+							'action': 'pwtc_mapdb_edit_mileage',
+							'postid': '<?php echo $postid ?>',
+							'userid': cell.attr('userid'),
+							'mileage': input.val()
+						};
+						$.post(action, data, edit_mileage_cb);
    					}
 				});
 				input.focus();
@@ -1065,9 +1092,11 @@ class PwtcMapdb {
 					$rider_name = '';
 					$rider_id = '';
 					$contact = '';
+					$mileage = '';
 					if ($rider_count < count($signup_list)) {
 						$arr = json_decode($signup_list[$rider_count], true);
 						$userid = $arr['userid'];
+						$mileage = $arr['mileage'];
 						$user_info = get_userdata($userid);
 						if ($user_info) {
 							$rider_name = $user_info->first_name . ' ' . $user_info->last_name;
@@ -1084,7 +1113,7 @@ class PwtcMapdb {
 					$pdf->SetFont('Arial', '', $font_size);
 					$pdf->Cell(10, $cell_h, $rider_count, 1, 0,'C');
 					$pdf->Cell(30, $cell_h, $rider_id, 1, 0,'C');
-					$pdf->Cell(20, $cell_h, '', 1, 0,'L');
+					$pdf->Cell(20, $cell_h, $mileage, 1, 0,'L');
 					$pdf->Cell(70, $cell_h, $rider_name, 1, 0,'L');
 					$pdf->Cell(50, $cell_h, '', 1, 0,'L');
 					$pdf->Cell(80, $cell_h, $contact, 1, 0,'L');
@@ -1140,6 +1169,43 @@ Photographs and video may be taken during this ride. By signing this ride sheet,
 EOT;
 	}
 	
+	/*************************************************************/
+	/* AJAX request/response callback functions
+	/*************************************************************/
+
+	public static function edit_mileage_callback() {
+		$current_user = wp_get_current_user();
+		if ( 0 == $current_user->ID ) {
+			$response = array(
+				'error' => 'Mileage edit failed - user access denied.'
+			);		
+		}
+		else if (isset($_POST['userid']) and isset($_POST['postid']) and isset($_POST['mileage'])) {
+			$userid = intval($_POST['userid']);
+			$postid = intval($_POST['postid']);
+			$mileage = trim($_POST['mileage']);
+			if (!empty($mileage)) {
+				$m = abs(intval($mileage));
+				$mileage = '' . $m;
+			}
+			self::delete_all_signups($postid, $userid);
+			$value = json_encode(array('userid' => $userid, 'mileage' => $mileage));
+			add_post_meta($postid, '_signup_user_id', $value);
+			$response = array(
+				'postid' => $postid,
+				'userid' => $userid,
+				'mileage' => $mileage
+			);
+		}
+		else {
+			$response = array(
+				'error' => 'Mileage edit failed - AJAX arguments missing.'
+			);		
+		}
+		echo wp_json_encode($response);
+		wp_die();
+	}	
+
 	/*************************************************************/
 	/* Plugin installation and removal functions.
 	/*************************************************************/
