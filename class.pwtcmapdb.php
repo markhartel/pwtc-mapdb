@@ -801,9 +801,11 @@ class PwtcMapdb {
 							'action': 'pwtc_mapdb_edit_mileage',
 							'postid': '<?php echo $postid ?>',
 							'userid': cell.attr('userid'),
+							'oldmileage': cell.attr('mileage'),
 							'mileage': input.val()
 						};
 						$.post(action, data, edit_mileage_cb);
+						cell.html('<span>Mileage</span><i class="fa fa-spinner fa-pulse"></i> please wait...');
    					}
 				});
 				input.focus();
@@ -1180,17 +1182,18 @@ EOT;
 				'error' => 'Mileage edit failed - user access denied.'
 			);		
 		}
-		else if (isset($_POST['userid']) and isset($_POST['postid']) and isset($_POST['mileage'])) {
+		else if (isset($_POST['userid']) and isset($_POST['postid']) and isset($_POST['mileage']) and isset($_POST['oldmileage'])) {
 			$userid = intval($_POST['userid']);
 			$postid = intval($_POST['postid']);
+			$oldmileage = trim($_POST['oldmileage']);
 			$mileage = trim($_POST['mileage']);
 			if (!empty($mileage)) {
 				$m = abs(intval($mileage));
 				$mileage = '' . $m;
 			}
-			self::delete_all_signups($postid, $userid);
+			$oldvalue = json_encode(array('userid' => $userid, 'mileage' => $oldmileage));
 			$value = json_encode(array('userid' => $userid, 'mileage' => $mileage));
-			add_post_meta($postid, '_signup_user_id', $value);
+			update_post_meta($postid, '_signup_user_id', $value, $oldvalue);
 			$response = array(
 				'postid' => $postid,
 				'userid' => $userid,
