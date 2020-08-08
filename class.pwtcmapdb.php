@@ -816,7 +816,7 @@ class PwtcMapdb {
 
 	<div id='pwtc-mapdb-view-signup-div'>
 		<?php if (count($signup_list) > 0) { ?>
-			<p>The following riders are currently signed up for the ride "<?php echo $ride_title; ?>."</p>
+			<p>The following riders are currently signed up for the ride "<?php echo $ride_title; ?>." Click on the mileage field to edit and press the enter key to accept changes.</p>
 			<table class="pwtc-mapdb-rwd-table"><thead><tr><th>Name</th><th>Rider ID</th><th>Mileage</th><th>Emergency Contact</th></tr></thead><tbody>
 			<?php foreach($signup_list as $item) { 
 				$arr = json_decode($item, true);
