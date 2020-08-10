@@ -761,9 +761,34 @@ class PwtcMapdb {
 	<script type="text/javascript">
 		jQuery(document).ready(function($) { 
 
+			$.fn.setCursorPosition = function(pos) {
+  				this.each(function(index, elem) {
+    				if (elem.setSelectionRange) {
+      					elem.setSelectionRange(pos, pos);
+    				} else if (elem.createTextRange) {
+      					var range = elem.createTextRange();
+      					range.collapse(true);
+      					range.moveEnd('character', pos);
+      					range.moveStart('character', pos);
+      					range.select();
+    				}
+  				});
+  			return this;
+			};
+
+			function show_errmsg(message) {
+				$('#pwtc-mapdb-view-signup-div .errmsg').html('<div class="callout small alert">' + message + '</div>');
+			}
+
+			function clear_errmsg() {
+				$('#pwtc-mapdb-view-signup-div .errmsg').html('');
+			}
+
 			function edit_mileage_cb(response) {
 				var res = JSON.parse(response);
 				if (res.error) {
+					show_errmsg(res.error);
+					clear_image_tags();
 				}
 				else {
 					if (res.postid == <?php echo $postid ?>) {
@@ -774,31 +799,41 @@ class PwtcMapdb {
 						cell.html('<span>Mileage</span>' + res.mileage);
 					}
 					else {
-						
+						show_errmsg('Ride post ID does not match post ID returned by server.');
+						clear_image_tags();
 					}
 				}
 			}
-				       
-			function remove_input_tags() {
+
+			function clear_input_tags() {
 				$('#pwtc-mapdb-view-signup-div table tbody td[mileage] input').each(function() {
 					var cell = $(this).parent();
 					cell.html('<span>Mileage</span>' + cell.attr('mileage'));
 				});
 			}
 
+			function clear_image_tags() {
+				$('#pwtc-mapdb-view-signup-div table tbody td[mileage] i').each(function() {
+					var cell = $(this).parent();
+					cell.html('<span>Mileage</span>' + cell.attr('mileage'));
+				});
+			}
+
 			$('#pwtc-mapdb-view-signup-div table tbody td[mileage]').on('click', function(evt) {
-				remove_input_tags();
+				clear_input_tags();
+				clear_errmsg();
 				var cell = $(this);
 				cell.html('<span>Mileage</span><input type="text" value="' + cell.attr('mileage') + '" style="width:50%" maxlength="3" />');
 				var input = cell.find('input');
-				input.on('click', function(evt) {
-					evt.stopPropagation();
+				input.on('click', function(e) {
+					e.stopPropagation();
 				});
 				input.on('keypress', function(e) {
-    					if (e.which == 13) {
+    				if (e.which == 13) {
 						var action = "<?php echo admin_url('admin-ajax.php'); ?>";
 						var data = {
 							'action': 'pwtc_mapdb_edit_mileage',
+							'nonce': '<?php echo wp_create_nonce('pwtc_mapdb_edit_mileage'); ?>',
 							'postid': '<?php echo $postid ?>',
 							'userid': cell.attr('userid'),
 							'oldmileage': cell.attr('mileage'),
@@ -809,7 +844,9 @@ class PwtcMapdb {
    					}
 				});
 				input.focus();
+				input.setCursorPosition(3);
 			});
+		
 		});
 		
 	</script>
@@ -817,6 +854,7 @@ class PwtcMapdb {
 	<div id='pwtc-mapdb-view-signup-div'>
 		<?php if (count($signup_list) > 0) { ?>
 			<p>The following riders are currently signed up for the ride "<?php echo $ride_title; ?>." Click on the mileage field to edit and press the enter key to accept changes.</p>
+			<div class="errmsg"></div>
 			<table class="pwtc-mapdb-rwd-table"><thead><tr><th>Name</th><th>Rider ID</th><th>Mileage</th><th>Emergency Contact</th></tr></thead><tbody>
 			<?php foreach($signup_list as $item) { 
 				$arr = json_decode($item, true);
@@ -1179,30 +1217,53 @@ EOT;
 		$current_user = wp_get_current_user();
 		if ( 0 == $current_user->ID ) {
 			$response = array(
-				'error' => 'Mileage edit failed - user access denied.'
+				'error' => 'Server user access denied for mileage edit.'
 			);		
 		}
-		else if (isset($_POST['userid']) and isset($_POST['postid']) and isset($_POST['mileage']) and isset($_POST['oldmileage'])) {
+		else if (isset($_POST['userid']) and isset($_POST['postid']) and isset($_POST['mileage']) and isset($_POST['oldmileage']) and isset($_POST['nonce'])) {
 			$userid = intval($_POST['userid']);
 			$postid = intval($_POST['postid']);
 			$oldmileage = trim($_POST['oldmileage']);
 			$mileage = trim($_POST['mileage']);
-			if (!empty($mileage)) {
-				$m = abs(intval($mileage));
-				$mileage = '' . $m;
+			$nonce = $_POST['nonce'];
+			if (!wp_verify_nonce($nonce, 'pwtc_mapdb_edit_mileage')) {
+				$response = array(
+					'error' => 'Server security check failed for mileage edit.'
+				);
 			}
-			$oldvalue = json_encode(array('userid' => $userid, 'mileage' => $oldmileage));
-			$value = json_encode(array('userid' => $userid, 'mileage' => $mileage));
-			update_post_meta($postid, '_signup_user_id', $value, $oldvalue);
-			$response = array(
-				'postid' => $postid,
-				'userid' => $userid,
-				'mileage' => $mileage
-			);
+			else {
+				if (!empty($mileage)) {
+					$m = abs(intval($mileage));
+					$mileage = '' . $m;
+				}
+				if ($mileage != $oldmileage) {
+					$oldvalue = json_encode(array('userid' => $userid, 'mileage' => $oldmileage));
+					$value = json_encode(array('userid' => $userid, 'mileage' => $mileage));
+					if (update_post_meta($postid, '_signup_user_id', $value, $oldvalue)) {
+						$response = array(
+							'postid' => $postid,
+							'userid' => $userid,
+							'mileage' => $mileage
+						);
+					}
+					else {
+						$response = array(
+							'error' => 'Server mileage update failed.'
+						);	
+					}
+				}
+				else {
+					$response = array(
+						'postid' => $postid,
+						'userid' => $userid,
+						'mileage' => $mileage
+					);
+				}
+			}
 		}
 		else {
 			$response = array(
-				'error' => 'Mileage edit failed - AJAX arguments missing.'
+				'error' => 'Server arguments missing for mileage edit.'
 			);		
 		}
 		echo wp_json_encode($response);
