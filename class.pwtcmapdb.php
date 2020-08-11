@@ -1088,6 +1088,13 @@ class PwtcMapdb {
 			$font_size = 12;
 			$cell_h = 8;
 			$max_pages = 2;
+			$nrows_1st_page = 13;
+			$nrows_next_pages = 16;
+			$npad = 5;
+			$extra_rows = count($signup_list)+$npad-$nrows_1st_page-$nrows_next_pages;
+			if ($extra_rows > 0) {
+				$max_pages += (int)ceil((float)$extra_rows/(float)$nrows_next_pages);
+			}
 			$rider_count = 0;
 			for ($i = 1; $i <= $max_pages; $i++) {
 				$pdf->AddPage();
@@ -1103,12 +1110,12 @@ class PwtcMapdb {
 					$pdf->Image(PWTC_MILEAGE__PLUGIN_DIR . 'pbc_logo.png', $x_margin, $y_margin, $logo_size, $logo_size);
 					$waiver_y = $y_margin+35;
 					$table_y = $y_margin+75;
-					$rows_per_page = 13;
+					$rows_per_page = $nrows_1st_page;
 				}
 				else {
 					$waiver_y = $y_margin+10;
 					$table_y = $y_margin+50;
-					$rows_per_page = 16;		
+					$rows_per_page = $nrows_next_pages;		
 				}
 				$pdf->SetFont('Arial', '', 6);
 				$pdf->SetXY($x_margin, $waiver_y);
