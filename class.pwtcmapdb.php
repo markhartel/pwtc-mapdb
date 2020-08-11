@@ -579,10 +579,11 @@ class PwtcMapdb {
 
 		$ride_title = get_the_title($postid);
 		$ride_link = get_the_permalink($postid);
+		$return_to_ride = 'Click <a href="' . $ride_link . '">here</a> to return to the posted ride.';
 
 		$current_user = wp_get_current_user();
 		if ( 0 == $current_user->ID ) {
-			return '<div class="callout small warning"><p>Please <a href="/wp-login.php">log in</a> to signup for this ride.</p></div>';
+			return '<div class="callout small warning"><p>You must log in <a href="/wp-login.php">here</a> to signup for this ride. ' . $return_to_ride . '</p></div>';
 		}
 
 		$allow_signup = false;
@@ -597,16 +598,16 @@ class PwtcMapdb {
 			}
 		}
 		if ( !$allow_signup ) {
-			return '<div class="callout small warning"><p>The leader for ride "' . $ride_title . '" does not allow online signup.</p></div>';
+			return '<div class="callout small warning"><p>The leader for ride "' . $ride_title . '" does not allow online signup. ' . $return_to_ride . '</p></div>';
 		}
 
 		if (get_field('is_canceled', $postid)) {
-			return '<div class="callout small warning"><p>The ride "' . $ride_title . '" has been canceled, no signup allowed.</p></div>';
+			return '<div class="callout small warning"><p>The ride "' . $ride_title . '" has been canceled, no signup allowed. ' . $return_to_ride . '</p></div>';
 		}
 
 		if (!in_array('current_member', (array) $current_user->roles) and 
 		    !in_array('expired_member', (array) $current_user->roles)) {
-			return '<div class="callout small warning"><p>You must be a club member to signup for rides.</p></div>';
+			return '<div class="callout small warning"><p>You must be a club member to signup for rides. ' . $return_to_ride . '</p></div>';
 		}
 
 		if ($time_limit >= 0) {
@@ -616,13 +617,13 @@ class PwtcMapdb {
 			$now_date = new DateTime(null, $timezone);
 			$now_date_str = $now_date->format('m/d/Y g:ia');
 			if ($now_date > $ride_date) {
-				return '<div class="callout small warning"><p>You cannot signup for ride "' . $ride_title . '" because it has already started. <em>The start time of the ride is ' . $ride_date_str . ' and the current time is ' . $now_date_str . '.</em></p></div>';
+				return '<div class="callout small warning"><p>You cannot signup for ride "' . $ride_title . '" because it has already started. <em>The start time of the ride is ' . $ride_date_str . ' and the current time is ' . $now_date_str . '.</em> ' . $return_to_ride . '</p></div>';
 			}
 			if ($time_limit > 0) {
 				$interval = new DateInterval('PT' . $time_limit . 'H');	
 				$ride_date->sub($interval);
 				if ($now_date > $ride_date) {
-					return '<div class="callout small warning"><p>You cannot signup for ride "' . $ride_title . '" because it is within ' . $time_limit . ' hours of the start time. <em>The start time of the ride is ' . $ride_date_str . ' and the current time is ' . $now_date_str . '.</em></p></div>';
+					return '<div class="callout small warning"><p>You cannot signup for ride "' . $ride_title . '" because it is within ' . $time_limit . ' hours of the start time. <em>The start time of the ride is ' . $ride_date_str . ' and the current time is ' . $now_date_str . '.</em> ' . $return_to_ride . '</p></div>';
 				}
 			}
 		}
@@ -670,7 +671,7 @@ class PwtcMapdb {
 
 		if ($accept_signup and $signup_limit > 0) {
 			if (count($signup_list) >= $signup_limit) {
-				return '<div class="callout small warning"><p>You cannot signup for ride "' . $ride_title . '" because it is full. <em>A maximumm of ' . $signup_limit . ' riders are allowed on this ride.</em></p></div>';
+				return '<div class="callout small warning"><p>You cannot signup for ride "' . $ride_title . '" because it is full. <em>A maximumm of ' . $signup_limit . ' riders are allowed on this ride.</em> ' . $return_to_ride . '</p></div>';
 			}
 		}
 
