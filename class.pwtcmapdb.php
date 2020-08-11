@@ -715,6 +715,10 @@ class PwtcMapdb {
 	
 	// Generates the [pwtc_mapdb_view_signup] shortcode.
 	public static function shortcode_view_signup($atts) {
+		$a = shortcode_atts(array('unused_rows' => 0, 'set_mileage' => 'no'), $atts);
+		$unused_rows = abs(intval($a['unused_rows']));
+		$set_mileage = $a['set_mileage'] == 'yes' ? true : false;
+
 		if (!defined('PWTC_MILEAGE__PLUGIN_DIR')) {
 			return '<div class="callout small alert"><p>Cannot render shortcode, PWTC Mileage plugin is required.</p></div>';
 		}
@@ -758,6 +762,8 @@ class PwtcMapdb {
 
 		ob_start();
 	?>
+
+	<?php if ($set_mileage) { ?>
 	<script type="text/javascript">
 		jQuery(document).ready(function($) { 
 
@@ -850,6 +856,7 @@ class PwtcMapdb {
 		});
 		
 	</script>
+	<?php } ?>
 
 	<div id='pwtc-mapdb-view-signup-div'>
 		<?php if (count($signup_list) > 0) { ?>
@@ -884,6 +891,7 @@ class PwtcMapdb {
 		<div class="row column clearfix">
 			<form method="POST">
 				<input type="hidden" name="ride_id" value="<?php echo $postid; ?>"/>
+				<input type="hidden" name="unused_rows" value="<?php echo $unused_rows; ?>"/>
 				<button class="dark button float-left" type="submit" name="pwtc_mapdb_download_signup"><i class="fa fa-download"></i> Signup Sheet</button>
 				<a href="<?php echo $ride_link; ?>" class="dark button float-right"><i class="fa fa-chevron-left"></i> Back to Ride</a>
 			</form>
@@ -1062,12 +1070,19 @@ class PwtcMapdb {
 				if ( 0 == $current_user->ID ) {
 					return;
 				}
+				
+				$unused_rows = 0;
+				if (isset($_POST['unused_rows'])) {
+					$unused_rows = abs(intval($_POST['unused_rows']));
+				}
+
 				$signup_list = get_post_meta($rideid, '_signup_user_id');
 				$ride_title = get_the_title($rideid);
 				$date = DateTime::createFromFormat('Y-m-d H:i:s', get_field('date', $rideid));
 				$ride_date = $date->format('m/d/Y g:ia');
 			}
 			else {
+				$unused_rows = 0;
 				$signup_list = [];
 				$ride_title = '';
 				$ride_date = '';
@@ -1090,8 +1105,7 @@ class PwtcMapdb {
 			$max_pages = 2;
 			$nrows_1st_page = 13;
 			$nrows_next_pages = 16;
-			$npad = 5;
-			$extra_rows = count($signup_list)+$npad-$nrows_1st_page-$nrows_next_pages;
+			$extra_rows = count($signup_list)+$unused_rows-$nrows_1st_page-$nrows_next_pages;
 			if ($extra_rows > 0) {
 				$max_pages += (int)ceil((float)$extra_rows/(float)$nrows_next_pages);
 			}
