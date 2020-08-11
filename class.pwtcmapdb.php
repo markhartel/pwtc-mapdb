@@ -636,7 +636,7 @@ class PwtcMapdb {
 
 		if (isset($_POST['accept_user_signup'])) {
 			self::delete_all_signups($postid, $current_user->ID);
-			$value = json_encode(array('userid' => $current_user->ID, 'mileage' => ''));
+			$value = json_encode(array('userid' => $current_user->ID, 'mileage' => ''.$mileage));
 			add_post_meta($postid, '_signup_user_id', $value);
 		}
 
