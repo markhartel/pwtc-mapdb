@@ -547,8 +547,9 @@ class PwtcMapdb {
 	
 	// Generates the [pwtc_mapdb_rider_signup] shortcode.
 	public static function shortcode_rider_signup($atts) {
-		//$a = shortcode_atts(array('time_limit' => -1), $atts);
-		//$time_limit = $a['time_limit'];
+		$a = shortcode_atts(array('signup_limit' => 0, 'set_mileage' => 'no'), $atts);
+		$signup_limit = abs(intval($a['signup_limit']));
+		$set_mileage = $a['set_mileage'] == 'yes' ? true : false;
 		
 		if (!defined('PWTC_MILEAGE__PLUGIN_DIR')) {
 			return '<div class="callout small alert"><p>Cannot render shortcode, PWTC Mileage plugin is required.</p></div>';
@@ -625,6 +626,13 @@ class PwtcMapdb {
 				}
 			}
 		}
+		
+		$mileage = '';
+		if (isset($_POST['mileage'])) {
+			if (!empty(trim($_POST['mileage']))) {
+				$mileage = abs(intval($_POST['mileage']));
+			}
+		}
 
 		if (isset($_POST['accept_user_signup'])) {
 			self::delete_all_signups($postid, $current_user->ID);
@@ -660,6 +668,12 @@ class PwtcMapdb {
 			}
 		}
 
+		if ($accept_signup and $signup_limit > 0) {
+			if (count($signup_list) >= $signup_limit) {
+				return '<div class="callout small warning"><p>You cannot signup for ride "' . $ride_title . '" because it is full. <em>A maximumm of ' . $signup_limit . ' riders are allowed on this ride.</em></p></div>';
+			}
+		}
+
 		$user_info = get_userdata($current_user->ID);
 		$rider_name = $user_info->first_name . ' ' . $user_info->last_name;
 		$contact_phone = get_field('emergency_contact_phone', 'user_'.$current_user->ID);
@@ -688,6 +702,14 @@ class PwtcMapdb {
 								<input type="text" name="contact_name" value="<?php echo $contact_name; ?>"/>
 							</label>
 						</div>
+			<?php if ($set_mileage) { ?>
+						<div class="small-12 medium-6 columns">
+							<label>Mileage
+								<input type="text" name="mileage" value="<?php echo $mileage; ?>" maxlength="3"/>
+							</label>
+						</div>
+			<?php } ?>
+
 					</div>
 					<div class="row column clearfix">
 						<input type="hidden" name="accept_user_signup" value="yes"/>
