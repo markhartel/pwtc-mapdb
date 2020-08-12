@@ -906,7 +906,7 @@ class PwtcMapdb {
 				$contact = self::get_emergency_contact($userid, true);
 			?>
 				<tr>
-				<td><span>Name</span><input type="checkbox" id="<?php echo $userid; ?>"/><label for="<?php echo $userid; ?>"><?php echo $name; ?></label></td>
+				<td><span>Name</span><input type="checkbox" id="<?php echo $userid; ?>"/><?php echo $name; ?></td>
 				<td><span>Rider ID</span><?php echo $rider_id; ?></td>
 				<td userid="<?php echo $userid; ?>" mileage="<?php echo $mileage; ?>"><span>Mileage</span><?php echo $mileage; ?></td>
 				<td><span>Emergency Contact</span><?php echo $contact; ?></td>
