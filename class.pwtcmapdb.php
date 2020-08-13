@@ -812,6 +812,12 @@ class PwtcMapdb {
 			function clear_errmsg() {
 				$('#pwtc-mapdb-view-signup-div .errmsg').html('');
 			}
+			
+			function clear_link_tags() {
+				$('#pwtc-mapdb-view-signup-div table tbody .name a').each(function() {
+					$(this).remove();
+				});
+			}
 
 			function edit_mileage_cb(response) {
 				var res = JSON.parse(response);
@@ -851,6 +857,7 @@ class PwtcMapdb {
 			$('#pwtc-mapdb-view-signup-div table tbody td[mileage]').on('click', function(evt) {
 				clear_input_tags();
 				clear_errmsg();
+				clear_link_tags();
 				var cell = $(this);
 				cell.html('<span>Mileage</span><input type="text" value="' + cell.attr('mileage') + '" style="width:50%" maxlength="3" />');
 				var input = cell.find('input');
@@ -876,9 +883,19 @@ class PwtcMapdb {
 				input.setCursorPosition(3);
 			});
 		
-			$('#pwtc-mapdb-view-signup-div table tbody td input[type="checkbox"]').on('change', function(evt) {
+			$('#pwtc-mapdb-view-signup-div table tbody .name').on('click', function(evt) {
 				clear_input_tags();
 				clear_errmsg();
+				clear_link_tags();
+				var cell = $(this);
+				cell.append('<a><i class="fa fa-thumbs-up"></i></a>');
+				var link = cell.find('a');
+				link.on('click', function(e) {
+					e.stopPropagation();
+					link.remove();
+					cell.find('i').remove();
+					cell.find('span').after('<i class="fa fa-thumbs-up"></i>');
+				});
 			});
 		
 		});
@@ -905,8 +922,8 @@ class PwtcMapdb {
 				$rider_id = self::get_rider_id($userid);
 				$contact = self::get_emergency_contact($userid, true);
 			?>
-				<tr>
-				<td><span>Name</span><input type="checkbox" id="<?php echo $userid; ?>"/> <label for="<?php echo $userid; ?>"><?php echo $name; ?></label></td>
+				<tr userid="<?php echo $userid; ?>" mileage="<?php echo $mileage; ?>">
+				<td class="name"><span>Name</span> <?php echo $name; ?> </td>
 				<td><span>Rider ID</span><?php echo $rider_id; ?></td>
 				<td userid="<?php echo $userid; ?>" mileage="<?php echo $mileage; ?>"><span>Mileage</span><?php echo $mileage; ?></td>
 				<td><span>Emergency Contact</span><?php echo $contact; ?></td>
