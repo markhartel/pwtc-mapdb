@@ -58,8 +58,8 @@ class PwtcMapdb {
 		
 		/* Register AJAX request/response callbacks */
 
-		add_action( 'wp_ajax_pwtc_mapdb_edit_mileage', 
-			array( 'PwtcMapdb', 'edit_mileage_callback') );
+		add_action( 'wp_ajax_pwtc_mapdb_edit_signup', 
+			array( 'PwtcMapdb', 'edit_signup_callback') );
 
 	}
 
@@ -637,7 +637,7 @@ class PwtcMapdb {
 
 		if (isset($_POST['accept_user_signup'])) {
 			self::delete_all_signups($postid, $current_user->ID);
-			$value = json_encode(array('userid' => $current_user->ID, 'mileage' => ''.$mileage));
+			$value = json_encode(array('userid' => $current_user->ID, 'mileage' => ''.$mileage, 'attended' => true));
 			add_post_meta($postid, '_signup_user_id', $value);
 		}
 
@@ -738,9 +738,10 @@ class PwtcMapdb {
 	
 	// Generates the [pwtc_mapdb_view_signup] shortcode.
 	public static function shortcode_view_signup($atts) {
-		$a = shortcode_atts(array('unused_rows' => 0, 'set_mileage' => 'no'), $atts);
+		$a = shortcode_atts(array('unused_rows' => 0, 'set_mileage' => 'no', 'take_attendance' => 'no'), $atts);
 		$unused_rows = abs(intval($a['unused_rows']));
 		$set_mileage = $a['set_mileage'] == 'yes' ? true : false;
+		$take_attendance = $a['take_attendance'] == 'yes' ? true : false;
 
 		if (!defined('PWTC_MILEAGE__PLUGIN_DIR')) {
 			return '<div class="callout small alert"><p>Cannot render shortcode, PWTC Mileage plugin is required.</p></div>';
@@ -802,7 +803,7 @@ class PwtcMapdb {
       					range.select();
     				}
   				});
-  			return this;
+  				return this;
 			};
 
 			function show_errmsg(message) {
@@ -812,53 +813,96 @@ class PwtcMapdb {
 			function clear_errmsg() {
 				$('#pwtc-mapdb-view-signup-div .errmsg').html('');
 			}
-			
-			function clear_link_tags() {
-				$('#pwtc-mapdb-view-signup-div table tbody .name a').each(function() {
-					$(this).remove();
-				});
-			}
 
-			function edit_mileage_cb(response) {
-				var res = JSON.parse(response);
-				if (res.error) {
-					show_errmsg(res.error);
-					clear_image_tags();
-				}
-				else {
-					if (res.postid == <?php echo $postid ?>) {
-						var cell = $('#pwtc-mapdb-view-signup-div table tbody td[userid="' + res.userid + '"]');
-						cell.attr('mileage', function() {
-							return res.mileage;
-						});
-						cell.html('<span>Mileage</span>' + res.mileage);
-					}
-					else {
-						show_errmsg('Ride post ID does not match post ID returned by server.');
-						clear_image_tags();
-					}
-				}
-			}
-
-			function clear_input_tags() {
+			function reset_mileage_cell() {
 				$('#pwtc-mapdb-view-signup-div table tbody td[mileage] input').each(function() {
 					var cell = $(this).parent();
 					cell.html('<span>Mileage</span>' + cell.attr('mileage'));
 				});
 			}
 
-			function clear_image_tags() {
-				$('#pwtc-mapdb-view-signup-div table tbody td[mileage] i').each(function() {
+			function reset_attended_cell() {
+				$('#pwtc-mapdb-view-signup-div table tbody td[attended] a').each(function() {
+					$(this).remove();
+				});				
+			}
+
+			function reset_waiting_icon() {
+				$('#pwtc-mapdb-view-signup-div table tbody td[mileage] .waiting').each(function() {
 					var cell = $(this).parent();
 					cell.html('<span>Mileage</span>' + cell.attr('mileage'));
 				});
+
+				$('#pwtc-mapdb-view-signup-div table tbody td[attended] .waiting').each(function() {
+					var cell = $(this).parent();
+					$(this).remove();
+					cell.find('i').remove();
+					if (cell.attr('attended') == '0') {
+						cell.find('span').after('<i class="fa fa-times"></i>');
+					}
+				});			
 			}
 
+			function change_signup_cb(response) {
+				var res;
+				try {
+					res = JSON.parse(response);
+				}
+				catch (e) {
+					show_errmsg(e.message);
+					reset_waiting_icon();
+					return;
+				}
+				if (res.error) {
+					show_errmsg(res.error);
+					reset_waiting_icon();
+				}
+				else {
+					if (res.postid == <?php echo $postid ?>) {
+						var row = $('#pwtc-mapdb-view-signup-div table tbody tr[userid="' + res.userid + '"]');
+						var mcell = row.find('td[mileage]');
+						mcell.attr('mileage', function() {
+							return res.mileage;
+						});
+						mcell.html('<span>Mileage</span>' + res.mileage);
+						var acell = row.find('td[attended]');
+						acell.attr('attended', function() {
+							return res.attended;
+						});
+						acell.find('i').remove();
+						if (res.attended == '0') {
+							acell.find('span').after('<i class="fa fa-times"></i>');
+						}
+					}
+					else {
+						show_errmsg('Ride post ID does not match post ID returned by server.');
+						reset_waiting_icon();
+					}
+				}
+			}
+
+			function change_signup_setting(userid, oldmileage, mileage, oldattended, attended) {
+				var action = "<?php echo admin_url('admin-ajax.php'); ?>";
+				var data = {
+					'action': 'pwtc_mapdb_edit_signup',
+					'nonce': '<?php echo wp_create_nonce('pwtc_mapdb_edit_signup'); ?>',
+					'postid': '<?php echo $postid ?>',
+					'userid': userid,
+					'oldmileage': oldmileage,
+					'mileage': mileage,
+					'oldattended': oldattended,
+					'attended': attended
+				};
+				$.post(action, data, change_signup_cb);
+			}
+
+			<?php if ($set_mileage) { ?>
 			$('#pwtc-mapdb-view-signup-div table tbody td[mileage]').on('click', function(evt) {
-				clear_input_tags();
+				reset_mileage_cell();
 				clear_errmsg();
-				clear_link_tags();
+				reset_attended_cell();
 				var cell = $(this);
+				var row = cell.parent();
 				cell.html('<span>Mileage</span><input type="text" value="' + cell.attr('mileage') + '" style="width:50%" maxlength="3" />');
 				var input = cell.find('input');
 				input.on('click', function(e) {
@@ -866,37 +910,61 @@ class PwtcMapdb {
 				});
 				input.on('keypress', function(e) {
     				if (e.which == 13) {
-						var action = "<?php echo admin_url('admin-ajax.php'); ?>";
-						var data = {
-							'action': 'pwtc_mapdb_edit_mileage',
-							'nonce': '<?php echo wp_create_nonce('pwtc_mapdb_edit_mileage'); ?>',
-							'postid': '<?php echo $postid ?>',
-							'userid': cell.attr('userid'),
-							'oldmileage': cell.attr('mileage'),
-							'mileage': input.val()
-						};
-						$.post(action, data, edit_mileage_cb);
-						cell.html('<span>Mileage</span><i class="fa fa-spinner fa-pulse"></i> please wait...');
+						change_signup_setting(
+							row.attr('userid'), 
+							cell.attr('mileage'), 
+							input.val(), 
+							row.find('td[attended]').attr('attended'), 
+							row.find('td[attended]').attr('attended'));
+						cell.html('<span>Mileage</span><i class="fa fa-spinner fa-pulse waiting"></i> ');
    					}
 				});
 				input.focus();
 				input.setCursorPosition(3);
 			});
-		
-			$('#pwtc-mapdb-view-signup-div table tbody .name').on('click', function(evt) {
-				clear_input_tags();
+			<?php } ?>
+
+			<?php if ($take_attendance) { ?>
+			$('#pwtc-mapdb-view-signup-div table tbody td[attended]').on('click', function(evt) {
+				reset_mileage_cell();
 				clear_errmsg();
-				clear_link_tags();
+				reset_attended_cell();
 				var cell = $(this);
-				cell.append('<a><i class="fa fa-thumbs-up"></i></a>');
-				var link = cell.find('a');
-				link.on('click', function(e) {
-					e.stopPropagation();
-					link.remove();
-					cell.find('i').remove();
-					cell.find('span').after('<i class="fa fa-thumbs-up"></i>');
-				});
+				var row = cell.parent();
+				if (cell.attr('attended') == '1') {
+					cell.append('<a><i class="fa fa-thumbs-down"></i></a>');
+					var link = cell.find('a');
+					link.on('click', function(e) {
+						e.stopPropagation();
+						link.remove();
+						change_signup_setting(
+							row.attr('userid'), 
+							row.find('td[mileage]').attr('mileage'), 
+							row.find('td[mileage]').attr('mileage'), 
+							cell.attr('attended'), 
+							'0');
+						cell.find('i').remove();
+						cell.find('span').after('<i class="fa fa-spinner fa-pulse waiting">W</i>');
+					});
+				}
+				else {
+					cell.append('<a><i class="fa fa-thumbs-up"></i></a>');
+					var link = cell.find('a');
+					link.on('click', function(e) {
+						e.stopPropagation();
+						link.remove();
+						change_signup_setting(
+							row.attr('userid'), 
+							row.find('td[mileage]').attr('mileage'), 
+							row.find('td[mileage]').attr('mileage'), 
+							cell.attr('attended'), 
+							'1');
+						cell.find('i').remove();
+						cell.find('span').after('<i class="fa fa-spinner fa-pulse waiting"></i>');
+					});
+				}
 			});
+			<?php } ?>
 		
 		});
 		
@@ -905,13 +973,14 @@ class PwtcMapdb {
 
 	<div id='pwtc-mapdb-view-signup-div'>
 		<?php if (count($signup_list) > 0) { ?>
-			<p>The following riders are currently signed up for the ride "<?php echo $ride_title; ?>."<?php if ($set_mileage) { ?> Click on the mileage field to edit and press the enter key to accept changes.<?php } ?></p>
+			<p>The following riders are currently signed up for the ride "<?php echo $ride_title; ?>."</p>
 			<div class="errmsg"></div>
 			<table class="pwtc-mapdb-rwd-table"><thead><tr><th>Name</th><th>Rider ID</th><th>Mileage</th><th>Emergency Contact</th></tr></thead><tbody>
 			<?php foreach($signup_list as $item) { 
 				$arr = json_decode($item, true);
 				$userid = $arr['userid'];
 				$mileage = $arr['mileage'];
+				$attended = $arr['attended'];
 				$user_info = get_userdata($userid);
 				if ($user_info) {
 					$name = $user_info->first_name . ' ' . $user_info->last_name;
@@ -922,10 +991,10 @@ class PwtcMapdb {
 				$rider_id = self::get_rider_id($userid);
 				$contact = self::get_emergency_contact($userid, true);
 			?>
-				<tr userid="<?php echo $userid; ?>" mileage="<?php echo $mileage; ?>">
-				<td class="name"><span>Name</span> <?php echo $name; ?> </td>
+				<tr userid="<?php echo $userid; ?>">
+				<td attended="<?php echo $attended ? '1':'0'; ?>"><span>Name</span><?php echo $attended ? '':'<i class="fa fa-times"></i>'; ?> <?php echo $name; ?> </td>
 				<td><span>Rider ID</span><?php echo $rider_id; ?></td>
-				<td userid="<?php echo $userid; ?>" mileage="<?php echo $mileage; ?>"><span>Mileage</span><?php echo $mileage; ?></td>
+				<td mileage="<?php echo $mileage; ?>"><span>Mileage</span><?php echo $mileage; ?></td>
 				<td><span>Emergency Contact</span><?php echo $contact; ?></td>
 				</tr>
 			<?php } ?>
@@ -1121,7 +1190,15 @@ class PwtcMapdb {
 					$unused_rows = abs(intval($_POST['unused_rows']));
 				}
 
-				$signup_list = get_post_meta($rideid, '_signup_user_id');
+				$list = get_post_meta($rideid, '_signup_user_id');
+				$signup_list = [];
+				foreach($list as $item) {
+					$arr = json_decode($item, true);
+					if ($arr['attended']) {
+						$signup_list[] = $arr;
+					}
+				}
+
 				$ride_title = get_the_title($rideid);
 				$date = DateTime::createFromFormat('Y-m-d H:i:s', get_field('date', $rideid));
 				$ride_date = $date->format('m/d/Y g:ia');
@@ -1200,7 +1277,7 @@ class PwtcMapdb {
 					$contact = '';
 					$mileage = '';
 					if ($rider_count < count($signup_list)) {
-						$arr = json_decode($signup_list[$rider_count], true);
+						$arr = $signup_list[$rider_count];
 						$userid = $arr['userid'];
 						$mileage = $arr['mileage'];
 						$user_info = get_userdata($userid);
@@ -1279,22 +1356,24 @@ EOT;
 	/* AJAX request/response callback functions
 	/*************************************************************/
 
-	public static function edit_mileage_callback() {
+	public static function edit_signup_callback() {
 		$current_user = wp_get_current_user();
 		if ( 0 == $current_user->ID ) {
 			$response = array(
-				'error' => 'Server user access denied for mileage edit.'
+				'error' => 'Server user access denied for signup edit.'
 			);		
 		}
-		else if (isset($_POST['userid']) and isset($_POST['postid']) and isset($_POST['mileage']) and isset($_POST['oldmileage']) and isset($_POST['nonce'])) {
+		else if (isset($_POST['userid']) and isset($_POST['postid']) and isset($_POST['mileage']) and isset($_POST['oldmileage']) and isset($_POST['attended']) and isset($_POST['oldattended']) and isset($_POST['nonce'])) {
 			$userid = intval($_POST['userid']);
 			$postid = intval($_POST['postid']);
 			$oldmileage = trim($_POST['oldmileage']);
 			$mileage = trim($_POST['mileage']);
+			$oldattended = trim($_POST['oldattended']);
+			$attended = trim($_POST['attended']);
 			$nonce = $_POST['nonce'];
-			if (!wp_verify_nonce($nonce, 'pwtc_mapdb_edit_mileage')) {
+			if (!wp_verify_nonce($nonce, 'pwtc_mapdb_edit_signup')) {
 				$response = array(
-					'error' => 'Server security check failed for mileage edit.'
+					'error' => 'Server security check failed for signup edit.'
 				);
 			}
 			else {
@@ -1302,19 +1381,20 @@ EOT;
 					$m = abs(intval($mileage));
 					$mileage = '' . $m;
 				}
-				if ($mileage != $oldmileage) {
-					$oldvalue = json_encode(array('userid' => $userid, 'mileage' => $oldmileage));
-					$value = json_encode(array('userid' => $userid, 'mileage' => $mileage));
+				if ($mileage != $oldmileage or $attended != $oldattended) {
+					$oldvalue = json_encode(array('userid' => $userid, 'mileage' => $oldmileage, 'attended' => boolval($oldattended)));
+					$value = json_encode(array('userid' => $userid, 'mileage' => $mileage, 'attended' => boolval($attended)));
 					if (update_post_meta($postid, '_signup_user_id', $value, $oldvalue)) {
 						$response = array(
 							'postid' => $postid,
 							'userid' => $userid,
-							'mileage' => $mileage
+							'mileage' => $mileage,
+							'attended' => $attended
 						);
 					}
 					else {
 						$response = array(
-							'error' => 'Server mileage update failed.'
+							'error' => 'Server signup update failed.'
 						);	
 					}
 				}
@@ -1322,14 +1402,15 @@ EOT;
 					$response = array(
 						'postid' => $postid,
 						'userid' => $userid,
-						'mileage' => $mileage
+						'mileage' => $mileage,
+						'attended' => $attended
 					);
 				}
 			}
 		}
 		else {
 			$response = array(
-				'error' => 'Server arguments missing for mileage edit.'
+				'error' => 'Server arguments missing for signup edit.'
 			);		
 		}
 		echo wp_json_encode($response);
