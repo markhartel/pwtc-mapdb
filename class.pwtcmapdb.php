@@ -944,7 +944,7 @@ class PwtcMapdb {
 							cell.attr('attended'), 
 							'0');
 						cell.find('i').remove();
-						cell.find('span').after('<i class="fa fa-spinner fa-pulse waiting">W</i>');
+						cell.find('span').after('<i class="fa fa-spinner fa-pulse waiting"></i>');
 					});
 				}
 				else {
