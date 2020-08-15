@@ -547,9 +547,10 @@ class PwtcMapdb {
 	
 	// Generates the [pwtc_mapdb_rider_signup] shortcode.
 	public static function shortcode_rider_signup($atts) {
-		$a = shortcode_atts(array('signup_limit' => 0, 'set_mileage' => 'no'), $atts);
+		$a = shortcode_atts(array('signup_limit' => 0, 'paperless' => 'no'), $atts);
 		$signup_limit = abs(intval($a['signup_limit']));
-		$set_mileage = $a['set_mileage'] == 'yes' ? true : false;
+		$paperless = $a['paperless'] == 'yes' ? true : false;
+		$set_mileage = $paperless;
 		
 		if (!defined('PWTC_MILEAGE__PLUGIN_DIR')) {
 			return '<div class="callout small alert"><p>Cannot render shortcode, PWTC Mileage plugin is required.</p></div>';
@@ -584,6 +585,11 @@ class PwtcMapdb {
 		$current_user = wp_get_current_user();
 		if ( 0 == $current_user->ID ) {
 			return '<div class="callout small warning"><p>You must log in <a href="/wp-login.php">here</a> to signup for this ride. ' . $return_to_ride . '</p></div>';
+		}
+		
+		$signup_locked = get_post_meta($postid, '_signup_locked', true);
+		if ($signup_locked) {
+			return '<div class="callout small warning"><p>You cannot signup for ride "' . $ride_title . '" because it is locked. ' . $return_to_ride . '</p></div>';	
 		}
 
 		$allow_signup = false;
@@ -698,7 +704,7 @@ class PwtcMapdb {
 	<div id='pwtc-mapdb-rider-signup-div'>
 		<?php if ($accept_signup) { ?>
 			<div class="callout">
-				<p>Hello <?php echo $rider_name; ?>, to sign up for the ride "<?php echo $ride_title; ?>," please enter your emergency contact information below and press the accept button. Doing so will indicate your acceptance of the Club's <a href="/terms-and-conditions" target="_blank">terms and conditions</a>.</p>
+				<p>Hello <?php echo $rider_name; ?>, to sign up for the ride "<?php echo $ride_title; ?>," please enter your emergency contact information <?php if ($set_mileage) { ?>and mileage <?php } ?>below and press the accept button. Doing so will indicate your acceptance of the Club's <a href="/terms-and-conditions" target="_blank">terms and conditions</a>.</p>
 				<form method="POST">
 					<div class="row">
 						<div class="small-12 medium-6 columns">
@@ -746,10 +752,10 @@ class PwtcMapdb {
 	
 	// Generates the [pwtc_mapdb_view_signup] shortcode.
 	public static function shortcode_view_signup($atts) {
-		$a = shortcode_atts(array('unused_rows' => 0, 'set_mileage' => 'no', 'take_attendance' => 'no'), $atts);
+		$a = shortcode_atts(array('unused_rows' => 0, 'paperless' => 'no'), $atts);
 		$unused_rows = abs(intval($a['unused_rows']));
-		$set_mileage = $a['set_mileage'] == 'yes' ? true : false;
-		$take_attendance = $a['take_attendance'] == 'yes' ? true : false;
+		$paperless = $a['paperless'] == 'yes' ? true : false;
+		$set_mileage = $take_attendance = $paperless;
 
 		if (!defined('PWTC_MILEAGE__PLUGIN_DIR')) {
 			return '<div class="callout small alert"><p>Cannot render shortcode, PWTC Mileage plugin is required.</p></div>';
@@ -792,6 +798,19 @@ class PwtcMapdb {
 		$ride_title = get_the_title($postid);
 		$ride_link = get_the_permalink($postid);
 
+		if ($paperless) {
+			if (isset($_POST['lock_signup'])) {
+				add_post_meta($postid, '_signup_locked', true, true);
+			}
+			else if (isset($_POST['unlock_signup'])) {
+				delete_post_meta( $postid, '_signup_locked');
+			}
+			$signup_locked = get_post_meta($postid, '_signup_locked', true);
+			if ($signup_locked) {
+				$set_mileage = $take_attendance = false;
+			}
+		}
+		
 		ob_start();
 	?>
 
@@ -1012,9 +1031,17 @@ class PwtcMapdb {
 		<?php } ?>
 		<div class="row column clearfix">
 			<form method="POST">
+		<?php if ($paperless) { ?>
+			<?php if ($signup_locked) { ?>
+				<button class="button float-left" type="submit" name="unlock_signup"><i class="fa fa-unlock"></i> Unlock Signup</button>
+			<?php } else { ?>
+				<button class="button float-left" type="submit" name="lock_signup"><i class="fa fa-lock"></i> Lock Signup</button>
+			<?php } ?>
+		<?php } else { ?>
 				<input type="hidden" name="ride_id" value="<?php echo $postid; ?>"/>
 				<input type="hidden" name="unused_rows" value="<?php echo $unused_rows; ?>"/>
-				<button class="dark button float-left" type="submit" name="pwtc_mapdb_download_signup"><i class="fa fa-download"></i> Signup Sheet</button>
+				<button class="button float-left" type="submit" name="pwtc_mapdb_download_signup"><i class="fa fa-download"></i> Signup Sheet</button>
+		<?php } ?>				
 				<a href="<?php echo $ride_link; ?>" class="dark button float-right"><i class="fa fa-chevron-left"></i> Back to Ride</a>
 			</form>
 		</div>
