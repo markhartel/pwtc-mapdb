@@ -1101,7 +1101,7 @@ class PwtcMapdb {
 			update_field('home_phone', pwtc_members_format_phone_number($_POST['text_phone']), 'user_'.$userid);
 		}
 		if (isset($_POST['signup_cutoff'])) {
-			$val = abs(intval($_POST['signup_cutoff']));
+			$val = intval($_POST['signup_cutoff']);
 			update_field('signup_cutoff_time', $val, 'user_'.$userid);
 		}
 		$voice_phone = pwtc_members_format_phone_number(get_field('cell_phone', 'user_'.$userid));
@@ -1109,7 +1109,7 @@ class PwtcMapdb {
 		$contact_email = get_field('contact_email', 'user_'.$userid);
 		$use_contact_email = get_field('use_contact_email', 'user_'.$userid);
 		$allow_ride_signup = get_field('allow_ride_signup', 'user_'.$userid);
-		$signup_cutoff = abs(intval(get_field('signup_cutoff_time', 'user_'.$userid)));
+		$signup_cutoff = intval(get_field('signup_cutoff_time', 'user_'.$userid));
 		ob_start();
 		?>
 		<div class="callout">
