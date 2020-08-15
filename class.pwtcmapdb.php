@@ -587,13 +587,13 @@ class PwtcMapdb {
 		}
 
 		$allow_signup = false;
-		$time_limit = -1;
+		$time_limit = 0;
 		$leaders = get_field('ride_leaders', $postid);
 		foreach($leaders as $leader) {
 			$allow_signup = get_field('allow_ride_signup', 'user_'.$leader['ID']);
 			if ($allow_signup) {
 				$str = get_field('signup_cutoff_time', 'user_'.$leader['ID']);
-				$time_limit = abs(intval($str));
+				$time_limit = intval($str);
 				break;
 			}
 		}
@@ -609,13 +609,13 @@ class PwtcMapdb {
 		    !in_array('expired_member', (array) $current_user->roles)) {
 			return '<div class="callout small warning"><p>You must be a club member to signup for rides. ' . $return_to_ride . '</p></div>';
 		}
-
+		
+		$timezone = new DateTimeZone(pwtc_get_timezone_string());
+		$ride_date = DateTime::createFromFormat('Y-m-d H:i:s', get_field('date', $postid), $timezone);
+		$ride_date_str = $ride_date->format('m/d/Y g:ia');
+		$now_date = new DateTime(null, $timezone);
+		$now_date_str = $now_date->format('m/d/Y g:ia');
 		if ($time_limit >= 0) {
-			$timezone = new DateTimeZone(pwtc_get_timezone_string());
-			$ride_date = DateTime::createFromFormat('Y-m-d H:i:s', get_field('date', $postid), $timezone);
-			$ride_date_str = $ride_date->format('m/d/Y g:ia');
-			$now_date = new DateTime(null, $timezone);
-			$now_date_str = $now_date->format('m/d/Y g:ia');
 			if ($now_date > $ride_date) {
 				return '<div class="callout small warning"><p>You cannot signup for ride "' . $ride_title . '" because it has already started. <em>The start time of the ride is ' . $ride_date_str . ' and the current time is ' . $now_date_str . '.</em> ' . $return_to_ride . '</p></div>';
 			}
@@ -625,6 +625,14 @@ class PwtcMapdb {
 				if ($now_date > $ride_date) {
 					return '<div class="callout small warning"><p>You cannot signup for ride "' . $ride_title . '" because it is within ' . $time_limit . ' hours of the start time. <em>The start time of the ride is ' . $ride_date_str . ' and the current time is ' . $now_date_str . '.</em> ' . $return_to_ride . '</p></div>';
 				}
+			}
+		}
+		else {
+			$time_limit = abs($time_limit);
+			$interval = new DateInterval('PT' . $time_limit . 'H');	
+			$ride_date->add($interval);
+			if ($now_date > $ride_date) {
+				return '<div class="callout small warning"><p>You cannot signup for ride "' . $ride_title . '" because it is beyond ' . $time_limit . ' hours of the start time. <em>The start time of the ride is ' . $ride_date_str . ' and the current time is ' . $now_date_str . '.</em> ' . $return_to_ride . '</p></div>';		
 			}
 		}
 		
