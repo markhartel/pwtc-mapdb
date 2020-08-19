@@ -1458,7 +1458,9 @@ class PwtcMapdb {
 			if ($now_date > $ride_date) {
 				return '<div class="callout small warning"><p>You cannot signup for ride "' . $ride_title . '" because it is beyond ' . $time_limit . ' hours of the start time. <em>The start time of the ride is ' . $ride_date_str . ' and the current time is ' . $now_date_str . '.</em> ' . $return_to_ride . '</p></div>';		
 			}
-		}		
+		}
+		
+		return '';
 	}
 	
 	// Generates the [pwtc_mapdb_leader_details] shortcode.
