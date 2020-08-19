@@ -50,6 +50,9 @@ class PwtcMapdb {
 		add_shortcode('pwtc_mapdb_view_signup', 
 			array( 'PwtcMapdb', 'shortcode_view_signup'));
 		
+		add_shortcode('pwtc_mapdb_nonmember_signup', 
+			array( 'PwtcMapdb', 'shortcode_nonmember_signup'));
+		
 		add_shortcode('pwtc_mapdb_download_signup', 
 			array( 'PwtcMapdb', 'shortcode_download_signup'));
 
@@ -60,6 +63,15 @@ class PwtcMapdb {
 
 		add_action( 'wp_ajax_pwtc_mapdb_edit_signup', 
 			array( 'PwtcMapdb', 'edit_signup_callback') );
+		
+		add_action( 'wp_ajax_nopriv_pwtc_mapdb_check_nonmember_signup', 
+			array( 'PwtcMapdb', 'check_nonmember_signup_callback') );
+
+		add_action( 'wp_ajax_nopriv_pwtc_mapdb_accept_nonmember_signup', 
+			array( 'PwtcMapdb', 'accept_nonmember_signup_callback') );
+
+		add_action( 'wp_ajax_nopriv_pwtc_mapdb_cancel_nonmember_signup', 
+			array( 'PwtcMapdb', 'cancel_nonmember_signup_callback') );
 
 	}
 
@@ -1076,6 +1088,379 @@ class PwtcMapdb {
 		return ob_get_clean();
 	}
 	
+	// Generates the [pwtc_mapdb_nonmember_signup] shortcode.
+	public static function shortcode_nonmember_signup($atts) {
+		$a = shortcode_atts(array('signup_limit' => 0, 'paperless' => 'no'), $atts);
+		$signup_limit = abs(intval($a['signup_limit']));
+		$paperless = $a['paperless'] == 'yes' ? true : false;
+
+		$error = self::check_plugin_dependency();
+		if (!empty($error)) {
+			return $error;
+		}
+
+		$error = self::check_post_id();
+		if (!empty($error)) {
+			return $error;
+		}
+		$postid = intval($_GET['post']);
+
+		$current_user = wp_get_current_user();
+		if ( 0 != $current_user->ID ) {
+			return '<div class="callout small alert"><p>This page is only for non-member ride signup and you must be logged out to use it.</p></div>';
+		}
+
+		$ride_title = get_the_title($postid);
+		$ride_link = get_the_permalink($postid);
+		$return_to_ride = 'Click <a href="' . $ride_link . '">here</a> to return to the posted ride.';
+
+		$timestamp = time();
+
+		$signup_locked = get_post_meta($postid, '_signup_locked', true);
+		if ($signup_locked) {
+			return '<div class="callout small warning"><p>You cannot signup for ride "' . $ride_title . '" because it is locked. ' . $return_to_ride . '</p></div>';	
+		}
+
+		$leader_id = self::get_leader_userid($postid);
+		if ($leader_id == 0) {
+			return '<div class="callout small warning"><p>The leader for ride "' . $ride_title . '" does not allow online signup. ' . $return_to_ride . '</p></div>';			
+		}
+
+		if (get_field('is_canceled', $postid)) {
+			return '<div class="callout small warning"><p>The ride "' . $ride_title . '" has been canceled, no signup allowed. ' . $return_to_ride . '</p></div>';
+		}
+
+		$error = self::check_ride_start($postid, $leader_id, $return_to_ride);
+		if (!empty($error)) {
+			return $error;
+		}
+
+		ob_start();
+	?>
+	<script type="text/javascript">
+		jQuery(document).ready(function($) { 
+
+			function clear_warnmsg() {
+				$('#pwtc-mapdb-nonmember-signup-div .accept_div .warnmsg').html('');
+			}
+
+			function show_warnmsg(message) {
+				$('#pwtc-mapdb-nonmember-signup-div .accept_div .warnmsg').html('<div class="callout small warning">' + message + '</div>');
+			}
+
+			function clear_errmsg() {
+				$('#pwtc-mapdb-nonmember-signup-div .errmsg').html('');
+			}
+
+			function show_errmsg(message) {
+				$('#pwtc-mapdb-nonmember-signup-div .errmsg').html('<div class="callout small alert">' + message + '</div>');
+			}
+
+			function show_waiting() {
+				$('#pwtc-mapdb-nonmember-signup-div .errmsg').html('<div class="callout small"><i class="fa fa-spinner fa-pulse waiting"></i> please wait...</div>');
+			}
+
+			function set_accept_form() {
+				var form = $('#pwtc-mapdb-nonmember-signup-div .accept_div form');
+				var your_name = window.localStorage.getItem('ride_signup_name');
+				if (!your_name) {
+					your_name = '';
+				}
+				form.find('input[name="your_name"]').val(your_name);
+				var contact_phone = window.localStorage.getItem('ride_signup_contact_phone');
+				if (!contact_phone) {
+					contact_phone = '';
+				}
+				form.find('input[name="contact_phone"]').val(contact_phone);
+				var contact_name = window.localStorage.getItem('ride_signup_contact_name');
+				if (!contact_name) {
+					contact_name = '';	
+				}	
+				form.find('input[name="contact_name"]').val(contact_name);			
+			}
+
+			function check_signup_cb(response) {
+				var res;
+				try {
+					res = JSON.parse(response);
+				}
+				catch (e) {
+					show_errmsg(e.message);
+					return;
+				}
+				if (res.error) {
+					show_errmsg(res.error);
+				}
+				else {
+					if (res.postid == <?php echo $postid ?>) {
+						clear_errmsg();
+						if (res.found) {
+							$('#pwtc-mapdb-nonmember-signup-div .accept_div').hide();
+							$('#pwtc-mapdb-nonmember-signup-div .cancel_div .your_name').html(res.signup_name);
+							$('#pwtc-mapdb-nonmember-signup-div .cancel_div').show();
+						}
+						else {
+							$('#pwtc-mapdb-nonmember-signup-div .cancel_div').hide();
+							clear_warnmsg();
+							set_accept_form();
+							$('#pwtc-mapdb-nonmember-signup-div .accept_div').show();
+						}
+					}
+					else {
+						show_errmsg('Ride post ID does not match post ID returned by server.');
+					}
+				}
+			}
+
+			function accept_signup_cb(response) {
+				var res;
+				try {
+					res = JSON.parse(response);
+				}
+				catch (e) {
+					show_errmsg(e.message);
+					return;
+				}
+				if (res.error) {
+					show_errmsg(res.error);
+				}
+				else {
+					if (res.postid == <?php echo $postid ?>) {
+						//TODO: verify that signup IDs match!
+						clear_errmsg();
+						if (res.warning) {
+							show_warnmsg(res.warning);
+							$('#pwtc-mapdb-nonmember-signup-div .accept_div').show();
+						}
+						else {
+							window.localStorage.setItem('ride_signup_name', res.signup_name);
+							window.localStorage.setItem('ride_signup_contact_name', res.signup_contact_name);
+							window.localStorage.setItem('ride_signup_contact_phone', res.signup_contact_phone);
+							$('#pwtc-mapdb-nonmember-signup-div .accept_div').hide();
+							$('#pwtc-mapdb-nonmember-signup-div .cancel_div .your_name').html(res.signup_name);
+							$('#pwtc-mapdb-nonmember-signup-div .cancel_div').show();
+						}
+					}
+					else {
+						show_errmsg('Ride post ID does not match post ID returned by server.');
+					}
+				}
+			}
+
+			function cancel_signup_cb(response) {
+				var res;
+				try {
+					res = JSON.parse(response);
+				}
+				catch (e) {
+					show_errmsg(e.message);
+					return;
+				}
+				if (res.error) {
+					show_errmsg(res.error);
+				}
+				else {
+					if (res.postid == <?php echo $postid ?>) {
+						//TODO: verify that signup IDs match!
+						clear_errmsg();
+						$('#pwtc-mapdb-nonmember-signup-div .cancel_div').hide();
+						clear_warnmsg();
+						set_accept_form();
+						$('#pwtc-mapdb-nonmember-signup-div .accept_div').show();
+					}
+					else {
+						show_errmsg('Ride post ID does not match post ID returned by server.');
+					}
+				}
+			}
+
+			$('#pwtc-mapdb-nonmember-signup-div .accept_div form').on('submit', function(evt) {
+				evt.preventDefault();
+				var your_name = $(this).find('input[name="your_name"]').val().trim();
+				if (your_name) {
+					clear_warnmsg();
+					var signup_id = window.localStorage.getItem('ride_signup_id');
+					var contact_phone = $(this).find('input[name="contact_phone"]').val().trim();
+					var contact_name = $(this).find('input[name="contact_name"]').val().trim();
+					var action = "<?php echo admin_url('admin-ajax.php'); ?>";
+					var data = {
+						'action': 'pwtc_mapdb_accept_nonmember_signup',
+						'nonce': '<?php echo wp_create_nonce('pwtc_mapdb_accept_nonmember_signup'); ?>',
+						'postid': '<?php echo $postid ?>',
+						'signup_id': signup_id,
+						'signup_name': your_name,
+						'signup_contact_phone': contact_phone,
+						'signup_contact_name': contact_name,
+						'signup_limit': <?php echo $signup_limit ?>
+					};
+					$.post(action, data, accept_signup_cb);
+					$('#pwtc-mapdb-nonmember-signup-div .accept_div').hide();
+					show_waiting();
+				}
+				else {
+					show_warnmsg('Your name must be specified.')
+				}
+			});
+
+			$('#pwtc-mapdb-nonmember-signup-div .cancel_div form').on('submit', function(evt) {
+				evt.preventDefault();
+				var signup_id = window.localStorage.getItem('ride_signup_id');
+				var action = "<?php echo admin_url('admin-ajax.php'); ?>";
+				var data = {
+					'action': 'pwtc_mapdb_cancel_nonmember_signup',
+					'nonce': '<?php echo wp_create_nonce('pwtc_mapdb_cancel_nonmember_signup'); ?>',
+					'postid': '<?php echo $postid ?>',
+					'signup_id': signup_id
+				};
+				$.post(action, data, cancel_signup_cb);
+				$('#pwtc-mapdb-nonmember-signup-div .cancel_div').hide();
+				show_waiting();
+			});
+
+			if (window.localStorage) {
+				var signup_id = window.localStorage.getItem('ride_signup_id');
+				if (!signup_id) {
+					signup_id = '<?php echo $timestamp ?>';
+					window.localStorage.setItem('ride_signup_id', signup_id);
+				}
+
+				var action = "<?php echo admin_url('admin-ajax.php'); ?>";
+				var data = {
+					'action': 'pwtc_mapdb_check_nonmember_signup',
+					'nonce': '<?php echo wp_create_nonce('pwtc_mapdb_check_nonmember_signup'); ?>',
+					'postid': '<?php echo $postid ?>',
+					'signup_id': signup_id
+				};
+				$.post(action, data, check_signup_cb);
+				show_waiting();
+			}
+			else {
+				show_errmsg('You cannot signup because your browser does not support local storage.');
+			}
+		});
+	</script>
+
+	<div id='pwtc-mapdb-nonmember-signup-div'>
+		<div class="callout small warning"><p>ONLY non-members should use this page to signup for rides. If you are a club member, first log in <a href="/wp-login.php">here</a> before signing up for a ride.</p></div>
+		<div class="errmsg"></div>
+		<div class="accept_div callout" style="display: none">
+			<p>To sign up for the ride "<?php echo $ride_title; ?>," please enter your name and emergency contact information below and press the accept button. Doing so will indicate your acceptance of the Club's <a href="/terms-and-conditions" target="_blank">terms and conditions</a>.</p>
+			<div class="warnmsg"></div>
+			<form method="POST">
+				<div class="row">
+					<div class="small-12 medium-6 columns">
+						<label>Your Name
+							<input type="text" name="your_name" value=""/>
+						</label>
+					</div>
+					<div class="small-12 medium-6 columns">
+						<label><i class="fa fa-phone"></i> Emergency Contact Phone
+							<input type="text" name="contact_phone" value=""/>
+						</label>
+					</div>
+					<div class="small-12 medium-6 columns">
+						<label>Emergency Contact Name
+							<input type="text" name="contact_name" value=""/>
+						</label>
+					</div>
+				</div>
+				<div class="row column clearfix">
+					<button class="dark button float-left" type="submit"><i class="fa fa-user-plus"></i> Accept Signup</button>
+					<a href="<?php echo $ride_link; ?>" class="dark button float-right"><i class="fa fa-chevron-left"></i> Back to Ride</a>
+				</div>
+			</form>
+		</div>
+		<div class="cancel_div callout" style="display: none">
+			<p>Hello <span class="your_name"></span>, you are currently signed up for the ride "<?php echo $ride_title; ?>." To cancel your sign up, please press the cancel button below.</p>
+			<form method="POST">
+				<div class="row column clearfix">
+					<button class="dark button float-left" type="submit"><i class="fa fa-user-times"></i> Cancel Signup</button>
+					<a href="<?php echo $ride_link; ?>" class="dark button float-right"><i class="fa fa-chevron-left"></i> Back to Ride</a>
+				</div>
+			</form>
+		</div>
+	</div>
+
+	<?php
+		return ob_get_clean();
+	}
+	
+	public static function check_plugin_dependency() {
+		if (!defined('PWTC_MILEAGE__PLUGIN_DIR')) {
+			return '<div class="callout small alert"><p>Cannot render shortcode, PWTC Mileage plugin is required.</p></div>';
+		}
+
+		if (!defined('PWTC_MEMBERS__PLUGIN_DIR')) {
+			return '<div class="callout small alert"><p>Cannot render shortcode, PWTC Members plugin is required.</p></div>';
+		}
+
+		return '';
+	}
+
+	public static function check_post_id() {
+		if (!isset($_GET['post'])) {
+			return '<div class="callout small alert"><p>Cannot render shortcode, missing post ID parameter.</p></div>';
+		}
+
+		$postid = intval($_GET['post']);
+		if ($postid == 0) {
+			return '<div class="callout small alert"><p>Cannot render shortcode, post ID is invalid.</p></div>';
+		}
+
+		$post = get_post($postid);
+		if (!$post) {
+			return '<div class="callout small alert"><p>Cannot render shortcode, post does not exist.</p></div>';
+		}
+
+		if (get_post_type($post) != 'scheduled_rides') {
+			return '<div class="callout small alert"><p>Cannot render shortcode, post type is not a scheduled ride.</p></div>';
+		}
+		
+		return '';
+	}
+
+	public static function get_leader_userid($postid) {
+		$leaders = get_field('ride_leaders', $postid);
+		foreach ($leaders as $leader) {
+			$allow_signup = get_field('allow_ride_signup', 'user_'.$leader['ID']);
+			if ($allow_signup) {
+				return $leader['ID'];
+			}
+		}
+		return 0;		
+	}
+
+	public static function check_ride_start($postid, $leaderid, $return_to_ride) {
+		$ride_title = get_the_title($postid);
+		$str = get_field('signup_cutoff_time', 'user_'.$leaderid);
+		$time_limit = intval($str);
+		$timezone = new DateTimeZone(pwtc_get_timezone_string());
+		$ride_date = DateTime::createFromFormat('Y-m-d H:i:s', get_field('date', $postid), $timezone);
+		$ride_date_str = $ride_date->format('m/d/Y g:ia');
+		$now_date = new DateTime(null, $timezone);
+		$now_date_str = $now_date->format('m/d/Y g:ia');
+		if ($time_limit >= 0) {
+			if ($now_date > $ride_date) {
+				return '<div class="callout small warning"><p>You cannot signup for ride "' . $ride_title . '" because it has already started. <em>The start time of the ride is ' . $ride_date_str . ' and the current time is ' . $now_date_str . '.</em> ' . $return_to_ride . '</p></div>';
+			}
+			if ($time_limit > 0) {
+				$interval = new DateInterval('PT' . $time_limit . 'H');	
+				$ride_date->sub($interval);
+				if ($now_date > $ride_date) {
+					return '<div class="callout small warning"><p>You cannot signup for ride "' . $ride_title . '" because it is within ' . $time_limit . ' hours of the start time. <em>The start time of the ride is ' . $ride_date_str . ' and the current time is ' . $now_date_str . '.</em> ' . $return_to_ride . '</p></div>';
+				}
+			}
+		}
+		else {
+			$time_limit = abs($time_limit);
+			$interval = new DateInterval('PT' . $time_limit . 'H');	
+			$ride_date->add($interval);
+			if ($now_date > $ride_date) {
+				return '<div class="callout small warning"><p>You cannot signup for ride "' . $ride_title . '" because it is beyond ' . $time_limit . ' hours of the start time. <em>The start time of the ride is ' . $ride_date_str . ' and the current time is ' . $now_date_str . '.</em> ' . $return_to_ride . '</p></div>';		
+			}
+		}		
+	}
+	
 	// Generates the [pwtc_mapdb_leader_details] shortcode.
 	public static function shortcode_leader_details($atts) {
 		if (!defined('PWTC_MEMBERS__PLUGIN_DIR')) {
@@ -1448,6 +1833,131 @@ EOT;
 				'error' => 'Server arguments missing for signup edit.'
 			);		
 		}
+		echo wp_json_encode($response);
+		wp_die();
+	}	
+	
+	public static function check_nonmember_signup_callback() {
+		if (isset($_POST['signup_id']) and isset($_POST['postid']) and isset($_POST['nonce'])) {
+			$signup_id = intval($_POST['signup_id']);
+			$postid = intval($_POST['postid']);
+			$nonce = $_POST['nonce'];
+			if (!wp_verify_nonce($nonce, 'pwtc_mapdb_check_nonmember_signup')) {
+				$response = array(
+					'error' => 'Server security check failed for nonmember signup check.'
+				);
+			}
+			else {
+				$found = false;
+				$signup_list = get_post_meta($postid, '_signup_nonmember_id');
+				foreach($signup_list as $item) {
+					$arr = json_decode($item, true);
+					if ($arr['signup_id'] == $signup_id) {
+						$found = true;
+						break;
+					}
+				}
+				if ($found) {
+					$response = array(
+						'postid' => $postid,
+						'signup_id' => ''.$signup_id,
+						'found' => $found,
+						'signup_name' => $arr['name'],
+						'signup_contact_phone' => $arr['contact_phone'],
+						'signup_contact_name' => $arr['contact_name']
+					);
+				}
+				else {
+					$response = array(
+						'postid' => $postid,
+						'signup_id' => ''.$signup_id,
+						'found' => $found
+					);					
+				}
+			}
+		}
+		else {
+			$response = array(
+				'error' => 'Server arguments missing for nonmember signup check.'
+			);		
+		}
+		echo wp_json_encode($response);
+		wp_die();
+	}	
+
+	public static function accept_nonmember_signup_callback() {
+		if (isset($_POST['signup_id']) and isset($_POST['postid']) and isset($_POST['nonce']) and isset($_POST['signup_name']) and isset($_POST['signup_contact_phone']) and isset($_POST['signup_contact_name']) and isset($_POST['signup_limit'])) {
+			$signup_id = intval($_POST['signup_id']);
+			$postid = intval($_POST['postid']);
+			$signup_limit = intval($_POST['signup_limit']);
+			$nonce = $_POST['nonce'];
+			$signup_name = $_POST['signup_name'];
+			$contact_phone = $_POST['signup_contact_phone'];
+			$contact_name = $_POST['signup_contact_name'];
+			if (!wp_verify_nonce($nonce, 'pwtc_mapdb_accept_nonmember_signup')) {
+				$response = array(
+					'error' => 'Server security check failed for nonmember signup accept.'
+				);
+			}
+			else {
+				$total_signups = count(get_post_meta($postid, '_signup_user_id')) +
+					count(get_post_meta($postid, '_signup_nonmember_id'));
+				if ($signup_limit > 0 and $total_signups >= $signup_limit) {
+					$response = array(
+						'postid' => $postid,
+						'signup_id' => ''.$signup_id,
+						'warning' => 'You cannot signup for this ride because it is full; a maximum of ' . $signup_limit . ' riders are allowed.'
+					);				
+				}
+				else {
+					if (function_exists('pwtc_members_format_phone_number')) {
+						$contact_phone = pwtc_members_format_phone_number($contact_phone);
+					}
+					self::delete_all_nonmember_signups($postid, $signup_id);
+					$value = json_encode(array('signup_id' => $signup_id, 'name' => $signup_name, 'contact_phone' => $contact_phone, 'contact_name' => $contact_name, 'attended' => true));
+					add_post_meta($postid, '_signup_nonmember_id', $value);
+					$response = array(
+						'postid' => $postid,
+						'signup_id' => ''.$signup_id,
+						'signup_name' => $signup_name,
+						'signup_contact_phone' => $contact_phone,
+						'signup_contact_name' => $contact_name
+					);
+				}
+			}
+		}
+		else {
+			$response = array(
+				'error' => 'Server arguments missing for nonmember signup accept.'
+			);		
+		}
+		echo wp_json_encode($response);
+		wp_die();
+	}	
+
+	public static function cancel_nonmember_signup_callback() {
+		if (isset($_POST['signup_id']) and isset($_POST['postid']) and isset($_POST['nonce'])) {
+			$signup_id = intval($_POST['signup_id']);
+			$postid = intval($_POST['postid']);
+			$nonce = $_POST['nonce'];
+			if (!wp_verify_nonce($nonce, 'pwtc_mapdb_cancel_nonmember_signup')) {
+				$response = array(
+					'error' => 'Server security check failed for nonmember signup cancel.'
+				);
+			}
+			else {
+				self::delete_all_nonmember_signups($postid, $signup_id);
+				$response = array(
+					'postid' => $postid,
+					'signup_id' => ''.$signup_id
+				);
+			}
+		}
+		else {
+			$response = array(
+				'error' => 'Server arguments missing for nonmember signup cancel.'
+			);		
+		}		
 		echo wp_json_encode($response);
 		wp_die();
 	}	
