@@ -564,31 +564,16 @@ class PwtcMapdb {
 		$paperless = $a['paperless'] == 'yes' ? true : false;
 		$set_mileage = $paperless;
 		
-		if (!defined('PWTC_MILEAGE__PLUGIN_DIR')) {
-			return '<div class="callout small alert"><p>Cannot render shortcode, PWTC Mileage plugin is required.</p></div>';
+		$error = self::check_plugin_dependency();
+		if (!empty($error)) {
+			return $error;
 		}
 
-		if (!defined('PWTC_MEMBERS__PLUGIN_DIR')) {
-			return '<div class="callout small alert"><p>Cannot render shortcode, PWTC Members plugin is required.</p></div>';
+		$error = self::check_post_id();
+		if (!empty($error)) {
+			return $error;
 		}
-
-		if (!isset($_GET['post'])) {
-			return '<div class="callout small alert"><p>Cannot render shortcode, missing post ID parameter.</p></div>';
-		}
-
 		$postid = intval($_GET['post']);
-		if ($postid == 0) {
-			return '<div class="callout small alert"><p>Cannot render shortcode, post ID is invalid.</p></div>';
-		}
-
-		$post = get_post($postid);
-		if (!$post) {
-			return '<div class="callout small alert"><p>Cannot render shortcode, post does not exist.</p></div>';
-		}
-
-		if (get_post_type($post) != 'scheduled_rides') {
-			return '<div class="callout small alert"><p>Cannot render shortcode, post type is not a scheduled ride.</p></div>';
-		}
 
 		$ride_title = get_the_title($postid);
 		$ride_link = get_the_permalink($postid);
@@ -604,21 +589,11 @@ class PwtcMapdb {
 			return '<div class="callout small warning"><p>You cannot signup for ride "' . $ride_title . '" because it is locked. ' . $return_to_ride . '</p></div>';	
 		}
 
-		$allow_signup = false;
-		$time_limit = 0;
-		$leaders = get_field('ride_leaders', $postid);
-		foreach($leaders as $leader) {
-			$allow_signup = get_field('allow_ride_signup', 'user_'.$leader['ID']);
-			if ($allow_signup) {
-				$str = get_field('signup_cutoff_time', 'user_'.$leader['ID']);
-				$time_limit = intval($str);
-				break;
-			}
+		$leader_id = self::get_leader_userid($postid);
+		if ($leader_id == 0) {
+			return '<div class="callout small warning"><p>The leader for ride "' . $ride_title . '" does not allow online signup. ' . $return_to_ride . '</p></div>';			
 		}
-		if ( !$allow_signup ) {
-			return '<div class="callout small warning"><p>The leader for ride "' . $ride_title . '" does not allow online signup. ' . $return_to_ride . '</p></div>';
-		}
-
+		
 		if (get_field('is_canceled', $postid)) {
 			return '<div class="callout small warning"><p>The ride "' . $ride_title . '" has been canceled, no signup allowed. ' . $return_to_ride . '</p></div>';
 		}
@@ -628,30 +603,9 @@ class PwtcMapdb {
 			return '<div class="callout small warning"><p>You must be a club member to signup for rides. ' . $return_to_ride . '</p></div>';
 		}
 		
-		$timezone = new DateTimeZone(pwtc_get_timezone_string());
-		$ride_date = DateTime::createFromFormat('Y-m-d H:i:s', get_field('date', $postid), $timezone);
-		$ride_date_str = $ride_date->format('m/d/Y g:ia');
-		$now_date = new DateTime(null, $timezone);
-		$now_date_str = $now_date->format('m/d/Y g:ia');
-		if ($time_limit >= 0) {
-			if ($now_date > $ride_date) {
-				return '<div class="callout small warning"><p>You cannot signup for ride "' . $ride_title . '" because it has already started. <em>The start time of the ride is ' . $ride_date_str . ' and the current time is ' . $now_date_str . '.</em> ' . $return_to_ride . '</p></div>';
-			}
-			if ($time_limit > 0) {
-				$interval = new DateInterval('PT' . $time_limit . 'H');	
-				$ride_date->sub($interval);
-				if ($now_date > $ride_date) {
-					return '<div class="callout small warning"><p>You cannot signup for ride "' . $ride_title . '" because it is within ' . $time_limit . ' hours of the start time. <em>The start time of the ride is ' . $ride_date_str . ' and the current time is ' . $now_date_str . '.</em> ' . $return_to_ride . '</p></div>';
-				}
-			}
-		}
-		else {
-			$time_limit = abs($time_limit);
-			$interval = new DateInterval('PT' . $time_limit . 'H');	
-			$ride_date->add($interval);
-			if ($now_date > $ride_date) {
-				return '<div class="callout small warning"><p>You cannot signup for ride "' . $ride_title . '" because it is beyond ' . $time_limit . ' hours of the start time. <em>The start time of the ride is ' . $ride_date_str . ' and the current time is ' . $now_date_str . '.</em> ' . $return_to_ride . '</p></div>';		
-			}
+		$error = self::check_ride_start($postid, $leader_id, $return_to_ride);
+		if (!empty($error)) {
+			return $error;
 		}
 		
 		$mileage = '';
@@ -768,33 +722,18 @@ class PwtcMapdb {
 		$unused_rows = abs(intval($a['unused_rows']));
 		$paperless = $a['paperless'] == 'yes' ? true : false;
 		$set_mileage = $take_attendance = $paperless;
-
-		if (!defined('PWTC_MILEAGE__PLUGIN_DIR')) {
-			return '<div class="callout small alert"><p>Cannot render shortcode, PWTC Mileage plugin is required.</p></div>';
-		}
-
-		if (!defined('PWTC_MEMBERS__PLUGIN_DIR')) {
-			return '<div class="callout small alert"><p>Cannot render shortcode, PWTC Members plugin is required.</p></div>';
-		}
 		
-		if (!isset($_GET['post'])) {
-			return '<div class="callout small alert"><p>Cannot render shortcode, missing post ID parameter.</p></div>';
+		$error = self::check_plugin_dependency();
+		if (!empty($error)) {
+			return $error;
 		}
 
+		$error = self::check_post_id();
+		if (!empty($error)) {
+			return $error;
+		}
 		$postid = intval($_GET['post']);
-		if ($postid == 0) {
-			return '<div class="callout small alert"><p>Cannot render shortcode, post ID is invalid.</p></div>';
-		}
-
-		$post = get_post($postid);
-		if (!$post) {
-			return '<div class="callout small alert"><p>Cannot render shortcode, post does not exist.</p></div>';
-		}
-
-		if (get_post_type($post) != 'scheduled_rides') {
-			return '<div class="callout small alert"><p>Cannot render shortcode, post type is not a scheduled ride.</p></div>';
-		}
-
+		
 		$current_user = wp_get_current_user();
 		if ( 0 == $current_user->ID ) {
 			return '<div class="callout small warning"><p>Please <a href="/wp-login.php">log in</a> to view the ride signup list.</p></div>';
@@ -826,7 +765,6 @@ class PwtcMapdb {
 		ob_start();
 	?>
 
-	<?php if ($set_mileage) { ?>
 	<script type="text/javascript">
 		jQuery(document).ready(function($) { 
 
@@ -1008,7 +946,6 @@ class PwtcMapdb {
 		});
 		
 	</script>
-	<?php } ?>
 
 	<div id='pwtc-mapdb-view-signup-div'>
 		<?php if (count($signup_list) > 0) { ?>
@@ -1064,12 +1001,9 @@ class PwtcMapdb {
 
 	// Generates the [pwtc_mapdb_download_signup] shortcode.
 	public static function shortcode_download_signup($atts) {
-		if (!defined('PWTC_MILEAGE__PLUGIN_DIR')) {
-			return '<div class="callout small alert"><p>Cannot render shortcode, PWTC Mileage plugin is required.</p></div>';
-		}
-
-		if (!defined('PWTC_MEMBERS__PLUGIN_DIR')) {
-			return '<div class="callout small alert"><p>Cannot render shortcode, PWTC Members plugin is required.</p></div>';
+		$error = self::check_plugin_dependency();
+		if (!empty($error)) {
+			return $error;
 		}
 		
 		ob_start();
@@ -1105,10 +1039,12 @@ class PwtcMapdb {
 		}
 		$postid = intval($_GET['post']);
 
+		/*
 		$current_user = wp_get_current_user();
 		if ( 0 != $current_user->ID ) {
 			return '<div class="callout small alert"><p>This page is only for non-member ride signup and you must be logged out to use it.</p></div>';
 		}
+		*/
 
 		$ride_title = get_the_title($postid);
 		$ride_link = get_the_permalink($postid);
@@ -1581,6 +1517,16 @@ class PwtcMapdb {
 			$arr = json_decode($item, true);
 			if ($arr['userid'] == $userid) {
 				delete_post_meta($postid, '_signup_user_id', $item);
+			}
+		}
+	}
+	
+	public static function delete_all_nonmember_signups($postid, $signup_id) {
+		$signup_list = get_post_meta($postid, '_signup_nonmember_id');
+		foreach($signup_list as $item) {
+			$arr = json_decode($item, true);
+			if ($arr['signup_id'] == $signup_id) {
+				delete_post_meta($postid, '_signup_nonmember_id', $item);
 			}
 		}
 	}
