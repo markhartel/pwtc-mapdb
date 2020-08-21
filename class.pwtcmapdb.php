@@ -885,7 +885,7 @@ class PwtcMapdb {
 						});
 						acell.find('i').remove();
 						if (res.attended == '0') {
-							acell.find('span').after('<i class="fa fa-times">X</i>');
+							acell.find('span').after('<i class="fa fa-times"></i>');
 						}
 					}
 					else {
@@ -977,7 +977,8 @@ class PwtcMapdb {
 								row.attr('signup_id'), 
 								cell.attr('attended'), 
 								'0');
-						}						cell.find('i').remove();
+						}						
+						cell.find('i').remove();
 						cell.find('span').after('<i class="fa fa-spinner fa-pulse waiting"></i>');
 					});
 				}
@@ -1049,9 +1050,9 @@ class PwtcMapdb {
 				$attended = $arr['attended'];
 			?>
 				<tr signup_id="<?php echo $signup_id; ?>">
-				<td attended="<?php echo $attended ? '1':'0'; ?>"><span>Name</span><?php echo $attended ? '':'<i class="fa fa-times">X</i>'; ?> <?php echo $name; ?> </td>
+				<td attended="<?php echo $attended ? '1':'0'; ?>"><span>Name</span><?php echo $attended ? '':'<i class="fa fa-times"></i>'; ?> <?php echo $name; ?> </td>
 				<td><span>Rider ID</span>n/a</td>
-				<td><span>Mileage</span>n/a</td>
+				<td><span>Mileage</span></td>
 				<td><span>Emergency Contact</span><?php echo $contact; ?></td>
 				</tr>
 			<?php } ?>
