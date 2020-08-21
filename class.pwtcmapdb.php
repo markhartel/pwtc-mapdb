@@ -64,6 +64,9 @@ class PwtcMapdb {
 		add_action( 'wp_ajax_pwtc_mapdb_edit_signup', 
 			array( 'PwtcMapdb', 'edit_signup_callback') );
 		
+		add_action( 'wp_ajax_pwtc_mapdb_edit_nonmember_signup', 
+			array( 'PwtcMapdb', 'edit_nonmember_signup_callback') );
+		
 		add_action( 'wp_ajax_nopriv_pwtc_mapdb_check_nonmember_signup', 
 			array( 'PwtcMapdb', 'check_nonmember_signup_callback') );
 
@@ -1779,6 +1782,75 @@ EOT;
 		else {
 			$response = array(
 				'error' => 'Server arguments missing for signup edit.'
+			);		
+		}
+		echo wp_json_encode($response);
+		wp_die();
+	}	
+	
+	public static function edit_nonmember_signup_callback() {
+		$current_user = wp_get_current_user();
+		if ( 0 == $current_user->ID ) {
+			$response = array(
+				'error' => 'Server user access denied for nonmember signup edit.'
+			);		
+		}
+		else if (isset($_POST['signup_id']) and isset($_POST['postid']) and isset($_POST['attended']) and isset($_POST['oldattended']) and isset($_POST['nonce'])) {
+			$signup_id = intval($_POST['signup_id']);
+			$postid = intval($_POST['postid']);
+			$oldattended = trim($_POST['oldattended']);
+			$attended = trim($_POST['attended']);
+			$nonce = $_POST['nonce'];
+			if (!wp_verify_nonce($nonce, 'pwtc_mapdb_edit_nonmember_signup')) {
+				$response = array(
+					'error' => 'Server security check failed for nonmember signup edit.'
+				);
+			}
+			else {
+				if ($attended != $oldattended) {
+					$list = get_post_meta($postid, '_signup_nonmember_id');
+					$oldvalue = '';
+					foreach($list as $item) {
+						$arr = json_decode($item, true);
+						if ($arr['signup_id'] == $signup_id) {
+							$oldvalue = $item;
+							break;
+						}
+					}
+					if (!empty($oldvalue)) {
+						$arr = json_decode($oldvalue, true);
+						$value = json_encode(array('signup_id' => $arr['signup_id'], 'name' => $arr['name'], 'contact_phone' => $arr['contact_phone'], 'contact_name' => $arr['contact_name'], 'attended' => boolval($attended)));
+						if (update_post_meta($postid, '_signup_nonmember_id', $value, $oldvalue)) {
+							$response = array(
+								'postid' => $postid,
+								'signup_id' => $signup_id,
+								'attended' => $attended
+							);
+						}
+						else {
+							$response = array(
+								'error' => 'Server nonmember signup update failed.'
+							);	
+						}
+					}
+					else {
+						$response = array(
+							'error' => 'Server nonmember signup ID not found for edit.'
+						);	
+					}
+				}
+				else {
+					$response = array(
+						'postid' => $postid,
+						'signup_id' => $signup_id,
+						'attended' => $attended
+					);
+				}
+			}
+		}
+		else {
+			$response = array(
+				'error' => 'Server arguments missing for nonmember signup edit.'
 			);		
 		}
 		echo wp_json_encode($response);
