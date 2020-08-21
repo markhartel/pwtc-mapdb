@@ -749,6 +749,7 @@ class PwtcMapdb {
 		}
 
 		$signup_list = get_post_meta($postid, '_signup_user_id');
+		$nonmember_signup_list = get_post_meta($postid, '_signup_nonmember_id');
 		$ride_title = get_the_title($postid);
 		$ride_link = get_the_permalink($postid);
 
@@ -860,6 +861,39 @@ class PwtcMapdb {
 					}
 				}
 			}
+				       
+			function change_nonmember_signup_cb(response) {
+				var res;
+				try {
+					res = JSON.parse(response);
+				}
+				catch (e) {
+					show_errmsg(e.message);
+					reset_waiting_icon();
+					return;
+				}
+				if (res.error) {
+					show_errmsg(res.error);
+					reset_waiting_icon();
+				}
+				else {
+					if (res.postid == <?php echo $postid ?>) {
+						var row = $('#pwtc-mapdb-view-signup-div table tbody tr[signup_id="' + res.signup_id + '"]');
+						var acell = row.find('td[attended]');
+						acell.attr('attended', function() {
+							return res.attended;
+						});
+						acell.find('i').remove();
+						if (res.attended == '0') {
+							acell.find('span').after('<i class="fa fa-times">X</i>');
+						}
+					}
+					else {
+						show_errmsg('Ride post ID does not match post ID returned by server.');
+						reset_waiting_icon();
+					}
+				}
+			}
 
 			function change_signup_setting(userid, oldmileage, mileage, oldattended, attended) {
 				var action = "<?php echo admin_url('admin-ajax.php'); ?>";
@@ -874,6 +908,19 @@ class PwtcMapdb {
 					'attended': attended
 				};
 				$.post(action, data, change_signup_cb);
+			}
+		
+			function change_nonmember_signup_setting(signup_id, oldattended, attended) {
+				var action = "<?php echo admin_url('admin-ajax.php'); ?>";
+				var data = {
+					'action': 'pwtc_mapdb_edit_nonmember_signup',
+					'nonce': '<?php echo wp_create_nonce('pwtc_mapdb_edit_nonmember_signup'); ?>',
+					'postid': '<?php echo $postid ?>',
+					'signup_id': signup_id,
+					'oldattended': oldattended,
+					'attended': attended
+				};
+				$.post(action, data, change_nonmember_signup_cb);
 			}
 
 			<?php if ($set_mileage) { ?>
@@ -917,13 +964,20 @@ class PwtcMapdb {
 					link.on('click', function(e) {
 						e.stopPropagation();
 						link.remove();
-						change_signup_setting(
-							row.attr('userid'), 
-							row.find('td[mileage]').attr('mileage'), 
-							row.find('td[mileage]').attr('mileage'), 
-							cell.attr('attended'), 
-							'0');
-						cell.find('i').remove();
+						if (row.attr('userid')) {
+							change_signup_setting(
+								row.attr('userid'), 
+								row.find('td[mileage]').attr('mileage'), 
+								row.find('td[mileage]').attr('mileage'), 
+								cell.attr('attended'), 
+								'0');
+						}
+						else {
+							change_nonmember_signup_setting(
+								row.attr('signup_id'), 
+								cell.attr('attended'), 
+								'0');
+						}						cell.find('i').remove();
 						cell.find('span').after('<i class="fa fa-spinner fa-pulse waiting"></i>');
 					});
 				}
@@ -933,12 +987,20 @@ class PwtcMapdb {
 					link.on('click', function(e) {
 						e.stopPropagation();
 						link.remove();
-						change_signup_setting(
-							row.attr('userid'), 
-							row.find('td[mileage]').attr('mileage'), 
-							row.find('td[mileage]').attr('mileage'), 
-							cell.attr('attended'), 
-							'1');
+						if (row.attr('userid')) {
+							change_signup_setting(
+								row.attr('userid'), 
+								row.find('td[mileage]').attr('mileage'), 
+								row.find('td[mileage]').attr('mileage'), 
+								cell.attr('attended'), 
+								'1');
+						}
+						else {
+							change_nonmember_signup_setting(
+								row.attr('signup_id'), 
+								cell.attr('attended'), 
+								'1');
+						}
 						cell.find('i').remove();
 						cell.find('span').after('<i class="fa fa-spinner fa-pulse waiting"></i>');
 					});
@@ -951,7 +1013,7 @@ class PwtcMapdb {
 	</script>
 
 	<div id='pwtc-mapdb-view-signup-div'>
-		<?php if (count($signup_list) > 0) { ?>
+		<?php if (count($signup_list) > 0 or count($nonmember_signup_list) > 0) { ?>
 			<p>The following riders are currently signed up for the ride "<?php echo $ride_title; ?>."</p>
 			<div class="errmsg"></div>
 			<table class="pwtc-mapdb-rwd-table"><thead><tr><th>Name</th><th>Rider ID</th><th>Mileage</th><th>Emergency Contact</th></tr></thead><tbody>
@@ -974,6 +1036,22 @@ class PwtcMapdb {
 				<td attended="<?php echo $attended ? '1':'0'; ?>"><span>Name</span><?php echo $attended ? '':'<i class="fa fa-times"></i>'; ?> <?php echo $name; ?> </td>
 				<td><span>Rider ID</span><?php echo $rider_id; ?></td>
 				<td mileage="<?php echo $mileage; ?>"><span>Mileage</span><?php echo $mileage; ?></td>
+				<td><span>Emergency Contact</span><?php echo $contact; ?></td>
+				</tr>
+			<?php } ?>
+			<?php foreach($nonmember_signup_list as $item) { 
+				$arr = json_decode($item, true);
+				$signup_id = $arr['signup_id'];
+				$name = $arr['name'];
+				$contact_phone = $arr['contact_phone'];
+				$contact_name = $arr['contact_name'];
+				$contact = self::get_nonmember_emergency_contact($contact_phone, $contact_name, true);
+				$attended = $arr['attended'];
+			?>
+				<tr signup_id="<?php echo $signup_id; ?>">
+				<td attended="<?php echo $attended ? '1':'0'; ?>"><span>Name</span><?php echo $attended ? '':'<i class="fa fa-times">X</i>'; ?> <?php echo $name; ?> </td>
+				<td><span>Rider ID</span>n/a</td>
+				<td><span>Mileage</span>n/a</td>
 				<td><span>Emergency Contact</span><?php echo $contact; ?></td>
 				</tr>
 			<?php } ?>
@@ -1042,12 +1120,10 @@ class PwtcMapdb {
 		}
 		$postid = intval($_GET['post']);
 
-		/*
 		$current_user = wp_get_current_user();
 		if ( 0 != $current_user->ID ) {
 			return '<div class="callout small alert"><p>This page is only for non-member ride signup and you must be logged out to use it.</p></div>';
 		}
-		*/
 
 		$ride_title = get_the_title($postid);
 		$ride_link = get_the_permalink($postid);
@@ -1698,6 +1774,26 @@ class PwtcMapdb {
 			}
 		}
 		$contact_name = trim(get_field('emergency_contact_name', 'user_'.$userid));
+		$contact = $contact_phone;
+		if (!empty($contact_name)) {
+			$contact .= ' (' . $contact_name . ')';
+		}
+		return $contact;
+	}
+	
+	public static function get_nonmember_emergency_contact($contact_phone, $contact_name, $use_link) {
+		if (!empty($contact_phone)) {
+			if (function_exists('pwtc_members_format_phone_number')) {
+				if ($use_link) {
+					$contact_phone = '<a href="tel:' . 
+						pwtc_members_strip_phone_number($contact_phone) . '">' . 
+						pwtc_members_format_phone_number($contact_phone) . '</a>';
+				}
+				else {
+					$contact_phone = pwtc_members_format_phone_number($contact_phone);
+				}
+			}
+		}
 		$contact = $contact_phone;
 		if (!empty($contact_name)) {
 			$contact .= ' (' . $contact_name . ')';
