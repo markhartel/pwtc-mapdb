@@ -1640,7 +1640,14 @@ class PwtcMapdb {
 
 				$list = get_post_meta($rideid, '_signup_user_id');
 				$signup_list = [];
-				foreach($list as $item) {
+				foreach ($list as $item) {
+					$arr = json_decode($item, true);
+					if ($arr['attended']) {
+						$signup_list[] = $arr;
+					}
+				}
+				$list = get_post_meta($rideid, '_signup_nonmember_id');
+				foreach ($list as $item) {
 					$arr = json_decode($item, true);
 					if ($arr['attended']) {
 						$signup_list[] = $arr;
@@ -1725,18 +1732,29 @@ class PwtcMapdb {
 					$contact = '';
 					$mileage = '';
 					if ($rider_count < count($signup_list)) {
-						$arr = $signup_list[$rider_count];
-						$userid = $arr['userid'];
-						$mileage = $arr['mileage'];
-						$user_info = get_userdata($userid);
-						if ($user_info) {
-							$rider_name = $user_info->first_name . ' ' . $user_info->last_name;
+						if ($arr['userid']) {
+							$arr = $signup_list[$rider_count];
+							$userid = $arr['userid'];
+							$mileage = $arr['mileage'];
+							$user_info = get_userdata($userid);
+							if ($user_info) {
+								$rider_name = $user_info->first_name . ' ' . $user_info->last_name;
+							}
+							else {
+								$rider_name = 'Unknown';
+							}	
+							$rider_id = self::get_rider_id($userid);
+							$contact = self::get_emergency_contact($userid, false);
 						}
 						else {
-							$rider_name = 'Unknown';
-						}	
-						$rider_id = self::get_rider_id($userid);
-						$contact = self::get_emergency_contact($userid, false);
+							$signup_id = $arr['signup_id'];
+							$rider_name = $arr['name'];
+							$contact_phone = $arr['contact_phone'];
+							$contact_name = $arr['contact_name'];
+							$contact = self::get_nonmember_emergency_contact($contact_phone, $contact_name, false);	
+							$mileage = '';
+							$rider_id = 'n/a';						
+						}
 					}
 					$rider_count++;
 					$y_offset += $cell_h;
