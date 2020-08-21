@@ -1014,6 +1014,17 @@ class PwtcMapdb {
 	</script>
 
 	<div id='pwtc-mapdb-view-signup-div'>
+		<ul id="rider-signup-tips" class="accordion" data-accordion="" data-allow-all-closed="true">
+		<li class="accordion-item" data-accordion-item=""><a class="accordion-title" href="#">Instructions</a>
+		<div id="rider-signup-tips-1" class="accordion-content" data-tab-content="">
+		<?php if ($paperless) { ?>
+			Under construction!
+		<?php } else { ?>
+			Under construction!
+		<?php } ?>
+		</div>
+		</li>
+		</ul>
 		<?php if (count($signup_list) > 0 or count($nonmember_signup_list) > 0) { ?>
 			<p>The following riders are currently signed up for the ride "<?php echo $ride_title; ?>."</p>
 			<div class="errmsg"></div>
