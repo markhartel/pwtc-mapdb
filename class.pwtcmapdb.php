@@ -1484,11 +1484,11 @@ class PwtcMapdb {
 	}
 
 	public static function is_paperless($leader_id) {
-		return get_field('online_ride_signup', 'user_'.$id) == 'paperless';
+		return get_field('online_ride_signup', 'user_'.$leader_id) == 'paperless';
 	}
 
 	public static function is_hardcopy($leader_id) {
-		return get_field('online_ride_signup', 'user_'.$id) == 'hardcopy';
+		return get_field('online_ride_signup', 'user_'.$leader_id) == 'hardcopy';
 	}
 
 	public static function get_leader_userid($postid) {
