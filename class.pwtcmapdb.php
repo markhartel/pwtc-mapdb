@@ -1524,13 +1524,8 @@ class PwtcMapdb {
 				update_field('use_contact_email', false, 'user_'.$userid);
 			}
 		}
-		if (isset($_POST['allow_ride_signup'])) {
-			if ($_POST['allow_ride_signup'] == 'yes') {
-				update_field('allow_ride_signup', true, 'user_'.$userid);
-			}
-			else {
-				update_field('allow_ride_signup', false, 'user_'.$userid);
-			}
+		if (isset($_POST['ride_signup_mode'])) {
+			update_field('online_ride_signup', $_POST['ride_signup_mode'], 'user_'.$userid);
 		}
 		if (isset($_POST['contact_email'])) {
 			update_field('contact_email', sanitize_email($_POST['contact_email']), 'user_'.$userid);
@@ -1549,7 +1544,7 @@ class PwtcMapdb {
 		$text_phone = pwtc_members_format_phone_number(get_field('home_phone', 'user_'.$userid));
 		$contact_email = get_field('contact_email', 'user_'.$userid);
 		$use_contact_email = get_field('use_contact_email', 'user_'.$userid);
-		$allow_ride_signup = get_field('allow_ride_signup', 'user_'.$userid);
+		$ride_signup_mode = get_field('online_ride_signup', 'user_'.$userid);
 		$signup_cutoff = intval(get_field('signup_cutoff_time', 'user_'.$userid));
 		ob_start();
 		?>
@@ -1580,10 +1575,11 @@ class PwtcMapdb {
 						</label>
 					</div>
 					<div class="small-12 medium-6 columns">
-						<label>Allow Online Ride Signup?
-							<select name="allow_ride_signup">
-								<option value="no" <?php echo $allow_ride_signup ? '': 'selected'; ?>>No</option>
-								<option value="yes"  <?php echo $allow_ride_signup ? 'selected': ''; ?>>Yes</option>
+						<label>Online Ride Signup
+							<select name="ride_signup_mode">
+								<option value="no" <?php echo $ride_signup_mode == 'no' ? '': 'selected'; ?>>No</option>
+								<option value="hardcopy"  <?php echo $ride_signup_mode == 'hardcopy' ? 'selected': ''; ?>>Hardcopy</option>
+								<option value="paperless"  <?php echo $ride_signup_mode == 'paperless' ? 'selected': ''; ?>>Paperless</option>
 							</select>
 						</label>
 					</div>
