@@ -587,6 +587,15 @@ class PwtcMapdb {
 			return '<div class="callout small warning"><p>You must log in <a href="/wp-login.php">here</a> to signup for this ride. ' . $return_to_ride . '</p></div>';
 		}
 		
+		if (get_field('is_canceled', $postid)) {
+			return '<div class="callout small warning"><p>The ride "' . $ride_title . '" has been canceled, no signup allowed. ' . $return_to_ride . '</p></div>';
+		}
+
+		if (!in_array('current_member', (array) $current_user->roles) and 
+		    !in_array('expired_member', (array) $current_user->roles)) {
+			return '<div class="callout small warning"><p>You must be a club member to signup for rides. ' . $return_to_ride . '</p></div>';
+		}
+		
 		$signup_locked = get_post_meta($postid, '_signup_locked', true);
 		if ($signup_locked) {
 			return '<div class="callout small warning"><p>You cannot signup for ride "' . $ride_title . '" because it is locked. ' . $return_to_ride . '</p></div>';	
@@ -597,20 +606,11 @@ class PwtcMapdb {
 			return '<div class="callout small warning"><p>The leader for ride "' . $ride_title . '" does not allow online signup. ' . $return_to_ride . '</p></div>';			
 		}
 
-		if (self::is_paperless($leader_id)) {
+		if (self::get_online_signup_mode($postid, $leader_id) == 'paperless') {
 			$set_mileage = true;
 		}
 		else {
 			$set_mileage = false;
-		}
-		
-		if (get_field('is_canceled', $postid)) {
-			return '<div class="callout small warning"><p>The ride "' . $ride_title . '" has been canceled, no signup allowed. ' . $return_to_ride . '</p></div>';
-		}
-
-		if (!in_array('current_member', (array) $current_user->roles) and 
-		    !in_array('expired_member', (array) $current_user->roles)) {
-			return '<div class="callout small warning"><p>You must be a club member to signup for rides. ' . $return_to_ride . '</p></div>';
 		}
 		
 		$error = self::check_ride_start($postid, $leader_id, $return_to_ride);
@@ -758,7 +758,7 @@ class PwtcMapdb {
 			return '<div class="callout small warning"><p>The leader for ride "' . $ride_title . '" does not allow online signup. ' . $return_to_ride . '</p></div>';			
 		}
 
-		if (self::is_paperless($leader_id)) {
+		if (self::get_online_signup_mode($postid, $leader_id) == 'paperless') {
 			$paperless = $set_mileage = $take_attendance = true;
 		}
 		else {
@@ -1157,6 +1157,10 @@ class PwtcMapdb {
 		$return_to_ride = 'Click <a href="' . $ride_link . '">here</a> to return to the posted ride.';
 
 		$timestamp = time();
+		
+		if (get_field('is_canceled', $postid)) {
+			return '<div class="callout small warning"><p>The ride "' . $ride_title . '" has been canceled, no signup allowed. ' . $return_to_ride . '</p></div>';
+		}
 
 		$signup_locked = get_post_meta($postid, '_signup_locked', true);
 		if ($signup_locked) {
@@ -1168,9 +1172,6 @@ class PwtcMapdb {
 			return '<div class="callout small warning"><p>The leader for ride "' . $ride_title . '" does not allow online signup. ' . $return_to_ride . '</p></div>';			
 		}
 
-		if (get_field('is_canceled', $postid)) {
-			return '<div class="callout small warning"><p>The ride "' . $ride_title . '" has been canceled, no signup allowed. ' . $return_to_ride . '</p></div>';
-		}
 
 		$error = self::check_ride_start($postid, $leader_id, $return_to_ride);
 		if (!empty($error)) {
@@ -1483,20 +1484,12 @@ class PwtcMapdb {
 		return $userids;		
 	}
 
-	public static function is_paperless($leader_id) {
-		return get_field('online_ride_signup', 'user_'.$leader_id) == 'paperless';
-	}
-
-	public static function is_hardcopy($leader_id) {
-		return get_field('online_ride_signup', 'user_'.$leader_id) == 'hardcopy';
-	}
-
 	public static function get_leader_userid($postid) {
 		$userids = self::get_leader_userids($postid);
 		if (count($userids) > 0) {
 			$userid = -1;
 			foreach ($userids as $id) {
-				$signup_mode = get_field('online_ride_signup', 'user_'.$id);
+				$signup_mode = self::get_online_signup_mode($postid, $id);
 				if ($signup_mode != 'no') {
 					if ($userid < 0) {
 						$userid = $id;
@@ -1513,36 +1506,54 @@ class PwtcMapdb {
 		}
 	}
 
-	public static function check_ride_start($postid, $leaderid, $return_to_ride) {
-		$ride_title = get_the_title($postid);
+	public static function get_online_signup_mode($postid, $leaderid) {
+		return get_field('online_ride_signup', 'user_'.$leader_id);
+	}
+
+	public static function get_signup_cutoff($postid, $leaderid) {
 		$str = get_field('signup_cutoff_time', 'user_'.$leaderid);
-		$time_limit = intval($str);
+		$cutoff = abs(intval($str));
+		return $cutoff;
+	}
+
+	public static function get_signup_cutoff_time($postid, $leaderid) {
+		$ride_date = self::get_ride_start_time($postid);
+		$pad = self::get_signup_cutoff($postid, $leaderid);
+		$mode = self::get_online_signup_mode($postid, $leaderid);
+		if ($pad > 0) {
+			if ($mode == 'paperless') {
+				$interval = new DateInterval('PT' . $pad . 'H');	
+				$ride_date->add($interval);
+			}
+			else if ($mode == 'hardcopy') {
+				$interval = new DateInterval('PT' . $pad . 'H');	
+				$ride_date->sub($interval);
+			}
+		}
+		return $ride_date;
+	}
+
+	public static function get_ride_start_time($postid) {
 		$timezone = new DateTimeZone(pwtc_get_timezone_string());
 		$ride_date = DateTime::createFromFormat('Y-m-d H:i:s', get_field('date', $postid), $timezone);
-		$ride_date_str = $ride_date->format('m/d/Y g:ia');
+		return $ride_date;
+	}
+
+	public static function get_current_time() {
+		$timezone = new DateTimeZone(pwtc_get_timezone_string());
 		$now_date = new DateTime(null, $timezone);
+		return $now_date;
+	}
+
+	public static function check_ride_start($postid, $leaderid, $return_to_ride) {
+		$ride_title = get_the_title($postid);
+		$now_date = self::get_current_time();
 		$now_date_str = $now_date->format('m/d/Y g:ia');
-		if ($time_limit >= 0) {
-			if ($now_date > $ride_date) {
-				return '<div class="callout small warning"><p>You cannot signup for ride "' . $ride_title . '" because it has already started. <em>The start time of the ride is ' . $ride_date_str . ' and the current time is ' . $now_date_str . '.</em> ' . $return_to_ride . '</p></div>';
-			}
-			if ($time_limit > 0) {
-				$interval = new DateInterval('PT' . $time_limit . 'H');	
-				$ride_date->sub($interval);
-				if ($now_date > $ride_date) {
-					return '<div class="callout small warning"><p>You cannot signup for ride "' . $ride_title . '" because it is within ' . $time_limit . ' hours of the start time. <em>The start time of the ride is ' . $ride_date_str . ' and the current time is ' . $now_date_str . '.</em> ' . $return_to_ride . '</p></div>';
-				}
-			}
+		$cutoff_date = self::get_signup_cutoff_time($postid, $leaderid);
+		$cutoff_date_str = $cutoff_date->format('m/d/Y g:ia');
+		if ($now_date > $cutoff_date) {
+			return '<div class="callout small warning"><p>You cannot signup for ride "' . $ride_title . '" because you are beyond the signup cutoff time. <em>The current time is ' . $now_date_str . ' and the cutoff time is ' . $cutoff_date_str . '.</em> ' . $return_to_ride . '</p></div>';
 		}
-		else {
-			$time_limit = abs($time_limit);
-			$interval = new DateInterval('PT' . $time_limit . 'H');	
-			$ride_date->add($interval);
-			if ($now_date > $ride_date) {
-				return '<div class="callout small warning"><p>You cannot signup for ride "' . $ride_title . '" because it is beyond ' . $time_limit . ' hours of the start time. <em>The start time of the ride is ' . $ride_date_str . ' and the current time is ' . $now_date_str . '.</em> ' . $return_to_ride . '</p></div>';		
-			}
-		}
-		
 		return '';
 	}
 	
