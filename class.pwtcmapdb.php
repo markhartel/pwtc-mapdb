@@ -1446,6 +1446,7 @@ class PwtcMapdb {
 		return '';
 	}
 
+	/*
 	public static function get_leader_userid($postid) {
 		$leaders = get_field('ride_leaders', $postid);
 		foreach ($leaders as $leader) {
@@ -1455,6 +1456,38 @@ class PwtcMapdb {
 			}
 		}
 		return 0;		
+	}
+	*/
+	
+	public static function get_leader_userids($postid) {
+		$leaders = get_field('ride_leaders', $postid);
+		$userids = [];
+		foreach ($leaders as $leader) {
+			$userids[] = $leader['ID'];
+		}
+		return $userids;		
+	}
+
+	public static function get_leader_userid($postid) {
+		$userids = self::get_leader_userids($postid);
+		if (count($userids) > 0) {
+			$userid = -1;
+			foreach ($userids as $id) {
+				$signup_mode = get_field('online_ride_signup', 'user_'.$id);
+				if ($signup_mode != 'no') {
+					if ($userid < 0) {
+						$userid = $id;
+					}
+				}
+				else {
+					return 0;
+				}
+			}
+			return $userid;
+		}
+		else {
+			return 0;
+		}
 	}
 
 	public static function check_ride_start($postid, $leaderid, $return_to_ride) {
