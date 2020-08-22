@@ -1507,7 +1507,7 @@ class PwtcMapdb {
 	}
 
 	public static function get_online_signup_mode($postid, $leaderid) {
-		return get_field('online_ride_signup', 'user_'.$leader_id);
+		return get_field('online_ride_signup', 'user_'.$leaderid);
 	}
 
 	public static function get_signup_cutoff($postid, $leaderid) {
