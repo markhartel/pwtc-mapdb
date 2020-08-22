@@ -591,10 +591,17 @@ class PwtcMapdb {
 		if ($signup_locked) {
 			return '<div class="callout small warning"><p>You cannot signup for ride "' . $ride_title . '" because it is locked. ' . $return_to_ride . '</p></div>';	
 		}
-
+		
 		$leader_id = self::get_leader_userid($postid);
 		if ($leader_id == 0) {
 			return '<div class="callout small warning"><p>The leader for ride "' . $ride_title . '" does not allow online signup. ' . $return_to_ride . '</p></div>';			
+		}
+
+		if (self::is_paperless($leader_id)) {
+			$set_mileage = true;
+		}
+		else {
+			$set_mileage = false;
 		}
 		
 		if (get_field('is_canceled', $postid)) {
@@ -741,17 +748,25 @@ class PwtcMapdb {
 		if ( 0 == $current_user->ID ) {
 			return '<div class="callout small warning"><p>Please <a href="/wp-login.php">log in</a> to view the ride signup list.</p></div>';
 		}
+		
+		$ride_title = get_the_title($postid);
+		$ride_link = get_the_permalink($postid);
+		$return_to_ride = 'Click <a href="' . $ride_link . '">here</a> to return to the posted ride.';
 
-		if (!user_can($current_user,'edit_published_rides')) {
-			if (!in_array('ride_leader', (array) $current_user->roles)) {
-				return '<div class="callout small warning"><p>You must be a ride leader to view the ride signup list.</p></div>';
-			}
+		$leader_id = self::get_leader_userid($postid);
+		if ($leader_id == 0) {
+			return '<div class="callout small warning"><p>The leader for ride "' . $ride_title . '" does not allow online signup. ' . $return_to_ride . '</p></div>';			
+		}
+
+		if (self::is_paperless($leader_id)) {
+			$paperless = $set_mileage = $take_attendance = true;
+		}
+		else {
+			$paperless = $set_mileage = $take_attendance = false;
 		}
 
 		$signup_list = get_post_meta($postid, '_signup_user_id');
 		$nonmember_signup_list = get_post_meta($postid, '_signup_nonmember_id');
-		$ride_title = get_the_title($postid);
-		$ride_link = get_the_permalink($postid);
 
 		if ($paperless) {
 			if (isset($_POST['lock_signup'])) {
@@ -1466,6 +1481,14 @@ class PwtcMapdb {
 			$userids[] = $leader['ID'];
 		}
 		return $userids;		
+	}
+
+	public static function is_paperless($leader_id) {
+		return get_field('online_ride_signup', 'user_'.$id) == 'paperless';
+	}
+
+	public static function is_hardcopy($leader_id) {
+		return get_field('online_ride_signup', 'user_'.$id) == 'hardcopy';
 	}
 
 	public static function get_leader_userid($postid) {
