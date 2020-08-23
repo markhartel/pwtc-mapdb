@@ -764,6 +764,10 @@ class PwtcMapdb {
 		else {
 			$paperless = $set_mileage = $take_attendance = false;
 		}
+		
+		$now_date = self::get_current_time();
+		$cutoff_date = self::get_signup_cutoff_time($postid, $leader_id);
+		$cutoff_date_str = $cutoff_date->format('m/d/Y g:ia');
 
 		$signup_list = get_post_meta($postid, '_signup_user_id');
 		$nonmember_signup_list = get_post_meta($postid, '_signup_nonmember_id');
@@ -1085,6 +1089,9 @@ class PwtcMapdb {
 			</tbody></table>
 		<?php } else { ?>
 			<div class="callout small"><p>There are currently no riders signed up for the ride "<?php echo $ride_title; ?>."</p></div>
+		<?php } ?>
+		<?php if ($now_date < $cutoff_date) { ?>
+			<div class="callout small warning"><p>Online signups are allowed until <?php echo $cutoff_date_str; ?>.</p></div>
 		<?php } ?>
 		<div class="row column clearfix">
 			<form method="POST">
