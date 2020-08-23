@@ -1097,14 +1097,15 @@ class PwtcMapdb {
 			<form method="POST">
 		<?php if ($paperless) { ?>
 			<?php if ($signup_locked) { ?>
+				<a class="dark button float-left"><i class="fa fa-bicycle"></i> Log Mileage</a>
 				<button class="dark button float-left" type="submit" name="unlock_signup"><i class="fa fa-unlock"></i> Unlock Signup</button>
 			<?php } else { ?>
-				<button class="dark button float-left" type="submit" name="lock_signup" <?php echo $now_date < $cutoff_date ? '': 'disabled'; ?>><i class="fa fa-lock"></i> Lock Signup</button>
+				<button class="dark button float-left" type="submit" name="lock_signup" <?php echo $now_date < $cutoff_date ? 'disabled': ''; ?>><i class="fa fa-lock"></i> Lock Signup</button>
 			<?php } ?>
 		<?php } else { ?>
 				<input type="hidden" name="ride_id" value="<?php echo $postid; ?>"/>
 				<input type="hidden" name="unused_rows" value="<?php echo $unused_rows; ?>"/>
-				<button class="dark button float-left" type="submit" name="pwtc_mapdb_download_signup" <?php echo $now_date < $cutoff_date ? '': 'disabled'; ?>><i class="fa fa-download"></i> Signup Sheet</button>
+				<button class="dark button float-left" type="submit" name="pwtc_mapdb_download_signup" <?php echo $now_date < $cutoff_date ? 'disabled': ''; ?>><i class="fa fa-download"></i> Signup Sheet</button>
 		<?php } ?>				
 				<a href="<?php echo $ride_link; ?>" class="dark button float-right"><i class="fa fa-chevron-left"></i> Back to Ride</a>
 			</form>
