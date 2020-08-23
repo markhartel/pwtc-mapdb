@@ -1028,6 +1028,10 @@ class PwtcMapdb {
 			});
 			<?php } ?>
 		
+			$('#pwtc-mapdb-view-signup-div .log_mileage').on('click', function(evt) {
+				alert('Clicked log mileage!');
+			}
+		
 		});
 		
 	</script>
@@ -1097,7 +1101,7 @@ class PwtcMapdb {
 			<form method="POST">
 		<?php if ($paperless) { ?>
 			<?php if ($signup_locked) { ?>
-				<a class="dark button float-left"><i class="fa fa-bicycle"></i> Log Mileage</a>
+				<a class="log_mileage dark button float-left"><i class="fa fa-bicycle"></i> Log Mileage</a>&nbsp;
 				<button class="dark button float-left" type="submit" name="unlock_signup"><i class="fa fa-unlock"></i> Unlock Signup</button>
 			<?php } else { ?>
 				<button class="dark button float-left" type="submit" name="lock_signup" <?php echo $now_date < $cutoff_date ? 'disabled': ''; ?>><i class="fa fa-lock"></i> Lock Signup</button>
