@@ -844,6 +844,22 @@ class PwtcMapdb {
 			function clear_errmsg() {
 				$('#pwtc-mapdb-view-signup-div .errmsg').html('');
 			}
+			
+			function show_errmsg2(message) {
+				$('#pwtc-mapdb-view-signup-div .errmsg2').html('<div class="callout small alert">' + message + '</div>');
+			}
+
+			function show_errmsg2_success(message) {
+				$('#pwtc-mapdb-view-signup-div .errmsg2').html('<div class="callout small success">' + message + '</div>');
+			}
+
+			function show_errmsg2_wait() {
+				$('#pwtc-mapdb-view-signup-div .errmsg2').html('<i class="fa fa-spinner fa-pulse waiting"></i> please wait...');
+			}
+
+			function clear_errmsg2() {
+				$('#pwtc-mapdb-view-signup-div .errmsg2').html('');
+			}
 
 			function reset_mileage_cell() {
 				$('#pwtc-mapdb-view-signup-div table tbody td[mileage] input').each(function() {
@@ -941,6 +957,28 @@ class PwtcMapdb {
 					else {
 						show_errmsg('Ride post ID does not match post ID returned by server.');
 						reset_waiting_icon();
+					}
+				}
+			}
+			
+			function log_mileage_cb(response) {
+				var res;
+				try {
+					res = JSON.parse(response);
+				}
+				catch (e) {
+					show_errmsg2(e.message);
+					return;
+				}
+				if (res.error) {
+					show_errmsg2(res.error);
+				}
+				else {
+					if (res.postid == <?php echo $postid ?>) {
+						show_errmsg2_success('Log mileage was successful.');
+					}
+					else {
+						show_errmsg2('Ride post ID does not match post ID returned by server.');
 					}
 				}
 			}
@@ -1060,7 +1098,14 @@ class PwtcMapdb {
 			<?php } ?>
 		
 			$('#pwtc-mapdb-view-signup-div .log_mileage').on('click', function(evt) {
-				alert('Clicked log mileage!');
+				var action = "<?php echo admin_url('admin-ajax.php'); ?>";
+				var data = {
+					'action': 'pwtc_mapdb_log_mileage',
+					'nonce': '<?php echo wp_create_nonce('pwtc_mapdb_log_mileage'); ?>',
+					'postid': '<?php echo $postid ?>'
+				};
+				$.post(action, data, log_mileage_cb);
+				show_errmsg2_wait();
 			});
 		
 		});
@@ -1125,6 +1170,7 @@ class PwtcMapdb {
 		<?php } else { ?>
 			<div class="callout small"><p>There are currently no riders signed up for the ride "<?php echo $ride_title; ?>."</p></div>
 		<?php } ?>
+			<div class="errmsg2"></div>
 		<?php if ($now_date < $cutoff_date) { ?>
 			<div class="callout small warning"><p>Online signups are allowed until <?php echo $cutoff_date_str; ?>.</p></div>
 		<?php } ?>
