@@ -17,6 +17,34 @@ class PwtcMapdb {
 	//const LINK_ANCHOR_LABEL = '<i class="fa fa-link"></i>';
 	const EDIT_ANCHOR_LABEL = '<i class="fa fa-pencil-square"></i>';
 	const EDIT_CAPABILITY = 'edit_others_rides';
+	
+	const RIDE_CANCELED = 'is_canceled';
+	const RIDE_LEADERS = 'ride_leaders';
+	const RIDE_DATE = 'date';
+	const RIDE_SIGNUP_LOCKED = '_signup_locked';
+	const RIDE_SIGNUP_USERID = '_signup_user_id';
+	const RIDE_SIGNUP_NONMEMBER = '_signup_nonmember_id';
+
+	const USER_EMER_PHONE = 'emergency_contact_phone';
+	const USER_EMER_NAME = 'emergency_contact_name';
+	const USER_SIGNUP_MODE = 'online_ride_signup';
+	const USER_SIGNUP_CUTOFF = 'signup_cutoff_time';
+	const USER_USE_EMAIL = 'use_contact_email';
+	const USER_CONTACT_EMAIL = 'contact_email';
+	const USER_CELL_PHONE = 'cell_phone';
+	const USER_HOME_PHONE = 'home_phone';
+	const USER_RIDER_ID = 'rider_id';
+
+	const ROLE_CURRENT_MEMBER = 'current_member';
+	const ROLE_EXPIRED_MEMBER = 'expired_member';
+	const ROLE_RIDE_LEADER = 'ride_leader';
+
+	const LOCAL_SIGNUP_ID = 'ride_signup_id';
+	const LOCAL_SIGNUP_NAME = 'ride_signup_name';
+	const LOCAL_EMER_PHONE = 'ride_signup_contact_name';
+	const LOCAL_EMER_NAME = 'ride_signup_contact_phone';
+
+	const POST_TYPE_RIDE = 'scheduled_rides';
 
     private static $initiated = false;
 
@@ -587,7 +615,7 @@ class PwtcMapdb {
 			return '<div class="callout small warning"><p>You must log in <a href="/wp-login.php">here</a> to signup for this ride. ' . $return_to_ride . '</p></div>';
 		}
 		
-		if (get_field('is_canceled', $postid)) {
+		if (get_field(self::RIDE_CANCELED, $postid)) {
 			return '<div class="callout small warning"><p>The ride "' . $ride_title . '" has been canceled, no signup allowed. ' . $return_to_ride . '</p></div>';
 		}
 
@@ -596,7 +624,7 @@ class PwtcMapdb {
 			return '<div class="callout small warning"><p>You must be a club member to signup for rides. ' . $return_to_ride . '</p></div>';
 		}
 		
-		$signup_locked = get_post_meta($postid, '_signup_locked', true);
+		$signup_locked = get_post_meta($postid, self::RIDE_SIGNUP_LOCKED, true);
 		if ($signup_locked) {
 			return '<div class="callout small warning"><p>You cannot signup for ride "' . $ride_title . '" because it is locked. ' . $return_to_ride . '</p></div>';	
 		}
@@ -628,7 +656,7 @@ class PwtcMapdb {
 		if (isset($_POST['accept_user_signup'])) {
 			self::delete_all_signups($postid, $current_user->ID);
 			$value = json_encode(array('userid' => $current_user->ID, 'mileage' => ''.$mileage, 'attended' => true));
-			add_post_meta($postid, '_signup_user_id', $value);
+			add_post_meta($postid, self::RIDE_SIGNUP_USERID, $value);
 		}
 
 		if (isset($_POST['cancel_user_signup'])) {
@@ -650,7 +678,7 @@ class PwtcMapdb {
 			update_field('emergency_contact_name', $name, 'user_'.$current_user->ID);
 		}
 
-		$signup_list = get_post_meta($postid, '_signup_user_id');
+		$signup_list = get_post_meta($postid, self::RIDE_SIGNUP_USERID);
 		$accept_signup = true;
 		foreach($signup_list as $item) {
 			$arr = json_decode($item, true);
@@ -769,17 +797,17 @@ class PwtcMapdb {
 		$cutoff_date = self::get_signup_cutoff_time($postid, $leader_id);
 		$cutoff_date_str = $cutoff_date->format('m/d/Y g:ia');
 
-		$signup_list = get_post_meta($postid, '_signup_user_id');
-		$nonmember_signup_list = get_post_meta($postid, '_signup_nonmember_id');
+		$signup_list = get_post_meta($postid, self::RIDE_SIGNUP_USERID);
+		$nonmember_signup_list = get_post_meta($postid, self::RIDE_SIGNUP_NONMEMBER);
 
 		if ($paperless) {
 			if (isset($_POST['lock_signup'])) {
-				add_post_meta($postid, '_signup_locked', true, true);
+				add_post_meta($postid, self::RIDE_SIGNUP_LOCKED, true, true);
 			}
 			else if (isset($_POST['unlock_signup'])) {
-				delete_post_meta( $postid, '_signup_locked');
+				delete_post_meta( $postid, self::RIDE_SIGNUP_LOCKED);
 			}
-			$signup_locked = get_post_meta($postid, '_signup_locked', true);
+			$signup_locked = get_post_meta($postid, self::RIDE_SIGNUP_LOCKED, true);
 			if ($signup_locked) {
 				$set_mileage = $take_attendance = false;
 			}
@@ -1170,11 +1198,11 @@ class PwtcMapdb {
 
 		$timestamp = time();
 		
-		if (get_field('is_canceled', $postid)) {
+		if (get_field(self::RIDE_CANCELED, $postid)) {
 			return '<div class="callout small warning"><p>The ride "' . $ride_title . '" has been canceled, no signup allowed. ' . $return_to_ride . '</p></div>';
 		}
 
-		$signup_locked = get_post_meta($postid, '_signup_locked', true);
+		$signup_locked = get_post_meta($postid, self::RIDE_SIGNUP_LOCKED, true);
 		if ($signup_locked) {
 			return '<div class="callout small warning"><p>You cannot signup for ride "' . $ride_title . '" because it is locked. ' . $return_to_ride . '</p></div>';	
 		}
@@ -1488,7 +1516,7 @@ class PwtcMapdb {
 	*/
 	
 	public static function get_leader_userids($postid) {
-		$leaders = get_field('ride_leaders', $postid);
+		$leaders = get_field(self::RIDE_LEADERS, $postid);
 		$userids = [];
 		foreach ($leaders as $leader) {
 			$userids[] = $leader['ID'];
@@ -1547,7 +1575,7 @@ class PwtcMapdb {
 
 	public static function get_ride_start_time($postid) {
 		$timezone = new DateTimeZone(pwtc_get_timezone_string());
-		$ride_date = DateTime::createFromFormat('Y-m-d H:i:s', get_field('date', $postid), $timezone);
+		$ride_date = DateTime::createFromFormat('Y-m-d H:i:s', get_field(self::RIDE_DATE, $postid), $timezone);
 		return $ride_date;
 	}
 
@@ -1678,21 +1706,21 @@ class PwtcMapdb {
 	}
 	
 	public static function delete_all_signups($postid, $userid) {
-		$signup_list = get_post_meta($postid, '_signup_user_id');
+		$signup_list = get_post_meta($postid, self::RIDE_SIGNUP_USERID);
 		foreach($signup_list as $item) {
 			$arr = json_decode($item, true);
 			if ($arr['userid'] == $userid) {
-				delete_post_meta($postid, '_signup_user_id', $item);
+				delete_post_meta($postid, self::RIDE_SIGNUP_USERID, $item);
 			}
 		}
 	}
 	
 	public static function delete_all_nonmember_signups($postid, $signup_id) {
-		$signup_list = get_post_meta($postid, '_signup_nonmember_id');
+		$signup_list = get_post_meta($postid, self::RIDE_SIGNUP_NONMEMBER);
 		foreach($signup_list as $item) {
 			$arr = json_decode($item, true);
 			if ($arr['signup_id'] == $signup_id) {
-				delete_post_meta($postid, '_signup_nonmember_id', $item);
+				delete_post_meta($postid, self::RIDE_SIGNUP_NONMEMBER, $item);
 			}
 		}
 	}
@@ -1724,7 +1752,7 @@ class PwtcMapdb {
 					$unused_rows = abs(intval($_POST['unused_rows']));
 				}
 
-				$list = get_post_meta($rideid, '_signup_user_id');
+				$list = get_post_meta($rideid, self::RIDE_SIGNUP_USERID);
 				$signup_list = [];
 				foreach ($list as $item) {
 					$arr = json_decode($item, true);
@@ -1732,7 +1760,7 @@ class PwtcMapdb {
 						$signup_list[] = $arr;
 					}
 				}
-				$list = get_post_meta($rideid, '_signup_nonmember_id');
+				$list = get_post_meta($rideid, self::RIDE_SIGNUP_NONMEMBER);
 				foreach ($list as $item) {
 					$arr = json_decode($item, true);
 					if ($arr['attended']) {
@@ -1741,7 +1769,7 @@ class PwtcMapdb {
 				}
 
 				$ride_title = get_the_title($rideid);
-				$date = DateTime::createFromFormat('Y-m-d H:i:s', get_field('date', $rideid));
+				$date = DateTime::createFromFormat('Y-m-d H:i:s', get_field(self::RIDE_DATE, $rideid));
 				$ride_date = $date->format('m/d/Y g:ia');
 			}
 			else {
@@ -1956,7 +1984,7 @@ EOT;
 				if ($mileage != $oldmileage or $attended != $oldattended) {
 					$oldvalue = json_encode(array('userid' => $userid, 'mileage' => $oldmileage, 'attended' => boolval($oldattended)));
 					$value = json_encode(array('userid' => $userid, 'mileage' => $mileage, 'attended' => boolval($attended)));
-					if (update_post_meta($postid, '_signup_user_id', $value, $oldvalue)) {
+					if (update_post_meta($postid, self::RIDE_SIGNUP_USERID, $value, $oldvalue)) {
 						$response = array(
 							'postid' => $postid,
 							'userid' => $userid,
@@ -2009,7 +2037,7 @@ EOT;
 			}
 			else {
 				if ($attended != $oldattended) {
-					$list = get_post_meta($postid, '_signup_nonmember_id');
+					$list = get_post_meta($postid, self::RIDE_SIGNUP_NONMEMBER);
 					$oldvalue = '';
 					foreach($list as $item) {
 						$arr = json_decode($item, true);
@@ -2021,7 +2049,7 @@ EOT;
 					if (!empty($oldvalue)) {
 						$arr = json_decode($oldvalue, true);
 						$value = json_encode(array('signup_id' => $arr['signup_id'], 'name' => $arr['name'], 'contact_phone' => $arr['contact_phone'], 'contact_name' => $arr['contact_name'], 'attended' => boolval($attended)));
-						if (update_post_meta($postid, '_signup_nonmember_id', $value, $oldvalue)) {
+						if (update_post_meta($postid, self::RIDE_SIGNUP_NONMEMBER, $value, $oldvalue)) {
 							$response = array(
 								'postid' => $postid,
 								'signup_id' => $signup_id,
@@ -2070,7 +2098,7 @@ EOT;
 			}
 			else {
 				$found = false;
-				$signup_list = get_post_meta($postid, '_signup_nonmember_id');
+				$signup_list = get_post_meta($postid, self::RIDE_SIGNUP_NONMEMBER);
 				foreach($signup_list as $item) {
 					$arr = json_decode($item, true);
 					if ($arr['signup_id'] == $signup_id) {
@@ -2121,8 +2149,8 @@ EOT;
 				);
 			}
 			else {
-				$total_signups = count(get_post_meta($postid, '_signup_user_id')) +
-					count(get_post_meta($postid, '_signup_nonmember_id'));
+				$total_signups = count(get_post_meta($postid, self::RIDE_SIGNUP_USERID)) +
+					count(get_post_meta($postid, self::RIDE_SIGNUP_NONMEMBER));
 				if ($signup_limit > 0 and $total_signups >= $signup_limit) {
 					$response = array(
 						'postid' => $postid,
@@ -2136,7 +2164,7 @@ EOT;
 					}
 					self::delete_all_nonmember_signups($postid, $signup_id);
 					$value = json_encode(array('signup_id' => $signup_id, 'name' => $signup_name, 'contact_phone' => $contact_phone, 'contact_name' => $contact_name, 'attended' => true));
-					add_post_meta($postid, '_signup_nonmember_id', $value);
+					add_post_meta($postid, self::RIDE_SIGNUP_NONMEMBER, $value);
 					$response = array(
 						'postid' => $postid,
 						'signup_id' => ''.$signup_id,
