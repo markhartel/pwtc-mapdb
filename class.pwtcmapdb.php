@@ -95,6 +95,9 @@ class PwtcMapdb {
 		add_action( 'wp_ajax_pwtc_mapdb_edit_nonmember_signup', 
 			array( 'PwtcMapdb', 'edit_nonmember_signup_callback') );
 		
+		add_action( 'wp_ajax_pwtc_mapdb_log_mileage', 
+			array( 'PwtcMapdb', 'log_mileage_callback') );
+		
 		add_action( 'wp_ajax_nopriv_pwtc_mapdb_check_nonmember_signup', 
 			array( 'PwtcMapdb', 'check_nonmember_signup_callback') );
 
@@ -2209,7 +2212,80 @@ EOT;
 		}		
 		echo wp_json_encode($response);
 		wp_die();
-	}	
+	}
+	
+	public static function log_mileage_callback() {
+		if (isset($_POST['postid']) and isset($_POST['nonce'])) {
+			$postid = intval($_POST['postid']);
+			$nonce = $_POST['nonce'];
+			if (!wp_verify_nonce($nonce, 'pwtc_mapdb_log_mileage')) {
+				$response = array(
+					'error' => 'Server security check failed for log mileage.'
+				);
+			}
+			else {
+				$results = PwtcMileage_DB::fetch_ride_by_post_id($postid);
+				if (count($results) > 0) {
+					$response = array(
+						'error' => 'Mileage for this ride has already been logged.'
+					);
+				}
+				else {
+					$title = get_the_title($postid);
+					$date = self::get_ride_start_time($postid);
+					$startdate = $date->format('Y-m-d');
+					$status = PwtcMileage_DB::insert_ride_with_postid($title, $startdate, $postid);
+					if (false === $status or 0 === $status) {
+						$response = array(
+							'error' => 'Could not insert new ridesheet into mileage database.'
+						);
+					}
+					else {
+						$ride_id = PwtcMileage_DB::get_new_ride_id();
+						$leaders = self::get_leader_userids($postid);
+						$nleaders = 0;
+						$nriders = 0;
+						foreach ($leaders as $item) {
+							$memberid = get_field(self::USER_RIDER_ID, 'user_'.$item);
+							$result = PwtcMileage_DB::fetch_rider($memberid);
+							if (count($result) > 0) {
+								PwtcMileage_DB::insert_ride_leader($ride_id, $memberid);
+								$nleaders++;
+							}
+						}
+						$signup_list = get_post_meta($postid, self::RIDE_SIGNUP_USERID);
+						foreach ($signup_list as $item) {
+							$arr = json_decode($item, true);
+							$userid = $arr['userid'];
+							$mileage = $arr['mileage'];
+							$attended = $arr['attended'];
+							if ($attended and !empty($mileage)) {
+								$memberid = get_field(self::USER_RIDER_ID, 'user_'.$userid);
+								$result = PwtcMileage_DB::fetch_rider($memberid);
+								if (count($result) > 0) {
+										PwtcMileage_DB::insert_ride_mileage($ride_id, $memberid, intval($mileage));
+										$nriders++;
+								}
+							}
+						}
+						$response = array(
+							'postid' => $postid,
+							'rideid' => $ride_id,
+							'num_leaders' => $nleaders,
+							'num_riders' => $nriders
+						);											
+					}
+				}
+			}
+		}
+		else {
+			$response = array(
+				'error' => 'Server arguments missing for log mileage.'
+			);		
+		}		
+		echo wp_json_encode($response);
+		wp_die();
+	}
 
 	/*************************************************************/
 	/* Plugin installation and removal functions.
