@@ -816,6 +816,11 @@ class PwtcMapdb {
 			}
 		}
 		
+		$ride_signup_mode = 'no';
+		$ride_signup_cutoff = 0;
+		$ride_signup_window = 0;
+		$ride_signup_limit = 0;
+		
 		ob_start();
 	?>
 
@@ -1113,17 +1118,44 @@ class PwtcMapdb {
 	</script>
 
 	<div id='pwtc-mapdb-view-signup-div'>
-		<ul id="rider-signup-tips" class="accordion" data-accordion="" data-allow-all-closed="true">
-		<li class="accordion-item" data-accordion-item=""><a class="accordion-title" href="#">Instructions</a>
-		<div id="rider-signup-tips-1" class="accordion-content" data-tab-content="">
-		<?php if ($paperless) { ?>
-			Under construction!
-		<?php } else { ?>
-			Under construction!
-		<?php } ?>
-		</div>
-		</li>
-		</ul>
+		<ul class="accordion" data-accordion data-allow-all-closed="true">
+			<li class="accordion-item" data-accordion-item>
+            			<a href="#" class="accordion-title">Click Here For Signup Options</a>
+            			<div class="accordion-content" data-tab-content>
+					<form method="POST">
+						<div class="row">
+							<div class="small-12 medium-6 columns">
+								<label>Online Ride Signup
+									<select name="ride_signup_mode">
+										<option value="no" <?php echo $ride_signup_mode == 'no' ? '': 'selected'; ?>>No</option>
+										<option value="hardcopy"  <?php echo $ride_signup_mode == 'hardcopy' ? 'selected': ''; ?>>Hardcopy</option>
+										<option value="paperless"  <?php echo $ride_signup_mode == 'paperless' ? 'selected': ''; ?>>Paperless</option>
+									</select>
+								</label>
+							</div>
+							<div class="small-12 medium-6 columns">
+								<label>Signup Cutoff (hours)
+									<input type="number" name="signup_cutoff" value="<?php echo $ride_signup_cutoff; ?>"/>
+								</label>
+							</div>
+							<div class="small-12 medium-6 columns">
+								<label>Signup Window (days)
+									<input type="number" name="signup_window" value="<?php echo $ride_signup_window; ?>"/>
+								</label>
+							</div>
+							<div class="small-12 medium-6 columns">
+								<label>Signup Limit (0 means unlimited)
+									<input type="number" name="signup_limit" value="<?php echo $ride_signup_limit; ?>"/>
+								</label>
+							</div>
+						</div>
+						<div class="row column clearfix">
+							<input class="dark button float-left" type="submit" value="Submit"/>
+						</div>
+					</form>
+				</div>
+			</li>
+		</ul>		
 		<?php if (count($signup_list) > 0 or count($nonmember_signup_list) > 0) { ?>
 			<p>The following riders are currently signed up for the ride "<?php echo $ride_title; ?>."</p>
 			<div class="errmsg"></div>
