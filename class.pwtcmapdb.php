@@ -24,6 +24,8 @@ class PwtcMapdb {
 	const RIDE_SIGNUP_LOCKED = '_signup_locked';
 	const RIDE_SIGNUP_USERID = '_signup_user_id';
 	const RIDE_SIGNUP_NONMEMBER = '_signup_nonmember_id';
+	const RIDE_SIGNUP_MODE = '_signup_mode';
+	const RIDE_SIGNUP_CUTOFF = '_signup_cutoff';
 
 	const USER_EMER_PHONE = 'emergency_contact_phone';
 	const USER_EMER_NAME = 'emergency_contact_name';
