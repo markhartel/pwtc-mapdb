@@ -784,12 +784,35 @@ class PwtcMapdb {
 		$ride_link = get_the_permalink($postid);
 		$return_to_ride = 'Click <a href="' . $ride_link . '">here</a> to return to the posted ride.';
 
-		$leader_id = self::get_leader_userid($postid);
-		if ($leader_id == 0) {
-			return '<div class="callout small warning"><p>The leader for ride "' . $ride_title . '" does not allow online signup. ' . $return_to_ride . '</p></div>';			
+		$leaders = self::get_leader_userids($postid);
+		foreach ($leaders as $item) {
+			if ($current_user->ID == $item) {
+				break;
+			}
+			return '<div class="callout small warning"><p>You must be a leader for ride "' . $ride_title . '" to view signups. ' . $return_to_ride . '</p></div>';
+		}
+		
+		if (isset($_POST['ride_signup_mode'])) {
+			delete_post_meta($postid, self::RIDE_SIGNUP_MODE);
+			add_post_meta($postid, self::RIDE_SIGNUP_MODE, $_POST['ride_signup_mode'], true);
 		}
 
-		if (self::get_online_signup_mode($postid, $leader_id) == 'paperless') {
+		if (isset($_POST['ride_signup_cutoff'])) {
+			delete_post_meta($postid, self::RIDE_SIGNUP_CUTOFF);
+			add_post_meta($postid, self::RIDE_SIGNUP_CUTOFF, abs(intval($_POST['ride_signup_cutoff'])), true);
+		}
+
+		$ride_signup_mode = get_post_meta($postid, self::RIDE_SIGNUP_MODE, true);
+		if (!$ride_signup_mode) {
+			$ride_signup_mode = 'no';
+		}
+
+		$ride_signup_cutoff = get_post_meta($postid, self::RIDE_SIGNUP_CUTOFF, true);
+		if (!$ride_signup_cutoff) {
+			$ride_signup_cutoff = 0;
+		}
+
+		if ($ride_signup_mode == 'paperless') {
 			$paperless = $set_mileage = $take_attendance = true;
 		}
 		else {
@@ -797,7 +820,7 @@ class PwtcMapdb {
 		}
 		
 		$now_date = self::get_current_time();
-		$cutoff_date = self::get_signup_cutoff_time($postid, $leader_id);
+		$cutoff_date = self::get_signup_cutoff_time($postid, $ride_signup_mode, $ride_signup_cutoff);
 		$cutoff_date_str = $cutoff_date->format('m/d/Y g:ia');
 
 		$signup_list = get_post_meta($postid, self::RIDE_SIGNUP_USERID);
@@ -816,8 +839,6 @@ class PwtcMapdb {
 			}
 		}
 		
-		$ride_signup_mode = 'no';
-		$ride_signup_cutoff = 0;
 		$ride_signup_window = 0;
 		$ride_signup_limit = 0;
 		
@@ -1135,17 +1156,17 @@ class PwtcMapdb {
 							</div>
 							<div class="small-12 medium-6 columns">
 								<label>Signup Cutoff (hours)
-									<input type="number" name="signup_cutoff" value="<?php echo $ride_signup_cutoff; ?>"/>
+									<input type="number" name="ride_signup_cutoff" value="<?php echo $ride_signup_cutoff; ?>"/>
 								</label>
 							</div>
 							<div class="small-12 medium-6 columns">
 								<label>Signup Window (days)
-									<input type="number" name="signup_window" value="<?php echo $ride_signup_window; ?>"/>
+									<input type="number" name="ride_signup_window" value="<?php echo $ride_signup_window; ?>"/>
 								</label>
 							</div>
 							<div class="small-12 medium-6 columns">
 								<label>Signup Limit (0 means unlimited)
-									<input type="number" name="signup_limit" value="<?php echo $ride_signup_limit; ?>"/>
+									<input type="number" name="ride_signup_limit" value="<?php echo $ride_signup_limit; ?>"/>
 								</label>
 							</div>
 						</div>
@@ -1582,19 +1603,6 @@ class PwtcMapdb {
 		
 		return '';
 	}
-
-	/*
-	public static function get_leader_userid($postid) {
-		$leaders = get_field('ride_leaders', $postid);
-		foreach ($leaders as $leader) {
-			$allow_signup = get_field('allow_ride_signup', 'user_'.$leader['ID']);
-			if ($allow_signup) {
-				return $leader['ID'];
-			}
-		}
-		return 0;		
-	}
-	*/
 	
 	public static function get_leader_userids($postid) {
 		$leaders = get_field(self::RIDE_LEADERS, $postid);
@@ -1636,11 +1644,9 @@ class PwtcMapdb {
 		$cutoff = abs(intval($str));
 		return $cutoff;
 	}
-
-	public static function get_signup_cutoff_time($postid, $leaderid) {
+	
+	public static function get_signup_cutoff_time($postid, $mode, $pad) {
 		$ride_date = self::get_ride_start_time($postid);
-		$pad = self::get_signup_cutoff($postid, $leaderid);
-		$mode = self::get_online_signup_mode($postid, $leaderid);
 		if ($pad > 0) {
 			if ($mode == 'paperless') {
 				$interval = new DateInterval('PT' . $pad . 'H');	
@@ -1665,12 +1671,12 @@ class PwtcMapdb {
 		$now_date = new DateTime(null, $timezone);
 		return $now_date;
 	}
-
-	public static function check_ride_start($postid, $leaderid, $return_to_ride) {
+	
+	public static function check_ride_start($postid, $mode, $pad, $return_to_ride) {
 		$ride_title = get_the_title($postid);
 		$now_date = self::get_current_time();
 		$now_date_str = $now_date->format('m/d/Y g:ia');
-		$cutoff_date = self::get_signup_cutoff_time($postid, $leaderid);
+		$cutoff_date = self::get_signup_cutoff_time($postid, $mode, $pad);
 		$cutoff_date_str = $cutoff_date->format('m/d/Y g:ia');
 		if ($now_date > $cutoff_date) {
 			return '<div class="callout small warning"><p>You cannot signup for ride "' . $ride_title . '" because you are beyond the signup cutoff time. <em>The current time is ' . $now_date_str . ' and the cutoff time is ' . $cutoff_date_str . '.</em> ' . $return_to_ride . '</p></div>';
