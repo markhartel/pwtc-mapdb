@@ -809,7 +809,7 @@ class PwtcMapdb {
 			delete_post_meta($postid, self::RIDE_SIGNUP_CUTOFF);
 			add_post_meta($postid, self::RIDE_SIGNUP_CUTOFF, abs(intval($_POST['ride_signup_cutoff'])), true);
 		}
-
+		
 		$ride_signup_mode = get_post_meta($postid, self::RIDE_SIGNUP_MODE, true);
 		if (!$ride_signup_mode) {
 			$ride_signup_mode = 'no';
@@ -819,22 +819,25 @@ class PwtcMapdb {
 		if (!$ride_signup_cutoff) {
 			$ride_signup_cutoff = 0;
 		}
-
-		if ($ride_signup_mode == 'paperless') {
-			$paperless = $set_mileage = $take_attendance = true;
-		}
-		else {
-			$paperless = $set_mileage = $take_attendance = false;
-		}
 		
-		$now_date = self::get_current_time();
-		$cutoff_date = self::get_signup_cutoff_time($postid, $ride_signup_mode, $ride_signup_cutoff);
-		$cutoff_date_str = $cutoff_date->format('m/d/Y g:ia');
+		$ride_signup_window = 0;
+		$ride_signup_limit = 0;
 
-		$signup_list = get_post_meta($postid, self::RIDE_SIGNUP_USERID);
-		$nonmember_signup_list = get_post_meta($postid, self::RIDE_SIGNUP_NONMEMBER);
+		if ($ride_signup_mode != 'no') {
+			if ($ride_signup_mode == 'paperless') {
+				$paperless = $set_mileage = $take_attendance = true;
+			}
+			else {
+				$paperless = $set_mileage = $take_attendance = false;
+			}
 
-		if ($paperless) {
+			$now_date = self::get_current_time();
+			$cutoff_date = self::get_signup_cutoff_time($postid, $ride_signup_mode, $ride_signup_cutoff);
+			$cutoff_date_str = $cutoff_date->format('m/d/Y g:ia');
+
+			$signup_list = get_post_meta($postid, self::RIDE_SIGNUP_USERID);
+			$nonmember_signup_list = get_post_meta($postid, self::RIDE_SIGNUP_NONMEMBER);
+
 			if (isset($_POST['lock_signup'])) {
 				add_post_meta($postid, self::RIDE_SIGNUP_LOCKED, true, true);
 			}
@@ -847,13 +850,11 @@ class PwtcMapdb {
 			}
 		}
 		
-		$ride_signup_window = 0;
-		$ride_signup_limit = 0;
-		
 		ob_start();
 	?>
 
 	<script type="text/javascript">
+		<?php if ($ride_signup_mode == 'no') { ?>
 		jQuery(document).ready(function($) { 
 
 			$.fn.setCursorPosition = function(pos) {
@@ -1143,9 +1144,8 @@ class PwtcMapdb {
 			});
 		
 		});
-		
+		<?php } ?>
 	</script>
-
 	<div id='pwtc-mapdb-view-signup-div'>
 		<ul class="accordion" data-accordion data-allow-all-closed="true">
 			<li class="accordion-item" data-accordion-item>
@@ -1240,20 +1240,20 @@ class PwtcMapdb {
 		<?php } ?>
 		<div class="row column clearfix">
 			<form method="POST">
-		<?php if ($paperless) { ?>
-			<?php if ($signup_locked) { ?>
+		<?php if ($signup_locked) { ?>
 				<div class="button-group float-left">
+			<?php if ($paperless) { ?>
 				<a class="log_mileage dark button"><i class="fa fa-bicycle"></i> Log Mileage</a>
-				<button class="dark button" type="submit" name="unlock_signup"><i class="fa fa-unlock"></i> Unlock Signup</button>
-				</div>
 			<?php } else { ?>
-				<button class="dark button float-left" type="submit" name="lock_signup" <?php echo $now_date < $cutoff_date ? 'disabled': ''; ?>><i class="fa fa-lock"></i> Lock Signup</button>
-			<?php } ?>
-		<?php } else { ?>
 				<input type="hidden" name="ride_id" value="<?php echo $postid; ?>"/>
 				<input type="hidden" name="unused_rows" value="<?php echo $unused_rows; ?>"/>
-				<button class="dark button float-left" type="submit" name="pwtc_mapdb_download_signup" <?php echo $now_date < $cutoff_date ? 'disabled': ''; ?>><i class="fa fa-download"></i> Signup Sheet</button>
-		<?php } ?>				
+				<button class="dark button" type="submit" name="pwtc_mapdb_download_signup"><i class="fa fa-download"></i> Signup Sheet</button>
+			<?php } ?>
+				<button class="dark button" type="submit" name="unlock_signup"><i class="fa fa-unlock"></i> Unlock Signup</button>
+				</div>
+		<?php } else { ?>
+				<button class="dark button float-left" type="submit" name="lock_signup" <?php echo $now_date < $cutoff_date ? 'disabled': ''; ?>><i class="fa fa-lock"></i> Lock Signup</button>
+		<?php } ?>
 				<a href="<?php echo $ride_link; ?>" class="dark button float-right"><i class="fa fa-chevron-left"></i> Back to Ride</a>
 			</form>
 		</div>
