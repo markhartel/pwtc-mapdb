@@ -1945,8 +1945,8 @@ class PwtcMapdb {
 					$contact = '';
 					$mileage = '';
 					if ($rider_count < count($signup_list)) {
+						$arr = $signup_list[$rider_count];
 						if ($arr['userid']) {
-							$arr = $signup_list[$rider_count];
 							$userid = $arr['userid'];
 							$mileage = $arr['mileage'];
 							$user_info = get_userdata($userid);
