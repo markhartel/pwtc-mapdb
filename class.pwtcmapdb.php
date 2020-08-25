@@ -1052,7 +1052,7 @@ class PwtcMapdb {
 				reset_attended_cell();
 				var cell = $(this);
 				var row = cell.parent();
-				cell.html('<span>Mileage</span><input type="text" value="' + cell.attr('mileage') + '" style="width:50%" maxlength="3" />');
+				cell.html('<span>Mileage</span><input type="number" value="' + cell.attr('mileage') + '" style="width:50%" maxlength="3" />');
 				var input = cell.find('input');
 				input.on('click', function(e) {
 					e.stopPropagation();
