@@ -860,7 +860,7 @@ class PwtcMapdb {
 	?>
 
 	<script type="text/javascript">
-		<?php if ($ride_signup_mode == 'no') { ?>
+		<?php if ($ride_signup_mode != 'no') { ?>
 		jQuery(document).ready(function($) { 
 
 			$.fn.setCursorPosition = function(pos) {
