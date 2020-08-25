@@ -1069,7 +1069,7 @@ class PwtcMapdb {
    					}
 				});
 				input.focus();
-				input.setCursorPosition(3);
+				//input.setCursorPosition(3);
 			});
 			<?php } ?>
 
