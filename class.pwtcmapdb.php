@@ -26,6 +26,7 @@ class PwtcMapdb {
 	const RIDE_SIGNUP_NONMEMBER = '_signup_nonmember_id';
 	const RIDE_SIGNUP_MODE = '_signup_mode';
 	const RIDE_SIGNUP_CUTOFF = '_signup_cutoff';
+	const RIDE_SIGNUP_LIMIT = '_signup_limit';
 
 	const USER_EMER_PHONE = 'emergency_contact_phone';
 	const USER_EMER_NAME = 'emergency_contact_name';
@@ -761,10 +762,8 @@ class PwtcMapdb {
 	
 	// Generates the [pwtc_mapdb_view_signup] shortcode.
 	public static function shortcode_view_signup($atts) {
-		$a = shortcode_atts(array('unused_rows' => 0, 'paperless' => 'no'), $atts);
+		$a = shortcode_atts(array('unused_rows' => 0), $atts);
 		$unused_rows = abs(intval($a['unused_rows']));
-		$paperless = $a['paperless'] == 'yes' ? true : false;
-		$set_mileage = $take_attendance = $paperless;
 		
 		$error = self::check_plugin_dependency();
 		if (!empty($error)) {
@@ -810,6 +809,11 @@ class PwtcMapdb {
 			add_post_meta($postid, self::RIDE_SIGNUP_CUTOFF, abs(intval($_POST['ride_signup_cutoff'])), true);
 		}
 		
+		if (isset($_POST['ride_signup_limit'])) {
+			delete_post_meta($postid, self::RIDE_SIGNUP_LIMIT);
+			add_post_meta($postid, self::RIDE_SIGNUP_LIMIT, abs(intval($_POST['ride_signup_limit'])), true);
+		}
+		
 		$ride_signup_mode = get_post_meta($postid, self::RIDE_SIGNUP_MODE, true);
 		if (!$ride_signup_mode) {
 			$ride_signup_mode = 'no';
@@ -820,8 +824,10 @@ class PwtcMapdb {
 			$ride_signup_cutoff = 0;
 		}
 		
-		$ride_signup_window = 0;
-		$ride_signup_limit = 0;
+		$ride_signup_limit = get_post_meta($postid, self::RIDE_SIGNUP_LIMIT, true);
+		if (!$ride_signup_limit) {
+			$ride_signup_limit = 0;
+		}
 
 		if ($ride_signup_mode != 'no') {
 			if ($ride_signup_mode == 'paperless') {
@@ -1153,7 +1159,7 @@ class PwtcMapdb {
             			<div class="accordion-content" data-tab-content>
 					<form method="POST">
 						<div class="row">
-							<div class="small-12 medium-6 columns">
+							<div class="small-12 medium-4 columns">
 								<label>Online Ride Signup
 									<select name="ride_signup_mode">
 										<option value="no" <?php echo $ride_signup_mode == 'no' ? '': 'selected'; ?>>No</option>
@@ -1162,17 +1168,12 @@ class PwtcMapdb {
 									</select>
 								</label>
 							</div>
-							<div class="small-12 medium-6 columns">
+							<div class="small-12 medium-4 columns">
 								<label>Signup Cutoff (hours)
 									<input type="number" name="ride_signup_cutoff" value="<?php echo $ride_signup_cutoff; ?>"/>
 								</label>
 							</div>
-							<div class="small-12 medium-6 columns">
-								<label>Signup Window (days)
-									<input type="number" name="ride_signup_window" value="<?php echo $ride_signup_window; ?>"/>
-								</label>
-							</div>
-							<div class="small-12 medium-6 columns">
+							<div class="small-12 medium-4 columns">
 								<label>Signup Limit (0 means unlimited)
 									<input type="number" name="ride_signup_limit" value="<?php echo $ride_signup_limit; ?>"/>
 								</label>
