@@ -786,12 +786,18 @@ class PwtcMapdb {
 		$ride_link = get_the_permalink($postid);
 		$return_to_ride = 'Click <a href="' . $ride_link . '">here</a> to return to the posted ride.';
 
-		$leaders = self::get_leader_userids($postid);
-		foreach ($leaders as $item) {
-			if ($current_user->ID == $item) {
-				break;
+		if (!user_can($current_user,'edit_published_rides')) {
+			$denied = true;
+			$leaders = self::get_leader_userids($postid);
+			foreach ($leaders as $item) {
+				if ($current_user->ID == $item) {
+					$denied = false;
+					break;
+				}
 			}
-			return '<div class="callout small warning"><p>You must be a leader for ride "' . $ride_title . '" to view signups. ' . $return_to_ride . '</p></div>';
+			if ($denied) {
+				return '<div class="callout small warning"><p>You must be a leader for ride "' . $ride_title . '" to view signups. ' . $return_to_ride . '</p></div>';
+			}
 		}
 		
 		if (isset($_POST['ride_signup_mode'])) {
@@ -817,8 +823,11 @@ class PwtcMapdb {
 		if ($ride_signup_mode == 'paperless') {
 			$paperless = $set_mileage = $take_attendance = true;
 		}
-		else {
+		else if ($ride_signup_mode == 'hardcopy') {
 			$paperless = $set_mileage = $take_attendance = false;
+		}
+		else {
+			return '<div class="callout small warning"><p>Online signup is not enabled for ride "' . $ride_title . '." ' . $return_to_ride . '</p></div>';			
 		}
 		
 		$now_date = self::get_current_time();
@@ -882,7 +891,7 @@ class PwtcMapdb {
 			}
 
 			function show_errmsg2_wait() {
-				$('#pwtc-mapdb-view-signup-div .errmsg2').html('<i class="fa fa-spinner fa-pulse waiting"></i> please wait...');
+				$('#pwtc-mapdb-view-signup-div .errmsg2').html('<div class="callout small"><i class="fa fa-spinner fa-pulse waiting"></i> please wait...</div>');
 			}
 
 			function clear_errmsg2() {
