@@ -823,11 +823,8 @@ class PwtcMapdb {
 		if ($ride_signup_mode == 'paperless') {
 			$paperless = $set_mileage = $take_attendance = true;
 		}
-		else if ($ride_signup_mode == 'hardcopy') {
-			$paperless = $set_mileage = $take_attendance = false;
-		}
 		else {
-			return '<div class="callout small warning"><p>Online signup is not enabled for ride "' . $ride_title . '." ' . $return_to_ride . '</p></div>';			
+			$paperless = $set_mileage = $take_attendance = false;
 		}
 		
 		$now_date = self::get_current_time();
@@ -1188,6 +1185,9 @@ class PwtcMapdb {
 				</div>
 			</li>
 		</ul>		
+		<?php if ($ride_signup_mode == 'no') { ?>
+			<div class="callout small"><p>Online signup is not enabled for ride "<?php echo $ride_title; ?>." <?php echo $return_to_ride; ?></p></div>
+		<?php } else { ?>
 		<?php if (count($signup_list) > 0 or count($nonmember_signup_list) > 0) { ?>
 			<p>The following riders are currently signed up for the ride "<?php echo $ride_title; ?>."</p>
 			<div class="errmsg"></div>
@@ -1255,6 +1255,7 @@ class PwtcMapdb {
 				<a href="<?php echo $ride_link; ?>" class="dark button float-right"><i class="fa fa-chevron-left"></i> Back to Ride</a>
 			</form>
 		</div>
+		<?php } ?>
 	</div>
 	<?php
 		return ob_get_clean();
