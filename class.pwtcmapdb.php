@@ -701,9 +701,9 @@ class PwtcMapdb {
 			}
 		}
 
-		if ($accept_signup and $signup_limit > 0) {
-			if (count($signup_list) >= $signup_limit) {
-				return '<div class="callout small warning"><p>You cannot signup for ride "' . $ride_title . '" because it is full. <em>A maximumm of ' . $signup_limit . ' riders are allowed on this ride.</em> ' . $return_to_ride . '</p></div>';
+		if ($accept_signup and $ride_signup_limit > 0) {
+			if (count($signup_list)+count(get_post_meta($postid, self::RIDE_SIGNUP_NONMEMBER)) >= $ride_signup_limit) {
+				return '<div class="callout small warning"><p>You cannot signup for ride "' . $ride_title . '" because it is full. <em>A maximumm of ' . $ride_signup_limit . ' riders are allowed on this ride.</em> ' . $return_to_ride . '</p></div>';
 			}
 		}
 
