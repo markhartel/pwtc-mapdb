@@ -32,7 +32,7 @@ class PwtcMapdb {
 	const USER_EMER_NAME = 'emergency_contact_name';
 	const USER_SIGNUP_MODE = 'online_ride_signup';
 	const USER_SIGNUP_CUTOFF = 'signup_cutoff_time';
-	const USER_SIGNUP_LIMIT = 'signup_limit';
+	const USER_SIGNUP_LIMIT = 'signup_count_limit';
 	const USER_USE_EMAIL = 'use_contact_email';
 	const USER_CONTACT_EMAIL = 'contact_email';
 	const USER_CELL_PHONE = 'cell_phone';
@@ -1755,34 +1755,39 @@ class PwtcMapdb {
 		}
 		if (isset($_POST['use_contact_email'])) {
 			if ($_POST['use_contact_email'] == 'yes') {
-				update_field('use_contact_email', true, 'user_'.$userid);
+				update_field(self::USER_USE_EMAIL, true, 'user_'.$userid);
 			}
 			else {
-				update_field('use_contact_email', false, 'user_'.$userid);
+				update_field(self::USER_USE_EMAIL, false, 'user_'.$userid);
 			}
 		}
 		if (isset($_POST['ride_signup_mode'])) {
-			update_field('online_ride_signup', $_POST['ride_signup_mode'], 'user_'.$userid);
+			update_field(self::USER_SIGNUP_MODE, $_POST['ride_signup_mode'], 'user_'.$userid);
 		}
 		if (isset($_POST['contact_email'])) {
-			update_field('contact_email', sanitize_email($_POST['contact_email']), 'user_'.$userid);
+			update_field(self::USER_CONTACT_EMAIL, sanitize_email($_POST['contact_email']), 'user_'.$userid);
 		}
 		if (isset($_POST['voice_phone'])) {
-			update_field('cell_phone', pwtc_members_format_phone_number($_POST['voice_phone']), 'user_'.$userid);
+			update_field(self::USER_CELL_PHONE, pwtc_members_format_phone_number($_POST['voice_phone']), 'user_'.$userid);
 		}
 		if (isset($_POST['text_phone'])) {
-			update_field('home_phone', pwtc_members_format_phone_number($_POST['text_phone']), 'user_'.$userid);
+			update_field(self::USER_HOME_PHONE, pwtc_members_format_phone_number($_POST['text_phone']), 'user_'.$userid);
 		}
 		if (isset($_POST['signup_cutoff'])) {
-			$val = intval($_POST['signup_cutoff']);
-			update_field('signup_cutoff_time', $val, 'user_'.$userid);
+			$val = abs(intval($_POST['signup_cutoff']));
+			update_field(self::USER_SIGNUP_CUTOFF, $val, 'user_'.$userid);
 		}
-		$voice_phone = pwtc_members_format_phone_number(get_field('cell_phone', 'user_'.$userid));
-		$text_phone = pwtc_members_format_phone_number(get_field('home_phone', 'user_'.$userid));
-		$contact_email = get_field('contact_email', 'user_'.$userid);
-		$use_contact_email = get_field('use_contact_email', 'user_'.$userid);
-		$ride_signup_mode = get_field('online_ride_signup', 'user_'.$userid);
-		$signup_cutoff = intval(get_field('signup_cutoff_time', 'user_'.$userid));
+		if (isset($_POST['signup_limit'])) {
+			$val = abs(intval($_POST['signup_limit']));
+			update_field(self::USER_SIGNUP_LIMIT, $val, 'user_'.$userid);
+		}
+		$voice_phone = pwtc_members_format_phone_number(get_field(self::USER_CELL_PHONE, 'user_'.$userid));
+		$text_phone = pwtc_members_format_phone_number(get_field(self::USER_HOME_PHONE, 'user_'.$userid));
+		$contact_email = get_field(self::USER_CONTACT_EMAIL, 'user_'.$userid);
+		$use_contact_email = get_field(self::USER_USE_EMAIL, 'user_'.$userid);
+		$ride_signup_mode = get_field(self::USER_SIGNUP_MODE, 'user_'.$userid);
+		$signup_cutoff = abs(intval(get_field(self::USER_SIGNUP_CUTOFF, 'user_'.$userid)));
+		$signup_limit = abs(intval(get_field(self::USER_SIGNUP_LIMIT, 'user_'.$userid)));
 		ob_start();
 		?>
 		<div class="callout">
@@ -1821,8 +1826,13 @@ class PwtcMapdb {
 						</label>
 					</div>
 					<div class="small-12 medium-6 columns">
-						<label>Signup Cutoff Time (hours before start)
+						<label>Signup Cutoff Time (hours)
 							<input type="text" name="signup_cutoff" value="<?php echo $signup_cutoff; ?>"/>
+						</label>
+					</div>
+					<div class="small-12 medium-6 columns">
+						<label>Signup Count Limit ()
+							<input type="text" name="signup_limit" value="<?php echo $signup_limit; ?>"/>
 						</label>
 					</div>
 				</div>
