@@ -1186,12 +1186,12 @@ class PwtcMapdb {
 								</label>
 							</div>
 							<div class="small-12 medium-4 columns">
-								<label>Signup Cutoff (hours)
+								<label>Signup Cutoff Time (hours)
 									<input type="number" name="ride_signup_cutoff" value="<?php echo $ride_signup_cutoff; ?>"/>
 								</label>
 							</div>
 							<div class="small-12 medium-4 columns">
-								<label>Signup Limit (0 means unlimited)
+								<label>Signup Count Limit (0 means unlimited)
 									<input type="number" name="ride_signup_limit" value="<?php echo $ride_signup_limit; ?>"/>
 								</label>
 							</div>
@@ -1676,7 +1676,6 @@ class PwtcMapdb {
 			}
 		}
 
-		/*
 		if (count(get_post_meta($postid, self::RIDE_SIGNUP_LIMIT)) == 0) {
 			if (count($leaders) > 0) {
 				add_post_meta($postid, self::RIDE_SIGNUP_LIMIT, abs(intval(get_field(self::USER_SIGNUP_LIMIT, 'user_'.$leaders[0]))), true);
@@ -1685,7 +1684,6 @@ class PwtcMapdb {
 				add_post_meta($postid, self::RIDE_SIGNUP_LIMIT, 0, true);
 			}
 		}
-		*/
 	}
 	
 	public static function get_signup_cutoff_time($postid, $mode, $pad) {
@@ -1827,12 +1825,12 @@ class PwtcMapdb {
 					</div>
 					<div class="small-12 medium-6 columns">
 						<label>Signup Cutoff Time (hours)
-							<input type="text" name="signup_cutoff" value="<?php echo $signup_cutoff; ?>"/>
+							<input type="number" name="signup_cutoff" value="<?php echo $signup_cutoff; ?>"/>
 						</label>
 					</div>
 					<div class="small-12 medium-6 columns">
-						<label>Signup Count Limit ()
-							<input type="text" name="signup_limit" value="<?php echo $signup_limit; ?>"/>
+						<label>Signup Count Limit (0 means unlimited)
+							<input type="number" name="signup_limit" value="<?php echo $signup_limit; ?>"/>
 						</label>
 					</div>
 				</div>
