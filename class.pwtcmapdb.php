@@ -32,6 +32,7 @@ class PwtcMapdb {
 	const USER_EMER_NAME = 'emergency_contact_name';
 	const USER_SIGNUP_MODE = 'online_ride_signup';
 	const USER_SIGNUP_CUTOFF = 'signup_cutoff_time';
+	const USER_SIGNUP_LIMIT = 'signup_limit';
 	const USER_USE_EMAIL = 'use_contact_email';
 	const USER_CONTACT_EMAIL = 'contact_email';
 	const USER_CELL_PHONE = 'cell_phone';
