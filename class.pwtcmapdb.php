@@ -792,6 +792,10 @@ class PwtcMapdb {
 		$ride_title = get_the_title($postid);
 		$ride_link = get_the_permalink($postid);
 		$return_to_ride = 'Click <a href="' . $ride_link . '">here</a> to return to the posted ride.';
+		
+		if (get_field(self::RIDE_CANCELED, $postid)) {
+			return '<div class="callout small warning"><p>The ride "' . $ride_title . '" has been canceled, no signup view allowed. ' . $return_to_ride . '</p></div>';
+		}
 
 		if (!user_can($current_user,'edit_published_rides')) {
 			$denied = true;
