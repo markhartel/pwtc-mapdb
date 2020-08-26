@@ -626,6 +626,8 @@ class PwtcMapdb {
 			return '<div class="callout small warning"><p>You must be a club member to signup for rides. ' . $return_to_ride . '</p></div>';
 		}
 		
+		self::init_online_signup($postid);
+		
 		$ride_signup_mode = get_post_meta($postid, self::RIDE_SIGNUP_MODE, true);
 		if (!$ride_signup_mode) {
 			$ride_signup_mode = 'no';
@@ -826,6 +828,8 @@ class PwtcMapdb {
 			delete_post_meta($postid, self::RIDE_SIGNUP_LIMIT);
 			add_post_meta($postid, self::RIDE_SIGNUP_LIMIT, abs(intval($_POST['ride_signup_limit'])), true);
 		}
+		
+		self::init_online_signup($postid);
 		
 		$ride_signup_mode = get_post_meta($postid, self::RIDE_SIGNUP_MODE, true);
 		if (!$ride_signup_mode) {
@@ -1327,6 +1331,8 @@ class PwtcMapdb {
 		if (get_field(self::RIDE_CANCELED, $postid)) {
 			return '<div class="callout small warning"><p>The ride "' . $ride_title . '" has been canceled, no signup allowed. ' . $return_to_ride . '</p></div>';
 		}
+		
+		self::init_online_signup($postid);
 
 		$ride_signup_mode = get_post_meta($postid, self::RIDE_SIGNUP_MODE, true);
 		if (!$ride_signup_mode) {
@@ -1648,6 +1654,38 @@ class PwtcMapdb {
 			$userids[] = $leader['ID'];
 		}
 		return $userids;		
+	}
+	
+	public static function init_online_signup($postid) {
+		$leaders = self::get_leader_userids($postid);
+		if (count(get_post_meta($postid, self::RIDE_SIGNUP_MODE)) == 0) {
+			if (count($leaders) > 0) {
+				add_post_meta($postid, self::RIDE_SIGNUP_MODE, get_field(self::USER_SIGNUP_MODE, 'user_'.$leaders[0]), true);
+			}
+			else {
+				add_post_meta($postid, self::RIDE_SIGNUP_MODE, 'no', true);
+			}
+		}
+
+		if (count(get_post_meta($postid, self::RIDE_SIGNUP_CUTOFF)) == 0) {
+			if (count($leaders) > 0) {
+				add_post_meta($postid, self::RIDE_SIGNUP_CUTOFF, abs(intval(get_field(self::USER_SIGNUP_CUTOFF, 'user_'.$leaders[0]))), true);
+			}
+			else {
+				add_post_meta($postid, self::RIDE_SIGNUP_CUTOFF, 0, true);
+			}
+		}
+
+		/*
+		if (count(get_post_meta($postid, self::RIDE_SIGNUP_LIMIT)) == 0) {
+			if (count($leaders) > 0) {
+				add_post_meta($postid, self::RIDE_SIGNUP_LIMIT, abs(intval(get_field(self::USER_SIGNUP_LIMIT, 'user_'.$leaders[0]))), true);
+			}
+			else {
+				add_post_meta($postid, self::RIDE_SIGNUP_LIMIT, 0, true);
+			}
+		}
+		*/
 	}
 	
 	public static function get_signup_cutoff_time($postid, $mode, $pad) {
