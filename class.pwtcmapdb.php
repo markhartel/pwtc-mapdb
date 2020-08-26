@@ -1301,10 +1301,6 @@ class PwtcMapdb {
 	
 	// Generates the [pwtc_mapdb_nonmember_signup] shortcode.
 	public static function shortcode_nonmember_signup($atts) {
-		$a = shortcode_atts(array('signup_limit' => 0, 'paperless' => 'no'), $atts);
-		$signup_limit = abs(intval($a['signup_limit']));
-		$paperless = $a['paperless'] == 'yes' ? true : false;
-
 		$error = self::check_plugin_dependency();
 		if (!empty($error)) {
 			return $error;
@@ -1331,20 +1327,33 @@ class PwtcMapdb {
 			return '<div class="callout small warning"><p>The ride "' . $ride_title . '" has been canceled, no signup allowed. ' . $return_to_ride . '</p></div>';
 		}
 
-		$signup_locked = get_post_meta($postid, self::RIDE_SIGNUP_LOCKED, true);
-		if ($signup_locked) {
-			return '<div class="callout small warning"><p>You cannot signup for ride "' . $ride_title . '" because it is locked. ' . $return_to_ride . '</p></div>';	
+		$ride_signup_mode = get_post_meta($postid, self::RIDE_SIGNUP_MODE, true);
+		if (!$ride_signup_mode) {
+			$ride_signup_mode = 'no';
 		}
 
-		$leader_id = self::get_leader_userid($postid);
-		if ($leader_id == 0) {
+		$ride_signup_cutoff = get_post_meta($postid, self::RIDE_SIGNUP_CUTOFF, true);
+		if (!$ride_signup_cutoff) {
+			$ride_signup_cutoff = 0;
+		}
+		
+		$ride_signup_limit = get_post_meta($postid, self::RIDE_SIGNUP_LIMIT, true);
+		if (!$ride_signup_limit) {
+			$ride_signup_limit = 0;
+		}
+
+		if ($ride_signup_mode == 'no') {
 			return '<div class="callout small warning"><p>The leader for ride "' . $ride_title . '" does not allow online signup. ' . $return_to_ride . '</p></div>';			
 		}
 
-
-		$error = self::check_ride_start($postid, $leader_id, $return_to_ride);
+		$error = self::check_ride_start($postid, $ride_signup_mode, $ride_signup_cutoff, $return_to_ride);
 		if (!empty($error)) {
 			return $error;
+		}
+
+		$signup_locked = get_post_meta($postid, self::RIDE_SIGNUP_LOCKED, true);
+		if ($signup_locked) {
+			return '<div class="callout small warning"><p>You cannot signup for ride "' . $ride_title . '" because it is locked. ' . $return_to_ride . '</p></div>';	
 		}
 
 		ob_start();
@@ -1503,7 +1512,7 @@ class PwtcMapdb {
 						'signup_name': your_name,
 						'signup_contact_phone': contact_phone,
 						'signup_contact_name': contact_name,
-						'signup_limit': <?php echo $signup_limit ?>
+						'signup_limit': <?php echo $ride_signup_limit; ?>
 					};
 					$.post(action, data, accept_signup_cb);
 					$('#pwtc-mapdb-nonmember-signup-div .accept_div').hide();
