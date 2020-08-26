@@ -741,7 +741,7 @@ class PwtcMapdb {
 			<?php if ($set_mileage) { ?>
 						<div class="small-12 medium-6 columns">
 							<label>Mileage
-								<input type="text" name="mileage" value="<?php echo $mileage; ?>" maxlength="3"/>
+								<input type="number" name="mileage" value="<?php echo $mileage; ?>" maxlength="3"/>
 							</label>
 						</div>
 			<?php } ?>
