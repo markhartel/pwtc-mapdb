@@ -1648,38 +1648,6 @@ class PwtcMapdb {
 		}
 		return $userids;		
 	}
-
-	public static function get_leader_userid($postid) {
-		$userids = self::get_leader_userids($postid);
-		if (count($userids) > 0) {
-			$userid = -1;
-			foreach ($userids as $id) {
-				$signup_mode = self::get_online_signup_mode($postid, $id);
-				if ($signup_mode != 'no') {
-					if ($userid < 0) {
-						$userid = $id;
-					}
-				}
-				else {
-					return 0;
-				}
-			}
-			return $userid;
-		}
-		else {
-			return 0;
-		}
-	}
-
-	public static function get_online_signup_mode($postid, $leaderid) {
-		return get_field('online_ride_signup', 'user_'.$leaderid);
-	}
-
-	public static function get_signup_cutoff($postid, $leaderid) {
-		$str = get_field('signup_cutoff_time', 'user_'.$leaderid);
-		$cutoff = abs(intval($str));
-		return $cutoff;
-	}
 	
 	public static function get_signup_cutoff_time($postid, $mode, $pad) {
 		$ride_date = self::get_ride_start_time($postid);
