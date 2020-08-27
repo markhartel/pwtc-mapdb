@@ -85,6 +85,9 @@ class PwtcMapdb {
 		add_shortcode('pwtc_mapdb_nonmember_signup', 
 			array( 'PwtcMapdb', 'shortcode_nonmember_signup'));
 		
+		add_shortcode('pwtc_mapdb_show_userid_signups', 
+			array( 'PwtcMapdb', 'shortcode_show_userid_signups'));
+		
 		add_shortcode('pwtc_mapdb_download_signup', 
 			array( 'PwtcMapdb', 'shortcode_download_signup'));
 
@@ -1610,6 +1613,63 @@ class PwtcMapdb {
 	</div>
 
 	<?php
+		return ob_get_clean();
+	}
+	
+	// Generates the [pwtc_mapdb_show_userid_signups] shortcode.
+	public static function shortcode_show_userid_signups($atts) {
+		$current_user = wp_get_current_user();
+		if ( 0 == $current_user->ID ) {
+			return '<div class="callout small warning"><p>Please <a href="/wp-login.php">log in</a> to view the rides for which you have signed up.</p></div>';
+		}
+
+		$now = self::get_current_time();
+		$query_args = [
+			'posts_per_page' => -1,
+			'post_type' => 'scheduled_rides',
+			'meta_query' => [
+				[
+					'key' => 'date',
+					'value' => $now->format('Y-m-d 00:00:00'),
+					'compare' => '>=',
+					'type' => 'DATETIME'
+				],
+			],
+			'orderby' => ['date' => 'ASC'],
+		];		
+		$query = new WP_Query($query_args);
+
+		if (!$query->have_posts()) {
+			return '<div class="callout small"><p>You are not signed up for any upcoming rides.</p></div>';
+		}
+
+		ob_start();
+		?>
+
+	<div id="pwtc-mapdb-show-signups-div">
+		<table class="pwtc-mapdb-rwd-table">
+			<thead><tr><th>Ride Name</th><th>Start Time</th></tr></thead>
+			<tbody>
+		<?php
+
+		while ($query->have_posts()) {
+			$query->the_post();
+			$title = get_the_title();
+            $link = get_the_permalink();
+			$start = DateTime::createFromFormat('Y-m-d H:i:s', get_field('date'))->format('m/d/Y g:ia');
+		?>
+			<tr>
+				<td><span>Ride Name</span><a href="<?php echo $link; ?>"><?php echo $title; ?></a></td>
+				<td><span>Start Time</span><?php echo $start; ?></td>
+			</tr>
+		<?php
+		}
+		wp_reset_postdata();
+		?>
+			</tbody>
+		</table>
+	</div>
+		<?php
 		return ob_get_clean();
 	}
 	
