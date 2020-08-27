@@ -1197,7 +1197,7 @@ class PwtcMapdb {
 							</div>
 						</div>
 						<div class="row column clearfix">
-							<input class="dark button float-left" type="submit" value="Submit"/>
+							<input class="accent button float-left" type="submit" value="Submit"/>
 						</div>
 					</form>
 				</div>
