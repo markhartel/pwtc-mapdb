@@ -1634,6 +1634,11 @@ class PwtcMapdb {
 					'compare' => '>=',
 					'type' => 'DATETIME'
 				],
+				[
+					'key' => self::RIDE_SIGNUP_USERID,
+					'value' => '"userid":' . $current_user->ID . ',',
+					'compare' => 'LIKE'
+				],				
 			],
 			'orderby' => ['date' => 'ASC'],
 		];		
