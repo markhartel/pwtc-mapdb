@@ -1623,6 +1623,9 @@ class PwtcMapdb {
 			return '<div class="callout small warning"><p>Please <a href="/wp-login.php">log in</a> to view the rides for which you have signed up.</p></div>';
 		}
 
+		$user_info = get_userdata($current_user->ID);
+		$rider_name = $user_info->first_name . ' ' . $user_info->last_name;
+
 		$now = self::get_current_time();
 		$query_args = [
 			'posts_per_page' => -1,
@@ -1638,22 +1641,23 @@ class PwtcMapdb {
 					'key' => self::RIDE_SIGNUP_USERID,
 					'value' => '"userid":' . $current_user->ID . ',',
 					'compare' => 'LIKE'
-				],				
+				],
 			],
 			'orderby' => ['date' => 'ASC'],
 		];		
 		$query = new WP_Query($query_args);
 
 		if (!$query->have_posts()) {
-			return '<div class="callout small"><p>You are not signed up for any upcoming rides.</p></div>';
+			return '<div class="callout small"><p>Hello ' . $rider_name . ', you are not signed up for any upcoming rides.</p></div>';
 		}
 
 		ob_start();
 		?>
 
 	<div id="pwtc-mapdb-show-signups-div">
+		<p>Hello <?php echo $rider_name; ?>, you are signed up for the following upcoming rides.</p>
 		<table class="pwtc-mapdb-rwd-table">
-			<thead><tr><th>Ride Name</th><th>Start Time</th></tr></thead>
+			<thead><tr><th>Start Time</th><th>Ride Title</th></tr></thead>
 			<tbody>
 		<?php
 
@@ -1664,8 +1668,8 @@ class PwtcMapdb {
 			$start = DateTime::createFromFormat('Y-m-d H:i:s', get_field('date'))->format('m/d/Y g:ia');
 		?>
 			<tr>
-				<td><span>Ride Name</span><a href="<?php echo $link; ?>"><?php echo $title; ?></a></td>
 				<td><span>Start Time</span><?php echo $start; ?></td>
+				<td><span>Ride Title</span><a href="<?php echo $link; ?>"><?php echo $title; ?></a></td>	
 			</tr>
 		<?php
 		}
