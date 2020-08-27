@@ -1660,7 +1660,11 @@ class PwtcMapdb {
 		$leaders = self::get_leader_userids($postid);
 		if (count(get_post_meta($postid, self::RIDE_SIGNUP_MODE)) == 0) {
 			if (count($leaders) > 0) {
-				add_post_meta($postid, self::RIDE_SIGNUP_MODE, get_field(self::USER_SIGNUP_MODE, 'user_'.$leaders[0]), true);
+				$mode = get_field(self::USER_SIGNUP_MODE, 'user_'.$leaders[0]);
+				if (!$mode) {
+					$mode = 'no';
+				}
+				add_post_meta($postid, self::RIDE_SIGNUP_MODE, $mode, true);
 			}
 			else {
 				add_post_meta($postid, self::RIDE_SIGNUP_MODE, 'no', true);
@@ -1784,6 +1788,9 @@ class PwtcMapdb {
 		$contact_email = get_field(self::USER_CONTACT_EMAIL, 'user_'.$userid);
 		$use_contact_email = get_field(self::USER_USE_EMAIL, 'user_'.$userid);
 		$ride_signup_mode = get_field(self::USER_SIGNUP_MODE, 'user_'.$userid);
+		if (!$ride_signup_mode) {
+			$ride_signup_mode = 'no';
+		}
 		$signup_cutoff = abs(intval(get_field(self::USER_SIGNUP_CUTOFF, 'user_'.$userid)));
 		$signup_limit = abs(intval(get_field(self::USER_SIGNUP_LIMIT, 'user_'.$userid)));
 		ob_start();
