@@ -1176,8 +1176,8 @@ class PwtcMapdb {
 		
 			$("#pwtc-mapdb-view-signup-div select[name='ride_signup_mode']").change(function() {
 				$(this).find('option:selected').each(function() {
-					val mode = $(this).val();
-					val label = '(hours)';
+					var mode = $(this).val();
+					var label = '(hours)';
 					if (mode == 'paperless') {
 						label = '(hours after ride start)';
 					} else if (mode == 'hardcopy') {
