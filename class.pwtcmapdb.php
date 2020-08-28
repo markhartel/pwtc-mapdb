@@ -1259,7 +1259,6 @@ class PwtcMapdb {
 		<?php } else { ?>
 			<div class="callout small"><p>There are currently no riders signed up for the ride "<?php echo $ride_title; ?>."</p></div>
 		<?php } ?>
-			<div class="errmsg2"></div>
 		<?php if ($signup_locked) { ?>
 			<?php if ($paperless) { ?>
 				<div class="callout small success"><p>Online signup is closed, you may now log the rider mileage to the mileage database.</p></div>
@@ -1272,7 +1271,8 @@ class PwtcMapdb {
 			<?php } else { ?>
 				<div class="callout small success"><p>The period for online signup is past, you may now close it.</p></div>
 			<?php } ?>
-		<?php } ?>		
+		<?php } ?>
+		<div class="errmsg2"></div>
 		<div class="row column clearfix">
 			<form method="POST">
 		<?php if ($signup_locked) { ?>
