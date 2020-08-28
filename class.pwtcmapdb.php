@@ -852,9 +852,11 @@ class PwtcMapdb {
 		if ($ride_signup_mode != 'no') {
 			if ($ride_signup_mode == 'paperless') {
 				$paperless = $set_mileage = $take_attendance = true;
+				$cutoff_units = '(hours after ride start)';
 			}
 			else {
 				$paperless = $set_mileage = $take_attendance = false;
+				$cutoff_units = '(hours before ride start)';
 			}
 
 			$now_date = self::get_current_time();
@@ -874,6 +876,9 @@ class PwtcMapdb {
 			if ($signup_locked) {
 				$set_mileage = $take_attendance = false;
 			}
+		}
+		else {
+			$cutoff_units = '(hours)';
 		}
 		
 		ob_start();
@@ -1169,6 +1174,19 @@ class PwtcMapdb {
 				show_errmsg2_wait();
 			});
 		
+			$("#pwtc-mapdb-view-signup-div select[name='ride_signup_mode']").change(function() {
+				$(this).find('option:selected').each(function() {
+					val mode = $(this).val();
+					val label = '(hours)';
+					if (mode == 'paperless') {
+						label = '(hours after ride start)';
+					} else if (mode == 'hardcopy') {
+						label = '(hours before ride start)';
+					}
+					$('#pwtc-mapdb-view-signup-div .cutoff_units').html(label);
+				});
+			});
+		
 		});
 		<?php } ?>
 	</script>
@@ -1189,7 +1207,7 @@ class PwtcMapdb {
 								</label>
 							</div>
 							<div class="small-12 medium-4 columns">
-								<label>Signup Cutoff Time (hours)
+								<label>Signup Cutoff <span class="cutoff_units"><?php echo $cutoff_units; ?></span>
 									<input type="number" name="ride_signup_cutoff" value="<?php echo $ride_signup_cutoff; ?>"/>
 								</label>
 							</div>
