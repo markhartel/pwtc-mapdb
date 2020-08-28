@@ -1238,6 +1238,7 @@ class PwtcMapdb {
 					</div>
 				</li>
 			</ul>
+			<?php } ?>
 			<div class="errmsg"></div>
 			<table class="pwtc-mapdb-rwd-table"><thead><tr><th>Name</th><th>Rider ID</th><th>Mileage</th><th>Emergency Contact</th></tr></thead><tbody>
 			<?php foreach($signup_list as $item) { 
