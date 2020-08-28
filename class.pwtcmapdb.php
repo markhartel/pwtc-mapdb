@@ -663,7 +663,7 @@ class PwtcMapdb {
 
 		$signup_locked = get_post_meta($postid, self::RIDE_SIGNUP_LOCKED, true);
 		if ($signup_locked) {
-			return '<div class="callout small warning"><p>You cannot signup for ride "' . $ride_title . '" because it is locked. ' . $return_to_ride . '</p></div>';	
+			return '<div class="callout small warning"><p>You cannot signup for ride "' . $ride_title . '" because it is closed. ' . $return_to_ride . '</p></div>';	
 		}
 		
 		$mileage = '';
@@ -1256,9 +1256,19 @@ class PwtcMapdb {
 			<div class="callout small"><p>There are currently no riders signed up for the ride "<?php echo $ride_title; ?>."</p></div>
 		<?php } ?>
 			<div class="errmsg2"></div>
-		<?php if ($now_date < $cutoff_date) { ?>
-			<div class="callout small warning"><p>Online signups are allowed until <?php echo $cutoff_date_str; ?>.</p></div>
-		<?php } ?>
+		<?php if ($signup_locked) { ?>
+			<?php if ($paperless) { ?>
+				<div class="callout small success"><p>Online signup is closed, you may now log the rider mileage to the mileage database.</p></div>
+			<?php } else { ?>
+				<div class="callout small success"><p>Online signup is closed, you may now download the ride signup sheet and print it.</p></div>
+			<?php } ?>
+		<?php } else { ?>
+			<?php if ($now_date < $cutoff_date) { ?>
+				<div class="callout small warning"><p>Online signup is allowed until <?php echo $cutoff_date_str; ?>, you cannot close it until then.</p></div>
+			<?php } else { ?>
+				<div class="callout small success"><p>The period for online signup is past, you may now close it.</p></div>
+			<?php } ?>
+		<?php } ?>		
 		<div class="row column clearfix">
 			<form method="POST">
 		<?php if ($signup_locked) { ?>
@@ -1270,10 +1280,10 @@ class PwtcMapdb {
 				<input type="hidden" name="unused_rows" value="<?php echo $unused_rows; ?>"/>
 				<button class="dark button" type="submit" name="pwtc_mapdb_download_signup"><i class="fa fa-download"></i> Signup Sheet</button>
 			<?php } ?>
-				<button class="dark button" type="submit" name="unlock_signup"><i class="fa fa-unlock"></i> Unlock Signup</button>
+				<button class="dark button" type="submit" name="unlock_signup"><i class="fa fa-unlock"></i> Reopen Signup</button>
 				</div>
 		<?php } else { ?>
-				<button class="dark button float-left" type="submit" name="lock_signup" <?php echo $now_date < $cutoff_date ? 'disabled': ''; ?>><i class="fa fa-lock"></i> Lock Signup</button>
+				<button class="dark button float-left" type="submit" name="lock_signup" <?php echo $now_date < $cutoff_date ? 'disabled': ''; ?>><i class="fa fa-lock"></i> Close Signup</button>
 		<?php } ?>
 				<a href="<?php echo $ride_link; ?>" class="dark button float-right"><i class="fa fa-chevron-left"></i> Back to Ride</a>
 			</form>
@@ -1363,7 +1373,7 @@ class PwtcMapdb {
 
 		$signup_locked = get_post_meta($postid, self::RIDE_SIGNUP_LOCKED, true);
 		if ($signup_locked) {
-			return '<div class="callout small warning"><p>You cannot signup for ride "' . $ride_title . '" because it is locked. ' . $return_to_ride . '</p></div>';	
+			return '<div class="callout small warning"><p>You cannot signup for ride "' . $ride_title . '" because it is closed. ' . $return_to_ride . '</p></div>';	
 		}
 
 		ob_start();
