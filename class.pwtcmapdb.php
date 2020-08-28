@@ -1807,7 +1807,7 @@ class PwtcMapdb {
 		$cutoff_date = self::get_signup_cutoff_time($postid, $mode, $pad);
 		$cutoff_date_str = $cutoff_date->format('m/d/Y g:ia');
 		if ($now_date > $cutoff_date) {
-			return '<div class="callout small warning"><p>You cannot signup for ride "' . $ride_title . '" because you are beyond the signup cutoff time. <em>The current time is ' . $now_date_str . ' and the cutoff time is ' . $cutoff_date_str . '.</em> ' . $return_to_ride . '</p></div>';
+			return '<div class="callout small warning"><p>You cannot signup for ride "' . $ride_title . '" because you are beyond the signup cutoff time at ' . $cutoff_date_str . '. ' . $return_to_ride . '</p></div>';
 		}
 		return '';
 	}
