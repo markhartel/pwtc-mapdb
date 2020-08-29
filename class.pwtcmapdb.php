@@ -1201,8 +1201,8 @@ class PwtcMapdb {
 								<label>Online Ride Signup
 									<select name="ride_signup_mode">
 										<option value="no" <?php echo $ride_signup_mode == 'no' ? '': 'selected'; ?>>No</option>
-										<option value="hardcopy"  <?php echo $ride_signup_mode == 'hardcopy' ? 'selected': ''; ?>>Hardcopy</option>
-										<option value="paperless"  <?php echo $ride_signup_mode == 'paperless' ? 'selected': ''; ?>>Paperless</option>
+										<option value="hardcopy"  <?php echo $ride_signup_mode == 'hardcopy' ? 'selected': ''; ?>>Hardcopy (requires computer/printer)</option>
+										<option value="paperless"  <?php echo $ride_signup_mode == 'paperless' ? 'selected': ''; ?>>Paperless (requires smartphone)</option>
 									</select>
 								</label>
 							</div>
