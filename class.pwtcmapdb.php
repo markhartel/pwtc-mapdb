@@ -1227,7 +1227,10 @@ class PwtcMapdb {
 			<li class="accordion-item" data-accordion-item>
             			<a href="#" class="accordion-title">Click Here For Edit Instuctions</a>
             			<div class="accordion-content" data-tab-content>
-				Under Construction!
+				<strong>How to mark a rider as NOT present.</strong><br>
+				Under contruction!<br>
+				<strong>How to set/modify a rider&#39;s mileage.</strong><br>
+				Under contruction!<br>
 				</div>
 			</li>
 		<?php } ?>			
