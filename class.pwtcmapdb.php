@@ -1225,12 +1225,16 @@ class PwtcMapdb {
 			</li>
 		<?php if ($paperless and !$signup_locked) { ?>
 			<li class="accordion-item" data-accordion-item>
-            			<a href="#" class="accordion-title">Click Here For Edit Instuctions</a>
+            			<a href="#" class="accordion-title">Click Here For Leader Instuctions</a>
             			<div class="accordion-content" data-tab-content>
-				<strong>How to mark a rider as NOT present.</strong><br>
-				Under contruction!<br>
-				<strong>How to set/modify a rider&#39;s mileage.</strong><br>
-				Under contruction!<br>
+				<strong>How to mark a rider as NOT present for the ride.</strong><br>
+				1) Click on the rider&#39;s name.<br>
+				2) A <i class="fa fa-thumbs-down"></i> icon will appear, click on it.<br>
+				3) A <i class="fa fa-times"></i> icon will be displayed next to the name, marking the rider as not present.<br>
+				<strong>How to modify a rider&#39;s mileage for the ride.</strong><br>
+				1) Click on the rider&#39;s mileage.<br>
+				2) An entry field will appear, type in the new mileage.<br>
+				3) Press the enter key to accept the change.<br>
 				</div>
 			</li>
 		<?php } ?>			
