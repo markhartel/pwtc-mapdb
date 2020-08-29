@@ -722,6 +722,17 @@ class PwtcMapdb {
 	?>
 	<script type="text/javascript">
 		jQuery(document).ready(function($) { 
+
+		<?php if ($accept_signup and $set_mileage) { ?>
+			$('#pwtc-mapdb-rider-signup-div form').on('submit', function(evt) {
+				var mileage = $(this).find("input[name='mileage']").val().trim();
+				if (mileage.length == 0) {
+					$('#pwtc-mapdb-rider-signup-div .errmsg').html('<div class="callout small warning"><p>You must enter the mileage that you intend to ride. <em>You may ask the leader to change this at ride start if desired.</em></p></div>');
+        				evt.preventDefault();
+				}
+     			});
+		<?php } ?>
+
 		});
 	</script>
 
@@ -748,8 +759,8 @@ class PwtcMapdb {
 							</label>
 						</div>
 			<?php } ?>
-
 					</div>
+					<div class="row column errmsg"></div>
 					<div class="row column clearfix">
 						<input type="hidden" name="accept_user_signup" value="yes"/>
 						<button class="dark button float-left" type="submit"><i class="fa fa-user-plus"></i> Accept Signup</button>
