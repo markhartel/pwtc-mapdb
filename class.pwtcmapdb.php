@@ -1915,11 +1915,40 @@ class PwtcMapdb {
 		if (!$ride_signup_mode) {
 			$ride_signup_mode = 'no';
 		}
+		
+		if ($ride_signup_mode == 'paperless') {
+			$cutoff_units = '(hours after ride start)';
+		}
+		else if ($ride_signup_mode == 'hardcopy') {
+			$cutoff_units = '(hours before ride start)';
+		}
+		else {
+			$cutoff_units = '(hours)';
+		}
+
 		$signup_cutoff = abs(intval(get_field(self::USER_SIGNUP_CUTOFF, 'user_'.$userid)));
 		$signup_limit = abs(intval(get_field(self::USER_SIGNUP_LIMIT, 'user_'.$userid)));
 		ob_start();
 		?>
-		<div class="callout">
+		<script type="text/javascript">
+			jQuery(document).ready(function($) { 
+
+				$("#pwtc-mapdb-leader-details-div select[name='ride_signup_mode']").change(function() {
+					$(this).find('option:selected').each(function() {
+						var mode = $(this).val();
+						var label = '(hours)';
+						if (mode == 'paperless') {
+							label = '(hours after ride start)';
+						} else if (mode == 'hardcopy') {
+							label = '(hours before ride start)';
+						}
+						$('#pwtc-mapdb-leader-details-div .cutoff_units').html(label);
+					});
+				});
+
+			});
+		</script>
+		<div id="pwtc-mapdb-leader-details-div" class="callout">
 			<form method="POST">
 				<div class="row">
 					<div class="small-12 medium-6 columns">
@@ -1955,7 +1984,7 @@ class PwtcMapdb {
 						</label>
 					</div>
 					<div class="small-12 medium-6 columns">
-						<label>Signup Cutoff Time (hours)
+						<label>Signup Cutoff <span class="cutoff_units"><?php echo $cutoff_units; ?></span>
 							<input type="number" name="signup_cutoff" value="<?php echo $signup_cutoff; ?>"/>
 						</label>
 					</div>
