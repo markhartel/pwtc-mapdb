@@ -1198,6 +1198,18 @@ class PwtcMapdb {
 				});
 			});
 		
+			<?php if ($paperless and !$signup_locked) { ?>
+			$('#pwtc-mapdb-view-signup-div .show_more').on('click', function(evt) {
+				$(this).hide();
+				$('#pwtc-mapdb-view-signup-div .more_details').show();
+			});
+
+			$('#pwtc-mapdb-view-signup-div .show_less').on('click', function(evt) {
+				$('#pwtc-mapdb-view-signup-div .more_details').hide();
+				$('#pwtc-mapdb-view-signup-div .show_more').show();
+			});
+			<?php } ?>
+
 		});
 		<?php } ?>
 	</script>
@@ -1241,7 +1253,7 @@ class PwtcMapdb {
 		<?php if (count($signup_list) > 0 or count($nonmember_signup_list) > 0) { ?>
 			<p>The following riders are currently signed up for the ride "<?php echo $ride_title; ?>." <em>(Riders with a "n/a" ID are not club members and their mileage is not logged.)</em>
 			<?php if ($paperless and !$signup_locked) { ?>
-			To mark a rider as NOT present for the ride: (1) click on the rider&#39;s name, (2) click on the <i class="fa fa-thumbs-down"></i> icon after it appears and (3) a <i class="fa fa-times"></i> icon will mark the rider as not present. To modify a rider&#39;s mileage for the ride: (1) click on the rider&#39;s mileage, (2) type the new mileage into the entry field after it appears and (3) press the enter key to accept the change.
+			<a class="show_more">more&gt;</a><span class="more_details" style="display: none">To mark a rider as NOT present for the ride: (1) click on the rider&#39;s name, (2) click on the <i class="fa fa-thumbs-down"></i> icon after it appears and (3) a <i class="fa fa-times"></i> icon will mark the rider as not present. To modify a rider&#39;s mileage for the ride: (1) click on the rider&#39;s mileage, (2) type the new mileage into the entry field after it appears and (3) press the enter key to accept the change. <a class="show_less">&lt;less</a><span>
 			<?php } ?>
 			</p> 
 			<div class="errmsg"></div>
