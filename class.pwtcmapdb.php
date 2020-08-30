@@ -1234,27 +1234,16 @@ class PwtcMapdb {
 					</form>
 				</div>
 			</li>
-		<?php if ($paperless and !$signup_locked) { ?>
-			<li class="accordion-item" data-accordion-item>
-            			<a href="#" class="accordion-title">Click Here For Leader Instuctions</a>
-            			<div class="accordion-content" data-tab-content>
-				<strong>How to mark a rider as NOT present for the ride.</strong><br>
-				1) Click on the rider&#39;s name.<br>
-				2) A <i class="fa fa-thumbs-down"></i> icon will appear, click on it.<br>
-				3) A <i class="fa fa-times"></i> icon will be displayed next to the name, marking the rider as not present.<br>
-				<strong>How to modify a rider&#39;s mileage for the ride.</strong><br>
-				1) Click on the rider&#39;s mileage.<br>
-				2) An entry field will appear, type in the new mileage.<br>
-				3) Press the enter key to accept the change.<br>
-				</div>
-			</li>
-		<?php } ?>			
 		</ul>		
 		<?php if ($ride_signup_mode == 'no') { ?>
 			<div class="callout small"><p>Online signup is not enabled for ride "<?php echo $ride_title; ?>." <?php echo $return_to_ride; ?></p></div>
 		<?php } else { ?>
 		<?php if (count($signup_list) > 0 or count($nonmember_signup_list) > 0) { ?>
-			<p>The following riders are currently signed up for the ride "<?php echo $ride_title; ?>." <em>(Riders with a "n/a" ID are not club members and their mileage is not logged.)</em></p> 
+			<p>The following riders are currently signed up for the ride "<?php echo $ride_title; ?>." <em>(Riders with a "n/a" ID are not club members and their mileage is not logged.)</em>
+			<?php if ($paperless and !$signup_locked) { ?>
+			To mark a rider as NOT present for the ride: (1) click on the rider&#39;s name, (2) click on the <i class="fa fa-thumbs-down"></i> icon after it appears and (3) a <i class="fa fa-times"></i> icon will mark the rider as not present. To modify a rider&#39;s mileage for the ride: (1) click on the rider&#39;s mileage, (2) type the new mileage into the entry field after it appears and (3) press the enter key to accept the change.
+			<?php } ?>
+			</p> 
 			<div class="errmsg"></div>
 			<table class="pwtc-mapdb-rwd-table"><thead><tr><th>Name</th><th>Rider ID</th><th>Mileage</th><th>Emergency Contact</th></tr></thead><tbody>
 			<?php foreach($signup_list as $item) { 
