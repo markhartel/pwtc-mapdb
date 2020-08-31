@@ -629,6 +629,11 @@ class PwtcMapdb {
 			return '<div class="callout small warning"><p>You must be a club member to signup for rides. ' . $return_to_ride . '</p></div>';
 		}
 		
+		$expired = false;
+		if (in_array('expired_member', (array) $current_user->roles)) {
+			$expired = true;
+		}
+		
 		self::init_online_signup($postid);
 		
 		$ride_signup_mode = get_post_meta($postid, self::RIDE_SIGNUP_MODE, true);
@@ -723,7 +728,7 @@ class PwtcMapdb {
 	<script type="text/javascript">
 		jQuery(document).ready(function($) { 
 
-		<?php if ($accept_signup and $set_mileage) { ?>
+		<?php if ($accept_signup and $set_mileage and !$expired) { ?>
 			$('#pwtc-mapdb-rider-signup-div form').on('submit', function(evt) {
 				var mileage = $(this).find("input[name='mileage']").val().trim();
 				if (mileage.length == 0) {
@@ -755,12 +760,16 @@ class PwtcMapdb {
 			<?php if ($set_mileage) { ?>
 						<div class="small-12 medium-6 columns">
 							<label>Mileage
-								<input type="number" name="mileage" value="<?php echo $mileage; ?>" maxlength="3"/>
+								<input type="number" name="mileage" value="<?php echo $mileage; ?>" maxlength="3" <?php echo $expired ? 'disabled': ''; ?>/>
 							</label>
 						</div>
 			<?php } ?>
 					</div>
-					<div class="row column errmsg"></div>
+					<div class="row column errmsg">
+			<?php if ($expired) { ?>
+						<div class="callout small warning"><p>Your club membership has expired, please renew. While expired members may still signup for rides, your mileage will not be logged.</p></div>
+			<?php } ?>
+					</div>
 					<div class="row column clearfix">
 						<input type="hidden" name="accept_user_signup" value="yes"/>
 						<button class="dark button float-left" type="submit"><i class="fa fa-user-plus"></i> Accept Signup</button>
