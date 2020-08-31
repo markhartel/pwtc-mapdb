@@ -1103,25 +1103,27 @@ class PwtcMapdb {
 				clear_errmsg();
 				reset_attended_cell();
 				var cell = $(this);
-				var row = cell.parent();
-				cell.html('<span>Mileage</span><input type="number" value="' + cell.attr('mileage') + '" style="width:50%" maxlength="3" />');
-				var input = cell.find('input');
-				input.on('click', function(e) {
-					e.stopPropagation();
-				});
-				input.on('keypress', function(e) {
-    				if (e.which == 13) {
-						change_signup_setting(
-							row.attr('userid'), 
-							cell.attr('mileage'), 
-							input.val(), 
-							row.find('td[attended]').attr('attended'), 
-							row.find('td[attended]').attr('attended'));
-						cell.html('<span>Mileage</span><i class="fa fa-spinner fa-pulse waiting"></i> ');
-   					}
-				});
-				input.focus();
-				//input.setCursorPosition(3);
+				if (cell.attr('mileage') != '!') {
+					var row = cell.parent();
+					cell.html('<span>Mileage</span><input type="number" value="' + cell.attr('mileage') + '" style="width:50%" maxlength="3" />');
+					var input = cell.find('input');
+					input.on('click', function(e) {
+						e.stopPropagation();
+					});
+					input.on('keypress', function(e) {
+    						if (e.which == 13) {
+							change_signup_setting(
+								row.attr('userid'), 
+								cell.attr('mileage'), 
+								input.val(), 
+								row.find('td[attended]').attr('attended'), 
+								row.find('td[attended]').attr('attended'));
+							cell.html('<span>Mileage</span><i class="fa fa-spinner fa-pulse waiting"></i> ');
+   						}
+					});
+					input.focus();
+					//input.setCursorPosition(3);
+				}
 			});
 			<?php } ?>
 
@@ -1279,13 +1281,18 @@ class PwtcMapdb {
 				else {
 					$name = 'Unknown';
 				}
+				$expired = false;
+				if (in_array('expired_member', (array) $user_info->roles)) {
+					$expired = true;
+					$mileage = '!';
+				}
 				$rider_id = self::get_rider_id($userid);
 				$contact = self::get_emergency_contact($userid, true);
 			?>
 				<tr userid="<?php echo $userid; ?>">
 				<td attended="<?php echo $attended ? '1':'0'; ?>"><span>Name</span><?php echo $attended ? '':'<i class="fa fa-times"></i>'; ?> <?php echo $name; ?> </td>
 				<td><span>Rider ID</span><?php echo $rider_id; ?></td>
-				<td mileage="<?php echo $mileage; ?>"><span>Mileage</span><?php echo $mileage; ?></td>
+				<td mileage="<?php echo $mileage; ?>"><span>Mileage</span><?php if ($expired) { echo '<i class="fa fa-exclamation-triangle"></i>'; } else { echo $mileage; } ?></td>
 				<td><span>Emergency Contact</span><?php echo $contact; ?></td>
 				</tr>
 			<?php } ?>
