@@ -2163,14 +2163,17 @@ class PwtcMapdb {
 						$arr = $signup_list[$rider_count];
 						if ($arr['userid']) {
 							$userid = $arr['userid'];
-							$mileage = $arr['mileage'];
+							$mileage = ''; //$arr['mileage'];
 							$user_info = get_userdata($userid);
 							if ($user_info) {
 								$rider_name = $user_info->first_name . ' ' . $user_info->last_name;
 							}
 							else {
 								$rider_name = 'Unknown';
-							}	
+							}
+							if (in_array('expired_member', (array) $user_info->roles)) {
+								$mileage = '!';
+							}
 							$rider_id = self::get_rider_id($userid);
 							$contact = self::get_emergency_contact($userid, false);
 						}
