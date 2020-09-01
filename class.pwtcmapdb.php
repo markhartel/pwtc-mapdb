@@ -2068,16 +2068,12 @@ class PwtcMapdb {
 				$signup_list = [];
 				foreach ($list as $item) {
 					$arr = json_decode($item, true);
-					if ($arr['attended']) {
-						$signup_list[] = $arr;
-					}
+					$signup_list[] = $arr;
 				}
 				$list = get_post_meta($rideid, self::RIDE_SIGNUP_NONMEMBER);
 				foreach ($list as $item) {
 					$arr = json_decode($item, true);
-					if ($arr['attended']) {
-						$signup_list[] = $arr;
-					}
+					$signup_list[] = $arr;
 				}
 
 				$ride_title = get_the_title($rideid);
@@ -2161,16 +2157,13 @@ class PwtcMapdb {
 						$arr = $signup_list[$rider_count];
 						if ($arr['userid']) {
 							$userid = $arr['userid'];
-							$mileage = ''; //$arr['mileage'];
+							$mileage = '';
 							$user_info = get_userdata($userid);
 							if ($user_info) {
 								$rider_name = $user_info->first_name . ' ' . $user_info->last_name;
 							}
 							else {
 								$rider_name = 'Unknown';
-							}
-							if (in_array('expired_member', (array) $user_info->roles)) {
-								$mileage = 'XXX';
 							}
 							$rider_id = self::get_rider_id($userid);
 							$contact = self::get_emergency_contact($userid, false);
