@@ -1103,7 +1103,7 @@ class PwtcMapdb {
 				clear_errmsg();
 				reset_attended_cell();
 				var cell = $(this);
-				if (cell.attr('mileage') != '!') {
+				if (cell.attr('mileage') != 'XXX') {
 					var row = cell.parent();
 					cell.html('<span>Mileage</span><input type="number" value="' + cell.attr('mileage') + '" style="width:50%" maxlength="3" />');
 					var input = cell.find('input');
@@ -1281,10 +1281,8 @@ class PwtcMapdb {
 				else {
 					$name = 'Unknown';
 				}
-				$expired = false;
 				if (in_array('expired_member', (array) $user_info->roles)) {
-					$expired = true;
-					$mileage = '!';
+					$mileage = 'XXX';
 				}
 				$rider_id = self::get_rider_id($userid);
 				$contact = self::get_emergency_contact($userid, true);
@@ -1292,7 +1290,7 @@ class PwtcMapdb {
 				<tr userid="<?php echo $userid; ?>">
 				<td attended="<?php echo $attended ? '1':'0'; ?>"><span>Name</span><?php echo $attended ? '':'<i class="fa fa-times"></i>'; ?> <?php echo $name; ?> </td>
 				<td><span>Rider ID</span><?php echo $rider_id; ?></td>
-				<td mileage="<?php echo $mileage; ?>"><span>Mileage</span><?php if ($expired) { echo '<i class="fa fa-exclamation-triangle"></i>'; } else { echo $mileage; } ?></td>
+				<td mileage="<?php echo $mileage; ?>"><span>Mileage</span><?php echo $mileage; ?></td>
 				<td><span>Emergency Contact</span><?php echo $contact; ?></td>
 				</tr>
 			<?php } ?>
@@ -2172,7 +2170,7 @@ class PwtcMapdb {
 								$rider_name = 'Unknown';
 							}
 							if (in_array('expired_member', (array) $user_info->roles)) {
-								$mileage = '!';
+								$mileage = 'XXX';
 							}
 							$rider_id = self::get_rider_id($userid);
 							$contact = self::get_emergency_contact($userid, false);
