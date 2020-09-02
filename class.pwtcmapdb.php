@@ -105,6 +105,15 @@ class PwtcMapdb {
 		add_action( 'wp_ajax_pwtc_mapdb_log_mileage', 
 			array( 'PwtcMapdb', 'log_mileage_callback') );
 		
+		add_action( 'wp_ajax_pwtc_mapdb_check_nonmember_signup', 
+			array( 'PwtcMapdb', 'check_nonmember_signup_callback') );
+
+		add_action( 'wp_ajax_pwtc_mapdb_accept_nonmember_signup', 
+			array( 'PwtcMapdb', 'accept_nonmember_signup_callback') );
+
+		add_action( 'wp_ajax_pwtc_mapdb_cancel_nonmember_signup', 
+			array( 'PwtcMapdb', 'cancel_nonmember_signup_callback') );
+		
 		add_action( 'wp_ajax_nopriv_pwtc_mapdb_check_nonmember_signup', 
 			array( 'PwtcMapdb', 'check_nonmember_signup_callback') );
 
@@ -1407,10 +1416,12 @@ class PwtcMapdb {
 		}
 		$postid = intval($_GET['post']);
 
+		/*
 		$current_user = wp_get_current_user();
 		if ( 0 != $current_user->ID ) {
 			return '<div class="callout small alert"><p>This page is only for non-member ride signup and you must be logged out to use it.</p></div>';
 		}
+		*/
 
 		$ride_title = get_the_title($postid);
 		$ride_link = get_the_permalink($postid);
