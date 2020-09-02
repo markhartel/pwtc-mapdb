@@ -2573,6 +2573,7 @@ EOT;
 				);
 			}
 			else {
+				//TODO: Do not allow a ride to be logged that is too old!
 				$results = PwtcMileage_DB::fetch_ride_by_post_id($postid);
 				if (count($results) > 0) {
 					$response = array(
