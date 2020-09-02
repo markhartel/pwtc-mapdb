@@ -1070,7 +1070,15 @@ class PwtcMapdb {
 				}
 				else {
 					if (res.postid == <?php echo $postid ?>) {
-						show_errmsg2_success('Log mileage was successful.');
+						var msg = 'Mileage was logged successfully, ' + res.num_leaders + ' leaders were logged and ' + res.num_riders + ' riders were logged.';
+						if (res.expired_riders.length > 0) {
+							msg += ' The following riders were NOT logged because of expired membership:';
+							res.expired_riders.forEach(function(item) {
+								msg += ' ' + item;
+							});
+							msg += '.';
+						}
+						show_errmsg2_success(msg);
 					}
 					else {
 						show_errmsg2('Ride post ID does not match post ID returned by server.');
@@ -1292,10 +1300,12 @@ class PwtcMapdb {
 					$mileage = $arr['mileage'];
 					$mileage_label = $mileage;
 					$attended = $arr['attended'];
+					/*
 					if (in_array('expired_member', (array) $user_info->roles)) {
 						$mileage = 'XXX';
 						$mileage_label = 'expired';
-					}	
+					}
+					*/
 				}
 				else {
 					$attended = true;
@@ -2579,12 +2589,18 @@ EOT;
 						$leaders = self::get_leader_userids($postid);
 						$nleaders = 0;
 						$nriders = 0;
+						$expired_ids = [];
+						$missing_ids = [];
+						$missing_leader_ids = [];
 						foreach ($leaders as $item) {
 							$memberid = get_field(self::USER_RIDER_ID, 'user_'.$item);
 							$result = PwtcMileage_DB::fetch_rider($memberid);
 							if (count($result) > 0) {
 								PwtcMileage_DB::insert_ride_leader($ride_id, $memberid);
 								$nleaders++;
+							}
+							else {
+								$missing_leader_ids[] = $memberid;
 							}
 						}
 						$signup_list = get_post_meta($postid, self::RIDE_SIGNUP_USERID);
@@ -2595,10 +2611,19 @@ EOT;
 							$attended = $arr['attended'];
 							if ($attended and !empty($mileage)) {
 								$memberid = get_field(self::USER_RIDER_ID, 'user_'.$userid);
-								$result = PwtcMileage_DB::fetch_rider($memberid);
-								if (count($result) > 0) {
-										PwtcMileage_DB::insert_ride_mileage($ride_id, $memberid, intval($mileage));
-										$nriders++;
+								$user_info = get_userdata($userid);
+								if (in_array('expired_member', (array) $user_info->roles)) {
+									$expired_ids[] = $memberid;
+								}
+								else {
+									$result = PwtcMileage_DB::fetch_rider($memberid);
+									if (count($result) > 0) {
+											PwtcMileage_DB::insert_ride_mileage($ride_id, $memberid, intval($mileage));
+											$nriders++;
+									}
+									else {
+										$missing_ids[] = $memberid;
+									}
 								}
 							}
 						}
@@ -2606,8 +2631,11 @@ EOT;
 							'postid' => $postid,
 							'rideid' => $ride_id,
 							'num_leaders' => $nleaders,
-							'num_riders' => $nriders
-						);											
+							'num_riders' => $nriders,
+							'missing_leaders' => $missing_leader_ids,
+							'missing_riders' => $missing_ids,
+							'expired_riders' => $expired_ids
+						);										
 					}
 				}
 			}
