@@ -2192,7 +2192,7 @@ class PwtcMapdb {
 							$contact_phone = $arr['contact_phone'];
 							$contact_name = $arr['contact_name'];
 							$contact = self::get_nonmember_emergency_contact($contact_phone, $contact_name, false);	
-							$mileage = '';
+							$mileage = 'n/a';
 							$rider_id = 'n/a';						
 						}
 					}
