@@ -737,7 +737,7 @@ class PwtcMapdb {
 	<script type="text/javascript">
 		jQuery(document).ready(function($) { 
 
-		<?php if ($accept_signup and $set_mileage and !$expired) { ?>
+		<?php if ($accept_signup and $set_mileage and false) { ?>
 			$('#pwtc-mapdb-rider-signup-div form').on('submit', function(evt) {
 				var mileage = $(this).find("input[name='mileage']").val().trim();
 				if (mileage.length == 0) {
@@ -753,7 +753,12 @@ class PwtcMapdb {
 	<div id='pwtc-mapdb-rider-signup-div'>
 		<?php if ($accept_signup) { ?>
 			<div class="callout">
-				<p>Hello <?php echo $rider_name; ?>, to sign up for the ride "<?php echo $ride_title; ?>," please enter your emergency contact information <?php if ($set_mileage) { ?>and mileage <?php } ?>below and press the accept button. Doing so will indicate your acceptance of the Club's <a href="/terms-and-conditions" target="_blank">terms and conditions</a>.</p>
+				<p>
+				Hello <?php echo $rider_name; ?>, to sign up for the ride "<?php echo $ride_title; ?>," please enter your emergency contact information <?php if ($set_mileage) { ?>and the mileage that you intend to ride <?php } ?>below and press the accept button. Doing so will indicate your acceptance of the Club's <a href="/terms-and-conditions" target="_blank">terms and conditions</a>.
+			<?php if ($set_mileage) { ?> 
+				<em>You may ask the leader to change your mileage at ride start if desired. If you don't want your mileage logged, leave the mileage field blank.</em>
+			<?php } ?>
+				</p>
 				<form method="POST">
 					<div class="row">
 						<div class="small-12 medium-6 columns">
@@ -769,7 +774,7 @@ class PwtcMapdb {
 			<?php if ($set_mileage) { ?>
 						<div class="small-12 medium-6 columns">
 							<label>Mileage
-								<input type="number" name="mileage" value="<?php echo $mileage; ?>" maxlength="3" <?php echo $expired ? 'disabled': ''; ?>/>
+								<input type="number" name="mileage" value="<?php echo $mileage; ?>" maxlength="3" />
 							</label>
 						</div>
 			<?php } ?>
