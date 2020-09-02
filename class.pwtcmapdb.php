@@ -1262,18 +1262,16 @@ class PwtcMapdb {
 			<div class="callout small"><p>Online signup is not enabled for ride "<?php echo $ride_title; ?>." <?php echo $return_to_ride; ?></p></div>
 		<?php } else { ?>
 		<?php if (count($signup_list) > 0 or count($nonmember_signup_list) > 0) { ?>
-			<p>The following riders are currently signed up for the ride "<?php echo $ride_title; ?>." <em>(Riders with a "n/a" ID are not club members and their mileage is not logged.)</em>
+			<p>The following riders are currently signed up for the ride "<?php echo $ride_title; ?>." <em>(Riders marked with a "n/a" ID and mileage are not club members and their mileage is not logged.)</em>
 			<?php if ($paperless and !$signup_locked) { ?>
 			<a class="show_more">more&gt;</a><span class="more_details" style="display: none"><strong>To mark a rider as NOT present for the ride:</strong> (1) click on the rider&#39;s name, (2) click on the <i class="fa fa-thumbs-down"></i> icon after it appears and (3) a <i class="fa fa-times"></i> icon will mark the rider as not present. <strong>To modify a rider&#39;s mileage for the ride:</strong> (1) click on the rider&#39;s mileage, (2) type the new mileage into the entry field after it appears and (3) press the enter key to accept the change. <a class="show_less">&lt;less</a><span>
 			<?php } ?>
 			</p> 
 			<div class="errmsg"></div>
-			<table class="pwtc-mapdb-rwd-table"><thead><tr><th>Name</th><th>Rider ID</th><th>Mileage</th><th>Emergency Contact</th></tr></thead><tbody>
+			<table class="pwtc-mapdb-rwd-table"><thead><tr><th>Name</th><th>Rider ID</th><?php if ($paperless) { ?><th>Mileage</th><?php } ?><th>Emergency Contact</th></tr></thead><tbody>
 			<?php foreach($signup_list as $item) { 
 				$arr = json_decode($item, true);
 				$userid = $arr['userid'];
-				$mileage = $arr['mileage'];
-				$attended = $arr['attended'];
 				$user_info = get_userdata($userid);
 				if ($user_info) {
 					$name = $user_info->first_name . ' ' . $user_info->last_name;
@@ -1281,8 +1279,17 @@ class PwtcMapdb {
 				else {
 					$name = 'Unknown';
 				}
-				if (in_array('expired_member', (array) $user_info->roles)) {
-					$mileage = 'XXX';
+				if ($paperless) {
+					$mileage = $arr['mileage'];
+					$mileage_label = $mileage;
+					$attended = $arr['attended'];
+					if (in_array('expired_member', (array) $user_info->roles)) {
+						$mileage = 'XXX';
+						$mileage_label = 'expired';
+					}	
+				}
+				else {
+					$attended = true;
 				}
 				$rider_id = self::get_rider_id($userid);
 				$contact = self::get_emergency_contact($userid, true);
@@ -1290,7 +1297,9 @@ class PwtcMapdb {
 				<tr userid="<?php echo $userid; ?>">
 				<td attended="<?php echo $attended ? '1':'0'; ?>"><span>Name</span><?php echo $attended ? '':'<i class="fa fa-times"></i>'; ?> <?php echo $name; ?> </td>
 				<td><span>Rider ID</span><?php echo $rider_id; ?></td>
-				<td mileage="<?php echo $mileage; ?>"><span>Mileage</span><?php echo $mileage; ?></td>
+				<?php if ($paperless) { ?>
+				<td mileage="<?php echo $mileage; ?>"><span>Mileage</span><?php echo $mileage_label; ?></td>
+				<?php } ?>
 				<td><span>Emergency Contact</span><?php echo $contact; ?></td>
 				</tr>
 			<?php } ?>
@@ -1301,12 +1310,21 @@ class PwtcMapdb {
 				$contact_phone = $arr['contact_phone'];
 				$contact_name = $arr['contact_name'];
 				$contact = self::get_nonmember_emergency_contact($contact_phone, $contact_name, true);
-				$attended = $arr['attended'];
+				if ($paperless) {
+					$mileage = 'XXX';
+					$mileage_label = 'n/a';
+					$attended = $arr['attended'];
+				}
+				else {
+					$attended = true;
+				}
 			?>
 				<tr signup_id="<?php echo $signup_id; ?>">
 				<td attended="<?php echo $attended ? '1':'0'; ?>"><span>Name</span><?php echo $attended ? '':'<i class="fa fa-times"></i>'; ?> <?php echo $name; ?> </td>
 				<td><span>Rider ID</span>n/a</td>
-				<td><span>Mileage</span></td>
+				<?php if ($paperless) { ?>
+				<td mileage="<?php echo $mileage; ?>"><span>Mileage</span><?php echo $mileage_label; ?></td>
+				<?php } ?>
 				<td><span>Emergency Contact</span><?php echo $contact; ?></td>
 				</tr>
 			<?php } ?>
