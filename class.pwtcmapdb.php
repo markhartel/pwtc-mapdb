@@ -2579,7 +2579,7 @@ EOT;
 				$now = self::get_current_time();
 				if ($ride_date < $now) {
 					$response = array(
-						'error' => 'This ride must be less that 6 months old to log its mileage.'
+						'error' => 'This ride must be less than 6 months old to log its mileage.'
 					);	
 				}
 				else {
