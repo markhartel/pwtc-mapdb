@@ -952,6 +952,10 @@ class PwtcMapdb {
 			function show_errmsg2_success(message) {
 				$('#pwtc-mapdb-view-signup-div .errmsg2').html('<div class="callout small success">' + message + '</div>');
 			}
+			
+			function show_errmsg2_warning(message) {
+				$('#pwtc-mapdb-view-signup-div .errmsg2').html('<div class="callout small warning">' + message + '</div>');
+			}
 
 			function show_errmsg2_wait() {
 				$('#pwtc-mapdb-view-signup-div .errmsg2').html('<div class="callout small"><i class="fa fa-spinner fa-pulse waiting"></i> please wait...</div>');
@@ -1075,15 +1079,38 @@ class PwtcMapdb {
 				}
 				else {
 					if (res.postid == <?php echo $postid ?>) {
-						var msg = 'Mileage was logged successfully, ' + res.num_leaders + ' leaders were logged and ' + res.num_riders + ' riders were logged.';
+						var warning = false;
+						var msg = 'Mileage was logged successfully, ' + res.num_leaders + ' ride leaders were recorded and ' + res.num_riders + ' riders were recorded.';
 						if (res.expired_riders.length > 0) {
-							msg += ' The following riders were NOT logged because of expired membership:';
+							msg += '<br>The following riders were NOT recorded because of expired membership:';
 							res.expired_riders.forEach(function(item) {
 								msg += ' ' + item;
 							});
 							msg += '.';
+							warning = true;
 						}
-						show_errmsg2_success(msg);
+						if (res.missing_riders.length > 0) {
+							msg += '<br>The following riders were NOT recorded because of missing rider IDs:';
+							res.missing_riders.forEach(function(item) {
+								msg += ' ' + item;
+							});
+							msg += '.';
+							warning = true;
+						}
+						if (res.missing_leaders.length > 0) {
+							msg += '<br>The following ride leaders were NOT recorded because of missing rider IDs:';
+							res.missing_leaders.forEach(function(item) {
+								msg += ' ' + item;
+							});
+							msg += '.';
+							warning = true;
+						}
+						if (warning) {
+							show_errmsg2_warning(msg);
+						}
+						else {
+							show_errmsg2_success(msg);
+						}
 					}
 					else {
 						show_errmsg2('Ride post ID does not match post ID returned by server.');
