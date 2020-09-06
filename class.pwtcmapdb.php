@@ -643,7 +643,7 @@ class PwtcMapdb {
 			$expired = true;
 		}
 		
-		self::init_online_signup($postid);
+		//self::init_online_signup($postid);
 		
 		$ride_signup_mode = get_post_meta($postid, self::RIDE_SIGNUP_MODE, true);
 		if (!$ride_signup_mode) {
@@ -739,9 +739,9 @@ class PwtcMapdb {
 
 		<?php if ($accept_signup and $set_mileage and false) { ?>
 			$('#pwtc-mapdb-rider-signup-div form').on('submit', function(evt) {
-				var mileage = $(this).find("input[name='mileage']").val().trim();
-				if (mileage.length == 0) {
-					$('#pwtc-mapdb-rider-signup-div .errmsg').html('<div class="callout small warning"><p>You must enter the mileage that you intend to ride. <em>You may ask the leader to change this at ride start if desired.</em></p></div>');
+				var accept_terms = $(this).find("input[name='accept_terms']").val();
+				if (accept_terms == 'no') {
+					$('#pwtc-mapdb-rider-signup-div .errmsg').html('<div class="callout small warning"><p>You must accept the Club&#39;s <a href="/terms-and-conditions" target="_blank">terms and conditions</a> to signup for rides.</p></div>');
         				evt.preventDefault();
 				}
      			});
@@ -754,13 +754,21 @@ class PwtcMapdb {
 		<?php if ($accept_signup) { ?>
 			<div class="callout">
 				<p>
-				Hello <?php echo $rider_name; ?>, to sign up for the ride "<?php echo $ride_title; ?>," please enter your emergency contact information <?php if ($set_mileage) { ?>and the mileage that you intend to ride <?php } ?>below and press the accept button. Doing so will indicate your acceptance of the Club's <a href="/terms-and-conditions" target="_blank">terms and conditions</a>.
+				Hello <?php echo $rider_name; ?>, to sign up for the ride "<?php echo $ride_title; ?>," please accept the Club's <a href="/terms-and-conditions" target="_blank">terms and conditions</a><?php if ($set_mileage) { ?>, enter your emergency contact information and the mileage that you intend to ride<?php } else { ?> and enter your emergency contact information<?php } ?> below and press the accept button.
 			<?php if ($set_mileage) { ?> 
 				<em>You may ask the leader to change your mileage at ride start if desired. If you don't want your mileage logged, leave the mileage field blank.</em>
 			<?php } ?>
 				</p>
 				<form method="POST">
 					<div class="row">
+						<div class="small-12 medium-6 columns">
+							<label>Accept Terms and Conditions
+								<select name="accept_terms">
+									<option value="no" selected>No</option>
+									<option value="yes">Yes</option>
+								</select>
+							</label>
+						</div>
 						<div class="small-12 medium-6 columns">
 							<label><i class="fa fa-phone"></i> Emergency Contact Phone
 								<input type="text" name="contact_phone" value="<?php echo $contact_phone; ?>"/>
@@ -866,7 +874,7 @@ class PwtcMapdb {
 			add_post_meta($postid, self::RIDE_SIGNUP_LIMIT, abs(intval($_POST['ride_signup_limit'])), true);
 		}
 		
-		self::init_online_signup($postid);
+		//self::init_online_signup($postid);
 		
 		$ride_signup_mode = get_post_meta($postid, self::RIDE_SIGNUP_MODE, true);
 		if (!$ride_signup_mode) {
@@ -1475,7 +1483,7 @@ class PwtcMapdb {
 			return '<div class="callout small warning"><p>The ride "' . $ride_title . '" has been canceled, no signup allowed. ' . $return_to_ride . '</p></div>';
 		}
 		
-		self::init_online_signup($postid);
+		//self::init_online_signup($postid);
 
 		$ride_signup_mode = get_post_meta($postid, self::RIDE_SIGNUP_MODE, true);
 		if (!$ride_signup_mode) {
