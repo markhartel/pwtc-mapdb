@@ -1733,7 +1733,6 @@ class PwtcMapdb {
 		<div class="errmsg"></div>
 		<div class="accept_div callout" style="display: none">
 			<p>To sign up for the ride "<?php echo $ride_title; ?>," please accept the Club's <a href="/terms-and-conditions" target="_blank">terms and conditions</a>, enter your name and emergency contact information and press the accept button.</p>
-			<div class="warnmsg"></div>
 			<form method="POST">
 				<div class="row">
 					<div class="small-12 medium-6 columns">
@@ -1760,6 +1759,7 @@ class PwtcMapdb {
 						</label>
 					</div>
 				</div>
+				<div class="warnmsg"></div>
 				<div class="row column clearfix">
 					<button class="dark button float-left" type="submit"><i class="fa fa-user-plus"></i> Accept Signup</button>
 					<a href="<?php echo $ride_link; ?>" class="dark button float-right"><i class="fa fa-chevron-left"></i> Back to Ride</a>
