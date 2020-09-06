@@ -739,7 +739,7 @@ class PwtcMapdb {
 
 		<?php if ($accept_signup and $set_mileage and false) { ?>
 			$('#pwtc-mapdb-rider-signup-div form').on('submit', function(evt) {
-				var accept_terms = $(this).find("input[name='accept_terms']").val();
+				var accept_terms = $(this).find("select[name='accept_terms']").val();
 				if (accept_terms == 'no') {
 					$('#pwtc-mapdb-rider-signup-div .errmsg').html('<div class="callout small warning"><p>You must accept the Club&#39;s <a href="/terms-and-conditions" target="_blank">terms and conditions</a> to signup for rides.</p></div>');
         				evt.preventDefault();
@@ -754,7 +754,7 @@ class PwtcMapdb {
 		<?php if ($accept_signup) { ?>
 			<div class="callout">
 				<p>
-				Hello <?php echo $rider_name; ?>, to sign up for the ride "<?php echo $ride_title; ?>," please accept the Club's <a href="/terms-and-conditions" target="_blank">terms and conditions</a><?php if ($set_mileage) { ?>, enter your emergency contact information and the mileage that you intend to ride<?php } else { ?> and enter your emergency contact information<?php } ?> below and press the accept button.
+				Hello <?php echo $rider_name; ?>, to sign up for the ride "<?php echo $ride_title; ?>," please accept the Club's <a href="/terms-and-conditions" target="_blank">terms and conditions</a>, enter your emergency contact information<?php if ($set_mileage) { ?>, enter the mileage that you intend to ride<?php } ?> and press the accept button.
 			<?php if ($set_mileage) { ?> 
 				<em>You may ask the leader to change your mileage at ride start if desired. If you don't want your mileage logged, leave the mileage field blank.</em>
 			<?php } ?>
