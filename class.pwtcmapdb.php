@@ -739,11 +739,13 @@ class PwtcMapdb {
 
 		<?php if ($accept_signup and $set_mileage and false) { ?>
 			$('#pwtc-mapdb-rider-signup-div form').on('submit', function(evt) {
-				var accept_terms = $(this).find("select[name='accept_terms']").val();
-				if (accept_terms == 'no') {
-					$('#pwtc-mapdb-rider-signup-div .errmsg').html('<div class="callout small warning"><p>You must accept the Club&#39;s <a href="/terms-and-conditions" target="_blank">terms and conditions</a> to signup for rides.</p></div>');
-        				evt.preventDefault();
-				}
+				$(this).find("select[name='accept_terms'] option:selected").each(function() {
+					var accept_terms = $(this).val();
+					if (accept_terms == 'no') {
+						$('#pwtc-mapdb-rider-signup-div .errmsg').html('<div class="callout small warning"><p>You must accept the Club&#39;s <a href="/terms-and-conditions" target="_blank">terms and conditions</a> to signup for rides.</p></div>');
+						evt.preventDefault();
+					}
+				});
      			});
 		<?php } ?>
 
