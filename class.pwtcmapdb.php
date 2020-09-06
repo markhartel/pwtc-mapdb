@@ -1657,8 +1657,15 @@ class PwtcMapdb {
 
 			$('#pwtc-mapdb-nonmember-signup-div .accept_div form').on('submit', function(evt) {
 				evt.preventDefault();
+				var accept_terms = 'no';
+				$(this).find("select[name='accept_terms'] option:selected").each(function() {
+					accept_terms = $(this).val();
+				});
 				var your_name = $(this).find('input[name="your_name"]').val().trim();
-				if (your_name) {
+				if (accept_terms == 'no') {
+					show_warnmsg('You must accept the Club&#39;s <a href="/terms-and-conditions" target="_blank">terms and conditions</a> to signup for rides.');
+				}
+				else if (your_name) {
 					clear_warnmsg();
 					var signup_id = window.localStorage.getItem('ride_signup_id');
 					var contact_phone = $(this).find('input[name="contact_phone"]').val().trim();
@@ -1725,10 +1732,18 @@ class PwtcMapdb {
 		<div class="callout small warning"><p>ONLY non-members should use this page to signup for rides. If you are a club member, first log in <a href="/wp-login.php">here</a> before signing up for a ride.</p></div>
 		<div class="errmsg"></div>
 		<div class="accept_div callout" style="display: none">
-			<p>To sign up for the ride "<?php echo $ride_title; ?>," please enter your name and emergency contact information below and press the accept button. Doing so will indicate your acceptance of the Club's <a href="/terms-and-conditions" target="_blank">terms and conditions</a>.</p>
+			<p>To sign up for the ride "<?php echo $ride_title; ?>," please accept the Club's <a href="/terms-and-conditions" target="_blank">terms and conditions</a>, enter your name and emergency contact information and press the accept button.</p>
 			<div class="warnmsg"></div>
 			<form method="POST">
 				<div class="row">
+					<div class="small-12 medium-6 columns">
+						<label>Accept Terms and Conditions
+							<select name="accept_terms">
+								<option value="no" selected>No</option>
+								<option value="yes">Yes</option>
+							</select>
+						</label>
+					</div>
 					<div class="small-12 medium-6 columns">
 						<label>Your Name
 							<input type="text" name="your_name" value=""/>
