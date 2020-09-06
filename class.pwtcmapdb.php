@@ -737,7 +737,7 @@ class PwtcMapdb {
 	<script type="text/javascript">
 		jQuery(document).ready(function($) { 
 
-		<?php if ($accept_signup and $set_mileage and false) { ?>
+		<?php if ($accept_signup) { ?>
 			$('#pwtc-mapdb-rider-signup-div form').on('submit', function(evt) {
 				$(this).find("select[name='accept_terms'] option:selected").each(function() {
 					var accept_terms = $(this).val();
