@@ -27,6 +27,7 @@ class PwtcMapdb {
 	const RIDE_SIGNUP_MODE = '_signup_mode';
 	const RIDE_SIGNUP_CUTOFF = '_signup_cutoff';
 	const RIDE_SIGNUP_LIMIT = '_signup_limit';
+	const RIDE_SIGNUP_MEMBERS_ONLY = '_signup_members_only';
 
 	const USER_EMER_PHONE = 'emergency_contact_phone';
 	const USER_EMER_NAME = 'emergency_contact_name';
@@ -876,6 +877,11 @@ class PwtcMapdb {
 			add_post_meta($postid, self::RIDE_SIGNUP_LIMIT, abs(intval($_POST['ride_signup_limit'])), true);
 		}
 		
+		if (isset($_POST['signup_members_only'])) {
+			delete_post_meta($postid, self::RIDE_SIGNUP_MEMBERS_ONLY);
+			add_post_meta($postid, self::RIDE_SIGNUP_MEMBERS_ONLY, $_POST['signup_members_only'] == 'yes', true);
+		}
+		
 		//self::init_online_signup($postid);
 		
 		$ride_signup_mode = get_post_meta($postid, self::RIDE_SIGNUP_MODE, true);
@@ -892,6 +898,8 @@ class PwtcMapdb {
 		if (!$ride_signup_limit) {
 			$ride_signup_limit = 0;
 		}
+		
+		$signup_members_only = get_post_meta($postid, self::RIDE_SIGNUP_MEMBERS_ONLY, true);
 
 		if ($ride_signup_mode != 'no') {
 			if ($ride_signup_mode == 'paperless') {
@@ -1293,7 +1301,7 @@ class PwtcMapdb {
 							<div class="small-12 medium-4 columns">
 								<label>Online Ride Signup
 									<select name="ride_signup_mode">
-										<option value="no" <?php echo $ride_signup_mode == 'no' ? '': 'selected'; ?>>No</option>
+										<option value="no" <?php echo $ride_signup_mode == 'no' ? 'selected': ''; ?>>No</option>
 										<option value="hardcopy"  <?php echo $ride_signup_mode == 'hardcopy' ? 'selected': ''; ?>>Hardcopy (requires computer/printer)</option>
 										<option value="paperless"  <?php echo $ride_signup_mode == 'paperless' ? 'selected': ''; ?>>Paperless (requires smartphone)</option>
 									</select>
@@ -1307,6 +1315,14 @@ class PwtcMapdb {
 							<div class="small-12 medium-4 columns">
 								<label>Signup Count Limit (0 means unlimited)
 									<input type="number" name="ride_signup_limit" value="<?php echo $ride_signup_limit; ?>"/>
+								</label>
+							</div>
+							<div class="small-12 medium-4 columns">
+								<label>Club Members Only
+									<select name="signup_members_only">
+										<option value="no" <?php echo $signup_members_only ? '': 'selected'; ?>>No</option>
+										<option value="yes"  <?php echo $signup_members_only ? 'selected': ''; ?>>Yes</option>
+									</select>
 								</label>
 							</div>
 						</div>
@@ -1915,12 +1931,11 @@ class PwtcMapdb {
 		}
 
 		if (count(get_post_meta($postid, self::RIDE_SIGNUP_LIMIT)) == 0) {
-			if (count($leaders) > 0) {
-				add_post_meta($postid, self::RIDE_SIGNUP_LIMIT, abs(intval(get_field(self::USER_SIGNUP_LIMIT, 'user_'.$leaders[0]))), true);
-			}
-			else {
-				add_post_meta($postid, self::RIDE_SIGNUP_LIMIT, 0, true);
-			}
+			add_post_meta($postid, self::RIDE_SIGNUP_LIMIT, 0, true);
+		}
+
+		if (count(get_post_meta($postid, self::RIDE_SIGNUP_MEMBERS_ONLY)) == 0) {
+			add_post_meta($postid, self::RIDE_SIGNUP_MEMBERS_ONLY, false, true);
 		}
 	}
 	
@@ -2087,7 +2102,7 @@ class PwtcMapdb {
 					<div class="small-12 medium-6 columns">
 						<label>Online Ride Signup
 							<select name="ride_signup_mode">
-								<option value="no" <?php echo $ride_signup_mode == 'no' ? '': 'selected'; ?>>No</option>
+								<option value="no" <?php echo $ride_signup_mode == 'no' ? 'selected': ''; ?>>No</option>
 								<option value="hardcopy"  <?php echo $ride_signup_mode == 'hardcopy' ? 'selected': ''; ?>>Hardcopy</option>
 								<option value="paperless"  <?php echo $ride_signup_mode == 'paperless' ? 'selected': ''; ?>>Paperless</option>
 							</select>
