@@ -33,7 +33,6 @@ class PwtcMapdb {
 	const USER_EMER_NAME = 'emergency_contact_name';
 	const USER_SIGNUP_MODE = 'online_ride_signup';
 	const USER_SIGNUP_CUTOFF = 'signup_cutoff_time';
-	const USER_SIGNUP_LIMIT = 'signup_count_limit';
 	const USER_USE_EMAIL = 'use_contact_email';
 	const USER_CONTACT_EMAIL = 'contact_email';
 	const USER_CELL_PHONE = 'cell_phone';
@@ -2028,10 +2027,6 @@ class PwtcMapdb {
 			$val = abs(intval($_POST['signup_cutoff']));
 			update_field(self::USER_SIGNUP_CUTOFF, $val, 'user_'.$userid);
 		}
-		if (isset($_POST['signup_limit'])) {
-			$val = abs(intval($_POST['signup_limit']));
-			update_field(self::USER_SIGNUP_LIMIT, $val, 'user_'.$userid);
-		}
 		$voice_phone = pwtc_members_format_phone_number(get_field(self::USER_CELL_PHONE, 'user_'.$userid));
 		$text_phone = pwtc_members_format_phone_number(get_field(self::USER_HOME_PHONE, 'user_'.$userid));
 		$contact_email = get_field(self::USER_CONTACT_EMAIL, 'user_'.$userid);
@@ -2052,7 +2047,7 @@ class PwtcMapdb {
 		}
 
 		$signup_cutoff = abs(intval(get_field(self::USER_SIGNUP_CUTOFF, 'user_'.$userid)));
-		$signup_limit = abs(intval(get_field(self::USER_SIGNUP_LIMIT, 'user_'.$userid)));
+		
 		ob_start();
 		?>
 		<script type="text/javascript">
@@ -2111,11 +2106,6 @@ class PwtcMapdb {
 					<div class="small-12 medium-6 columns">
 						<label>Signup Cutoff <span class="cutoff_units"><?php echo $cutoff_units; ?></span>
 							<input type="number" name="signup_cutoff" value="<?php echo $signup_cutoff; ?>"/>
-						</label>
-					</div>
-					<div class="small-12 medium-6 columns">
-						<label>Signup Count Limit (0 means unlimited)
-							<input type="number" name="signup_limit" value="<?php echo $signup_limit; ?>"/>
 						</label>
 					</div>
 				</div>
