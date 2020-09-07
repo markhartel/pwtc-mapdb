@@ -1906,7 +1906,7 @@ class PwtcMapdb {
 			update_field('description', $_POST['description'], $postid);
 		}
 
-		$description = get_field('description', $postid);
+		$description = get_field('description', $postid, false);
 		
 		ob_start();
 	?>
