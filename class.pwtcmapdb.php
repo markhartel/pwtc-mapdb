@@ -94,6 +94,9 @@ class PwtcMapdb {
 		add_shortcode('pwtc_mapdb_leader_details', 
 			array( 'PwtcMapdb', 'shortcode_leader_details'));
 		
+		add_shortcode('pwtc_mapdb_edit_ride', 
+			array( 'PwtcMapdb', 'shortcode_edit_ride'));
+		
 		/* Register AJAX request/response callbacks */
 
 		add_action( 'wp_ajax_pwtc_mapdb_edit_signup', 
@@ -1859,6 +1862,70 @@ class PwtcMapdb {
 		</table>
 	</div>
 		<?php
+		return ob_get_clean();
+	}
+	
+	// Generates the [pwtc_mapdb_edit_ride] shortcode.
+	public static function shortcode_edit_ride($atts) {
+		$error = self::check_post_id();
+		if (!empty($error)) {
+			return $error;
+		}
+		$postid = intval($_GET['post']);
+
+		$current_user = wp_get_current_user();
+		if ( 0 == $current_user->ID ) {
+			return '<div class="callout small warning"><p>Please <a href="/wp-login.php">log in</a> to edit this ride.</p></div>';
+		}
+
+		$ride_title = get_the_title($postid);
+		$ride_link = get_the_permalink($postid);
+		$return_to_ride = 'Click <a href="' . $ride_link . '">here</a> to return to the posted ride.';
+
+		if (!user_can($current_user,'edit_published_rides')) {
+			$denied = true;
+			$leaders = self::get_leader_userids($postid);
+			foreach ($leaders as $item) {
+				if ($current_user->ID == $item) {
+					$denied = false;
+					break;
+				}
+			}
+			if ($denied) {
+				return '<div class="callout small warning"><p>You must be a leader for ride "' . $ride_title . '" to edit it. ' . $return_to_ride . '</p></div>';
+			}
+		}
+
+		$now_date = self::get_current_time();
+		$ride_date = self::get_ride_start_time($postid);
+		if ($ride_date < $now_date) {
+			return '<div class="callout small warning"><p>Ride "' . $ride_title . '" has already started so you cannot edit it. ' . $return_to_ride . '</p></div>';
+		}
+
+		if (isset($_POST['description'])) {
+			update_field('description', $_POST['description'], $postid);
+		}
+
+		$description = get_field('description', $postid);
+		
+		ob_start();
+	?>
+	<div id='pwtc-mapdb-edit-ride-div'>
+		<div class="callout">
+			<form method="POST">
+				<div class="row column">
+					<label>Ride Description
+						<textarea name="description"><?php echo $description; ?></textarea>
+					</label>
+				</div>
+				<div class="row column clearfix">
+					<button class="dark button float-left" type="submit">Submit</button>
+					<a href="<?php echo $ride_link; ?>" class="dark button float-right"><i class="fa fa-chevron-left"></i> Back to Ride</a>
+				</div>
+			</form>
+		</div>
+	</div>
+	<?php
 		return ob_get_clean();
 	}
 	
