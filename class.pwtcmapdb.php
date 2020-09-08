@@ -49,8 +49,10 @@ class PwtcMapdb {
 	const LOCAL_EMER_NAME = 'ride_signup_contact_phone';
 
 	const POST_TYPE_RIDE = 'scheduled_rides';
+	
+	const TIMESTAMP_OFFSET = 50*365*24*60*60;
 
-    private static $initiated = false;
+    	private static $initiated = false;
 
 	public static function init() {
 		if ( ! self::$initiated ) {
@@ -1497,7 +1499,7 @@ class PwtcMapdb {
 		$ride_link = get_the_permalink($postid);
 		$return_to_ride = 'Click <a href="' . $ride_link . '">here</a> to return to the posted ride.';
 
-		$timestamp = time();
+		$timestamp = time() - self::TIMESTAMP_OFFSET;
 		
 		if (get_field(self::RIDE_CANCELED, $postid)) {
 			return '<div class="callout small warning"><p>The ride "' . $ride_title . '" has been canceled, no signup allowed. ' . $return_to_ride . '</p></div>';
