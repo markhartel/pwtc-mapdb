@@ -1,6 +1,6 @@
 <?php
 
-function pwtc_mapdb_get_signup_mode() {
+function pwtc_mapdb_get_signup() {
     $postid = get_the_ID();
     $signup_mode = get_post_meta($postid, PwtcMapdb::RIDE_SIGNUP_MODE, true);
     if (!$signup_mode) {
@@ -10,26 +10,39 @@ function pwtc_mapdb_get_signup_mode() {
             $signup_mode = 'no';
         }
     }
-    $result = ['mode' => $signup_mode];
+    $members_only = get_post_meta($postid, PwtcMapdb::RIDE_SIGNUP_MEMBERS_ONLY, true);
 
-    if ($signup_mode == 'paperless') {
-        $result['message'] = 'Online signup is required to attend this ride:';
-    }
-    else if ($signup_mode == 'hardcopy') {
-        $result['message'] = 'Online signup is available for this ride:';
+    $result['view_signup_url'] = '/ride-view-signups/?post='.$postid;
+    $result['edit_ride_url'] = '/ride-edit-fields/?post='.$postid;
+
+    if ($signup_mode == 'no') {
+        $result['ride_signup_msg'] = false;
+        $result['ride_signup_url'] = false;
     }
     else {
-        $result['message'] = '';
+        if (wp_get_current_user()->ID != 0) {
+            $result['ride_signup_url'] = '/ride-online-signup/?post='.$postid;
+            if ($signup_mode == 'paperless') {
+                $result['ride_signup_msg'] = 'Online signup is required to attend this ride.';
+            }
+            else {
+                $result['ride_signup_msg'] = 'Online signup is available for this ride.';
+            }
+        }
+        else if (!$members_only) {
+            $result['ride_signup_url'] = '/ride-online-nonmember-signup/?post='.$postid;
+            if ($signup_mode == 'paperless') {
+                $result['ride_signup_msg'] = 'Online signup is required to attend this ride.';
+            }
+            else {
+                $result['ride_signup_msg'] = 'Online signup is available for this ride.';
+            }
+        }
+        else {
+            $result['ride_signup_url'] = false;
+            $result['ride_signup_msg'] = 'Only club members may attend this ride. Members must first log in <a href="/wp-login.php">here</a> to signup.';
+        }
     }
-
-    if (wp_get_current_user()->ID != 0) {
-        $result['signup_url'] = '/ride-online-signup/?post='.$postid;
-    }
-    else {
-        $result['signup_url'] = '/ride-online-nonmember-signup/?post='.$postid;
-    }
-
-    $result['view_url'] = '/ride-view-signups/?post='.$postid;
 
     return $result;
 }
