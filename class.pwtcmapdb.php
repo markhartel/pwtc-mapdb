@@ -1521,9 +1521,15 @@ class PwtcMapdb {
 		if (!$ride_signup_limit) {
 			$ride_signup_limit = 0;
 		}
+		
+		$members_only = get_post_meta($postid, self::RIDE_SIGNUP_MEMBERS_ONLY, true);
 
 		if ($ride_signup_mode == 'no') {
 			return '<div class="callout small warning"><p>The leader for ride "' . $ride_title . '" does not allow online signup. ' . $return_to_ride . '</p></div>';			
+		}
+		
+		if ($members_only) {
+			return '<div class="callout small warning"><p>Only club members may attend ride "' . $ride_title . '." ' . $return_to_ride . '</p></div>';
 		}
 
 		$error = self::check_ride_start($postid, $ride_signup_mode, $ride_signup_cutoff, $return_to_ride);
