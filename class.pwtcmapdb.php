@@ -1910,22 +1910,50 @@ class PwtcMapdb {
 			return '<div class="callout small warning"><p>Ride "' . $ride_title . '" has already started so you cannot edit it. ' . $return_to_ride . '</p></div>';
 		}
 
+		if (isset($_POST['title'])) {
+			$my_post = array(
+				'ID' => $postid,
+				'post_title' => trim($_POST['title'])
+			);
+			wp_update_post( $my_post );			
+		}
+
 		if (isset($_POST['description'])) {
 			update_field('description', $_POST['description'], $postid);
 		}
 
+		$title = get_the_title($postid);
 		$description = get_field('description', $postid, false);
 		
 		ob_start();
 	?>
+	<script type="text/javascript">
+		jQuery(document).ready(function($) { 
+
+			function show_waiting() {
+				$('#pwtc-mapdb-edit-ride-div .errmsg').html('<div class="callout small"><i class="fa fa-spinner fa-pulse waiting"></i> please wait...</div>');
+			}
+
+			$('#pwtc-mapdb-edit-ride-div form').on('submit', function(evt) {
+				show_waiting();
+     		});
+
+		});
+	</script>
 	<div id='pwtc-mapdb-edit-ride-div'>
 		<div class="callout">
 			<form method="POST">
 				<div class="row column">
-					<label>Ride Description
-						<textarea name="description"><?php echo $description; ?></textarea>
+					<label>Ride Title
+						<input type="text" name="title" value="<?php echo $title; ?>"/>
 					</label>
 				</div>
+				<div class="row column">
+					<label>Ride Description
+						<textarea name="description" rows="10"><?php echo $description; ?></textarea>
+					</label>
+				</div>
+				<div class="row column errmsg"></div>
 				<div class="row column clearfix">
 					<button class="dark button float-left" type="submit">Submit</button>
 					<a href="<?php echo $ride_link; ?>" class="dark button float-right"><i class="fa fa-chevron-left"></i> Back to Ride</a>
