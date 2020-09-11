@@ -742,17 +742,26 @@ class PwtcMapdb {
 	<script type="text/javascript">
 		jQuery(document).ready(function($) { 
 
-		<?php if ($accept_signup) { ?>
+			function show_waiting() {
+				$('#pwtc-mapdb-rider-signup-div .errmsg').html('<div class="callout small"><i class="fa fa-spinner fa-pulse waiting"></i> please wait...</div>');
+			}
+
 			$('#pwtc-mapdb-rider-signup-div form').on('submit', function(evt) {
+				<?php if ($accept_signup) { ?>
 				$(this).find("select[name='accept_terms'] option:selected").each(function() {
 					var accept_terms = $(this).val();
 					if (accept_terms == 'no') {
 						$('#pwtc-mapdb-rider-signup-div .errmsg').html('<div class="callout small warning"><p>You must accept the Club&#39;s <a href="/terms-and-conditions" target="_blank">terms and conditions</a> to signup for rides.</p></div>');
 						evt.preventDefault();
 					}
+					else {
+						show_waiting();
+					}
 				});
+				<?php } else { ?>
+				show_waiting();
+				<?php } ?>
      			});
-		<?php } ?>
 
 		});
 	</script>
@@ -810,6 +819,7 @@ class PwtcMapdb {
 			<div class="callout">
 				<p>Hello <?php echo $rider_name; ?>, you are currently signed up for the ride "<?php echo $ride_title; ?>." To cancel your sign up, please press the cancel button below.</p>
 				<form method="POST">
+					<div class="row column errmsg"></div>
 					<div class="row column clearfix">
 						<input type="hidden" name="cancel_user_signup" value="yes"/>
 						<button class="dark button float-left" type="submit"><i class="fa fa-user-times"></i> Cancel Signup</button>
