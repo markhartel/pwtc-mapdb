@@ -951,7 +951,6 @@ class PwtcMapdb {
 	?>
 
 	<script type="text/javascript">
-		<?php if ($ride_signup_mode != 'no') { ?>
 		jQuery(document).ready(function($) { 
 
 			$.fn.setCursorPosition = function(pos) {
@@ -996,6 +995,12 @@ class PwtcMapdb {
 			function clear_errmsg2() {
 				$('#pwtc-mapdb-view-signup-div .errmsg2').html('');
 			}
+			
+			function show_errmsg3_wait() {
+				$('#pwtc-mapdb-view-signup-div .errmsg3').html('<div class="callout small"><i class="fa fa-spinner fa-pulse waiting"></i> please wait...</div>');
+			}
+		
+		<?php if ($ride_signup_mode != 'no') { ?>
 
 			function reset_mileage_cell() {
 				$('#pwtc-mapdb-view-signup-div table tbody td[mileage] input').each(function() {
@@ -1301,9 +1306,14 @@ class PwtcMapdb {
 				$('#pwtc-mapdb-view-signup-div .show_more').show();
 			});
 			<?php } ?>
+		
+		<?php } ?>
+		
+			$('#pwtc-mapdb-view-signup-div .accordion form').on('submit', function(evt) {
+				show_errmsg3_wait();
+     			});
 
 		});
-		<?php } ?>
 	</script>
 	<div id='pwtc-mapdb-view-signup-div'>
 		<ul class="accordion" data-accordion data-allow-all-closed="true">
@@ -1340,6 +1350,7 @@ class PwtcMapdb {
 								</label>
 							</div>
 						</div>
+						<div class="row column errmsg3"></div>
 						<div class="row column clearfix">
 							<input class="accent button float-left" type="submit" value="Submit"/>
 						</div>
