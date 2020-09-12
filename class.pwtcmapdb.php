@@ -626,7 +626,7 @@ class PwtcMapdb {
 		$postid = intval($_GET['post']);
 
 		$ride_title = esc_html(get_the_title($postid));
-		$ride_link = get_the_permalink($postid);
+		$ride_link = esc_url(get_the_permalink($postid));
 		$return_to_ride = 'Click <a href="' . $ride_link . '">here</a> to return to the posted ride.';
 
 		$current_user = wp_get_current_user();
@@ -855,7 +855,7 @@ class PwtcMapdb {
 		}
 		
 		$ride_title = esc_html(get_the_title($postid));
-		$ride_link = get_the_permalink($postid);
+		$ride_link = esc_url(get_the_permalink($postid));
 		$return_to_ride = 'Click <a href="' . $ride_link . '">here</a> to return to the posted ride.';
 		
 		if (get_field(self::RIDE_CANCELED, $postid)) {
@@ -1517,7 +1517,7 @@ class PwtcMapdb {
 		*/
 
 		$ride_title = esc_html(get_the_title($postid));
-		$ride_link = get_the_permalink($postid);
+		$ride_link = esc_url(get_the_permalink($postid));
 		$return_to_ride = 'Click <a href="' . $ride_link . '">here</a> to return to the posted ride.';
 
 		$timestamp = time() - self::TIMESTAMP_OFFSET;
@@ -1876,7 +1876,7 @@ class PwtcMapdb {
 		while ($query->have_posts()) {
 			$query->the_post();
 			$title = esc_html(get_the_title());
-            $link = get_the_permalink();
+            		$link = esc_url(get_the_permalink());
 			$start = DateTime::createFromFormat('Y-m-d H:i:s', get_field('date'))->format('m/d/Y g:ia');
 		?>
 			<tr>
@@ -1908,7 +1908,7 @@ class PwtcMapdb {
 		}
 
 		$ride_title = esc_html(get_the_title($postid));
-		$ride_link = get_the_permalink($postid);
+		$ride_link = esc_url(get_the_permalink($postid));
 		$return_to_ride = 'Click <a href="' . $ride_link . '">here</a> to return to the posted ride.';
 
 		if (!user_can($current_user,'edit_published_rides')) {
