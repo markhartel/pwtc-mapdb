@@ -625,7 +625,7 @@ class PwtcMapdb {
 		}
 		$postid = intval($_GET['post']);
 
-		$ride_title = get_the_title($postid);
+		$ride_title = esc_html(get_the_title($postid));
 		$ride_link = get_the_permalink($postid);
 		$return_to_ride = 'Click <a href="' . $ride_link . '">here</a> to return to the posted ride.';
 
@@ -854,7 +854,7 @@ class PwtcMapdb {
 			return '<div class="callout small warning"><p>Please <a href="/wp-login.php">log in</a> to view the ride signup list.</p></div>';
 		}
 		
-		$ride_title = get_the_title($postid);
+		$ride_title = esc_html(get_the_title($postid));
 		$ride_link = get_the_permalink($postid);
 		$return_to_ride = 'Click <a href="' . $ride_link . '">here</a> to return to the posted ride.';
 		
@@ -1516,7 +1516,7 @@ class PwtcMapdb {
 		}
 		*/
 
-		$ride_title = get_the_title($postid);
+		$ride_title = esc_html(get_the_title($postid));
 		$ride_link = get_the_permalink($postid);
 		$return_to_ride = 'Click <a href="' . $ride_link . '">here</a> to return to the posted ride.';
 
@@ -1875,7 +1875,7 @@ class PwtcMapdb {
 
 		while ($query->have_posts()) {
 			$query->the_post();
-			$title = get_the_title();
+			$title = esc_html(get_the_title());
             $link = get_the_permalink();
 			$start = DateTime::createFromFormat('Y-m-d H:i:s', get_field('date'))->format('m/d/Y g:ia');
 		?>
@@ -1907,7 +1907,7 @@ class PwtcMapdb {
 			return '<div class="callout small warning"><p>Please <a href="/wp-login.php">log in</a> to edit this ride.</p></div>';
 		}
 
-		$ride_title = get_the_title($postid);
+		$ride_title = esc_html(get_the_title($postid));
 		$ride_link = get_the_permalink($postid);
 		$return_to_ride = 'Click <a href="' . $ride_link . '">here</a> to return to the posted ride.';
 
@@ -1943,7 +1943,7 @@ class PwtcMapdb {
 			update_field('description', $_POST['description'], $postid);
 		}
 
-		$title = get_the_title($postid);
+		$title = esc_html(get_the_title($postid));
 		$description = get_field('description', $postid, false);
 		
 		ob_start();
@@ -2090,7 +2090,7 @@ class PwtcMapdb {
 	}
 	
 	public static function check_ride_start($postid, $mode, $pad, $return_to_ride) {
-		$ride_title = get_the_title($postid);
+		$ride_title = esc_html(get_the_title($postid));
 		$now_date = self::get_current_time();
 		$now_date_str = $now_date->format('m/d/Y g:ia');
 		$cutoff_date = self::get_signup_cutoff_time($postid, $mode, $pad);
