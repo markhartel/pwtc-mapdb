@@ -1934,7 +1934,7 @@ class PwtcMapdb {
 		if (isset($_POST['title'])) {
 			$my_post = array(
 				'ID' => $postid,
-				'post_title' => trim($_POST['title'])
+				'post_title' => esc_html(trim($_POST['title']))
 			);
 			wp_update_post( $my_post );			
 		}
