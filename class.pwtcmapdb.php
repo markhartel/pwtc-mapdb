@@ -1282,18 +1282,6 @@ class PwtcMapdb {
 				show_errmsg2_wait();
 			});
 		
-			$("#pwtc-mapdb-view-signup-div select[name='ride_signup_mode']").change(function() {
-				$(this).find('option:selected').each(function() {
-					var mode = $(this).val();
-					var label = '(hours)';
-					if (mode == 'paperless') {
-						label = '(hours after ride start)';
-					} else if (mode == 'hardcopy') {
-						label = '(hours before ride start)';
-					}
-					$('#pwtc-mapdb-view-signup-div .cutoff_units').html(label);
-				});
-			});
 		
 			<?php if ($paperless and !$signup_locked) { ?>
 			$('#pwtc-mapdb-view-signup-div .show_more').on('click', function(evt) {
@@ -1309,6 +1297,19 @@ class PwtcMapdb {
 		
 		<?php } ?>
 		
+			$("#pwtc-mapdb-view-signup-div .accordion form select[name='ride_signup_mode']").change(function() {
+				$(this).find('option:selected').each(function() {
+					var mode = $(this).val();
+					var label = '(hours)';
+					if (mode == 'paperless') {
+						label = '(hours after ride start)';
+					} else if (mode == 'hardcopy') {
+						label = '(hours before ride start)';
+					}
+					$('#pwtc-mapdb-view-signup-div .cutoff_units').html(label);
+				});
+			});
+
 			$('#pwtc-mapdb-view-signup-div .accordion form').on('submit', function(evt) {
 				show_errmsg3_wait();
      			});
