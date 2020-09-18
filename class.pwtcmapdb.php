@@ -2312,9 +2312,17 @@ class PwtcMapdb {
 				$ride_title = '';
 				$ride_date = '';
 			}
-			$release_waiver = self::get_release_waiver();
-			$safety_waiver = self::get_safety_waiver();
-			$photo_waiver = self::get_photo_waiver();
+			//$release_waiver = self::get_release_waiver();
+			//$safety_waiver = self::get_safety_waiver();
+			//$photo_waiver = self::get_photo_waiver();
+			
+			$waiver_post = get_page_by_title('Terms and Conditions');
+			if ($waiver_post) {
+				$release_waiver = get_the_content(null, false, $waiver_post);
+			}
+			else {
+				$release_waiver = 'Terms and Conditions page not found!';
+			}
 
 			header('Content-Description: File Transfer');
 			header("Content-type: application/pdf");
@@ -2359,10 +2367,12 @@ class PwtcMapdb {
 				$pdf->SetFont('Arial', '', 6);
 				$pdf->SetXY($x_margin, $waiver_y);
 				$pdf->MultiCell(0, 3, $release_waiver);
+				/*
 				$pdf->SetXY($x_margin, $waiver_y+15);
 				$pdf->MultiCell(0, 3, $safety_waiver);
 				$pdf->SetXY($x_margin, $waiver_y+30);
 				$pdf->MultiCell(0, 3, $photo_waiver);
+				*/
 
 				$pdf->SetXY($x_margin, $table_y);
 				$pdf->SetFont('Arial', 'B', $font_size);
