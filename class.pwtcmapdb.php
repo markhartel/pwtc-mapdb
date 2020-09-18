@@ -2318,7 +2318,7 @@ class PwtcMapdb {
 			
 			$waiver_post = get_page_by_title('Terms and Conditions');
 			if ($waiver_post) {
-				$release_waiver = get_the_content(null, false, $waiver_post);
+				$release_waiver = wp_kses(get_the_content(null, false, $waiver_post), array());
 			}
 			else {
 				$release_waiver = 'Terms and Conditions page not found!';
