@@ -2364,7 +2364,7 @@ class PwtcMapdb {
 					$table_y = $y_margin+50;
 					$rows_per_page = $nrows_next_pages;		
 				}
-				$pdf->SetFont('Arial', '', 6);
+				$pdf->SetFont('Arial', '', 8);
 				$pdf->SetXY($x_margin, $waiver_y);
 				$pdf->MultiCell(0, 3, $release_waiver);
 				/*
