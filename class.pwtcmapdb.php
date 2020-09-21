@@ -1439,7 +1439,7 @@ class PwtcMapdb {
 			<?php if ($paperless) { ?>
 				<div class="callout small success"><p>Online signup is closed, you may now log the rider mileage to the mileage database.</p></div>
 			<?php } else { ?>
-				<div class="callout small success"><p>Online signup is closed, you may now download the ride signup sheet and print it.</p></div>
+				<div class="callout small success"><p>Online signup is closed, you may now download the ride sign-in sheet and print it.</p></div>
 			<?php } ?>
 		<?php } else { ?>
 			<?php if ($now_date < $cutoff_date) { ?>
