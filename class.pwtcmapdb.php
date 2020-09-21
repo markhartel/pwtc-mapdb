@@ -1458,7 +1458,7 @@ class PwtcMapdb {
 			<?php } else { ?>
 				<input type="hidden" name="ride_id" value="<?php echo $postid; ?>"/>
 				<input type="hidden" name="unused_rows" value="<?php echo $unused_rows; ?>"/>
-				<button class="dark button" type="submit" name="pwtc_mapdb_download_signup"><i class="fa fa-download"></i> Signup Sheet</button>
+				<button class="dark button" type="submit" name="pwtc_mapdb_download_signup"><i class="fa fa-download"></i> Sign-in Sheet</button>
 			<?php } ?>
 				<button class="dark button" type="submit" name="unlock_signup"><i class="fa fa-unlock"></i> Reopen Signup</button>
 				</div>
@@ -1490,7 +1490,7 @@ class PwtcMapdb {
 
 	<div id='pwtc-mapdb-download-signup-div'>
 		<form method="POST">
-			<button class="dark button" type="submit" name="pwtc_mapdb_download_signup"><i class="fa fa-download"></i> Ride Signup Sheet</button>
+			<button class="dark button" type="submit" name="pwtc_mapdb_download_signup"><i class="fa fa-download"></i> Ride Sign-in Sheet</button>
 		</form>
 	</div>
 	<?php
