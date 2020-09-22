@@ -38,6 +38,7 @@ class PwtcMapdb {
 	const USER_CELL_PHONE = 'cell_phone';
 	const USER_HOME_PHONE = 'home_phone';
 	const USER_RIDER_ID = 'rider_id';
+	const USER_RELEASE_ACCEPTED = 'release_accepted';
 
 	const ROLE_CURRENT_MEMBER = 'current_member';
 	const ROLE_EXPIRED_MEMBER = 'expired_member';
@@ -716,6 +717,12 @@ class PwtcMapdb {
 			$name = sanitize_text_field($_POST['contact_name']);
 			update_field('emergency_contact_name', $name, 'user_'.$current_user->ID);
 		}
+		
+		if (isset($_POST['accept_terms'])) {
+			if ($_POST['accept_terms'] == 'yes') {
+				update_field(self::USER_RELEASE_ACCEPTED, true, 'user_'.$current_user->ID);
+			}
+		}
 
 		$signup_list = get_post_meta($postid, self::RIDE_SIGNUP_USERID);
 		$accept_signup = true;
@@ -736,6 +743,7 @@ class PwtcMapdb {
 		$rider_name = $user_info->first_name . ' ' . $user_info->last_name;
 		$contact_phone = get_field('emergency_contact_phone', 'user_'.$current_user->ID);
 		$contact_name = get_field('emergency_contact_name', 'user_'.$current_user->ID);
+		$release_accepted = get_field(self::USER_RELEASE_ACCEPTED, 'user_'.$current_user->ID);
 
 		ob_start();
 	?>
@@ -780,8 +788,8 @@ class PwtcMapdb {
 						<div class="small-12 medium-6 columns">
 							<label>Accept Terms and Conditions
 								<select name="accept_terms">
-									<option value="no" selected>No</option>
-									<option value="yes">Yes</option>
+									<option value="no" <?php echo $release_accepted ? '': 'selected'; ?>>No</option>
+									<option value="yes" <?php echo $release_accepted ? 'selected': ''; ?>>Yes</option>
 								</select>
 							</label>
 						</div>
