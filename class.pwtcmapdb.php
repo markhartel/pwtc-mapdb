@@ -818,7 +818,7 @@ class PwtcMapdb {
 					</div>
 					<div class="row column clearfix">
 						<input type="hidden" name="accept_user_signup" value="yes"/>
-						<button class="dark button float-left" type="submit"><i class="fa fa-user-plus"></i> Accept Signup</button>
+						<button class="dark button float-left" type="submit"><i class="fa fa-user-plus"></i> Accept Sign-up</button>
 						<a href="<?php echo $ride_link; ?>" class="dark button float-right"><i class="fa fa-chevron-left"></i> Back to Ride</a>
 					</div>
 				</form>
@@ -830,7 +830,7 @@ class PwtcMapdb {
 					<div class="row column errmsg"></div>
 					<div class="row column clearfix">
 						<input type="hidden" name="cancel_user_signup" value="yes"/>
-						<button class="dark button float-left" type="submit"><i class="fa fa-user-times"></i> Cancel Signup</button>
+						<button class="dark button float-left" type="submit"><i class="fa fa-user-times"></i> Cancel Sign-up</button>
 						<a href="<?php echo $ride_link; ?>" class="dark button float-right"><i class="fa fa-chevron-left"></i> Back to Ride</a>
 					</div>
 				</form>
@@ -1327,12 +1327,12 @@ class PwtcMapdb {
 	<div id='pwtc-mapdb-view-signup-div'>
 		<ul class="accordion" data-accordion data-allow-all-closed="true">
 			<li class="accordion-item" data-accordion-item>
-            			<a href="#" class="accordion-title">Click Here For Signup Options</a>
+            			<a href="#" class="accordion-title">Click Here For Sign-up Options</a>
             			<div class="accordion-content" data-tab-content>
 					<form method="POST">
 						<div class="row">
 							<div class="small-12 medium-4 columns">
-								<label>Online Ride Signup
+								<label>Online Ride Sign-up
 									<select name="ride_signup_mode">
 										<option value="no" <?php echo $ride_signup_mode == 'no' ? 'selected': ''; ?>>No</option>
 										<option value="hardcopy"  <?php echo $ride_signup_mode == 'hardcopy' ? 'selected': ''; ?>>Hardcopy (requires computer/printer)</option>
@@ -1341,12 +1341,12 @@ class PwtcMapdb {
 								</label>
 							</div>
 							<div class="small-12 medium-4 columns">
-								<label>Signup Cutoff <span class="cutoff_units"><?php echo $cutoff_units; ?></span>
+								<label>Sign-up Cutoff <span class="cutoff_units"><?php echo $cutoff_units; ?></span>
 									<input type="number" name="ride_signup_cutoff" value="<?php echo $ride_signup_cutoff; ?>"/>
 								</label>
 							</div>
 							<div class="small-12 medium-4 columns">
-								<label>Signup Count Limit (0 means unlimited)
+								<label>Sign-up Count Limit (0 means unlimited)
 									<input type="number" name="ride_signup_limit" value="<?php echo $ride_signup_limit; ?>"/>
 								</label>
 							</div>
@@ -1468,10 +1468,10 @@ class PwtcMapdb {
 				<input type="hidden" name="unused_rows" value="<?php echo $unused_rows; ?>"/>
 				<button class="dark button" type="submit" name="pwtc_mapdb_download_signup"><i class="fa fa-download"></i> Sign-in Sheet</button>
 			<?php } ?>
-				<button class="dark button" type="submit" name="unlock_signup"><i class="fa fa-unlock"></i> Reopen Signup</button>
+				<button class="dark button" type="submit" name="unlock_signup"><i class="fa fa-unlock"></i> Reopen Sign-up</button>
 				</div>
 		<?php } else { ?>
-				<button class="dark button float-left" type="submit" name="lock_signup" <?php echo $now_date < $cutoff_date ? 'disabled': ''; ?>><i class="fa fa-lock"></i> Close Signup</button>
+				<button class="dark button float-left" type="submit" name="lock_signup" <?php echo $now_date < $cutoff_date ? 'disabled': ''; ?>><i class="fa fa-lock"></i> Close Sign-up</button>
 		<?php } ?>
 				<a href="<?php echo $ride_link; ?>" class="dark button float-right"><i class="fa fa-chevron-left"></i> Back to Ride</a>
 			</form>
@@ -1817,7 +1817,7 @@ class PwtcMapdb {
 				</div>
 				<div class="warnmsg"></div>
 				<div class="row column clearfix">
-					<button class="dark button float-left" type="submit"><i class="fa fa-user-plus"></i> Accept Signup</button>
+					<button class="dark button float-left" type="submit"><i class="fa fa-user-plus"></i> Accept Sign-up</button>
 					<a href="<?php echo $ride_link; ?>" class="dark button float-right"><i class="fa fa-chevron-left"></i> Back to Ride</a>
 				</div>
 			</form>
@@ -1826,7 +1826,7 @@ class PwtcMapdb {
 			<p>Hello <span class="your_name"></span>, you are currently signed up for the ride "<?php echo $ride_title; ?>." To cancel your sign up, please press the cancel button below.</p>
 			<form method="POST">
 				<div class="row column clearfix">
-					<button class="dark button float-left" type="submit"><i class="fa fa-user-times"></i> Cancel Signup</button>
+					<button class="dark button float-left" type="submit"><i class="fa fa-user-times"></i> Cancel Sign-up</button>
 					<a href="<?php echo $ride_link; ?>" class="dark button float-right"><i class="fa fa-chevron-left"></i> Back to Ride</a>
 				</div>
 			</form>
@@ -2228,7 +2228,7 @@ class PwtcMapdb {
 						</label>
 					</div>
 					<div class="small-12 medium-6 columns">
-						<label>Online Ride Signup
+						<label>Online Ride Sign-up
 							<select name="ride_signup_mode">
 								<option value="no" <?php echo $ride_signup_mode == 'no' ? 'selected': ''; ?>>No</option>
 								<option value="hardcopy"  <?php echo $ride_signup_mode == 'hardcopy' ? 'selected': ''; ?>>Hardcopy</option>
@@ -2237,7 +2237,7 @@ class PwtcMapdb {
 						</label>
 					</div>
 					<div class="small-12 medium-6 columns">
-						<label>Signup Cutoff <span class="cutoff_units"><?php echo $cutoff_units; ?></span>
+						<label>Sign-up Cutoff <span class="cutoff_units"><?php echo $cutoff_units; ?></span>
 							<input type="number" name="signup_cutoff" value="<?php echo $signup_cutoff; ?>"/>
 						</label>
 					</div>
