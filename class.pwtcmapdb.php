@@ -710,12 +710,12 @@ class PwtcMapdb {
 			else {
 				$phone = sanitize_text_field($_POST['contact_phone']);
 			}
-			update_field('emergency_contact_phone', $phone, 'user_'.$current_user->ID);
+			update_field(self::USER_EMER_PHONE, $phone, 'user_'.$current_user->ID);
 		}
 
 		if (isset($_POST['contact_name'])) {
 			$name = sanitize_text_field($_POST['contact_name']);
-			update_field('emergency_contact_name', $name, 'user_'.$current_user->ID);
+			update_field(self::USER_EMER_NAME, $name, 'user_'.$current_user->ID);
 		}
 		
 		if (isset($_POST['accept_terms'])) {
@@ -741,8 +741,8 @@ class PwtcMapdb {
 
 		$user_info = get_userdata($current_user->ID);
 		$rider_name = $user_info->first_name . ' ' . $user_info->last_name;
-		$contact_phone = get_field('emergency_contact_phone', 'user_'.$current_user->ID);
-		$contact_name = get_field('emergency_contact_name', 'user_'.$current_user->ID);
+		$contact_phone = get_field(self::USER_EMER_PHONE, 'user_'.$current_user->ID);
+		$contact_name = get_field(self::USER_EMER_NAME, 'user_'.$current_user->ID);
 		$release_accepted = get_field(self::USER_RELEASE_ACCEPTED, 'user_'.$current_user->ID);
 
 		ob_start();
@@ -1853,7 +1853,7 @@ class PwtcMapdb {
 			'post_type' => 'scheduled_rides',
 			'meta_query' => [
 				[
-					'key' => 'date',
+					'key' => self::RIDE_DATE,
 					'value' => $now->format('Y-m-d 00:00:00'),
 					'compare' => '>=',
 					'type' => 'DATETIME'
@@ -1864,7 +1864,7 @@ class PwtcMapdb {
 					'compare' => 'LIKE'
 				],
 			],
-			'orderby' => ['date' => 'ASC'],
+			'orderby' => [self::RIDE_DATE => 'ASC'],
 		];		
 		$query = new WP_Query($query_args);
 
@@ -2440,12 +2440,12 @@ class PwtcMapdb {
 	}	
 
 	public static function get_rider_id($userid) {
-		$rider_id = get_field('rider_id', 'user_'.$userid);
+		$rider_id = get_field(self::USER_RIDER_ID, 'user_'.$userid);
 		return $rider_id;
 	}
 
 	public static function get_emergency_contact($userid, $use_link) {
-		$contact_phone = trim(get_field('emergency_contact_phone', 'user_'.$userid));
+		$contact_phone = trim(get_field(self::USER_EMER_PHONE, 'user_'.$userid));
 		if (!empty($contact_phone)) {
 			if (function_exists('pwtc_members_format_phone_number')) {
 				if ($use_link) {
@@ -2458,7 +2458,7 @@ class PwtcMapdb {
 				}
 			}
 		}
-		$contact_name = trim(get_field('emergency_contact_name', 'user_'.$userid));
+		$contact_name = trim(get_field(self::USER_EMER_NAME, 'user_'.$userid));
 		$contact = $contact_phone;
 		if (!empty($contact_name)) {
 			$contact .= ' (' . $contact_name . ')';
