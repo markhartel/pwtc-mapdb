@@ -632,16 +632,16 @@ class PwtcMapdb {
 
 		$current_user = wp_get_current_user();
 		if ( 0 == $current_user->ID ) {
-			return '<div class="callout small warning"><p>You must log in <a href="/wp-login.php">here</a> to signup for this ride. ' . $return_to_ride . '</p></div>';
+			return '<div class="callout small warning"><p>You must log in <a href="/wp-login.php">here</a> to sign up for this ride. ' . $return_to_ride . '</p></div>';
 		}
 		
 		if (get_field(self::RIDE_CANCELED, $postid)) {
-			return '<div class="callout small warning"><p>The ride "' . $ride_title . '" has been canceled, no signup allowed. ' . $return_to_ride . '</p></div>';
+			return '<div class="callout small warning"><p>The ride "' . $ride_title . '" has been canceled, no sign up allowed. ' . $return_to_ride . '</p></div>';
 		}
 
 		if (!in_array(self::ROLE_CURRENT_MEMBER, (array) $current_user->roles) and 
 		    !in_array(self::ROLE_EXPIRED_MEMBER, (array) $current_user->roles)) {
-			return '<div class="callout small warning"><p>You must be a club member to signup for rides. ' . $return_to_ride . '</p></div>';
+			return '<div class="callout small warning"><p>You must be a club member to sign up for rides. ' . $return_to_ride . '</p></div>';
 		}
 		
 		$expired = false;
@@ -673,7 +673,7 @@ class PwtcMapdb {
 			$set_mileage = false;
 		}
 		else {
-			return '<div class="callout small warning"><p>The leader for ride "' . $ride_title . '" does not allow online signup. ' . $return_to_ride . '</p></div>';			
+			return '<div class="callout small warning"><p>The leader for ride "' . $ride_title . '" does not allow online sign up. ' . $return_to_ride . '</p></div>';			
 		}
 
 		$error = self::check_ride_start($postid, $ride_signup_mode, $ride_signup_cutoff, $return_to_ride);
@@ -683,7 +683,7 @@ class PwtcMapdb {
 
 		$signup_locked = get_post_meta($postid, self::RIDE_SIGNUP_LOCKED, true);
 		if ($signup_locked) {
-			return '<div class="callout small warning"><p>You cannot signup for ride "' . $ride_title . '" because it is closed. ' . $return_to_ride . '</p></div>';	
+			return '<div class="callout small warning"><p>You cannot sign up for ride "' . $ride_title . '" because it is closed. ' . $return_to_ride . '</p></div>';	
 		}
 		
 		$mileage = '';
@@ -735,7 +735,7 @@ class PwtcMapdb {
 
 		if ($accept_signup and $ride_signup_limit > 0) {
 			if (count($signup_list)+count(get_post_meta($postid, self::RIDE_SIGNUP_NONMEMBER)) >= $ride_signup_limit) {
-				return '<div class="callout small warning"><p>You cannot signup for ride "' . $ride_title . '" because it is full. <em>A maximum of ' . $ride_signup_limit . ' riders are allowed on this ride.</em> ' . $return_to_ride . '</p></div>';
+				return '<div class="callout small warning"><p>You cannot sign up for ride "' . $ride_title . '" because it is full. <em>A maximum of ' . $ride_signup_limit . ' riders are allowed on this ride.</em> ' . $return_to_ride . '</p></div>';
 			}
 		}
 
@@ -759,7 +759,7 @@ class PwtcMapdb {
 				$(this).find("select[name='accept_terms'] option:selected").each(function() {
 					var accept_terms = $(this).val();
 					if (accept_terms == 'no') {
-						$('#pwtc-mapdb-rider-signup-div .errmsg').html('<div class="callout small warning"><p>You must accept the Club&#39;s <a href="/terms-and-conditions" target="_blank">terms and conditions</a> to signup for rides.</p></div>');
+						$('#pwtc-mapdb-rider-signup-div .errmsg').html('<div class="callout small warning"><p>You must accept the Club&#39;s <a href="/terms-and-conditions" target="_blank">terms and conditions</a> to sign up for rides.</p></div>');
 						evt.preventDefault();
 					}
 					else {
@@ -813,7 +813,7 @@ class PwtcMapdb {
 					</div>
 					<div class="row column errmsg">
 			<?php if ($expired) { ?>
-						<div class="callout small warning"><p>Your club membership has expired, please renew. While expired members may still signup for rides, your mileage will not be logged.</p></div>
+						<div class="callout small warning"><p>Your club membership has expired, please renew. While expired members may still sign up for rides, your mileage will not be logged.</p></div>
 			<?php } ?>
 					</div>
 					<div class="row column clearfix">
@@ -859,7 +859,7 @@ class PwtcMapdb {
 		
 		$current_user = wp_get_current_user();
 		if ( 0 == $current_user->ID ) {
-			return '<div class="callout small warning"><p>Please <a href="/wp-login.php">log in</a> to view the ride signup list.</p></div>';
+			return '<div class="callout small warning"><p>Please <a href="/wp-login.php">log in</a> to view the ride sign up list.</p></div>';
 		}
 		
 		$ride_title = esc_html(get_the_title($postid));
@@ -867,7 +867,7 @@ class PwtcMapdb {
 		$return_to_ride = 'Click <a href="' . $ride_link . '">here</a> to return to the posted ride.';
 		
 		if (get_field(self::RIDE_CANCELED, $postid)) {
-			return '<div class="callout small warning"><p>The ride "' . $ride_title . '" has been canceled, no signup view allowed. ' . $return_to_ride . '</p></div>';
+			return '<div class="callout small warning"><p>The ride "' . $ride_title . '" has been canceled, no sign up view allowed. ' . $return_to_ride . '</p></div>';
 		}
 
 		if (!user_can($current_user,'edit_published_rides')) {
@@ -880,7 +880,7 @@ class PwtcMapdb {
 				}
 			}
 			if ($denied) {
-				return '<div class="callout small warning"><p>You must be a leader for ride "' . $ride_title . '" to view signups. ' . $return_to_ride . '</p></div>';
+				return '<div class="callout small warning"><p>You must be a leader for ride "' . $ride_title . '" to view sign ups. ' . $return_to_ride . '</p></div>';
 			}
 		}
 		
@@ -1368,7 +1368,7 @@ class PwtcMapdb {
 			</li>
 		</ul>		
 		<?php if ($ride_signup_mode == 'no') { ?>
-			<div class="callout small"><p>Online signup is not enabled for ride "<?php echo $ride_title; ?>." <?php echo $return_to_ride; ?></p></div>
+			<div class="callout small"><p>Online sign up is not enabled for ride "<?php echo $ride_title; ?>." <?php echo $return_to_ride; ?></p></div>
 		<?php } else { ?>
 		<?php if (count($signup_list) > 0 or count($nonmember_signup_list) > 0) { ?>
 			<p>The following riders are currently signed up for the ride "<?php echo $ride_title; ?>." <em>(Riders marked with a "n/a" ID and mileage are not club members and their mileage is not logged.)</em>
@@ -1445,15 +1445,15 @@ class PwtcMapdb {
 		<?php } ?>
 		<?php if ($signup_locked) { ?>
 			<?php if ($paperless) { ?>
-				<div class="callout small success"><p>Online signup is closed, you may now log the rider mileage to the mileage database.</p></div>
+				<div class="callout small success"><p>Online sign up is closed, you may now log the rider mileage to the mileage database.</p></div>
 			<?php } else { ?>
-				<div class="callout small success"><p>Online signup is closed, you may now download the ride sign-in sheet and print it.</p></div>
+				<div class="callout small success"><p>Online sign up is closed, you may now download the ride sign-in sheet and print it.</p></div>
 			<?php } ?>
 		<?php } else { ?>
 			<?php if ($now_date < $cutoff_date) { ?>
-				<div class="callout small warning"><p>Online signup is allowed until <?php echo $cutoff_date_str; ?>, you cannot close it until then.</p></div>
+				<div class="callout small warning"><p>Online sign up is allowed until <?php echo $cutoff_date_str; ?>, you cannot close it until then.</p></div>
 			<?php } else { ?>
-				<div class="callout small success"><p>The period for online signup is past, you may now close it.</p></div>
+				<div class="callout small success"><p>The period for online sign up is past, you may now close it.</p></div>
 			<?php } ?>
 		<?php } ?>
 		<div class="errmsg2"></div>
@@ -1521,7 +1521,7 @@ class PwtcMapdb {
 		/*
 		$current_user = wp_get_current_user();
 		if ( 0 != $current_user->ID ) {
-			return '<div class="callout small alert"><p>This page is only for non-member ride signup and you must be logged out to use it.</p></div>';
+			return '<div class="callout small alert"><p>This page is only for non-member ride sign up and you must be logged out to use it.</p></div>';
 		}
 		*/
 
@@ -1532,7 +1532,7 @@ class PwtcMapdb {
 		$timestamp = time() - self::TIMESTAMP_OFFSET;
 		
 		if (get_field(self::RIDE_CANCELED, $postid)) {
-			return '<div class="callout small warning"><p>The ride "' . $ride_title . '" has been canceled, no signup allowed. ' . $return_to_ride . '</p></div>';
+			return '<div class="callout small warning"><p>The ride "' . $ride_title . '" has been canceled, no sign up allowed. ' . $return_to_ride . '</p></div>';
 		}
 		
 		//self::init_online_signup($postid);
@@ -1555,7 +1555,7 @@ class PwtcMapdb {
 		$members_only = get_post_meta($postid, self::RIDE_SIGNUP_MEMBERS_ONLY, true);
 
 		if ($ride_signup_mode == 'no') {
-			return '<div class="callout small warning"><p>The leader for ride "' . $ride_title . '" does not allow online signup. ' . $return_to_ride . '</p></div>';			
+			return '<div class="callout small warning"><p>The leader for ride "' . $ride_title . '" does not allow online sign up. ' . $return_to_ride . '</p></div>';			
 		}
 		
 		if ($members_only) {
@@ -1569,7 +1569,7 @@ class PwtcMapdb {
 
 		$signup_locked = get_post_meta($postid, self::RIDE_SIGNUP_LOCKED, true);
 		if ($signup_locked) {
-			return '<div class="callout small warning"><p>You cannot signup for ride "' . $ride_title . '" because it is closed. ' . $return_to_ride . '</p></div>';	
+			return '<div class="callout small warning"><p>You cannot sign up for ride "' . $ride_title . '" because it is closed. ' . $return_to_ride . '</p></div>';	
 		}
 
 		ob_start();
@@ -1663,7 +1663,7 @@ class PwtcMapdb {
 				}
 				else {
 					if (res.postid == <?php echo $postid ?>) {
-						//TODO: verify that signup IDs match!
+						//TODO: verify that sign up IDs match!
 						clear_errmsg();
 						if (res.warning) {
 							show_warnmsg(res.warning);
@@ -1698,7 +1698,7 @@ class PwtcMapdb {
 				}
 				else {
 					if (res.postid == <?php echo $postid ?>) {
-						//TODO: verify that signup IDs match!
+						//TODO: verify that sign up IDs match!
 						clear_errmsg();
 						$('#pwtc-mapdb-nonmember-signup-div .cancel_div').hide();
 						clear_warnmsg();
@@ -1719,7 +1719,7 @@ class PwtcMapdb {
 				});
 				var your_name = $(this).find('input[name="your_name"]').val().trim();
 				if (accept_terms == 'no') {
-					show_warnmsg('You must accept the Club&#39;s <a href="/terms-and-conditions" target="_blank">terms and conditions</a> to signup for rides.');
+					show_warnmsg('You must accept the Club&#39;s <a href="/terms-and-conditions" target="_blank">terms and conditions</a> to sign up for rides.');
 				}
 				else if (your_name) {
 					clear_warnmsg();
@@ -1779,13 +1779,13 @@ class PwtcMapdb {
 				show_waiting();
 			}
 			else {
-				show_errmsg('You cannot signup because your browser does not support local storage.');
+				show_errmsg('You cannot sign up because your browser does not support local storage.');
 			}
 		});
 	</script>
 
 	<div id='pwtc-mapdb-nonmember-signup-div'>
-		<div class="callout small warning"><p>ONLY non-members should use this page to signup for rides. If you are a club member, first log in <a href="/wp-login.php">here</a> before signing up for a ride.</p></div>
+		<div class="callout small warning"><p>ONLY non-members should use this page to sign up for rides. If you are a club member, first log in <a href="/wp-login.php">here</a> before signing up for a ride.</p></div>
 		<div class="errmsg"></div>
 		<div class="accept_div callout" style="display: none">
 			<p>To sign up for the ride "<?php echo $ride_title; ?>," please accept the Club's <a href="/terms-and-conditions" target="_blank">terms and conditions</a>, enter your name and emergency contact information and press the accept button.</p>
@@ -2105,7 +2105,7 @@ class PwtcMapdb {
 		$cutoff_date = self::get_signup_cutoff_time($postid, $mode, $pad);
 		$cutoff_date_str = $cutoff_date->format('m/d/Y g:ia');
 		if ($now_date > $cutoff_date) {
-			return '<div class="callout small warning"><p>You cannot signup for ride "' . $ride_title . '" because you are beyond the signup cutoff time at ' . $cutoff_date_str . '. ' . $return_to_ride . '</p></div>';
+			return '<div class="callout small warning"><p>You cannot sign up for ride "' . $ride_title . '" because you are past the sign up cutoff time at ' . $cutoff_date_str . '. ' . $return_to_ride . '</p></div>';
 		}
 		return '';
 	}
@@ -2512,7 +2512,7 @@ EOT;
 		$current_user = wp_get_current_user();
 		if ( 0 == $current_user->ID ) {
 			$response = array(
-				'error' => 'Server user access denied for signup edit.'
+				'error' => 'Server user access denied for sign up edit.'
 			);		
 		}
 		else if (isset($_POST['userid']) and isset($_POST['postid']) and isset($_POST['mileage']) and isset($_POST['oldmileage']) and isset($_POST['attended']) and isset($_POST['oldattended']) and isset($_POST['nonce'])) {
@@ -2525,7 +2525,7 @@ EOT;
 			$nonce = $_POST['nonce'];
 			if (!wp_verify_nonce($nonce, 'pwtc_mapdb_edit_signup')) {
 				$response = array(
-					'error' => 'Server security check failed for signup edit.'
+					'error' => 'Server security check failed for sign up edit.'
 				);
 			}
 			else {
@@ -2546,7 +2546,7 @@ EOT;
 					}
 					else {
 						$response = array(
-							'error' => 'Server signup update failed.'
+							'error' => 'Server sign up update failed.'
 						);	
 					}
 				}
@@ -2562,7 +2562,7 @@ EOT;
 		}
 		else {
 			$response = array(
-				'error' => 'Server arguments missing for signup edit.'
+				'error' => 'Server arguments missing for sign up edit.'
 			);		
 		}
 		echo wp_json_encode($response);
@@ -2584,7 +2584,7 @@ EOT;
 			$nonce = $_POST['nonce'];
 			if (!wp_verify_nonce($nonce, 'pwtc_mapdb_edit_nonmember_signup')) {
 				$response = array(
-					'error' => 'Server security check failed for nonmember signup edit.'
+					'error' => 'Server security check failed for nonmember sign up edit.'
 				);
 			}
 			else {
@@ -2610,13 +2610,13 @@ EOT;
 						}
 						else {
 							$response = array(
-								'error' => 'Server nonmember signup update failed.'
+								'error' => 'Server nonmember sign up update failed.'
 							);	
 						}
 					}
 					else {
 						$response = array(
-							'error' => 'Server nonmember signup ID not found for edit.'
+							'error' => 'Server nonmember sign up ID not found for edit.'
 						);	
 					}
 				}
@@ -2631,7 +2631,7 @@ EOT;
 		}
 		else {
 			$response = array(
-				'error' => 'Server arguments missing for nonmember signup edit.'
+				'error' => 'Server arguments missing for nonmember sign up edit.'
 			);		
 		}
 		echo wp_json_encode($response);
@@ -2645,7 +2645,7 @@ EOT;
 			$nonce = $_POST['nonce'];
 			if (!wp_verify_nonce($nonce, 'pwtc_mapdb_check_nonmember_signup')) {
 				$response = array(
-					'error' => 'Server security check failed for nonmember signup check.'
+					'error' => 'Server security check failed for nonmember sign up check.'
 				);
 			}
 			else {
@@ -2679,7 +2679,7 @@ EOT;
 		}
 		else {
 			$response = array(
-				'error' => 'Server arguments missing for nonmember signup check.'
+				'error' => 'Server arguments missing for nonmember sign up check.'
 			);		
 		}
 		echo wp_json_encode($response);
@@ -2697,7 +2697,7 @@ EOT;
 			$contact_name = $_POST['signup_contact_name'];
 			if (!wp_verify_nonce($nonce, 'pwtc_mapdb_accept_nonmember_signup')) {
 				$response = array(
-					'error' => 'Server security check failed for nonmember signup accept.'
+					'error' => 'Server security check failed for nonmember sign up accept.'
 				);
 			}
 			else {
@@ -2707,7 +2707,7 @@ EOT;
 					$response = array(
 						'postid' => $postid,
 						'signup_id' => ''.$signup_id,
-						'warning' => 'You cannot signup for this ride because it is full; a maximum of ' . $signup_limit . ' riders are allowed.'
+						'warning' => 'You cannot sign up for this ride because it is full; a maximum of ' . $signup_limit . ' riders are allowed.'
 					);				
 				}
 				else {
@@ -2729,7 +2729,7 @@ EOT;
 		}
 		else {
 			$response = array(
-				'error' => 'Server arguments missing for nonmember signup accept.'
+				'error' => 'Server arguments missing for nonmember sign up accept.'
 			);		
 		}
 		echo wp_json_encode($response);
@@ -2743,7 +2743,7 @@ EOT;
 			$nonce = $_POST['nonce'];
 			if (!wp_verify_nonce($nonce, 'pwtc_mapdb_cancel_nonmember_signup')) {
 				$response = array(
-					'error' => 'Server security check failed for nonmember signup cancel.'
+					'error' => 'Server security check failed for nonmember sign up cancel.'
 				);
 			}
 			else {
@@ -2756,7 +2756,7 @@ EOT;
 		}
 		else {
 			$response = array(
-				'error' => 'Server arguments missing for nonmember signup cancel.'
+				'error' => 'Server arguments missing for nonmember sign up cancel.'
 			);		
 		}		
 		echo wp_json_encode($response);
