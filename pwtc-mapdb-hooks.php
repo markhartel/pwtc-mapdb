@@ -11,11 +11,12 @@ function pwtc_mapdb_get_signup() {
         }
     }
     $members_only = get_post_meta($postid, PwtcMapdb::RIDE_SIGNUP_MEMBERS_ONLY, true);
+    $signup_locked = get_post_meta($postid, PwtcMapdb::RIDE_SIGNUP_LOCKED, true);
 
     $result['view_signup_url'] = '/ride-view-signups/?post='.$postid;
     $result['edit_ride_url'] = false; //'/ride-edit-fields/?post='.$postid;
 
-    if ($signup_mode == 'no') {
+    if ($signup_mode == 'no' or $signup_locked) {
         $result['ride_signup_msg'] = false;
         $result['ride_signup_url'] = false;
     }
