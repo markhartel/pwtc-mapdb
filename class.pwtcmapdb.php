@@ -46,8 +46,8 @@ class PwtcMapdb {
 
 	const LOCAL_SIGNUP_ID = 'ride_signup_id';
 	const LOCAL_SIGNUP_NAME = 'ride_signup_name';
-	const LOCAL_EMER_PHONE = 'ride_signup_contact_name';
-	const LOCAL_EMER_NAME = 'ride_signup_contact_phone';
+	const LOCAL_EMER_NAME = 'ride_signup_contact_name';
+	const LOCAL_EMER_PHONE = 'ride_signup_contact_phone';
 
 	const POST_TYPE_RIDE = 'scheduled_rides';
 	
@@ -639,13 +639,13 @@ class PwtcMapdb {
 			return '<div class="callout small warning"><p>The ride "' . $ride_title . '" has been canceled, no signup allowed. ' . $return_to_ride . '</p></div>';
 		}
 
-		if (!in_array('current_member', (array) $current_user->roles) and 
-		    !in_array('expired_member', (array) $current_user->roles)) {
+		if (!in_array(self::ROLE_CURRENT_MEMBER, (array) $current_user->roles) and 
+		    !in_array(self::ROLE_EXPIRED_MEMBER, (array) $current_user->roles)) {
 			return '<div class="callout small warning"><p>You must be a club member to signup for rides. ' . $return_to_ride . '</p></div>';
 		}
 		
 		$expired = false;
-		if (in_array('expired_member', (array) $current_user->roles)) {
+		if (in_array(self::ROLE_EXPIRED_MEMBER, (array) $current_user->roles)) {
 			$expired = true;
 		}
 		
@@ -1393,7 +1393,7 @@ class PwtcMapdb {
 					$mileage_label = $mileage;
 					$attended = $arr['attended'];
 					/*
-					if (in_array('expired_member', (array) $user_info->roles)) {
+					if (in_array(self::ROLE_EXPIRED_MEMBER, (array) $user_info->roles)) {
 						$mileage = 'XXX';
 						$mileage_label = 'expired';
 					}
@@ -1599,17 +1599,17 @@ class PwtcMapdb {
 
 			function set_accept_form() {
 				var form = $('#pwtc-mapdb-nonmember-signup-div .accept_div form');
-				var your_name = window.localStorage.getItem('ride_signup_name');
+				var your_name = window.localStorage.getItem(self::LOCAL_SIGNUP_NAME);
 				if (!your_name) {
 					your_name = '';
 				}
 				form.find('input[name="your_name"]').val(your_name);
-				var contact_phone = window.localStorage.getItem('ride_signup_contact_phone');
+				var contact_phone = window.localStorage.getItem(self::LOCAL_EMER_PHONE);
 				if (!contact_phone) {
 					contact_phone = '';
 				}
 				form.find('input[name="contact_phone"]').val(contact_phone);
-				var contact_name = window.localStorage.getItem('ride_signup_contact_name');
+				var contact_name = window.localStorage.getItem(self::LOCAL_EMER_NAME);
 				if (!contact_name) {
 					contact_name = '';	
 				}	
@@ -1670,9 +1670,9 @@ class PwtcMapdb {
 							$('#pwtc-mapdb-nonmember-signup-div .accept_div').show();
 						}
 						else {
-							window.localStorage.setItem('ride_signup_name', res.signup_name);
-							window.localStorage.setItem('ride_signup_contact_name', res.signup_contact_name);
-							window.localStorage.setItem('ride_signup_contact_phone', res.signup_contact_phone);
+							window.localStorage.setItem(self::LOCAL_SIGNUP_NAME, res.signup_name);
+							window.localStorage.setItem(self::LOCAL_EMER_NAME, res.signup_contact_name);
+							window.localStorage.setItem(self::LOCAL_EMER_PHONE, res.signup_contact_phone);
 							$('#pwtc-mapdb-nonmember-signup-div .accept_div').hide();
 							$('#pwtc-mapdb-nonmember-signup-div .cancel_div .your_name').html(res.signup_name);
 							$('#pwtc-mapdb-nonmember-signup-div .cancel_div').show();
@@ -1723,7 +1723,7 @@ class PwtcMapdb {
 				}
 				else if (your_name) {
 					clear_warnmsg();
-					var signup_id = window.localStorage.getItem('ride_signup_id');
+					var signup_id = window.localStorage.getItem(self::LOCAL_SIGNUP_ID);
 					var contact_phone = $(this).find('input[name="contact_phone"]').val().trim();
 					var contact_name = $(this).find('input[name="contact_name"]').val().trim();
 					var action = "<?php echo admin_url('admin-ajax.php'); ?>";
@@ -1748,7 +1748,7 @@ class PwtcMapdb {
 
 			$('#pwtc-mapdb-nonmember-signup-div .cancel_div form').on('submit', function(evt) {
 				evt.preventDefault();
-				var signup_id = window.localStorage.getItem('ride_signup_id');
+				var signup_id = window.localStorage.getItem(self::LOCAL_SIGNUP_ID);
 				var action = "<?php echo admin_url('admin-ajax.php'); ?>";
 				var data = {
 					'action': 'pwtc_mapdb_cancel_nonmember_signup',
@@ -1762,10 +1762,10 @@ class PwtcMapdb {
 			});
 
 			if (window.localStorage) {
-				var signup_id = window.localStorage.getItem('ride_signup_id');
+				var signup_id = window.localStorage.getItem(self::LOCAL_SIGNUP_ID);
 				if (!signup_id) {
 					signup_id = '<?php echo $timestamp ?>';
-					window.localStorage.setItem('ride_signup_id', signup_id);
+					window.localStorage.setItem(self::LOCAL_SIGNUP_ID, signup_id);
 				}
 
 				var action = "<?php echo admin_url('admin-ajax.php'); ?>";
@@ -1850,7 +1850,7 @@ class PwtcMapdb {
 		$now = self::get_current_time();
 		$query_args = [
 			'posts_per_page' => -1,
-			'post_type' => 'scheduled_rides',
+			'post_type' => self::POST_TYPE_RIDE,
 			'meta_query' => [
 				[
 					'key' => self::RIDE_DATE,
@@ -2022,7 +2022,7 @@ class PwtcMapdb {
 			return '<div class="callout small alert"><p>Cannot render shortcode, post does not exist.</p></div>';
 		}
 
-		if (get_post_type($post) != 'scheduled_rides') {
+		if (get_post_type($post) != self::POST_TYPE_RIDE) {
 			return '<div class="callout small alert"><p>Cannot render shortcode, post type is not a scheduled ride.</p></div>';
 		}
 		
@@ -2129,7 +2129,7 @@ class PwtcMapdb {
 		}
 		$userid = $current_user->ID;
 		$user_info = get_userdata( $userid );
-		if (!in_array('ride_leader', $user_info->roles)) {
+		if (!in_array(self::ROLE_RIDE_LEADER, $user_info->roles)) {
 			ob_start();
 			?>
 			<div class="callout warning"><p>You must be a ride leader to edit your details information.</p></div>		
@@ -2285,7 +2285,7 @@ class PwtcMapdb {
 				if (!$post) {
 					return;
 				}
-				if (get_post_type($post) != 'scheduled_rides') {
+				if (get_post_type($post) != self::POST_TYPE_RIDE) {
 					return;
 				}
 				$current_user = wp_get_current_user();
@@ -2827,7 +2827,7 @@ EOT;
 								if ($attended and !empty($mileage)) {
 									$memberid = get_field(self::USER_RIDER_ID, 'user_'.$userid);
 									$user_info = get_userdata($userid);
-									if (in_array('expired_member', (array) $user_info->roles)) {
+									if (in_array(self::ROLE_EXPIRED_MEMBER, (array) $user_info->roles)) {
 										$expired_ids[] = $memberid;
 									}
 									else {
