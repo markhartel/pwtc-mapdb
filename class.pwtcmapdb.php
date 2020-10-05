@@ -1954,6 +1954,7 @@ class PwtcMapdb {
 
 		$title = esc_html(get_the_title($postid));
 		$description = get_field('description', $postid, false);
+		$leaders = self::get_leader_userids($postid);
 		
 		ob_start();
 	?>
@@ -1981,6 +1982,19 @@ class PwtcMapdb {
 				<div class="row column">
 					<label>Ride Description
 						<textarea name="description" rows="10"><?php echo $description; ?></textarea>
+					</label>
+				</div>
+				<div class="row column">
+					<label>Ride Leaders
+						<input type="hidden" name="leaders" value="<?php echo json_encode($leaders); ?>"/>
+						<span style="border: solid black">
+						<?php foreach ($leaders as $leader) {
+							$info = get_userdata($leader);
+							$name = $info->first_name . ' ' . $info->last_name;
+						?>
+							<span style="border: solid black" userid="<?php echo $leader; ?>"><i class="fa fa-times"></i> <?php echo $name; ?></span>
+						<?php } ?>
+						</span>
 					</label>
 				</div>
 				<div class="row column errmsg"></div>
