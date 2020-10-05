@@ -1985,17 +1985,15 @@ class PwtcMapdb {
 					</label>
 				</div>
 				<div class="row column">
-					<label>Ride Leaders
 						<input type="hidden" name="leaders" value="<?php echo json_encode($leaders); ?>"/>
-						<span style="border: solid black">
+						<div class="small button-group">
 						<?php foreach ($leaders as $leader) {
 							$info = get_userdata($leader);
 							$name = $info->first_name . ' ' . $info->last_name;
 						?>
-							<span style="border: solid black" userid="<?php echo $leader; ?>"><i class="fa fa-times"></i> <?php echo $name; ?></span>
+							<span class="button" userid="<?php echo $leader; ?>"><i class="fa fa-times"></i> <?php echo $name; ?></span>
 						<?php } ?>
-						</span>
-					</label>
+						</div>
 				</div>
 				<div class="row column errmsg"></div>
 				<div class="row column clearfix">
