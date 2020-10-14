@@ -2322,7 +2322,7 @@ class PwtcMapdb {
 					$signup_list[] = $arr;
 				}
 
-				$ride_title = get_the_title($rideid);
+				$ride_title = sanitize_text_field(get_the_title($rideid));
 				$date = DateTime::createFromFormat('Y-m-d H:i:s', get_field(self::RIDE_DATE, $rideid));
 				$ride_date = $date->format('m/d/Y g:ia');
 			}
@@ -2802,7 +2802,7 @@ EOT;
 						);
 					}
 					else {
-						$title = get_the_title($postid);
+						$title = sanitize_text_field(get_the_title($postid));
 						$date = self::get_ride_start_time($postid);
 						$startdate = $date->format('Y-m-d');
 						$status = PwtcMileage_DB::insert_ride_with_postid($title, $startdate, $postid);
