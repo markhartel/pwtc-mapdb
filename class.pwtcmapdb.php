@@ -1986,7 +1986,11 @@ class PwtcMapdb {
 					</label>
 				</div>
 				<div class="row column">
-					<input type="hidden" name="leaders" value="<?php echo json_encode($leaders); ?>"/>
+					<label>Ride Leaders
+						<input type="hidden" name="leaders" value="<?php echo json_encode($leaders); ?>"/>	
+					</label>
+				</div>
+				<div class="row column">
 					<div style="border:1px solid; display:flex; flex-wrap:wrap;">
 						<?php foreach ($leaders as $leader) {
 							$info = get_userdata($leader);
@@ -1995,6 +1999,24 @@ class PwtcMapdb {
 							<div style="margin:10px; padding:10px; border:1px solid;" userid="<?php echo $leader; ?>"><i class="fa fa-times"></i> <?php echo $name; ?></div>
 						<?php } ?>
 					</div>
+				</div>
+				<div class="row column">
+					<ul class="accordion" data-accordion data-allow-all-closed="true">
+						<li class="accordion-item" data-accordion-item>
+            						<a href="#" class="accordion-title">Add Ride Leader...</a>
+            						<div class="accordion-content" data-tab-content>
+								<div class="row column">
+									<div class="input-group">
+										<span class="input-group-label">Enter Name</span>
+										<input class="input-group-field" type="text">
+										<div class="input-group-button">
+											<input type="button" class="dark button" value="Search">
+										</div>
+									</div>
+								</div>
+							</div>
+						</li>
+					</ul>					
 				</div>
 				<div class="row column errmsg"></div>
 				<div class="row column clearfix">
