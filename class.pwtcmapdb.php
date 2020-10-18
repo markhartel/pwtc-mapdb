@@ -1952,7 +1952,8 @@ class PwtcMapdb {
 			update_field('description', $_POST['description'], $postid);
 		}
 
-		$title = esc_html(get_the_title($postid));
+		$post = get_post($postid);
+		$title = esc_html($post->post_title);
 		$description = get_field('description', $postid, false);
 		$leaders = self::get_leader_userids($postid);
 		
