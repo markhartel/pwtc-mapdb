@@ -1951,6 +1951,11 @@ class PwtcMapdb {
 		if (isset($_POST['description'])) {
 			update_field('description', $_POST['description'], $postid);
 		}
+		
+		if (isset($_POST['leaders'])) {
+			$new_leaders = json_decode($_POST['leaders']);
+			update_field('ride_leaders', $new_leaders, $postid);
+		}
 
 		$post = get_post($postid);
 		$title = esc_html($post->post_title);
@@ -1965,6 +1970,15 @@ class PwtcMapdb {
 			function show_waiting() {
 				$('#pwtc-mapdb-edit-ride-div .errmsg').html('<div class="callout small"><i class="fa fa-spinner fa-pulse waiting"></i> please wait...</div>');
 			}
+			
+			$('#pwtc-mapdb-edit-ride-div .leaders-div a').on('click', function(evt) {
+				$(this).parent().remove();
+			});
+
+			$('#pwtc-mapdb-edit-ride-div input[name="search-leaders"]').on('click', function(evt) {
+				var searchstr = $('#pwtc-mapdb-edit-ride-div input[name="leader-pattern"]').val();
+				alert('searchstr = ' + searchstr);
+			});
 
 			$('#pwtc-mapdb-edit-ride-div form').on('submit', function(evt) {
 				show_waiting();
@@ -1987,16 +2001,16 @@ class PwtcMapdb {
 				</div>
 				<div class="row column">
 					<label>Ride Leaders
-						<input type="hidden" name="leaders" value="<?php echo json_encode($leaders); ?>"/>	
+						<input type="text" name="leaders" value="<?php echo json_encode($leaders); ?>"/>	
 					</label>
 				</div>
 				<div class="row column">
-					<div style="border:1px solid; display:flex; flex-wrap:wrap;">
+					<div class= "leaders-div" style="border:1px solid; display:flex; flex-wrap:wrap;">
 						<?php foreach ($leaders as $leader) {
 							$info = get_userdata($leader);
 							$name = $info->first_name . ' ' . $info->last_name;
 						?>
-							<div style="margin:10px; padding:10px; border:1px solid;" userid="<?php echo $leader; ?>"><i class="fa fa-times"></i> <?php echo $name; ?></div>
+						<div style="margin:10px; padding:10px; border:1px solid;" userid="<?php echo $leader; ?>"><a><i class="fa fa-times"></i></a> <?php echo $name; ?></div>
 						<?php } ?>
 					</div>
 				</div>
@@ -2008,9 +2022,9 @@ class PwtcMapdb {
 								<div class="row column">
 									<div class="input-group">
 										<span class="input-group-label">Enter Name</span>
-										<input class="input-group-field" type="text">
+										<input class="input-group-field" type="text" name="leader-pattern">
 										<div class="input-group-button">
-											<input type="button" class="dark button" value="Search">
+											<input type="button" class="dark button" name= "search-leaders" value="Search">
 										</div>
 									</div>
 								</div>
