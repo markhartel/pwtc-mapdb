@@ -1967,6 +1967,10 @@ class PwtcMapdb {
 	<script type="text/javascript">
 		jQuery(document).ready(function($) { 
 
+			function show_warning(msg) {
+				$('#pwtc-mapdb-edit-ride-div .errmsg').html('<div class="callout small warning"><p>' + msg + '</p></div>');
+			}
+
 			function show_waiting() {
 				$('#pwtc-mapdb-edit-ride-div .errmsg').html('<div class="callout small"><i class="fa fa-spinner fa-pulse waiting"></i> please wait...</div>');
 			}
@@ -1981,8 +1985,20 @@ class PwtcMapdb {
 			});
 
 			$('#pwtc-mapdb-edit-ride-div form').on('submit', function(evt) {
-				show_waiting();
-     		});
+				var new_leaders = [];
+				$('#pwtc-mapdb-edit-ride-div .leaders-div div').each(function() {
+					var userid = Number($(this).attr('userid'));
+					new_leaders.push(userid); 
+				});
+				if (new_leaders.length == 0) {
+					show_warning('You must assign at least one ride leader to this ride.');
+					evt.preventDefault();
+				}
+				else {
+					$('#pwtc-mapdb-edit-ride-div input[name="leaders"]').val(JSON.stringify(new_leaders));
+					show_waiting();
+				}     		
+			});
 
 		});
 	</script>
