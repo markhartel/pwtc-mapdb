@@ -111,6 +111,9 @@ class PwtcMapdb {
 		add_action( 'wp_ajax_pwtc_mapdb_log_mileage', 
 			array( 'PwtcMapdb', 'log_mileage_callback') );
 		
+		add_action( 'wp_ajax_pwtc_mapdb_lookup_ride_leaders', 
+			array( 'PwtcMapdb', 'lookup_ride_leaders_callback') );
+		
 		add_action( 'wp_ajax_pwtc_mapdb_check_nonmember_signup', 
 			array( 'PwtcMapdb', 'check_nonmember_signup_callback') );
 
@@ -2946,6 +2949,40 @@ EOT;
 		else {
 			$response = array(
 				'error' => 'Server arguments missing for log mileage.'
+			);		
+		}		
+		echo wp_json_encode($response);
+		wp_die();
+	}
+	
+	public static function lookup_ride_leaders_callback() {
+		if (isset($_POST['search'])) {
+			$search = trim($_POST['search']);
+			$query_args = [
+				'meta_key' => 'last_name',
+				'orderby' => 'meta_value',
+				'order' => 'ASC',
+				'role' => self::ROLE_RIDE_LEADER,
+				'search' => $search
+			];
+			$user_query = new WP_User_Query($query_args);
+			$members = $user_query->get_results();
+			$users = array();
+			foreach ( $members as $member ) {
+				$item = array(
+					'userid' => $member->ID,
+					'first_name' => $member->first_name,
+					'last_name' => $member->last_name
+				);
+				$users[] = $item;
+			}
+			$response = array(
+				'users' => $users
+			);
+		}
+		else {
+			$response = array(
+				'error' => 'Server arguments missing for ride leader lookup.'
 			);		
 		}		
 		echo wp_json_encode($response);
