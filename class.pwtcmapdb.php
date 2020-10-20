@@ -1964,6 +1964,19 @@ class PwtcMapdb {
 		
 		ob_start();
 	?>
+	<style>
+		#pwtc-mapdb-edit-ride-div .leaders-div div {
+			margin: 10px; 
+			padding: 10px; 
+			border: 1px solid;
+		}
+		#pwtc-mapdb-edit-ride-div .leader-search-ul li {
+			cursor: pointer;
+		}
+		#pwtc-mapdb-edit-ride-div .leader-search-ul li:hover {
+			font-weight: bold;
+		}
+	</style>
 	<script type="text/javascript">
 		jQuery(document).ready(function($) { 
 
@@ -2026,7 +2039,7 @@ class PwtcMapdb {
 							$info = get_userdata($leader);
 							$name = $info->first_name . ' ' . $info->last_name;
 						?>
-						<div style="margin:10px; padding:10px; border:1px solid;" userid="<?php echo $leader; ?>"><a><i class="fa fa-times"></i></a> <?php echo $name; ?></div>
+						<div userid="<?php echo $leader; ?>"><a><i class="fa fa-times"></i></a> <?php echo $name; ?></div>
 						<?php } ?>
 					</div>
 				</div>
@@ -2037,11 +2050,16 @@ class PwtcMapdb {
             						<div class="accordion-content" data-tab-content>
 								<div class="row column">
 									<div class="input-group">
-										<span class="input-group-label">Enter Name</span>
-										<input class="input-group-field" type="text" name="leader-pattern">
+										<input class="input-group-field" type="text" name="leader-pattern" placeholder="Enter leader name">
 										<div class="input-group-button">
 											<input type="button" class="dark button" name= "search-leaders" value="Search">
 										</div>
+									</div>
+								</div>
+								<div class="row column">
+									<div style="border:1px solid; overflow: auto; height: 100px;">
+										<ul class="leader-search-ul" style="list-style-type: none;">
+										</ul>
 									</div>
 								</div>
 							</div>
