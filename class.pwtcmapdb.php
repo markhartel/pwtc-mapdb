@@ -2009,6 +2009,13 @@ class PwtcMapdb {
             					$('#pwtc-mapdb-edit-ride-div .leader-search-ul').append(
 							'<li userid="' + item.userid + '">' + item.first_name + ' ' + item.last_name + '</li>');    
 					});
+					$('#pwtc-mapdb-edit-ride-div .leader-search-ul li').on('click', function(evt) {
+						var userid = $(this).attr('userid');
+						var name = $(this).html();
+						$('#pwtc-mapdb-edit-ride-div .leaders-div').append('<div userid="' + userid + '"><a><i class="fa fa-times"></i></a> ' + name + '</div>').find('a').on('click', function(evt) {
+							$(this).parent().remove();
+						});
+					});
 				}
 			}
 			
