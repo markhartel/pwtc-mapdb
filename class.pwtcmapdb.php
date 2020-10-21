@@ -1973,10 +1973,13 @@ class PwtcMapdb {
 			padding: 10px; 
 			border: 1px solid;
 		}
-		#pwtc-mapdb-edit-ride-div .leader-search-ul li {
+		#pwtc-mapdb-edit-ride-div .leader-search-div ul {
+			list-style-type: none;
+		}
+		#pwtc-mapdb-edit-ride-div .leader-search-div li {
 			cursor: pointer;
 		}
-		#pwtc-mapdb-edit-ride-div .leader-search-ul li:hover {
+		#pwtc-mapdb-edit-ride-div .leader-search-div li:hover {
 			font-weight: bold;
 		}
 	</style>
@@ -1988,7 +1991,7 @@ class PwtcMapdb {
 			}
 
 			function show_waiting() {
-				$('#pwtc-mapdb-edit-ride-div .errmsg').html('<div class="callout small"><i class="fa fa-spinner fa-pulse waiting"></i> please wait...</div>');
+				$('#pwtc-mapdb-edit-ride-div .errmsg').html('<div class="callout small"><i class="fa fa-spinner fa-pulse"></i> please wait...</div>');
 			}
 			
 			function leaders_lookup_cb(response) {
@@ -1997,19 +2000,20 @@ class PwtcMapdb {
 					res = JSON.parse(response);
 				}
 				catch (e) {
-					alert(e.message);
+					$('#pwtc-mapdb-edit-ride-div .leader-search-div').html('<div class="callout small alert"><p>' + e.message + '</p></div>');
 					return;
 				}
 				if (res.error) {
-					alert(res.error);
+					$('#pwtc-mapdb-edit-ride-div .leader-search-div').html('<div class="callout small alert"><p>' + res.error + '</p></div>');
 				}
 				else {
-					$('#pwtc-mapdb-edit-ride-div .leader-search-ul li').remove();
+					$('#pwtc-mapdb-edit-ride-div .leader-search-div').empty();
+					$('#pwtc-mapdb-edit-ride-div .leader-search-div').append('<ul></ul>');
 					res.users.forEach(function(item) {
-            					$('#pwtc-mapdb-edit-ride-div .leader-search-ul').append(
+            			$('#pwtc-mapdb-edit-ride-div .leader-search-div ul').append(
 							'<li userid="' + item.userid + '">' + item.first_name + ' ' + item.last_name + '</li>');    
 					});
-					$('#pwtc-mapdb-edit-ride-div .leader-search-ul li').on('click', function(evt) {
+					$('#pwtc-mapdb-edit-ride-div .leader-search-div li').on('click', function(evt) {
 						var userid = $(this).attr('userid');
 						var name = $(this).html();
 						$('#pwtc-mapdb-edit-ride-div .leaders-div').append('<div userid="' + userid + '"><a><i class="fa fa-times"></i></a> ' + name + '</div>').find('a').on('click', function(evt) {
@@ -2031,6 +2035,7 @@ class PwtcMapdb {
 					'search': searchstr
 				};
 				$.post(action, data, leaders_lookup_cb);
+				$('#pwtc-mapdb-edit-ride-div .leader-search-div').html('<div class="callout small"><i class="fa fa-spinner fa-pulse"></i> please wait...</div>');		
 			});
 
 			$('#pwtc-mapdb-edit-ride-div form').on('submit', function(evt) {
@@ -2093,9 +2098,7 @@ class PwtcMapdb {
 									</div>
 								</div>
 								<div class="row column">
-									<div style="border:1px solid; overflow: auto; height: 100px;">
-										<ul class="leader-search-ul" style="list-style-type: none;">
-										</ul>
+									<div class="leader-search-div" style="border:1px solid; overflow: auto; height: 100px;">
 									</div>
 								</div>
 							</div>
