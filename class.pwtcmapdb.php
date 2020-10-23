@@ -1959,11 +1959,42 @@ class PwtcMapdb {
 			$new_leaders = json_decode($_POST['leaders']);
 			update_field('ride_leaders', $new_leaders, $postid);
 		}
+		
+		if (isset($_POST['distance'])) {
+			update_field('length', intval($_POST['distance']), $postid);
+		}
+
+		if (isset($_POST['max_distance'])) {
+			$d = trim($_POST['max_distance']);
+			if (empty($d)) {
+				update_field('max_length', null, $postid);
+			}
+			else {
+				update_field('max_length', intval($d), $postid);
+			}
+		}
+
+		if (isset($_POST['ride_type'])) {
+			update_field('type', $_POST['ride_type'], $postid);
+		}
+
+		if (isset($_POST['ride_pace'])) {
+			update_field('pace', $_POST['ride_pace'], $postid);
+		}
+
+		if (isset($_POST['ride_terrain'])) {
+			update_field('terrain', $_POST['ride_terrain'], $postid);
+		}
 
 		$post = get_post($postid);
 		$title = esc_html($post->post_title);
 		$description = get_field('description', $postid, false);
 		$leaders = self::get_leader_userids($postid);
+		$distance = get_field('length', $postid);
+		$max_distance = get_field('max_length', $postid);
+		$ride_type = get_field('type', $postid);
+		$ride_pace = get_field('pace', $postid);
+		$ride_terrain = get_field('terrain', $postid);
 		
 		ob_start();
 	?>
@@ -2068,6 +2099,81 @@ class PwtcMapdb {
 					<label>Ride Description
 						<textarea name="description" rows="10"><?php echo $description; ?></textarea>
 					</label>
+				</div>
+				<div class="row">
+					<div class="small-12 medium-6 columns">
+						<label>Ride Type
+						<fieldset>
+    						<input type="radio" name="ride_type" value="nongroup" id="type-nongroup" <?php echo $ride_type == 'nongroup' ? 'checked': ''; ?>><label for="type-nongroup">Non-group</label>
+    						<input type="radio" name="ride_type" value="group" id="type-group" <?php echo $ride_type == 'group' ? 'checked': ''; ?>><label for="type-group">Group</label>
+    						<input type="radio" name="ride_type" value="regroup" id="type-regroup" <?php echo $ride_type == 'regroup' ? 'checked': ''; ?>><label for="type-regroup">Re-group</label>
+  						</fieldset>
+						</label>  					
+					</div>
+					<div class="small-12 medium-6 columns">
+						<label>Ride Pace
+						<fieldset>
+    						<input type="radio" name="ride_pace" value="no" id="pace-na" <?php echo $ride_pace == 'no' ? 'checked': ''; ?>><label for="pace-na">N/A</label>
+    						<input type="radio" name="ride_pace" value="slow" id="pace-slow" <?php echo $ride_pace == 'slow' ? 'checked': ''; ?>><label for="pace-slow">Slow</label>
+    						<input type="radio" name="ride_pace" value="leisurely" id="pace-leisurely" <?php echo $ride_pace == 'leisurely' ? 'checked': ''; ?>><label for="pace-leisurely">Leisurely</label>
+							<input type="radio" name="ride_pace" value="moderate" id="pace-moderate" <?php echo $ride_pace == 'moderate' ? 'checked': ''; ?>><label for="pace-moderate">Moderate</label>
+							<input type="radio" name="ride_pace" value="fast" id="pace-fast" <?php echo $ride_pace == 'fast' ? 'checked': ''; ?>><label for="pace-fast">Fast</label>
+  						</fieldset>
+						</label>  					
+					</div>
+				</div>
+				<div class="row">
+					<div class="small-12 medium-4 columns">
+						<label>Ride Terrain
+						<fieldset>
+    						<input type="checkbox" name="ride_terrain[]" value="a" id="terrain-a" <?php echo in_array('a', $ride_terrain) ? 'checked': ''; ?>><label for="terrain-a">A</label>
+							<input type="checkbox" name="ride_terrain[]" value="b" id="terrain-b" <?php echo in_array('b', $ride_terrain) ? 'checked': ''; ?>><label for="terrain-b">B</label>
+							<input type="checkbox" name="ride_terrain[]" value="c" id="terrain-c" <?php echo in_array('c', $ride_terrain) ? 'checked': ''; ?>><label for="terrain-c">C</label>
+							<input type="checkbox" name="ride_terrain[]" value="d" id="terrain-d" <?php echo in_array('d', $ride_terrain) ? 'checked': ''; ?>><label for="terrain-d">D</label>
+							<input type="checkbox" name="ride_terrain[]" value="e" id="terrain-e" <?php echo in_array('e', $ride_terrain) ? 'checked': ''; ?>><label for="terrain-e">E</label>
+  						</fieldset>
+						</label>				
+  					</div>
+					<div class="small-12 medium-4 columns">
+						<label>Ride Distance
+							<input type="number" name="distance" value="<?php echo $distance; ?>"/>	
+						</label>
+					</div>
+					<div class="small-12 medium-4 columns">
+						<label>Ride Max Distance
+							<input type="number" name="max_distance" value="<?php echo $max_distance; ?>"/>	
+						</label>
+					</div>
+				</div>
+				<div class="row column">
+					<label>Ride Maps
+						<input type="hidden" name="maps" value=""/>	
+					</label>
+				</div>
+				<div class="row column">
+					<div class= "maps-div" style="border:1px solid; display:flex; flex-wrap:wrap;">
+					</div>
+				</div>
+				<div class="row column">
+					<ul class="accordion" data-accordion data-allow-all-closed="true">
+						<li class="accordion-item" data-accordion-item>
+            				<a href="#" class="accordion-title">Add Ride Map...</a>
+            				<div class="accordion-content" data-tab-content>
+								<div class="row column">
+									<div class="input-group">
+										<input class="input-group-field" type="text" name="map-pattern" placeholder="Enter map name">
+										<div class="input-group-button">
+											<input type="button" class="dark button" name= "search-maps" value="Search">
+										</div>
+									</div>
+								</div>
+								<div class="row column">
+									<div class="map-search-div" style="border:1px solid; overflow: auto; height: 100px;">
+									</div>
+								</div>
+							</div>
+						</li>
+					</ul>					
 				</div>
 				<div class="row column">
 					<label>Ride Leaders
