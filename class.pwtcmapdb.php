@@ -2004,6 +2004,9 @@ class PwtcMapdb {
 			padding: 10px; 
 			border: 1px solid;
 		}
+		#pwtc-mapdb-edit-ride-div .maps-div div i {
+			cursor: pointer;
+		}
 		#pwtc-mapdb-edit-ride-div .map-search-div table tr {
 			cursor: pointer;
 		}
@@ -2094,7 +2097,7 @@ class PwtcMapdb {
 					$('#pwtc-mapdb-edit-ride-div .map-search-div tr').on('click', function(evt) {
 						var mapid = $(this).attr('mapid');
 						var title = $(this).find('td').first().html();
-						$('#pwtc-mapdb-edit-ride-div .maps-div').append('<div mapid="' + mapid + '"><a><i class="fa fa-times"></i></a> ' + title + '</div>').find('a').on('click', function(evt) {
+						$('#pwtc-mapdb-edit-ride-div .maps-div').append('<div mapid="' + mapid + '"><i class="fa fa-times"></i> ' + title + '</div>').find('i').on('click', function(evt) {
 							$(this).parent().remove();
 						});
 					});
@@ -2220,8 +2223,8 @@ class PwtcMapdb {
 				<div class="row column">
 					<ul class="accordion" data-accordion data-allow-all-closed="true">
 						<li class="accordion-item" data-accordion-item>
-            				<a href="#" class="accordion-title">Add Ride Map...</a>
-            				<div class="accordion-content" data-tab-content>
+            						<a href="#" class="accordion-title">Add Ride Map...</a>
+            						<div class="accordion-content" data-tab-content>
 								<div class="row column">
 									<div class="input-group">
 										<input class="input-group-field" type="text" name="map-pattern" placeholder="Enter map name">
