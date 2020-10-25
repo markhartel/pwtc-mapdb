@@ -1960,6 +1960,11 @@ class PwtcMapdb {
 			update_field('ride_leaders', $new_leaders, $postid);
 		}
 		
+		if (isset($_POST['maps'])) {
+			$new_maps = json_decode($_POST['maps']);
+			update_field('maps', $new_maps, $postid);
+		}
+		
 		if (isset($_POST['distance'])) {
 			update_field('length', intval($_POST['distance']), $postid);
 		}
@@ -1995,6 +2000,12 @@ class PwtcMapdb {
 		$ride_type = get_field('type', $postid);
 		$ride_pace = get_field('pace', $postid);
 		$ride_terrain = get_field('terrain', $postid);
+		$attach_map = get_field('attach_map', $postid);
+		$maps_obj = get_field('maps', $postid);
+		$maps = [];
+		foreach ($maps_obj as $map) {
+			$maps[] = $map->ID;
+		}
 		
 		ob_start();
 	?>
@@ -2024,6 +2035,9 @@ class PwtcMapdb {
 			margin: 10px; 
 			padding: 10px; 
 			border: 1px solid;
+		}
+		#pwtc-mapdb-edit-ride-div .leaders-div div i {
+			cursor: pointer;
 		}
 		#pwtc-mapdb-edit-ride-div .leader-search-div ul {
 			list-style-type: none;
@@ -2062,13 +2076,13 @@ class PwtcMapdb {
 					$('#pwtc-mapdb-edit-ride-div .leader-search-div').empty();
 					$('#pwtc-mapdb-edit-ride-div .leader-search-div').append('<ul></ul>');
 					res.users.forEach(function(item) {
-            			$('#pwtc-mapdb-edit-ride-div .leader-search-div ul').append(
+            					$('#pwtc-mapdb-edit-ride-div .leader-search-div ul').append(
 							'<li userid="' + item.userid + '">' + item.first_name + ' ' + item.last_name + '</li>');    
 					});
 					$('#pwtc-mapdb-edit-ride-div .leader-search-div li').on('click', function(evt) {
 						var userid = $(this).attr('userid');
 						var name = $(this).html();
-						$('#pwtc-mapdb-edit-ride-div .leaders-div').append('<div userid="' + userid + '"><a><i class="fa fa-times"></i></a> ' + name + '</div>').find('a').on('click', function(evt) {
+						$('#pwtc-mapdb-edit-ride-div .leaders-div').append('<div userid="' + userid + '"><i class="fa fa-times"></i> ' + name + '</div>').find('i').on('click', function(evt) {
 							$(this).parent().remove();
 						});
 					});
@@ -2104,7 +2118,11 @@ class PwtcMapdb {
 				}
 			}
 			
-			$('#pwtc-mapdb-edit-ride-div .leaders-div a').on('click', function(evt) {
+			$('#pwtc-mapdb-edit-ride-div .leaders-div i').on('click', function(evt) {
+				$(this).parent().remove();
+			});
+			
+			$('#pwtc-mapdb-edit-ride-div .maps-div i').on('click', function(evt) {
 				$(this).parent().remove();
 			});
 
@@ -2141,14 +2159,34 @@ class PwtcMapdb {
 					var userid = Number($(this).attr('userid'));
 					new_leaders.push(userid); 
 				});
-				if (new_leaders.length == 0) {
-					show_warning('You must assign at least one ride leader to this ride.');
+				var new_maps = [];
+				$('#pwtc-mapdb-edit-ride-div .maps-div div').each(function() {
+					var mapid = Number($(this).attr('mapid'));
+					new_maps.push(mapid); 
+				});
+				if ($('#pwtc-mapdb-edit-ride-div input[name="title"]').val().trim().length == 0) {
+					show_warning('The ride title cannot be blank.');
 					evt.preventDefault();
+					return;
 				}
-				else {
-					$('#pwtc-mapdb-edit-ride-div input[name="leaders"]').val(JSON.stringify(new_leaders));
-					show_waiting();
-				}     		
+				if ($('#pwtc-mapdb-edit-ride-div textarea[name="description"]').val().trim().length == 0) {
+					show_warning('The ride description cannot be blank.');
+					evt.preventDefault();
+					return;
+				}
+				if (new_maps.length == 0) {
+					show_warning('You must attach at least one map to this ride.');
+					evt.preventDefault();
+					return;
+				}
+				if (new_leaders.length == 0) {
+					show_warning('You must assign at least one leader to this ride.');
+					evt.preventDefault();
+					return;
+				}
+				$('#pwtc-mapdb-edit-ride-div input[name="leaders"]').val(JSON.stringify(new_leaders));
+				$('#pwtc-mapdb-edit-ride-div input[name="maps"]').val(JSON.stringify(new_maps));
+				show_waiting();
 			});
 
 		});
@@ -2213,11 +2251,14 @@ class PwtcMapdb {
 				</div>
 				<div class="row column">
 					<label>Ride Maps
-						<input type="hidden" name="maps" value=""/>	
+						<input type="hidden" name="maps" value="<?php echo json_encode($maps); ?>"/>	
 					</label>
 				</div>
 				<div class="row column">
 					<div class= "maps-div" style="border:1px solid; display:flex; flex-wrap:wrap;">
+						<?php foreach ($maps_obj as $map) { ?>
+						<div mapid="<?php echo $map->ID; ?>"><i class="fa fa-times"></i> <?php echo $map->post_title; ?></div>
+						<?php } ?>
 					</div>
 				</div>
 				<div class="row column">
@@ -2243,7 +2284,7 @@ class PwtcMapdb {
 				</div>
 				<div class="row column">
 					<label>Ride Leaders
-						<input type="text" name="leaders" value="<?php echo json_encode($leaders); ?>"/>	
+						<input type="hidden" name="leaders" value="<?php echo json_encode($leaders); ?>"/>	
 					</label>
 				</div>
 				<div class="row column">
@@ -2252,7 +2293,7 @@ class PwtcMapdb {
 							$info = get_userdata($leader);
 							$name = $info->first_name . ' ' . $info->last_name;
 						?>
-						<div userid="<?php echo $leader; ?>"><a><i class="fa fa-times"></i></a> <?php echo $name; ?></div>
+						<div userid="<?php echo $leader; ?>"><i class="fa fa-times"></i> <?php echo $name; ?></div>
 						<?php } ?>
 					</div>
 				</div>
