@@ -2152,6 +2152,14 @@ class PwtcMapdb {
 				$.post(action, data, maps_lookup_cb);
 				$('#pwtc-mapdb-edit-ride-div .map-search-div').html('<div class="callout small"><i class="fa fa-spinner fa-pulse"></i> please wait...</div>');		
 			});
+			
+			$('#pwtc-mapdb-edit-ride-div form').on('keypress', function(evt) {
+				var keyPressed = evt.keyCode || evt.which; 
+				if (keyPressed === 13) { 
+					evt.preventDefault(); 
+					return false; 
+				} 
+			});	
 
 			$('#pwtc-mapdb-edit-ride-div form').on('submit', function(evt) {
 				var new_leaders = [];
