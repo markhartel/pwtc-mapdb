@@ -2160,6 +2160,27 @@ class PwtcMapdb {
 					return false; 
 				} 
 			});	
+			
+			$('#pwtc-mapdb-edit-ride-div form textarea').on('keypress', function(evt) {
+				var keyPressed = evt.keyCode || evt.which; 
+				if (keyPressed === 13) { 
+					evt.stopPropagation(); 
+				} 
+			});	
+
+			$('#pwtc-mapdb-edit-ride-div input[name="leader-pattern"]').on('keypress', function(evt) {
+				var keyPressed = evt.keyCode || evt.which; 
+				if (keyPressed === 13) { 
+					$('#pwtc-mapdb-edit-ride-div input[name="search-leaders"]').trigger( 'click');
+				} 
+			});	
+
+			$('#pwtc-mapdb-edit-ride-div input[name="map-pattern"]').on('keypress', function(evt) {
+				var keyPressed = evt.keyCode || evt.which; 
+				if (keyPressed === 13) { 
+					$('#pwtc-mapdb-edit-ride-div input[name="search-maps"]').trigger( 'click');
+				} 
+			});	
 
 			$('#pwtc-mapdb-edit-ride-div form').on('submit', function(evt) {
 				var new_leaders = [];
