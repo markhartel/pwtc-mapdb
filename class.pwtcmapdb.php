@@ -2060,6 +2060,30 @@ class PwtcMapdb {
 				$('#pwtc-mapdb-edit-ride-div .errmsg').html('<div class="callout small"><i class="fa fa-spinner fa-pulse"></i> please wait...</div>');
 			}
 			
+			function has_user_id(id) {
+				id = Number(id);
+				var found = false;
+				$('#pwtc-mapdb-edit-ride-div .leaders-div div').each(function() {
+					var userid = Number($(this).attr('userid'));
+					if (userid == id) {
+						found = true;
+					}
+				});
+				return found;
+			}
+
+			function has_map_id(id) {
+				id = Number(id);
+				var found = false;
+				$('#pwtc-mapdb-edit-ride-div .maps-div div').each(function() {
+					var mapid = Number($(this).attr('mapid'));
+					if (mapid == id) {
+						found = true;
+					}
+				});	
+				return found;			
+			}
+			
 			function leaders_lookup_cb(response) {
 				var res;
 				try {
@@ -2081,10 +2105,12 @@ class PwtcMapdb {
 					});
 					$('#pwtc-mapdb-edit-ride-div .leader-search-div li').on('click', function(evt) {
 						var userid = $(this).attr('userid');
-						var name = $(this).html();
-						$('#pwtc-mapdb-edit-ride-div .leaders-div').append('<div userid="' + userid + '"><i class="fa fa-times"></i> ' + name + '</div>').find('i').on('click', function(evt) {
-							$(this).parent().remove();
-						});
+						if (!has_user_id(userid)) {
+							var name = $(this).html();
+							$('#pwtc-mapdb-edit-ride-div .leaders-div').append('<div userid="' + userid + '"><i class="fa fa-times"></i> ' + name + '</div>').find('i').on('click', function(evt) {
+								$(this).parent().remove();
+							});
+						}
 					});
 				}
 			}
@@ -2110,10 +2136,12 @@ class PwtcMapdb {
 					});
 					$('#pwtc-mapdb-edit-ride-div .map-search-div tr').on('click', function(evt) {
 						var mapid = $(this).attr('mapid');
-						var title = $(this).find('td').first().html();
-						$('#pwtc-mapdb-edit-ride-div .maps-div').append('<div mapid="' + mapid + '"><i class="fa fa-times"></i> ' + title + '</div>').find('i').on('click', function(evt) {
-							$(this).parent().remove();
-						});
+						if (!has_map_id(mapid)) {
+							var title = $(this).find('td').first().html();
+							$('#pwtc-mapdb-edit-ride-div .maps-div').append('<div mapid="' + mapid + '"><i class="fa fa-times"></i> ' + title + '</div>').find('i').on('click', function(evt) {
+								$(this).parent().remove();
+							});
+						}
 					});
 				}
 			}
