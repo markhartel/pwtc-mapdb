@@ -2000,7 +2000,7 @@ class PwtcMapdb {
 		$ride_type = get_field('type', $postid);
 		$ride_pace = get_field('pace', $postid);
 		$ride_terrain = get_field('terrain', $postid);
-		$attach_map = get_field('attach_map', $postid);
+		$attach_maps = get_field('attach_map', $postid);
 		$maps_obj = get_field('maps', $postid);
 		$maps = [];
 		foreach ($maps_obj as $map) {
@@ -2245,6 +2245,14 @@ class PwtcMapdb {
 				$('#pwtc-mapdb-edit-ride-div input[name="maps"]').val(JSON.stringify(new_maps));
 				show_waiting();
 			});
+			
+		<?php if ($attach_maps) { ?>
+			$('#pwtc-mapdb-edit-ride-div form .attach-map-no').hide();
+			$('#pwtc-mapdb-edit-ride-div form .attach-map-yes').show();
+		<?php } else { ?>
+			$('#pwtc-mapdb-edit-ride-div form .attach-map-yes').hide();
+			$('#pwtc-mapdb-edit-ride-div form .attach-map-no').show();
+		<?php } ?>
 
 		});
 	</script>
@@ -2282,9 +2290,15 @@ class PwtcMapdb {
   						</fieldset>
 						</label>  					
 					</div>
-				</div>
-				<div class="row">
-					<div class="small-12 medium-4 columns">
+					<div class="small-12 medium-6 columns">
+						<label>Attach Maps
+						<fieldset>
+    						<input type="radio" name="attach_maps" value="0" id="attach-no" <?php echo $attach_maps == false ? 'checked': ''; ?>><label for="attach-no">No</label>
+							<input type="radio" name="attach_maps" value="1" id="attach-yes" <?php echo $attach_maps == true ? 'checked': ''; ?>><label for="attach-no">Yes</label>
+  						</fieldset>
+						</label>  					
+					</div>
+					<div class="small-12 medium-6 columns attach-map-no">
 						<label>Ride Terrain
 						<fieldset>
     						<input type="checkbox" name="ride_terrain[]" value="a" id="terrain-a" <?php echo in_array('a', $ride_terrain) ? 'checked': ''; ?>><label for="terrain-a">A</label>
@@ -2295,30 +2309,30 @@ class PwtcMapdb {
   						</fieldset>
 						</label>				
   					</div>
-					<div class="small-12 medium-4 columns">
+					<div class="small-12 medium-6 columns attach-map-no">
 						<label>Ride Distance
 							<input type="number" name="distance" value="<?php echo $distance; ?>"/>	
 						</label>
 					</div>
-					<div class="small-12 medium-4 columns">
+					<div class="small-12 medium-6 columns attach-map-no">
 						<label>Ride Max Distance
 							<input type="number" name="max_distance" value="<?php echo $max_distance; ?>"/>	
 						</label>
 					</div>
 				</div>
-				<div class="row column">
+				<div class="row column attach-map-yes">
 					<label>Ride Maps
 						<input type="hidden" name="maps" value="<?php echo json_encode($maps); ?>"/>	
 					</label>
 				</div>
-				<div class="row column">
+				<div class="row column attach-map-yes">
 					<div class= "maps-div" style="border:1px solid; display:flex; flex-wrap:wrap;">
 						<?php foreach ($maps_obj as $map) { ?>
 						<div mapid="<?php echo $map->ID; ?>"><i class="fa fa-times"></i> <?php echo $map->post_title; ?></div>
 						<?php } ?>
 					</div>
 				</div>
-				<div class="row column">
+				<div class="row column attach-map-yes">
 					<ul class="accordion" data-accordion data-allow-all-closed="true">
 						<li class="accordion-item" data-accordion-item>
             						<a href="#" class="accordion-title">Add Ride Map...</a>
