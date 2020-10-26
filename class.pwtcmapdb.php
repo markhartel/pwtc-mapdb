@@ -1965,6 +1965,10 @@ class PwtcMapdb {
 			update_field('maps', $new_maps, $postid);
 		}
 		
+		if (isset($_POST['attach_maps'])) {
+			update_field('attach_map', $_POST['attach_maps'], $postid);
+		}
+		
 		if (isset($_POST['distance'])) {
 			update_field('length', intval($_POST['distance']), $postid);
 		}
@@ -2293,7 +2297,7 @@ class PwtcMapdb {
 					<div class="small-12 medium-6 columns">
 						<label>Attach Maps
 						<fieldset>
-    						<input type="radio" name="attach_maps" value="0" id="attach-no" <?php echo $attach_maps == false ? 'checked': ''; ?>><label for="attach-no">No</label>
+    							<input type="radio" name="attach_maps" value="0" id="attach-no" <?php echo $attach_maps == false ? 'checked': ''; ?>><label for="attach-no">No</label>
 							<input type="radio" name="attach_maps" value="1" id="attach-yes" <?php echo $attach_maps == true ? 'checked': ''; ?>><label for="attach-no">Yes</label>
   						</fieldset>
 						</label>  					
