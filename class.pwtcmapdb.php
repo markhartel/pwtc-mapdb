@@ -2213,6 +2213,17 @@ class PwtcMapdb {
 					$('#pwtc-mapdb-edit-ride-div input[name="search-maps"]').trigger( 'click');
 				} 
 			});	
+			
+			$('#pwtc-mapdb-edit-ride-div input[name="attach_maps"]').change(function() {
+				if (this.value == '0') {
+					$('#pwtc-mapdb-edit-ride-div form .attach-map-yes').hide();
+					$('#pwtc-mapdb-edit-ride-div form .attach-map-no').show();
+				}
+				else if (this.value == '1') {
+					$('#pwtc-mapdb-edit-ride-div form .attach-map-no').hide();
+					$('#pwtc-mapdb-edit-ride-div form .attach-map-yes').show();
+				}
+			});
 
 			$('#pwtc-mapdb-edit-ride-div form').on('submit', function(evt) {
 				var new_leaders = [];
