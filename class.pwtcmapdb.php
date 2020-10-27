@@ -1999,6 +1999,7 @@ class PwtcMapdb {
 		$title = esc_html($post->post_title);
 		$description = get_field('description', $postid, false);
 		$leaders = self::get_leader_userids($postid);
+		$start_location = get_field('start_location', $postid);
 		$distance = get_field('length', $postid);
 		$max_distance = get_field('max_length', $postid);
 		$ride_type = get_field('type', $postid);
@@ -2050,6 +2051,15 @@ class PwtcMapdb {
 			cursor: pointer;
 		}
 		#pwtc-mapdb-edit-ride-div .leader-search-div li:hover {
+			font-weight: bold;
+		}
+		#pwtc-mapdb-edit-ride-div .start-locations-div ul {
+			list-style-type: none;
+		}
+		#pwtc-mapdb-edit-ride-div .start-locations-div li {
+			cursor: pointer;
+		}
+		#pwtc-mapdb-edit-ride-div .start-locations-div li:hover {
 			font-weight: bold;
 		}
 	</style>
@@ -2261,6 +2271,24 @@ class PwtcMapdb {
 				show_waiting();
 			});
 			
+			$('#start_locations tr').each(function() {
+				var itemid = $(this).attr('itemid');
+				var title = $(this).find('td[name="title"]').html();
+				$('#pwtc-mapdb-edit-ride-div .start-locations-div ul').append(
+					'<li itemid="' + itemid + '">' + title + '</li>');
+			});
+
+			$('#pwtc-mapdb-edit-ride-div .start-locations-div li').on('click', function(evt) {
+				var itemid = $(this).attr('itemid');
+				var item = $('#start_locations tr[itemid="' + itemid +'"');
+				var addr = item.find('td[name="address"]').html();
+				var lat = item.attr('lat');
+				var lng = item.attr('lng');
+				$('#pwtc-mapdb-edit-ride-div input[name="start_address"]').val(addr);
+				$('#pwtc-mapdb-edit-ride-div input[name="start_lat"]').val(lat);
+				$('#pwtc-mapdb-edit-ride-div input[name="start_lng"]').val(lng);
+			});
+			
 		<?php if ($attach_maps) { ?>
 			$('#pwtc-mapdb-edit-ride-div form .attach-map-no').hide();
 			$('#pwtc-mapdb-edit-ride-div form .attach-map-yes').show();
@@ -2367,6 +2395,27 @@ class PwtcMapdb {
 							</div>
 						</li>
 					</ul>					
+				</div>
+				<div class="row column">
+					<label>Start Location
+						<input type="text" name="start_address" value="<?php echo esc_attr($start_location['address']); ?>" disabled/>	
+					</label>
+					<input type="hidden" name="start_lat" value="<?php echo esc_attr($start_location['lat']); ?>"/>
+					<input type="hidden" name="start_lng" value="<?php echo esc_attr($start_location['lng']); ?>"/>
+				</div>
+				<div class="row column">
+					<ul class="accordion" data-accordion data-allow-all-closed="true">
+						<li class="accordion-item" data-accordion-item>
+            						<a href="#" class="accordion-title">Change Start Location...</a>
+            						<div class="accordion-content" data-tab-content>
+								<div class="row column">
+									<div class="start-locations-div" style="border:1px solid; overflow: auto; height: 100px;">
+										<ul></ul>
+									</div>
+								</div>
+							</div>
+						</li>
+					</ul>
 				</div>
 				<div class="row column">
 					<label>Ride Leaders
