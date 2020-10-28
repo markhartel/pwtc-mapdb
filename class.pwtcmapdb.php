@@ -1998,9 +1998,9 @@ class PwtcMapdb {
 			update_field('terrain', $_POST['ride_terrain'], $postid);
 		}
 		
-		if (isset($_POST['start_address']) and isset($_POST['start_lat']) and isset($_POST['start_lng'])) {
+		if (isset($_POST['start_address']) and isset($_POST['start_lat']) and isset($_POST['start_lng']) and isset($_POST['start_zoom'])) {
 			$location = array('address' => $_POST['start_address'],
-			'lat' => floatval($_POST['start_lat']), 'lng' => floatval($_POST['start_lng']));
+			'lat' => floatval($_POST['start_lat']), 'lng' => floatval($_POST['start_lng']), 'zoom' => intval($_POST['start_zoom']));
 			update_field('start_location', $location, $postid);
 		}
 
@@ -2294,9 +2294,11 @@ class PwtcMapdb {
 				var addr = item.find('td[name="address"]').html();
 				var lat = item.attr('lat');
 				var lng = item.attr('lng');
+				var zoom = item.attr('zoom');
 				$('#pwtc-mapdb-edit-ride-div input[name="start_address"]').val(addr);
 				$('#pwtc-mapdb-edit-ride-div input[name="start_lat"]').val(lat);
 				$('#pwtc-mapdb-edit-ride-div input[name="start_lng"]').val(lng);
+				$('#pwtc-mapdb-edit-ride-div input[name="start_zoom"]').val(zoom);
 			});
 		<?php } ?>
 			
@@ -2410,10 +2412,11 @@ class PwtcMapdb {
 		<?php if ($set_start_location) { ?>
 				<div class="row column">
 					<label>Start Location
-						<input type="text" name="start_address" value="<?php echo esc_attr($start_location['address']); ?>" disabled/>	
+						<input type="text" name="start_address" value="<?php echo esc_attr($start_location['address']); ?>" readonly/>	
 					</label>
 					<input type="hidden" name="start_lat" value="<?php echo esc_attr($start_location['lat']); ?>"/>
 					<input type="hidden" name="start_lng" value="<?php echo esc_attr($start_location['lng']); ?>"/>
+					<input type="hidden" name="start_zoom" value="<?php echo esc_attr($start_location['zoom']); ?>"/>
 				</div>
 				<div class="row column">
 					<ul class="accordion" data-accordion data-allow-all-closed="true">
