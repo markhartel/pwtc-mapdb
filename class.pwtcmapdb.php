@@ -1908,6 +1908,9 @@ class PwtcMapdb {
 	
 	// Generates the [pwtc_mapdb_edit_ride] shortcode.
 	public static function shortcode_edit_ride($atts) {
+		$a = shortcode_atts(array('set_start_location' => 'no'), $atts);
+		$set_start_location = $a['set_start_location'] == 'yes';
+
 		$error = self::check_post_id();
 		if (!empty($error)) {
 			return $error;
@@ -1993,6 +1996,12 @@ class PwtcMapdb {
 
 		if (isset($_POST['ride_terrain'])) {
 			update_field('terrain', $_POST['ride_terrain'], $postid);
+		}
+		
+		if (isset($_POST['start_address']) and isset($_POST['start_lat']) and isset($_POST['start_lng'])) {
+			$location = array('address' => $_POST['start_address'],
+			'lat' => floatval($_POST['start_lat']), 'lng' => floatval($_POST['start_lng']));
+			update_field('start_location', $location, $postid);
 		}
 
 		$post = get_post($postid);
@@ -2271,6 +2280,7 @@ class PwtcMapdb {
 				show_waiting();
 			});
 			
+		<?php if ($set_start_location) { ?>
 			$('#start_locations tr').each(function() {
 				var itemid = $(this).attr('itemid');
 				var title = $(this).find('td[name="title"]').html();
@@ -2288,6 +2298,7 @@ class PwtcMapdb {
 				$('#pwtc-mapdb-edit-ride-div input[name="start_lat"]').val(lat);
 				$('#pwtc-mapdb-edit-ride-div input[name="start_lng"]').val(lng);
 			});
+		<?php } ?>
 			
 		<?php if ($attach_maps) { ?>
 			$('#pwtc-mapdb-edit-ride-div form .attach-map-no').hide();
@@ -2396,6 +2407,7 @@ class PwtcMapdb {
 						</li>
 					</ul>					
 				</div>
+		<?php if ($set_start_location) { ?>
 				<div class="row column">
 					<label>Start Location
 						<input type="text" name="start_address" value="<?php echo esc_attr($start_location['address']); ?>" disabled/>	
@@ -2417,6 +2429,7 @@ class PwtcMapdb {
 						</li>
 					</ul>
 				</div>
+		<?php } ?>
 				<div class="row column">
 					<label>Ride Leaders
 						<input type="hidden" name="leaders" value="<?php echo json_encode($leaders); ?>"/>	
