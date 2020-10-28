@@ -2283,7 +2283,7 @@ class PwtcMapdb {
 		<?php if ($set_start_location) { ?>
 			$('#start_locations tr').each(function() {
 				var itemid = $(this).attr('itemid');
-				var title = $(this).find('td[name="title"]').html();
+				var title = $(this).find('td').first().html();
 				$('#pwtc-mapdb-edit-ride-div .start-locations-div ul').append(
 					'<li itemid="' + itemid + '">' + title + '</li>');
 			});
@@ -2291,7 +2291,7 @@ class PwtcMapdb {
 			$('#pwtc-mapdb-edit-ride-div .start-locations-div li').on('click', function(evt) {
 				var itemid = $(this).attr('itemid');
 				var item = $('#start_locations tr[itemid="' + itemid +'"');
-				var addr = item.find('td[name="address"]').html();
+				var addr = item.find('td').first().next().html();
 				var lat = item.attr('lat');
 				var lng = item.attr('lng');
 				var zoom = item.attr('zoom');
