@@ -2281,16 +2281,15 @@ class PwtcMapdb {
 			});
 			
 		<?php if ($set_start_location) { ?>
-			$('#start_locations tr').each(function() {
-				var itemid = $(this).attr('itemid');
+			$('#start_locations tr').each(function(index) {
 				var title = $(this).find('td').first().html();
 				$('#pwtc-mapdb-edit-ride-div .start-locations-div ul').append(
-					'<li itemid="' + itemid + '">' + title + '</li>');
+					'<li itemid="' + (index+1) + '">' + title + '</li>');
 			});
 
 			$('#pwtc-mapdb-edit-ride-div .start-locations-div li').on('click', function(evt) {
 				var itemid = $(this).attr('itemid');
-				var item = $('#start_locations tr[itemid="' + itemid +'"');
+				var item = $('#start_locations tr:nth-child(' + itemid + ')');
 				var addr = item.find('td').first().next().html();
 				var lat = item.attr('lat');
 				var lng = item.attr('lng');
