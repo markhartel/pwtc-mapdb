@@ -1926,20 +1926,6 @@ class PwtcMapdb {
 		$ride_link = esc_url(get_the_permalink($postid));
 		$return_to_ride = 'Click <a href="' . $ride_link . '">here</a> to return to the posted ride.';
 
-		if (!user_can($current_user,'edit_published_rides')) {
-			$denied = true;
-			$leaders = self::get_leader_userids($postid);
-			foreach ($leaders as $item) {
-				if ($current_user->ID == $item) {
-					$denied = false;
-					break;
-				}
-			}
-			if ($denied) {
-				return '<div class="callout small warning"><p>You must be a leader for ride "' . $ride_title . '" to edit it. ' . $return_to_ride . '</p></div>';
-			}
-		}
-
 		$now_date = self::get_current_time();
 		$ride_date = self::get_ride_start_time($postid);
 		if ($ride_date < $now_date) {
@@ -2019,6 +2005,19 @@ class PwtcMapdb {
 		$maps = [];
 		foreach ($maps_obj as $map) {
 			$maps[] = $map->ID;
+		}
+		
+		if (!user_can($current_user,'edit_published_rides')) {
+			$denied = true;
+			foreach ($leaders as $item) {
+				if ($current_user->ID == $item) {
+					$denied = false;
+					break;
+				}
+			}
+			if ($denied) {
+				return '<div class="callout small warning"><p>You must be a leader for ride "' . $ride_title . '" to edit it. ' . $return_to_ride . '</p></div>';
+			}
 		}
 		
 		ob_start();
