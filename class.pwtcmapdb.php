@@ -1939,68 +1939,70 @@ class PwtcMapdb {
 			);
 			wp_update_post( $my_post );			
 		}
+		$post = get_post($postid);
+		$title = esc_html($post->post_title);
 
 		if (isset($_POST['description'])) {
 			update_field('description', $_POST['description'], $postid);
 		}
-		
+		$description = get_field('description', $postid, false);
+
 		if (isset($_POST['leaders'])) {
 			$new_leaders = json_decode($_POST['leaders']);
 			update_field('ride_leaders', $new_leaders, $postid);
 		}
-		
-		if (isset($_POST['maps'])) {
-			$new_maps = json_decode($_POST['maps']);
-			update_field('maps', $new_maps, $postid);
-		}
-		
-		if (isset($_POST['attach_maps'])) {
-			update_field('attach_map', $_POST['attach_maps'], $postid);
-		}
-		
-		if (isset($_POST['distance'])) {
-			update_field('length', intval($_POST['distance']), $postid);
-		}
+		$leaders = self::get_leader_userids($postid);
 
-		if (isset($_POST['max_distance'])) {
-			$d = trim($_POST['max_distance']);
-			if (empty($d)) {
-				update_field('max_length', null, $postid);
-			}
-			else {
-				update_field('max_length', intval($d), $postid);
-			}
-		}
-
-		if (isset($_POST['ride_type'])) {
-			update_field('type', $_POST['ride_type'], $postid);
-		}
-
-		if (isset($_POST['ride_pace'])) {
-			update_field('pace', $_POST['ride_pace'], $postid);
-		}
-
-		if (isset($_POST['ride_terrain'])) {
-			update_field('terrain', $_POST['ride_terrain'], $postid);
-		}
-		
 		if (isset($_POST['start_address']) and isset($_POST['start_lat']) and isset($_POST['start_lng']) and isset($_POST['start_zoom'])) {
 			$location = array('address' => $_POST['start_address'],
 			'lat' => floatval($_POST['start_lat']), 'lng' => floatval($_POST['start_lng']), 'zoom' => intval($_POST['start_zoom']));
 			update_field('start_location', $location, $postid);
 		}
-
-		$post = get_post($postid);
-		$title = esc_html($post->post_title);
-		$description = get_field('description', $postid, false);
-		$leaders = self::get_leader_userids($postid);
 		$start_location = get_field('start_location', $postid);
+
+		if (isset($_POST['ride_type'])) {
+			update_field('type', $_POST['ride_type'], $postid);
+		}
+		$ride_type = get_field('type', $postid);
+
+		if (isset($_POST['ride_pace'])) {
+			update_field('pace', $_POST['ride_pace'], $postid);
+		}
+		$ride_pace = get_field('pace', $postid);
+
+		if (isset($_POST['attach_maps'])) {
+			update_field('attach_map', $_POST['attach_maps'], $postid);
+		}
+		$attach_maps = get_field('attach_map', $postid);
+
+		if ($attach_maps) {
+			if (isset($_POST['maps'])) {
+				$new_maps = json_decode($_POST['maps']);
+				update_field('maps', $new_maps, $postid);
+			}	
+		}
+		else {
+			if (isset($_POST['distance'])) {
+				update_field('length', intval($_POST['distance']), $postid);
+			}
+	
+			if (isset($_POST['max_distance'])) {
+				$d = trim($_POST['max_distance']);
+				if (empty($d)) {
+					update_field('max_length', null, $postid);
+				}
+				else {
+					update_field('max_length', intval($d), $postid);
+				}
+			}
+	
+			if (isset($_POST['ride_terrain'])) {
+				update_field('terrain', $_POST['ride_terrain'], $postid);
+			}
+		}
 		$distance = get_field('length', $postid);
 		$max_distance = get_field('max_length', $postid);
-		$ride_type = get_field('type', $postid);
-		$ride_pace = get_field('pace', $postid);
 		$ride_terrain = get_field('terrain', $postid);
-		$attach_maps = get_field('attach_map', $postid);
 		$maps_obj = get_field('maps', $postid);
 		$maps = [];
 		foreach ($maps_obj as $map) {
@@ -2244,38 +2246,79 @@ class PwtcMapdb {
 			});
 
 			$('#pwtc-mapdb-edit-ride-div form').on('submit', function(evt) {
-				var new_leaders = [];
-				$('#pwtc-mapdb-edit-ride-div .leaders-div div').each(function() {
-					var userid = Number($(this).attr('userid'));
-					new_leaders.push(userid); 
-				});
-				var new_maps = [];
-				$('#pwtc-mapdb-edit-ride-div .maps-div div').each(function() {
-					var mapid = Number($(this).attr('mapid'));
-					new_maps.push(mapid); 
-				});
 				if ($('#pwtc-mapdb-edit-ride-div input[name="title"]').val().trim().length == 0) {
 					show_warning('The ride title cannot be blank.');
 					evt.preventDefault();
 					return;
 				}
+
 				if ($('#pwtc-mapdb-edit-ride-div textarea[name="description"]').val().trim().length == 0) {
 					show_warning('The ride description cannot be blank.');
 					evt.preventDefault();
 					return;
 				}
-				if (new_maps.length == 0) {
-					show_warning('You must attach at least one map to this ride.');
-					evt.preventDefault();
-					return;
+
+				var attach_map = $('#pwtc-mapdb-edit-ride-div input[name="attach_maps"]:checked').val() == '1';
+				if (attach_map) {
+					var new_maps = [];
+					$('#pwtc-mapdb-edit-ride-div .maps-div div').each(function() {
+						var mapid = Number($(this).attr('mapid'));
+						new_maps.push(mapid); 
+					});
+					if (new_maps.length == 0) {
+						show_warning('You must attach at least one map to this ride.');
+						evt.preventDefault();
+						return;
+					}
+					$('#pwtc-mapdb-edit-ride-div input[name="maps"]').val(JSON.stringify(new_maps));
 				}
+				else {
+					var terrain_empty = $('#pwtc-mapdb-edit-ride-div input[name="ride_terrain[]"]:checked').length == 0;
+					if (terrain_empty) {
+						show_warning('You must choose at least one terrain for this ride.');
+						evt.preventDefault();
+						return;						
+					}
+					var dist = $('#pwtc-mapdb-edit-ride-div input[name="distance"]').val().trim();
+					if (dist.length == 0) {
+						show_warning('You must enter a distance for this ride.');
+						evt.preventDefault();
+						return;							
+					}
+					dist = parseInt(dist, 10);
+					if (dist == NaN || dist < 0) {
+						show_warning('You must enter a distance that is a non-negative number.');
+						evt.preventDefault();
+						return;							
+					}
+					var maxdist = $('#pwtc-mapdb-edit-ride-div input[name="max_distance"]').val().trim();
+					if (maxdist.length > 0) {
+						maxdist = parseInt(maxdist, 10);
+						if (maxdist == NaN || maxdist < 0) {
+							show_warning('You must enter a maximum distance that is a non-negative number.');
+							evt.preventDefault();
+							return;							
+						}
+						if (maxdist <= dist) {
+							show_warning('The maximum distance must be greater than the distance.');
+							evt.preventDefault();
+							return;									
+						}					
+					}
+				}
+
+				var new_leaders = [];
+				$('#pwtc-mapdb-edit-ride-div .leaders-div div').each(function() {
+					var userid = Number($(this).attr('userid'));
+					new_leaders.push(userid); 
+				});
 				if (new_leaders.length == 0) {
 					show_warning('You must assign at least one leader to this ride.');
 					evt.preventDefault();
 					return;
 				}
 				$('#pwtc-mapdb-edit-ride-div input[name="leaders"]').val(JSON.stringify(new_leaders));
-				$('#pwtc-mapdb-edit-ride-div input[name="maps"]').val(JSON.stringify(new_maps));
+
 				show_waiting();
 			});
 			
