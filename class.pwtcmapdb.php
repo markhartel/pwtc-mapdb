@@ -2842,22 +2842,29 @@ class PwtcMapdb {
 					$signup_list[] = $arr;
 				}
 
-				//$ride_title = sanitize_text_field(get_the_title($rideid));
 				$post = get_post($rideid);
 				$ride_title = $post->post_title;
 				$date = DateTime::createFromFormat('Y-m-d H:i:s', get_field(self::RIDE_DATE, $rideid));
 				$ride_date = $date->format('m/d/Y g:ia');
+				$leaders = self::get_leader_userids($rideid);
+				$ride_leader = '';
+				if (count($leaders) > 0) {
+					$user_info = get_userdata($leaders[0]);
+					if ($user_info) {
+						$ride_leader = $user_info->first_name . ' ' . $user_info->last_name;
+					}
+					else {
+						$ride_leader = 'Unknown';
+					}
+				}
 			}
 			else {
 				$unused_rows = 0;
 				$signup_list = [];
 				$ride_title = '';
 				$ride_date = '';
-			}
-			//$release_waiver = self::get_release_waiver();
-			//$safety_waiver = self::get_safety_waiver();
-			//$photo_waiver = self::get_photo_waiver();
-			
+				$ride_leader = '';
+			}			
 			$waiver_post = get_page_by_title('Terms and Conditions');
 			if ($waiver_post) {
 				$release_waiver = wp_kses(get_the_content(null, false, $waiver_post), array());
@@ -2894,7 +2901,7 @@ class PwtcMapdb {
 					$pdf->SetFont('Arial', '', $font_size);
 					$pdf->Cell(220, $cell_h, 'Ride: '.$ride_title, 1, 2,'L');
 					$pdf->Cell(60, $cell_h, 'Date: '.$ride_date, 1, 0,'L');
-					$pdf->Cell(110, $cell_h, 'Leader:', 1, 0,'L');
+					$pdf->Cell(110, $cell_h, 'Leader: '.$ride_leader, 1, 0,'L');
 					$pdf->Cell(50, $cell_h, 'Distance:', 1, 0,'L');
 					$pdf->Image(PWTC_MILEAGE__PLUGIN_DIR . 'pbc_logo.png', $x_margin, $y_margin, $logo_size, $logo_size);
 					$waiver_y = $y_margin+35;
@@ -2909,13 +2916,6 @@ class PwtcMapdb {
 				$pdf->SetFont('Arial', '', 8);
 				$pdf->SetXY($x_margin, $waiver_y);
 				$pdf->MultiCell(0, 3, $release_waiver);
-				/*
-				$pdf->SetXY($x_margin, $waiver_y+15);
-				$pdf->MultiCell(0, 3, $safety_waiver);
-				$pdf->SetXY($x_margin, $waiver_y+30);
-				$pdf->MultiCell(0, 3, $photo_waiver);
-				*/
-
 				$pdf->SetXY($x_margin, $table_y);
 				$pdf->SetFont('Arial', 'B', $font_size);
 				$pdf->Cell(10, $cell_h, 'No.', 1, 0,'C');
@@ -2962,7 +2962,7 @@ class PwtcMapdb {
 					$pdf->SetFont('Arial', '', $font_size);
 					$pdf->Cell(10, $cell_h, $rider_count, 1, 0,'C');
 					$pdf->Cell(30, $cell_h, $rider_id, 1, 0,'C');
-					$pdf->Cell(20, $cell_h, $mileage, 1, 0,'L');
+					$pdf->Cell(20, $cell_h, $mileage, 1, 0,'C');
 					$pdf->Cell(70, $cell_h, $rider_name, 1, 0,'L');
 					$pdf->Cell(50, $cell_h, '', 1, 0,'L');
 					$pdf->Cell(80, $cell_h, $contact, 1, 0,'L');
