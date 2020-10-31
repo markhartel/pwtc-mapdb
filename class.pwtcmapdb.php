@@ -3409,7 +3409,8 @@ EOT;
 				'orderby' => 'meta_value',
 				'order' => 'ASC',
 				'role' => self::ROLE_RIDE_LEADER,
-				'search' => $search
+				'search' => '*'.$search.'*',
+				'search_columns' => array('display_name')
 			];
 			$user_query = new WP_User_Query($query_args);
 			$members = $user_query->get_results();
