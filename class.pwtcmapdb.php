@@ -2063,14 +2063,18 @@ class PwtcMapdb {
 		#pwtc-mapdb-edit-ride-div .leader-search-div li:hover {
 			font-weight: bold;
 		}
-		#pwtc-mapdb-edit-ride-div .start-locations-div ul {
-			list-style-type: none;
-		}
-		#pwtc-mapdb-edit-ride-div .start-locations-div li {
+		#pwtc-mapdb-edit-ride-div .start-locations-div table tr {
 			cursor: pointer;
 		}
-		#pwtc-mapdb-edit-ride-div .start-locations-div li:hover {
+		#pwtc-mapdb-edit-ride-div .start-locations-div table tr:hover {
 			font-weight: bold;
+		}
+		#pwtc-mapdb-edit-ride-div .start-locations-div table td {
+			padding: 3px;
+			vertical-align: top;
+		}
+		#pwtc-mapdb-edit-ride-div .start-locations-div table tr:nth-child(odd) {
+			background-color: #f2f2f2;
 		}
 	</style>
 	<script type="text/javascript">
@@ -2324,15 +2328,16 @@ class PwtcMapdb {
 			
 		<?php if ($set_start_location) { ?>
 			$('#start_locations tr').each(function(index) {
-				var title = $(this).find('td').first().html();
-				$('#pwtc-mapdb-edit-ride-div .start-locations-div ul').append(
-					'<li itemid="' + (index+1) + '">' + title + '</li>');
+				var area = $(this).find('td').first().html();
+				var title = $(this).find('td').first().next().html();
+				$('#pwtc-mapdb-edit-ride-div .start-locations-div table').append(
+					'<tr itemid="' + (index+1) + '"><td>' + title + '</td><td>' + area + '</td></tr>');
 			});
 
-			$('#pwtc-mapdb-edit-ride-div .start-locations-div li').on('click', function(evt) {
+			$('#pwtc-mapdb-edit-ride-div .start-locations-div tr').on('click', function(evt) {
 				var itemid = $(this).attr('itemid');
 				var item = $('#start_locations tr:nth-child(' + itemid + ')');
-				var addr = item.find('td').first().next().html();
+				var addr = item.find('td').first().next().next().html();
 				var lat = item.attr('lat');
 				var lng = item.attr('lng');
 				var zoom = item.attr('zoom');
@@ -2466,7 +2471,7 @@ class PwtcMapdb {
             						<div class="accordion-content" data-tab-content>
 								<div class="row column">
 									<div class="start-locations-div" style="border:1px solid; overflow: auto; height: 100px;">
-										<ul></ul>
+										<table></table>
 									</div>
 								</div>
 							</div>
