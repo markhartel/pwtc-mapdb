@@ -2345,6 +2345,7 @@ class PwtcMapdb {
 				$('#pwtc-mapdb-edit-ride-div input[name="start_lat"]').val(lat);
 				$('#pwtc-mapdb-edit-ride-div input[name="start_lng"]').val(lng);
 				$('#pwtc-mapdb-edit-ride-div input[name="start_zoom"]').val(zoom);
+				$('#pwtc-mapdb-edit-ride-div .google-maps').hide();
 			});
 		<?php } ?>
 			
@@ -2463,6 +2464,13 @@ class PwtcMapdb {
 					<input type="hidden" name="start_lat" value="<?php echo esc_attr($start_location['lat']); ?>"/>
 					<input type="hidden" name="start_lng" value="<?php echo esc_attr($start_location['lng']); ?>"/>
 					<input type="hidden" name="start_zoom" value="<?php echo esc_attr($start_location['zoom']); ?>"/>
+				</div>
+				<div class="row column">
+					<div class="google-maps">
+						<div class="acf-map" data-zoom="<?php echo esc_attr($start_location['zoom']); ?>">
+							<div class="marker" data-lat="<?php echo esc_attr($start_location['lat']); ?>" data-lng="<?php echo esc_attr($start_location['lng']); ?>"></div>
+						</div>
+					</div>			
 				</div>
 				<div class="row column">
 					<ul class="accordion" data-accordion data-allow-all-closed="true">
