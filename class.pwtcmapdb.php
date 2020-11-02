@@ -2162,6 +2162,9 @@ class PwtcMapdb {
             					$('#pwtc-mapdb-edit-ride-div .map-search-div table').append(
 							'<tr mapid="' + item.ID + '"><td>' + item.title + '</td><td>' + item.distance + '</td><td>' + item.terrain + '</td></tr>');    
 					});
+					if (res.offset !== undefined) {
+						$('#pwtc-mapdb-edit-ride-div .map-search-div').append('<a class="dark button" offset="' + res.offset + '" count="' + res.count + '">Fetch next 10 maps</a>');
+					}
 					$('#pwtc-mapdb-edit-ride-div .map-search-div tr').on('click', function(evt) {
 						var mapid = $(this).attr('mapid');
 						if (!has_map_id(mapid)) {
@@ -2170,6 +2173,26 @@ class PwtcMapdb {
 								$(this).parent().remove();
 							});
 						}
+					});
+					$('#pwtc-mapdb-edit-ride-div .map-search-div a').on('click', function(evt) {
+						var offset = $(this).attr('offset');
+						var count = $(this).attr('count');
+						var searchstr = $('#pwtc-mapdb-edit-ride-div input[name="map-pattern"]').val();
+						var action = "<?php echo admin_url('admin-ajax.php'); ?>";
+						var data = {
+							'action': 'pwtc_mapdb_lookup_maps',
+							'limit': 10,
+							'title': searchstr,
+							'location': '',
+							'terrain': 0,
+							'distance': 0,
+							'media': 0,
+							'offset': offset,
+							'count': count,
+							'next': 1
+						};
+						$.post(action, data, maps_lookup_cb);
+						$('#pwtc-mapdb-edit-ride-div .map-search-div').html('<div class="callout small"><i class="fa fa-spinner fa-pulse"></i> please wait...</div>');
 					});
 				}
 			}
