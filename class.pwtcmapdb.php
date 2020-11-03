@@ -1926,12 +1926,6 @@ class PwtcMapdb {
 		$ride_link = esc_url(get_the_permalink($postid));
 		$return_to_ride = 'Click <a href="' . $ride_link . '">here</a> to return to the posted ride.';
 
-		$now_date = self::get_current_time();
-		$ride_date = self::get_ride_start_time($postid);
-		if ($ride_date < $now_date) {
-			return '<div class="callout small warning"><p>Ride "' . $ride_title . '" has already started so you cannot edit it. ' . $return_to_ride . '</p></div>';
-		}
-
 		if (isset($_POST['title'])) {
 			$my_post = array(
 				'ID' => $postid,
@@ -1946,6 +1940,17 @@ class PwtcMapdb {
 			update_field('description', $_POST['description'], $postid);
 		}
 		$description = get_field('description', $postid, false);
+		
+		if (isset($_POST['ride_date']) and isset($_POST['ride_time'])) {
+			$date_str = trim($_POST['ride_date']) . ' ' . trim($_POST['ride_time']) . ':00';
+			update_field(self::RIDE_DATE, $date_str, $postid);
+		}
+		$now_date = self::get_current_time();
+		$ride_datetime = self::get_ride_start_time($postid);
+		$ride_date = $ride_datetime->format('Y-m-d');
+		$ride_time = $ride_datetime->format('H:i');
+		$min_date = $now_date->format('Y-m-d');
+		$edit_date = false;
 
 		if (isset($_POST['leaders'])) {
 			$new_leaders = json_decode($_POST['leaders']);
@@ -2007,6 +2012,10 @@ class PwtcMapdb {
 		$maps = [];
 		foreach ($maps_obj as $map) {
 			$maps[] = $map->ID;
+		}
+		
+		if ($ride_datetime < $now_date) {
+			return '<div class="callout small warning"><p>Ride "' . $ride_title . '" has already started so you cannot edit it. ' . $return_to_ride . '</p></div>';
 		}
 		
 		if (!user_can($current_user,'edit_published_rides')) {
@@ -2284,6 +2293,22 @@ class PwtcMapdb {
 					evt.preventDefault();
 					return;
 				}
+				
+				var date = $('#pwtc-mapdb-edit-ride-div input[name="ride_date"]').val().trim();
+				var time = $('#pwtc-mapdb-edit-ride-div input[name="ride_time"]').val().trim();
+				var datergx = /^\d{4}-\d{2}-\d{2}$/;
+				var timergx = /^\d{2}:\d{2}$/;
+				if (!datergx.test(date)) {
+					show_warning('The ride date format is invalid.');
+					evt.preventDefault();
+					return;
+				}
+				if (!timergx.test(time)) {
+					show_warning('The departure time format is invalid.');
+					evt.preventDefault();
+					return;					
+				}
+				//alert('date=' + date + ' time=' + time);
 
 				var attach_map = $('#pwtc-mapdb-edit-ride-div input[name="attach_maps"]:checked').val() == '1';
 				if (attach_map) {
@@ -2368,7 +2393,7 @@ class PwtcMapdb {
 				$('#pwtc-mapdb-edit-ride-div input[name="start_lat"]').val(lat);
 				$('#pwtc-mapdb-edit-ride-div input[name="start_lng"]').val(lng);
 				$('#pwtc-mapdb-edit-ride-div input[name="start_zoom"]').val(zoom);
-				$('#pwtc-mapdb-edit-ride-div .google-maps').hide();
+				//$('#pwtc-mapdb-edit-ride-div .google-maps').hide();
 			});
 		<?php } ?>
 			
@@ -2396,6 +2421,16 @@ class PwtcMapdb {
 					</label>
 				</div>
 				<div class="row">
+					<div class="small-12 medium-6 columns">
+						<label>Ride Date
+							<input type="date" name="ride_date" value="<?php echo $ride_date; ?>" min="<?php echo $min_date; ?>" <?php echo $edit_date ? '': 'readonly'; ?>/>	
+						</label>
+					</div>
+					<div class="small-12 medium-6 columns">
+						<label>Departure Time
+							<input type="time" name="ride_time" value="<?php echo $ride_time; ?>"/>	
+						</label>
+					</div>
 					<div class="small-12 medium-6 columns">
 						<label>Ride Type
 						<fieldset>
@@ -2488,6 +2523,7 @@ class PwtcMapdb {
 					<input type="hidden" name="start_lng" value="<?php echo esc_attr($start_location['lng']); ?>"/>
 					<input type="hidden" name="start_zoom" value="<?php echo esc_attr($start_location['zoom']); ?>"/>
 				</div>
+				<!--
 				<div class="row column">
 					<div class="google-maps">
 						<div class="acf-map" data-zoom="<?php echo esc_attr($start_location['zoom']); ?>">
@@ -2495,6 +2531,7 @@ class PwtcMapdb {
 						</div>
 					</div>			
 				</div>
+				-->
 				<div class="row column">
 					<ul class="accordion" data-accordion data-allow-all-closed="true">
 						<li class="accordion-item" data-accordion-item>
