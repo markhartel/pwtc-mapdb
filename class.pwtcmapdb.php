@@ -19,8 +19,29 @@ class PwtcMapdb {
 	const EDIT_CAPABILITY = 'edit_others_rides';
 	
 	const RIDE_CANCELED = 'is_canceled';
+	const RIDE_CANCELED_KEY = 'field_canceled';
 	const RIDE_LEADERS = 'ride_leaders';
+	const RIDE_LEADERS_KEY = 'field_57bc9992f40cc';
 	const RIDE_DATE = 'date';
+	const RIDE_DATE_KEY = 'field_57bc992c2f7f5';
+	const RIDE_ATTACH_MAP = 'attach_map';
+	const RIDE_ATTACH_MAP_KEY = 'field_582aedf005158';
+	const RIDE_MAPS = 'maps';
+	const RIDE_MAPS_KEY = 'field_582aee3e19e75';
+	const RIDE_TYPE = 'type';
+	const RIDE_TYPE_KEY = 'field_57bc95890afc7';
+	const RIDE_PACE = 'pace';
+	const RIDE_PACE_KEY = 'field_57bc95bf0afc8';
+	const RIDE_TERRAIN = 'terrain';
+	const RIDE_TERRAIN_KEY = 'field_57bc97180afca';
+	const RIDE_LENGTH = 'length';
+	const RIDE_LENGTH_KEY = 'field_57bc978e0afcb';
+	const RIDE_MAX_LENGTH = 'max_length';
+	const RIDE_MAX_LENGTH_KEY = 'field_57bc97a40afcc';
+	const RIDE_START_LOCATION = 'start_location';
+	const RIDE_START_LOCATION_KEY = 'field_57bc95fb0afc9';
+	const RIDE_DESCRIPTION = 'description';
+	const RIDE_DESCRIPTION_KEY = 'field_57bc9553246a2';
 	const RIDE_SIGNUP_LOCKED = '_signup_locked';
 	const RIDE_SIGNUP_USERID = '_signup_user_id';
 	const RIDE_SIGNUP_NONMEMBER = '_signup_nonmember_id';
@@ -1911,113 +1932,246 @@ class PwtcMapdb {
 		$a = shortcode_atts(array('set_start_location' => 'no'), $atts);
 		$set_start_location = $a['set_start_location'] == 'yes';
 
-		$error = self::check_post_id();
-		if (!empty($error)) {
-			return $error;
+		if (isset($_GET['post'])) {
+			$error = self::check_post_id();
+			if (!empty($error)) {
+				return $error;
+			}
+			$postid = intval($_GET['post']);
 		}
-		$postid = intval($_GET['post']);
+		else {
+			$postid = 0;
+		}
 
 		$current_user = wp_get_current_user();
 		if ( 0 == $current_user->ID ) {
 			return '<div class="callout small warning"><p>Please <a href="/wp-login.php">log in</a> to edit this ride.</p></div>';
 		}
 
-		$ride_title = esc_html(get_the_title($postid));
-		$ride_link = esc_url(get_the_permalink($postid));
-		$return_to_ride = 'Click <a href="' . $ride_link . '">here</a> to return to the posted ride.';
-
+		$new_post = false;
 		if (isset($_POST['title'])) {
-			$my_post = array(
-				'ID' => $postid,
-				'post_title' => esc_html(trim($_POST['title']))
-			);
-			wp_update_post( $my_post );			
+			if ($postid != 0) {
+				$my_post = array(
+					'ID' => $postid,
+					'post_title' => esc_html(trim($_POST['title']))
+				);
+				wp_update_post( $my_post );	
+			}
+			else {
+				$my_post = array(
+					'post_title'    => esc_html(trim($_POST['title'])),
+					'post_type'     => self::POST_TYPE_RIDE,
+					'post_status'   => 'publish'
+				);
+				$postid = wp_insert_post( $my_post );
+				$new_post = true;				
+			}		
 		}
-		$post = get_post($postid);
-		$title = esc_html($post->post_title);
+		if ($postid != 0) {
+			$post = get_post($postid);
+			$title = esc_html($post->post_title);
+		}
+		else {
+			$title = '';
+		}
+
+		if ($postid != 0) {
+			$ride_title = esc_html(get_the_title($postid));
+			$ride_link = esc_url(get_the_permalink($postid));
+			$return_to_ride = 'Click <a href="' . $ride_link . '">here</a> to return to the posted ride.';
+		}
+		else {
+			$ride_title = '';
+			$return_to_ride = '';
+		}
 
 		if (isset($_POST['description'])) {
-			update_field('description', $_POST['description'], $postid);
+			if ($new_post) {
+				update_field(self::RIDE_DESCRIPTION_KEY, $_POST['description'], $postid);
+			}
+			else {
+				update_field(self::RIDE_DESCRIPTION, $_POST['description'], $postid);
+			}
 		}
-		$description = get_field('description', $postid, false);
-		
+		if ($postid != 0) {
+			$description = get_field(self::RIDE_DESCRIPTION, $postid, false);
+		}
+		else {
+			$description = '';
+		}
+
 		if (isset($_POST['ride_date']) and isset($_POST['ride_time'])) {
 			$date_str = trim($_POST['ride_date']) . ' ' . trim($_POST['ride_time']) . ':00';
-			update_field(self::RIDE_DATE, $date_str, $postid);
+			if ($new_post) {
+				update_field(self::RIDE_DATE_KEY, $date_str, $postid);
+			}
+			else {
+				update_field(self::RIDE_DATE, $date_str, $postid);
+			}
 		}
 		$now_date = self::get_current_time();
-		$ride_datetime = self::get_ride_start_time($postid);
+		if ($postid != 0) {
+			$ride_datetime = self::get_ride_start_time($postid);
+			$edit_date = false;
+		}
+		else {
+			$ride_datetime = self::get_current_time();
+			$edit_date = true;
+		}
 		$ride_date = $ride_datetime->format('Y-m-d');
 		$ride_time = $ride_datetime->format('H:i');
 		$min_date = $now_date->format('Y-m-d');
-		$edit_date = false;
-
+		
 		if (isset($_POST['leaders'])) {
 			$new_leaders = json_decode($_POST['leaders']);
-			update_field('ride_leaders', $new_leaders, $postid);
+			if ($new_post) {
+				update_field(self::RIDE_LEADERS_KEY, $new_leaders, $postid);
+			}
+			else {
+				update_field(self::RIDE_LEADERS, $new_leaders, $postid);
+			}
 		}
-		$leaders = self::get_leader_userids($postid);
+		if ($postid != 0) {
+			$leaders = self::get_leader_userids($postid);
+		}
+		else {
+			$leaders = array($current_user->ID);
+		}
 
 		if (isset($_POST['start_address']) and isset($_POST['start_lat']) and isset($_POST['start_lng']) and isset($_POST['start_zoom'])) {
 			$location = array('address' => $_POST['start_address'],
 			'lat' => floatval($_POST['start_lat']), 'lng' => floatval($_POST['start_lng']), 'zoom' => intval($_POST['start_zoom']));
-			update_field('start_location', $location, $postid);
+			if ($new_post) {
+				update_field(self::RIDE_START_LOCATION_KEY, $location, $postid);
+			}
+			else {
+				update_field(self::RIDE_START_LOCATION, $location, $postid);
+			}
 		}
-		$start_location = get_field('start_location', $postid);
+		if ($postid != 0) {
+			$start_location = get_field(self::RIDE_START_LOCATION, $postid);
+		}
+		else {
+			$start_location = array('address' => '', 'lat' => 0.0, 'lng' => 0.0, 'zoom' => 17);
+		}
 
 		if (isset($_POST['ride_type'])) {
-			update_field('type', $_POST['ride_type'], $postid);
+			if ($new_post) {
+				update_field(self::RIDE_TYPE_KEY, $_POST['ride_type'], $postid);
+			}
+			else {
+				update_field(self::RIDE_TYPE, $_POST['ride_type'], $postid);
+			}
 		}
-		$ride_type = get_field('type', $postid);
+		if ($postid != 0) {
+			$ride_type = get_field(self::RIDE_TYPE, $postid);
+		}
+		else {
+			$ride_type = 'nongroup';
+		}
 
 		if (isset($_POST['ride_pace'])) {
-			update_field('pace', $_POST['ride_pace'], $postid);
+			if ($new_post) {
+				update_field(self::RIDE_PACE_KEY, $_POST['ride_pace'], $postid);
+			}
+			else {
+				update_field(self::RIDE_PACE, $_POST['ride_pace'], $postid);
+			}
 		}
-		$ride_pace = get_field('pace', $postid);
+		if ($postid != 0) {
+			$ride_pace = get_field(self::RIDE_PACE, $postid);
+		}
+		else {
+			$ride_pace = 'no';
+		}
 
 		if (isset($_POST['attach_maps'])) {
-			update_field('attach_map', $_POST['attach_maps'], $postid);
+			if ($new_post) {
+				update_field(self::RIDE_ATTACH_MAP_KEY, $_POST['attach_maps'], $postid);
+			}
+			else {
+				update_field(self::RIDE_ATTACH_MAP, $_POST['attach_maps'], $postid);
+			}
 		}
-		$attach_maps = get_field('attach_map', $postid);
+		if ($postid != 0) {
+			$attach_maps = get_field(self::RIDE_ATTACH_MAP, $postid);
+		}
+		else {
+			$attach_maps = false;
+		}
 
 		if ($attach_maps) {
 			if (isset($_POST['maps'])) {
 				$new_maps = json_decode($_POST['maps']);
-				update_field('maps', $new_maps, $postid);
+				if ($new_post) {
+					update_field(self::RIDE_MAPS_KEY, $new_maps, $postid);
+				}
+				else {
+					update_field(self::RIDE_MAPS, $new_maps, $postid);
+				}
 			}	
 		}
 		else {
 			if (isset($_POST['distance'])) {
-				update_field('length', intval($_POST['distance']), $postid);
+				if ($new_post) {
+					update_field(self::RIDE_LENGTH_KEY, intval($_POST['distance']), $postid);
+				}
+				else {
+					update_field(self::RIDE_LENGTH, intval($_POST['distance']), $postid);
+				}
 			}
 	
 			if (isset($_POST['max_distance'])) {
 				$d = trim($_POST['max_distance']);
 				if (empty($d)) {
-					update_field('max_length', null, $postid);
+					if ($new_post) {
+						update_field(self::RIDE_MAX_LENGTH_KEY, null, $postid);
+					}
+					else {
+						update_field(self::RIDE_MAX_LENGTH, null, $postid);
+					}
 				}
 				else {
-					update_field('max_length', intval($d), $postid);
+					if ($new_post) {
+						update_field(self::RIDE_MAX_LENGTH_KEY, intval($d), $postid);
+					}
+					else {
+						update_field(self::RIDE_MAX_LENGTH, intval($d), $postid);
+					}
 				}
 			}
 	
 			if (isset($_POST['ride_terrain'])) {
-				update_field('terrain', $_POST['ride_terrain'], $postid);
+				if ($new_post) {
+					update_field(self::RIDE_TERRAIN_KEY, $_POST['ride_terrain'], $postid);
+				}
+				else {
+					update_field(self::RIDE_TERRAIN, $_POST['ride_terrain'], $postid);
+				}
 			}
 		}
-		$distance = get_field('length', $postid);
-		$max_distance = get_field('max_length', $postid);
-		$ride_terrain = get_field('terrain', $postid);
-		$maps_obj = get_field('maps', $postid);
-		$maps = [];
-		foreach ($maps_obj as $map) {
-			$maps[] = $map->ID;
+		if ($postid != 0) {
+			$distance = get_field(self::RIDE_LENGTH, $postid);
+			$max_distance = get_field(self::RIDE_MAX_LENGTH, $postid);
+			$ride_terrain = get_field(self::RIDE_TERRAIN, $postid);
+			$maps_obj = get_field(self::RIDE_MAPS, $postid);
+			$maps = [];
+			foreach ($maps_obj as $map) {
+				$maps[] = $map->ID;
+			}
 		}
-		
+		else {
+			$distance = 0;
+			$max_distance = '';
+			$ride_terrain = [];
+			$maps_obj = [];
+			$maps = [];
+		}
+
 		if ($ride_datetime < $now_date) {
 			return '<div class="callout small warning"><p>Ride "' . $ride_title . '" has already started so you cannot edit it. ' . $return_to_ride . '</p></div>';
 		}
-		
+
 		if (!user_can($current_user,'edit_published_rides')) {
 			$denied = true;
 			foreach ($leaders as $item) {
@@ -2358,6 +2512,12 @@ class PwtcMapdb {
 						}					
 					}
 				}
+				
+				if ($('#pwtc-mapdb-edit-ride-div input[name="start_address"]').val().trim().length == 0) {
+					show_warning('You must choose a start location for this ride.');
+					evt.preventDefault();
+					return;
+				}
 
 				var new_leaders = [];
 				$('#pwtc-mapdb-edit-ride-div .leaders-div div').each(function() {
@@ -2585,8 +2745,10 @@ class PwtcMapdb {
 				</div>
 				<div class="row column errmsg"></div>
 				<div class="row column clearfix">
-					<button class="dark button float-left" type="submit">Submit</button>
+					<button class="dark button float-left" type="submit"><?php echo $postid == 0 ? 'Create Ride' : 'Save Ride'; ?></button>
+					<?php if ($postid != 0) { ?>
 					<a href="<?php echo $ride_link; ?>" class="dark button float-right"><i class="fa fa-chevron-left"></i> Back to Ride</a>
+					<?php } ?>
 				</div>
 			</form>
 		</div>
