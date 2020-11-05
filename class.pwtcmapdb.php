@@ -2009,18 +2009,23 @@ class PwtcMapdb {
 				update_field(self::RIDE_DATE, $date_str, $postid);
 			}
 		}
-		$now_date = self::get_current_time();
 		if ($postid != 0) {
 			$ride_datetime = self::get_ride_start_time($postid);
+			$ride_date = $ride_datetime->format('Y-m-d');
+			$ride_time = $ride_datetime->format('H:i');
+			$min_date = $ride_date;
 			$edit_date = false;
 		}
 		else {
 			$ride_datetime = self::get_current_time();
+			$interval = new DateInterval('P14D');
+			$ride_datetime->add($interval);
+			$ride_date = $ride_datetime->format('Y-m-d');
+			$ride_time = '10:00';
+			$min_date = $ride_date;
 			$edit_date = true;
 		}
-		$ride_date = $ride_datetime->format('Y-m-d');
-		$ride_time = $ride_datetime->format('H:i');
-		$min_date = $now_date->format('Y-m-d');
+		$now_date = self::get_current_time();
 		
 		if (isset($_POST['leaders'])) {
 			$new_leaders = json_decode($_POST['leaders']);
