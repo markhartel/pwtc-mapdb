@@ -2590,7 +2590,7 @@ class PwtcMapdb {
 		<?php if ($copy_ride) { ?>
 			$('#pwtc-mapdb-edit-ride-div').hide();
 			$('#pwtc-mapdb-copy-ride-div').show();
-			$('#pwtc-mapdb-copy-ride-div a').on('click', function(evt) {
+			$('#pwtc-mapdb-copy-ride-div .copy_ride').on('click', function(evt) {
 				$('#pwtc-mapdb-copy-ride-div').hide();
 				$('#pwtc-mapdb-edit-ride-div').show();
 			});
@@ -2604,7 +2604,7 @@ class PwtcMapdb {
 	<div id='pwtc-mapdb-copy-ride-div'>
 		<div class="callout small warning"><p>
 		Ride "<?php echo $ride_title; ?>" has finished so you cannot edit it. You may copy it instead. <?php echo $return_to_ride; ?><br>
-		<a class="dark button">Copy Ride</a>
+		<a class="dark button copy_ride">Copy Ride</a>
 		</p></div>
 	</div>
 	<div id='pwtc-mapdb-edit-ride-div'>
