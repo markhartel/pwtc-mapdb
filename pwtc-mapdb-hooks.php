@@ -15,6 +15,7 @@ function pwtc_mapdb_get_signup() {
 
     $result['view_signup_url'] = '/ride-view-signups/?post='.$postid;
     $result['edit_ride_url'] = '/ride-edit-fields/?post='.$postid;
+    $result['copy_ride_url'] = '/ride-edit-fields/?post='.$postid.'&action=copy';
 
     if ($signup_mode == 'no' or $signup_locked) {
         $result['ride_signup_msg'] = false;
