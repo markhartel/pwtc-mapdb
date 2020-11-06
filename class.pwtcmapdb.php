@@ -2025,14 +2025,15 @@ class PwtcMapdb {
 				$ride_datetime = self::get_current_time();
 				$interval = new DateInterval('P14D');
 				$ride_datetime->add($interval);
-				$ride_date = $ride_datetime->format('Y-m-d');	
+				$ride_date = $ride_datetime->format('Y-m-d');
+				$edit_date = true;	
 			}
 			else {
 				$ride_date = $ride_datetime->format('Y-m-d');
 				$ride_time = $ride_datetime->format('H:i');	
+				$edit_date = false;
 			}
 			$min_date = $ride_date;
-			$edit_date = false;
 		}
 		else {
 			$ride_datetime = self::get_current_time();
