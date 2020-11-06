@@ -1929,10 +1929,14 @@ class PwtcMapdb {
 	
 	// Generates the [pwtc_mapdb_edit_ride] shortcode.
 	public static function shortcode_edit_ride($atts) {
-		$a = shortcode_atts(array('set_start_location' => 'no'), $atts);
-		$set_start_location = $a['set_start_location'] == 'yes';
+		//$a = shortcode_atts(array('set_start_location' => 'no'), $atts);
+		//$set_start_location = $a['set_start_location'] == 'yes';
+		$set_start_location = true;
 
-		if (isset($_GET['post'])) {
+		if (isset($_POST['postid'])) {
+			$postid = intval($_POST['postid']);
+		}
+		else if (isset($_GET['post'])) {
 			$error = self::check_post_id();
 			if (!empty($error)) {
 				return $error;
@@ -1942,7 +1946,7 @@ class PwtcMapdb {
 		else {
 			$postid = 0;
 		}
-
+		
 		$current_user = wp_get_current_user();
 		if ( 0 == $current_user->ID ) {
 			return '<div class="callout small warning"><p>Please <a href="/wp-login.php">log in</a> to edit this ride.</p></div>';
@@ -2009,10 +2013,24 @@ class PwtcMapdb {
 				update_field(self::RIDE_DATE, $date_str, $postid);
 			}
 		}
+		$copy_ride = false;
+		$now_date = self::get_current_time();
 		if ($postid != 0) {
 			$ride_datetime = self::get_ride_start_time($postid);
-			$ride_date = $ride_datetime->format('Y-m-d');
-			$ride_time = $ride_datetime->format('H:i');
+			if ($ride_datetime < $now_date) {
+				$copy_ride = true;
+			}
+			if ($copy_ride) {
+				$ride_time = $ride_datetime->format('H:i');
+				$ride_datetime = self::get_current_time();
+				$interval = new DateInterval('P14D');
+				$ride_datetime->add($interval);
+				$ride_date = $ride_datetime->format('Y-m-d');	
+			}
+			else {
+				$ride_date = $ride_datetime->format('Y-m-d');
+				$ride_time = $ride_datetime->format('H:i');	
+			}
 			$min_date = $ride_date;
 			$edit_date = false;
 		}
@@ -2025,7 +2043,6 @@ class PwtcMapdb {
 			$min_date = $ride_date;
 			$edit_date = true;
 		}
-		$now_date = self::get_current_time();
 		
 		if (isset($_POST['leaders'])) {
 			$new_leaders = json_decode($_POST['leaders']);
@@ -2171,10 +2188,6 @@ class PwtcMapdb {
 			$ride_terrain = [];
 			$maps_obj = [];
 			$maps = [];
-		}
-
-		if ($ride_datetime < $now_date) {
-			return '<div class="callout small warning"><p>Ride "' . $ride_title . '" has already started so you cannot edit it. ' . $return_to_ride . '</p></div>';
 		}
 
 		if (!user_can($current_user,'edit_published_rides')) {
@@ -2569,15 +2582,36 @@ class PwtcMapdb {
 			$('#pwtc-mapdb-edit-ride-div form .attach-map-yes').hide();
 			$('#pwtc-mapdb-edit-ride-div form .attach-map-no').show();
 		<?php } ?>
+			
+		<?php if ($copy_ride) { ?>
+			$('#pwtc-mapdb-edit-ride-div').hide();
+			$('#pwtc-mapdb-copy-ride-div').show();
+			$('#pwtc-mapdb-copy-ride-div a').on('click', function(evt) {
+				$('#pwtc-mapdb-copy-ride-div').hide();
+				$('#pwtc-mapdb-edit-ride-div').show();
+				$('#pwtc-mapdb-edit-ride-div input[name="postid"]').val('0');
+				$('#pwtc-mapdb-edit-ride-div button[type="submit"]').html('Copy Ride');
+			});
+		<?php } else { ?>
+			$('#pwtc-mapdb-copy-ride-div').hide();
+			$('#pwtc-mapdb-edit-ride-div').show();
+		<?php } ?>
 
 		});
 	</script>
+	<div id='pwtc-mapdb-copy-ride-div'>
+		<div class="callout small warning"><p>
+		Ride "<?php echo $ride_title; ?>" has finished so you cannot edit it. You may copy it instead. <?php echo $return_to_ride; ?><br>
+		<a class="dark button">Copy Ride</a>
+		</p></div>
+	</div>
 	<div id='pwtc-mapdb-edit-ride-div'>
 		<div class="callout">
 			<form method="POST">
 				<div class="row column">
 					<label>Ride Title
 						<input type="text" name="title" value="<?php echo $title; ?>"/>
+						<input type="hidden" name="postid" value="<?php echo $postid; ?>"/>
 					</label>
 				</div>
 				<div class="row column">
