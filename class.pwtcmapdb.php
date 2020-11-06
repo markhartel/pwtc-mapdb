@@ -2203,6 +2203,10 @@ class PwtcMapdb {
 			}
 		}
 		
+		if ($copy_ride) {
+			$postid = 0;
+		}
+		
 		ob_start();
 	?>
 	<style>
@@ -2589,8 +2593,6 @@ class PwtcMapdb {
 			$('#pwtc-mapdb-copy-ride-div a').on('click', function(evt) {
 				$('#pwtc-mapdb-copy-ride-div').hide();
 				$('#pwtc-mapdb-edit-ride-div').show();
-				$('#pwtc-mapdb-edit-ride-div input[name="postid"]').val('0');
-				$('#pwtc-mapdb-edit-ride-div button[type="submit"]').html('Copy Ride');
 			});
 		<?php } else { ?>
 			$('#pwtc-mapdb-copy-ride-div').hide();
