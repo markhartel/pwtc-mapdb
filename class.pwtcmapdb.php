@@ -2062,8 +2062,10 @@ class PwtcMapdb {
 		}
 
 		if (isset($_POST['start_address']) and isset($_POST['start_lat']) and isset($_POST['start_lng']) and isset($_POST['start_zoom'])) {
-			$location = array('address' => $_POST['start_address'],
-			'lat' => floatval($_POST['start_lat']), 'lng' => floatval($_POST['start_lng']), 'zoom' => intval($_POST['start_zoom']));
+			$location = array('address' => $_POST['start_address'], 'lat' => floatval($_POST['start_lat']), 'lng' => floatval($_POST['start_lng']));
+			if (!empty($_POST['start_zoom'])) {
+				$location['zoom'] = intval($_POST['start_zoom']);
+			}
 			if ($new_post) {
 				update_field(self::RIDE_START_LOCATION_KEY, $location, $postid);
 			}
@@ -2723,7 +2725,7 @@ class PwtcMapdb {
 					</label>
 					<input type="hidden" name="start_lat" value="<?php echo esc_attr($start_location['lat']); ?>"/>
 					<input type="hidden" name="start_lng" value="<?php echo esc_attr($start_location['lng']); ?>"/>
-					<input type="hidden" name="start_zoom" value="<?php echo esc_attr($start_location['zoom']); ?>"/>
+					<input type="hidden" name="start_zoom" value="<?php echo esc_attr(isset($start_location['zoom']) ? $start_location['zoom'] : ''); ?>"/>
 				</div>
 				<!--
 				<div class="row column">
