@@ -1932,9 +1932,17 @@ class PwtcMapdb {
 		//$a = shortcode_atts(array('set_start_location' => 'no'), $atts);
 		//$set_start_location = $a['set_start_location'] == 'yes';
 		$set_start_location = true;
+		
+		$copy_ride = false;
+		if (isset($_GET['action'])) {
+			if ($_GET['action'] == 'copy') {
+				$copy_ride = true;
+			}
+		}
 
 		if (isset($_POST['postid'])) {
 			$postid = intval($_POST['postid']);
+			$copy_ride = false;
 		}
 		else if (isset($_GET['post'])) {
 			$error = self::check_post_id();
@@ -2013,13 +2021,9 @@ class PwtcMapdb {
 				update_field(self::RIDE_DATE, $date_str, $postid);
 			}
 		}
-		$copy_ride = false;
 		$now_date = self::get_current_time();
 		if ($postid != 0) {
 			$ride_datetime = self::get_ride_start_time($postid);
-			if ($ride_datetime < $now_date) {
-				$copy_ride = true;
-			}
 			if ($copy_ride) {
 				$ride_time = $ride_datetime->format('H:i');
 				$ride_datetime = self::get_current_time();
@@ -2589,27 +2593,9 @@ class PwtcMapdb {
 			$('#pwtc-mapdb-edit-ride-div form .attach-map-yes').hide();
 			$('#pwtc-mapdb-edit-ride-div form .attach-map-no').show();
 		<?php } ?>
-			
-		<?php if ($copy_ride) { ?>
-			$('#pwtc-mapdb-edit-ride-div').hide();
-			$('#pwtc-mapdb-copy-ride-div').show();
-			$('#pwtc-mapdb-copy-ride-div .copy_ride').on('click', function(evt) {
-				$('#pwtc-mapdb-copy-ride-div').hide();
-				$('#pwtc-mapdb-edit-ride-div').show();
-			});
-		<?php } else { ?>
-			$('#pwtc-mapdb-copy-ride-div').hide();
-			$('#pwtc-mapdb-edit-ride-div').show();
-		<?php } ?>
 
 		});
 	</script>
-	<div id='pwtc-mapdb-copy-ride-div'>
-		<div class="callout small warning"><p>
-		Ride "<?php echo $ride_title; ?>" has finished so you cannot edit it. You may copy it instead. <?php echo $return_to_ride; ?><br>
-		<a class="dark button copy_ride">Copy Ride</a>
-		</p></div>
-	</div>
 	<div id='pwtc-mapdb-edit-ride-div'>
 		<div class="callout">
 			<form method="POST">
