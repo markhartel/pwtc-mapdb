@@ -2596,13 +2596,14 @@ class PwtcMapdb {
 
 		});
 	</script>
+	<div>copy_ride=<?php echo $copy_ride; ?></div>
 	<div id='pwtc-mapdb-edit-ride-div'>
 		<div class="callout">
 			<form method="POST">
 				<div class="row column">
 					<label>Ride Title
 						<input type="text" name="title" value="<?php echo $title; ?>"/>
-						<input type="hidden" name="postid" value="<?php echo $postid; ?>"/>
+						<input type="text" name="postid" value="<?php echo $postid; ?>" readonly/>
 					</label>
 				</div>
 				<div class="row column">
