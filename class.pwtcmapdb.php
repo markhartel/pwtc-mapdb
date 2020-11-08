@@ -2596,8 +2596,8 @@ class PwtcMapdb {
 
 		});
 	</script>
-	<div>copy_ride=<?php echo $copy_ride; ?></div>
 	<div id='pwtc-mapdb-edit-ride-div'>
+		<h1><?php if ($copy_ride) { ?>Copy Ride<?php } else if ($postid == 0) { ?>Create Ride<?php } else { ?>Edit Ride<?php } ?></h1>
 		<div class="callout">
 			<form method="POST">
 				<div class="row column">
