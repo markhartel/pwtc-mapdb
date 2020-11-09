@@ -1936,10 +1936,21 @@ class PwtcMapdb {
 		if ( 0 == $current_user->ID ) {
 			return '<div class="callout small warning"><p>Please <a href="/wp-login.php">log in</a> to view the rides for which you have signed up.</p></div>';
 		}
+
 		$now = self::get_current_time();
-		$ride_month = $now->format('Y-m');
+
+		if (isset($_POST['ride_month'])) {
+			$timezone = new DateTimeZone(pwtc_get_timezone_string());
+			$this_month = DateTime::createFromFormat('Y-m-d H:i:s', $_POST['ride_month'].'-15 00:00:00', $timezone);
+			$next_month = DateTime::createFromFormat('Y-m-d H:i:s', $_POST['ride_month'].'-15 00:00:00', $timezone);
+		}
+		else {
+			$this_month = self::get_current_time();
+			$next_month = self::get_current_time();
+		}
+
+		$ride_month = $this_month->format('Y-m');
 		$interval = new DateInterval('P1M');
-		$next_month = self::get_current_time();
 		$next_month->add($interval);
 		$query_args = [
 			'posts_per_page' => -1,
@@ -1947,7 +1958,7 @@ class PwtcMapdb {
 			'meta_query' => [
 				[
 					'key' => self::RIDE_DATE,
-					'value' => [$now->format('Y-m-01 00:00:00'), $next_month->format('Y-m-01 00:00:00')],
+					'value' => [$this_month->format('Y-m-01 00:00:00'), $next_month->format('Y-m-01 00:00:00')],
 					'compare' => 'BETWEEN',
 					'type' => 'DATETIME'
 				],
@@ -1958,7 +1969,25 @@ class PwtcMapdb {
 
 		ob_start();
 		?>
+	<script type="text/javascript">
+		jQuery(document).ready(function($) { 
 
+			function show_warning(msg) {
+				$('#pwtc-mapdb-manage-rides-div .errmsg').html('<div class="callout small warning"><p>' + msg + '</p></div>');
+			}
+
+			$('#pwtc-mapdb-manage-rides-div form').on('submit', function(evt) {
+				var month = $('#pwtc-mapdb-manage-rides-div input[name="ride_month"]').val().trim();
+				var monthrgx = /^\d{4}-\d{2}$/;
+				if (!monthrgx.test(month)) {
+					show_warning('The ride month format is invalid.');
+					evt.preventDefault();
+					return;
+				}
+			});
+
+		});
+	</script>			
 	<div id="pwtc-mapdb-manage-rides-div">
 		<div class="row column clearfix">
 			<a href="/ride-edit-fields" class="dark button float-left">New Ride</a>
@@ -1973,6 +2002,7 @@ class PwtcMapdb {
 				</div>
 			</div>
 		</form>
+		<div class="row column errmsg"></div>
 		<?php if ($query->have_posts()) { ?>
 		<table class="pwtc-mapdb-rwd-table">
 			<thead><tr><th>Start Time</th><th>Ride Title</th><th>Leader</th><th>Actions</th></tr></thead>
