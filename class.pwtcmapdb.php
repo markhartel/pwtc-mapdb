@@ -1936,8 +1936,19 @@ class PwtcMapdb {
 		if ( 0 == $current_user->ID ) {
 			return '<div class="callout small warning"><p>Please <a href="/wp-login.php">log in</a> to view the rides for which you have signed up.</p></div>';
 		}
+		
+		if (!user_can($current_user,'edit_published_rides')) {
+			return '<div class="callout small warning"><p>You are not allowed to manage rides.</p></div>';
+		}
 
 		$now = self::get_current_time();
+		
+		if (isset($_POST['ride_title'])) {
+			$ride_title = trim($_POST['ride_title']);
+		}
+		else {
+			$ride_title = '';
+		}
 
 		if (isset($_POST['ride_month'])) {
 			$timezone = new DateTimeZone(pwtc_get_timezone_string());
@@ -1965,6 +1976,9 @@ class PwtcMapdb {
 			],
 			'orderby' => [self::RIDE_DATE => 'ASC'],
 		];		
+		if (!empty($ride_title)) {
+			$query_args['s'] = $ride_title;	
+		}		
 		$query = new WP_Query($query_args);
 
 		ob_start();
@@ -1990,19 +2004,33 @@ class PwtcMapdb {
 	</script>			
 	<div id="pwtc-mapdb-manage-rides-div">
 		<div class="row column clearfix">
-			<a href="/ride-edit-fields" class="dark button float-left">New Ride</a>
+			<a href="/ride-edit-fields" class="dark button float-left" target="_blank">New Ride</a>
 		</div>
-		<form method="POST">
-			<div class="row column">
-				<div class="input-group">
-					<input class="input-group-field" type="month" name="ride_month" value="<?php echo $ride_month; ?>">
-					<div class="input-group-button">
-						<input type="submit" class="dark button" value="Search">
-					</div>
+		<ul class="accordion" data-accordion data-allow-all-closed="true">
+			<li class="accordion-item" data-accordion-item>
+				<a href="#" class="accordion-title">Click Here to Search</a>
+				<div class="accordion-content" data-tab-content>
+					<form method="POST">
+						<div class="row">
+							<div class="small-12 medium-6 columns">
+								<label>Ride Title 
+									<input type="text" name="ride_title" value="<?php echo $ride_title; ?>">
+								</label>
+							</div>
+							<div class="small-12 medium-6 columns">
+								<label>Ride Month 
+									<input type="month" name="ride_month" value="<?php echo $ride_month; ?>">
+								</label>
+							</div>
+						</div>
+						<div class="row column errmsg"></div>
+						<div class="row column clearfix">
+							<input class="accent button float-left" type="submit" value="Submit"/>
+						</div>
+					</form>
 				</div>
-			</div>
-		</form>
-		<div class="row column errmsg"></div>
+			</li>
+		</ul>		
 		<?php if ($query->have_posts()) { ?>
 		<table class="pwtc-mapdb-rwd-table">
 			<thead><tr><th>Start Time</th><th>Ride Title</th><th>Leader</th><th>Actions</th></tr></thead>
