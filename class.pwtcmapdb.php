@@ -121,6 +121,9 @@ class PwtcMapdb {
 		add_shortcode('pwtc_mapdb_edit_ride', 
 			array( 'PwtcMapdb', 'shortcode_edit_ride'));
 		
+		add_shortcode('pwtc_mapdb_manage_rides', 
+			array( 'PwtcMapdb', 'shortcode_manage_rides'));
+		
 		/* Register AJAX request/response callbacks */
 
 		add_action( 'wp_ajax_pwtc_mapdb_edit_signup', 
@@ -1922,6 +1925,103 @@ class PwtcMapdb {
 		?>
 			</tbody>
 		</table>
+	</div>
+		<?php
+		return ob_get_clean();
+	}
+	
+	// Generates the [pwtc_mapdb_manage_rides] shortcode.
+	public static function shortcode_manage_rides($atts) {
+		$current_user = wp_get_current_user();
+		if ( 0 == $current_user->ID ) {
+			return '<div class="callout small warning"><p>Please <a href="/wp-login.php">log in</a> to view the rides for which you have signed up.</p></div>';
+		}
+		$now = self::get_current_time();
+		$ride_month = $now->format('Y-m');
+		$interval = new DateInterval('P1M');
+		$next_month = self::get_current_time();
+		$next_month->add($interval);
+		$query_args = [
+			'posts_per_page' => -1,
+			'post_type' => self::POST_TYPE_RIDE,
+			'meta_query' => [
+				[
+					'key' => self::RIDE_DATE,
+					'value' => [$now->format('Y-m-01 00:00:00'), $next_month->format('Y-m-01 00:00:00')],
+					'compare' => 'BETWEEN',
+					'type' => 'DATETIME'
+				],
+			],
+			'orderby' => [self::RIDE_DATE => 'ASC'],
+		];		
+		$query = new WP_Query($query_args);
+
+		ob_start();
+		?>
+
+	<div id="pwtc-mapdb-manage-rides-div">
+		<div class="row column clearfix">
+			<a href="/ride-edit-fields" class="dark button float-left">New Ride</a>
+		</div>
+		<form method="POST">
+			<div class="row column">
+				<div class="input-group">
+					<input class="input-group-field" type="month" name="ride_month" value="<?php echo $ride_month; ?>">
+					<div class="input-group-button">
+						<input type="submit" class="dark button" value="Search">
+					</div>
+				</div>
+			</div>
+		</form>
+		<?php if ($query->have_posts()) { ?>
+		<table class="pwtc-mapdb-rwd-table">
+			<thead><tr><th>Start Time</th><th>Ride Title</th><th>Leader</th><th>Actions</th></tr></thead>
+			<tbody>
+		<?php
+		while ($query->have_posts()) {
+			$query->the_post();
+			$postid = get_the_ID();
+			$title = esc_html(get_the_title());
+			$leaders = get_field(self::RIDE_LEADERS);
+			if (count($leaders)) {
+				$user_info = get_userdata($leaders[0]['ID']);
+				if ($user_info) {
+					$leader = $user_info->first_name . ' ' . $user_info->last_name;	
+				}
+				else {
+					$leader = 'Unknown';
+				}
+			}
+			else {
+				$leader = '';
+			}
+			$view_link = esc_url(get_the_permalink());
+			$edit_link = esc_url('/ride-edit-fields/?post='.$postid);
+			$copy_link = esc_url('/ride-edit-fields/?post='.$postid.'&action=copy');
+			$start = DateTime::createFromFormat('Y-m-d H:i:s', get_field(self::RIDE_DATE));
+			$start_date = $start->format('m/d/Y g:ia');
+		?>
+			<tr>
+				<td><span>Start Time</span><?php echo $start_date; ?></td>
+				<td><span>Ride Title</span><?php echo $title; ?></td>
+				<td><span>Leader</span><?php echo $leader; ?></td>
+				<td><span>Actions</span>
+					<a href="<?php echo $view_link; ?>" target="_blank">View</a>
+					<?php if ($start > $now) { ?>
+					<a href="<?php echo $edit_link; ?>" target="_blank">Edit</a>
+					<?php } ?>
+					<a href="<?php echo $copy_link; ?>" target="_blank">Copy</a>
+				</td>	
+			</tr>
+		<?php
+		}
+		wp_reset_postdata();
+		?>
+			</tbody>
+		</table>
+		<?php } else { ?>
+		<div class="callout small"><p>No rides found for this month.</p></div>
+		<?php } ?>
 	</div>
 		<?php
 		return ob_get_clean();
