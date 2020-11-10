@@ -2035,7 +2035,7 @@ class PwtcMapdb {
 		</ul>		
 		<?php if ($query->have_posts()) { ?>
 		<table class="pwtc-mapdb-rwd-table">
-			<thead><tr><th>Start Time</th><th>Ride Title</th><th>Leader</th><th>Actions</th></tr></thead>
+			<thead><tr><th>Start Time</th><th>Ride Title</th><th>1st Leader</th><th>Actions</th></tr></thead>
 			<tbody>
 		<?php
 		while ($query->have_posts()) {
@@ -2064,7 +2064,7 @@ class PwtcMapdb {
 			<tr>
 				<td><span>Start Time</span><?php echo $start_date; ?></td>
 				<td><span>Ride Title</span><?php echo $title; ?></td>
-				<td><span>Leader</span><?php echo $leader; ?></td>
+				<td><span>1st Leader</span><?php echo $leader; ?></td>
 				<td><span>Actions</span>
 					<a href="<?php echo $view_link; ?>" target="_blank">View</a>
 					<?php if ($start > $now) { ?>
