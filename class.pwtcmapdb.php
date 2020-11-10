@@ -40,6 +40,8 @@ class PwtcMapdb {
 	const RIDE_MAX_LENGTH_KEY = 'field_57bc97a40afcc';
 	const RIDE_START_LOCATION = 'start_location';
 	const RIDE_START_LOCATION_KEY = 'field_57bc95fb0afc9';
+	const RIDE_START_LOC_COMMENT = 'start_location_comment';
+	const RIDE_START_LOC_COMMENT_KEY = 'field_start_location_comment';
 	const RIDE_DESCRIPTION = 'description';
 	const RIDE_DESCRIPTION_KEY = 'field_57bc9553246a2';
 	const RIDE_SIGNUP_LOCKED = '_signup_locked';
@@ -2241,6 +2243,21 @@ class PwtcMapdb {
 		else {
 			$start_location = array('address' => '', 'lat' => 0.0, 'lng' => 0.0, 'zoom' => 17);
 		}
+		
+		if (isset($_POST['start_location_comment'])) {
+			if ($new_post) {
+				update_field(self::IDE_START_LOC_COMMENT_KEY, $_POST['start_location_comment'], $postid);
+			}
+			else {
+				update_field(self::RIDE_START_LOC_COMMENT, $_POST['start_location_comment'], $postid);
+			}
+		}
+		if ($postid != 0) {
+			$start_location_comment = get_field(self::RIDE_START_LOC_COMMENT, $postid);
+		}
+		else {
+			$start_location_comment = '';
+		}
 
 		if (isset($_POST['ride_type'])) {
 			if ($new_post) {
@@ -2738,10 +2755,12 @@ class PwtcMapdb {
 				var itemid = $(this).attr('itemid');
 				var item = $('#pwtc-mapdb-edit-ride-div .start_locations table tbody tr:nth-child(' + itemid + ')');
 				var addr = item.find('td').first().next().next().html();
+				var comment = item.find('td').first().next().next().next().html();
 				var lat = item.attr('lat');
 				var lng = item.attr('lng');
 				var zoom = item.attr('zoom');
 				$('#pwtc-mapdb-edit-ride-div input[name="start_address"]').val(addr);
+				$('#pwtc-mapdb-edit-ride-div input[name="start_location_comment"]').val(comment);
 				$('#pwtc-mapdb-edit-ride-div input[name="start_lat"]').val(lat);
 				$('#pwtc-mapdb-edit-ride-div input[name="start_lng"]').val(lng);
 				$('#pwtc-mapdb-edit-ride-div input[name="start_zoom"]').val(zoom);
@@ -2873,6 +2892,7 @@ class PwtcMapdb {
 					<label>Start Location
 						<input type="text" name="start_address" value="<?php echo esc_attr($start_location['address']); ?>" readonly/>	
 					</label>
+					<input type="hidden" name="start_location_comment" value="<?php echo $start_location_comment; ?>"/>
 					<input type="hidden" name="start_lat" value="<?php echo esc_attr($start_location['lat']); ?>"/>
 					<input type="hidden" name="start_lng" value="<?php echo esc_attr($start_location['lng']); ?>"/>
 					<input type="hidden" name="start_zoom" value="<?php echo esc_attr(isset($start_location['zoom']) ? $start_location['zoom'] : ''); ?>"/>
