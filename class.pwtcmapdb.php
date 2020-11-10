@@ -2722,16 +2722,21 @@ class PwtcMapdb {
 			});
 			
 		<?php if ($set_start_location) { ?>
-			$('#start_locations tr').each(function(index) {
-				var area = $(this).find('td').first().html();
-				var title = $(this).find('td').first().next().html();
-				$('#pwtc-mapdb-edit-ride-div .start-locations-div table').append(
-					'<tr itemid="' + (index+1) + '"><td>' + title + '</td><td>' + area + '</td></tr>');
+			$('#pwtc-mapdb-edit-ride-div .start_locations table tbody tr').each(function(index) {
+				var lat = $(this).attr('lat');
+				var lng = $(this).attr('lng');
+				var zoom = $(this).attr('zoom');
+				if (lat && lng && zoom) {
+					var area = $(this).find('td').first().html();
+					var title = $(this).find('td').first().next().html();
+					$('#pwtc-mapdb-edit-ride-div .start-locations-div table').append(
+						'<tr itemid="' + (index+1) + '"><td>' + title + '</td><td>' + area + '</td></tr>');
+				}
 			});
 
 			$('#pwtc-mapdb-edit-ride-div .start-locations-div tr').on('click', function(evt) {
 				var itemid = $(this).attr('itemid');
-				var item = $('#start_locations tr:nth-child(' + itemid + ')');
+				var item = $('#pwtc-mapdb-edit-ride-div .start_locations table tbody tr:nth-child(' + itemid + ')');
 				var addr = item.find('td').first().next().next().html();
 				var lat = item.attr('lat');
 				var lng = item.attr('lng');
@@ -2940,6 +2945,14 @@ class PwtcMapdb {
 					<?php } ?>
 				</div>
 			</form>
+		</div>
+		<div class="start_locations" style="display:none">
+			<?php
+			$content = get_page_by_title('Ride Start Locations');
+			if ($content) {
+				echo get_the_content(null, false, $content);
+			}
+			?>
 		</div>
 	</div>
 	<?php
