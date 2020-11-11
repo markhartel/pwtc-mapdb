@@ -126,6 +126,9 @@ class PwtcMapdb {
 		add_shortcode('pwtc_mapdb_manage_rides', 
 			array( 'PwtcMapdb', 'shortcode_manage_rides'));
 		
+		add_shortcode('pwtc_mapdb_reset_signups', 
+			array( 'PwtcMapdb', 'shortcode_reset_signups'));
+		
 		/* Register AJAX request/response callbacks */
 
 		add_action( 'wp_ajax_pwtc_mapdb_edit_signup', 
@@ -1863,6 +1866,75 @@ class PwtcMapdb {
 	</div>
 
 	<?php
+		return ob_get_clean();
+	}
+	
+	// Generates the [pwtc_mapdb_reset_signups] shortcode.
+	public static function shortcode_reset_signups($atts) {
+		$current_user = wp_get_current_user();
+		if ( 0 == $current_user->ID ) {
+			return '';
+		}
+
+		if (!user_can($current_user,'edit_published_rides')) {
+			return '';
+		}
+
+		$error = self::check_post_id();
+		if (!empty($error)) {
+			return $error;
+		}
+		$postid = intval($_GET['post']);
+
+		if (isset($_POST['reset_ride_signups'])) {
+			delete_post_meta($postid, self::RIDE_SIGNUP_LOCKED);
+			delete_post_meta($postid, self::RIDE_SIGNUP_USERID);
+			delete_post_meta($postid, self::RIDE_SIGNUP_NONMEMBER);
+			delete_post_meta($postid, self::RIDE_SIGNUP_MODE);
+			delete_post_meta($postid, self::RIDE_SIGNUP_CUTOFF);
+			delete_post_meta($postid, self::RIDE_SIGNUP_LIMIT);
+			delete_post_meta($postid, self::RIDE_SIGNUP_MEMBERS_ONLY);
+		}
+
+		ob_start();
+		?>
+	<script type="text/javascript">
+		jQuery(document).ready(function($) { 
+			$('#pwtc-mapdb-reset-signups-div a.reset-signup').on('click', function(evt) {
+				$('#pwtc-mapdb-reset-signups-div .reset-signup').hide();
+				$('#pwtc-mapdb-reset-signups-div .reset-signup-confirm').show();
+			});
+
+			$('#pwtc-mapdb-reset-signups-div a.reset-signup-confirm').on('click', function(evt) {
+				$('#pwtc-mapdb-reset-signups-div .reset-signup-confirm').hide();
+				$('#pwtc-mapdb-reset-signups-div .reset-signup').show();
+			});
+
+			$('#pwtc-mapdb-reset-signups-div .reset-signup-confirm').hide();
+			$('#pwtc-mapdb-reset-signups-div .reset-signup').show();
+		});
+	</script>
+	<div id="pwtc-mapdb-reset-signups-div">
+		<ul class="accordion" data-accordion data-allow-all-closed="true">
+			<li class="accordion-item" data-accordion-item>
+				<a href="#" class="accordion-title">Click Here For Sign-up Admin Options</a>
+				<div class="accordion-content" data-tab-content>
+					<form method="POST">
+						<div class="row column">
+							<div class="reset-signup callout small">Label</div>
+							<div class="reset-signup-confirm callout small warning">Warning</div>
+						</div>
+						<div class="row column clearfix">
+							<a class="reset-signup dark button float-left">Reset Sign-ups</a>
+							<input class="reset-signup-confirm accent button float-left" type="submit" name="reset_ride_signups" value="OK"/>
+							<a class="reset-signup-confirm dark button float-right">Cancel</a>
+						</div>
+					</form>
+				</div>
+			</li>
+		</ul>
+	</div>
+		<?php
 		return ob_get_clean();
 	}
 	
