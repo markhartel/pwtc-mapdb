@@ -4,16 +4,9 @@ function pwtc_mapdb_get_signup() {
     $current_user = wp_get_current_user();
     $now = PwtcMapdb::get_current_time();
     $postid = get_the_ID();
-    $signup_mode = get_post_meta($postid, PwtcMapdb::RIDE_SIGNUP_MODE, true);
-    if (!$signup_mode) {
-        PwtcMapdb::init_online_signup($postid);
-        $signup_mode = get_post_meta($postid, PwtcMapdb::RIDE_SIGNUP_MODE, true);
-        if (!$signup_mode) {
-            $signup_mode = 'no';
-        }
-    }
-    $members_only = get_post_meta($postid, PwtcMapdb::RIDE_SIGNUP_MEMBERS_ONLY, true);
-    $signup_locked = get_post_meta($postid, PwtcMapdb::RIDE_SIGNUP_LOCKED, true);
+    $signup_mode = PwtcMapdb::get_signup_mode();
+    $members_only = PwtcMapdb::get_signup_members_only();
+    $signup_locked = PwtcMapdb::get_signup_locked();
     $start = PwtcMapdb::get_ride_start_time($postid);
 
     $result['view_signup_url'] = '/ride-view-signups/?post='.$postid;
