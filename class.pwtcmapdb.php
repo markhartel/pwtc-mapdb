@@ -54,8 +54,8 @@ class PwtcMapdb {
 
 	const USER_EMER_PHONE = 'emergency_contact_phone';
 	const USER_EMER_NAME = 'emergency_contact_name';
-	const USER_SIGNUP_MODE = 'online_ride_signup';
-	const USER_SIGNUP_CUTOFF = 'signup_cutoff_time';
+	//const USER_SIGNUP_MODE = 'online_ride_signup';
+	//const USER_SIGNUP_CUTOFF = 'signup_cutoff_time';
 	const USER_USE_EMAIL = 'use_contact_email';
 	const USER_CONTACT_EMAIL = 'contact_email';
 	const USER_CELL_PHONE = 'cell_phone';
@@ -117,8 +117,8 @@ class PwtcMapdb {
 		add_shortcode('pwtc_mapdb_download_signup', 
 			array( 'PwtcMapdb', 'shortcode_download_signup'));
 
-		add_shortcode('pwtc_mapdb_leader_details', 
-			array( 'PwtcMapdb', 'shortcode_leader_details'));
+		//add_shortcode('pwtc_mapdb_leader_details', 
+		//	array( 'PwtcMapdb', 'shortcode_leader_details'));
 		
 		add_shortcode('pwtc_mapdb_edit_ride', 
 			array( 'PwtcMapdb', 'shortcode_edit_ride'));
@@ -3094,6 +3094,39 @@ class PwtcMapdb {
 		return $userids;		
 	}
 	
+	public static function get_signup_mode() {
+		$ride_signup_mode = get_post_meta($postid, self::RIDE_SIGNUP_MODE, true);
+		if (!$ride_signup_mode) {
+			$ride_signup_mode = 'no';
+		}
+		return $ride_signup_mode;
+	}
+
+	public static function get_signup_cutoff() {
+		$ride_signup_cutoff = get_post_meta($postid, self::RIDE_SIGNUP_CUTOFF, true);
+		if (!$ride_signup_cutoff) {
+			$ride_signup_cutoff = 0;
+		}
+		return $ride_signup_cutoff;	
+	}
+
+	public static function get_signup_limit() {
+		$ride_signup_limit = get_post_meta($postid, self::RIDE_SIGNUP_LIMIT, true);
+		if (!$ride_signup_limit) {
+			$ride_signup_limit = 0;
+		}
+		return $ride_signup_limit;
+	}
+
+	public static function get_signup_members_only() {
+		return get_post_meta($postid, self::RIDE_SIGNUP_MEMBERS_ONLY, true);
+	}
+
+	public static function get_signup_locked() {
+		return get_post_meta($postid, self::RIDE_SIGNUP_LOCKED, true);
+	}
+	
+	/*
 	public static function init_online_signup($postid) {
 		$leaders = self::get_leader_userids($postid);
 		if (count(get_post_meta($postid, self::RIDE_SIGNUP_MODE)) == 0) {
@@ -3126,6 +3159,7 @@ class PwtcMapdb {
 			add_post_meta($postid, self::RIDE_SIGNUP_MEMBERS_ONLY, false, true);
 		}
 	}
+	*/
 	
 	public static function get_signup_cutoff_time($postid, $mode, $pad) {
 		$ride_date = self::get_ride_start_time($postid);
@@ -3167,6 +3201,7 @@ class PwtcMapdb {
 	}
 	
 	// Generates the [pwtc_mapdb_leader_details] shortcode.
+	/*
 	public static function shortcode_leader_details($atts) {
 		if (!defined('PWTC_MEMBERS__PLUGIN_DIR')) {
 			ob_start();
@@ -3306,6 +3341,7 @@ class PwtcMapdb {
 		<?php
 		return ob_get_clean();
 	}
+	*/
 	
 	public static function delete_all_signups($postid, $userid) {
 		$signup_list = get_post_meta($postid, self::RIDE_SIGNUP_USERID);
