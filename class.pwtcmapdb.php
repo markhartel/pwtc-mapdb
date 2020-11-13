@@ -683,11 +683,11 @@ class PwtcMapdb {
 		
 		//self::init_online_signup($postid);
 		
-		$ride_signup_mode = self::get_signup_mode();
+		$ride_signup_mode = self::get_signup_mode($postid);
 
-		$ride_signup_cutoff = self::get_signup_cutoff();
+		$ride_signup_cutoff = self::get_signup_cutoff($postid);
 		
-		$ride_signup_limit = self::get_signup_limit();
+		$ride_signup_limit = self::get_signup_limit($postid);
 
 		if ($ride_signup_mode == 'paperless') {
 			$set_mileage = true;
@@ -929,13 +929,13 @@ class PwtcMapdb {
 		
 		//self::init_online_signup($postid);
 		
-		$ride_signup_mode = self::get_signup_mode();
+		$ride_signup_mode = self::get_signup_mode($postid);
 
-		$ride_signup_cutoff = self::get_signup_cutoff();
+		$ride_signup_cutoff = self::get_signup_cutoff($postid);
 		
-		$ride_signup_limit = self::get_signup_limit();
+		$ride_signup_limit = self::get_signup_limit($postid);
 		
-		$signup_members_only = self::get_signup_members_only();
+		$signup_members_only = self::get_signup_members_only($postid);
 
 		if ($ride_signup_mode != 'no') {
 			if ($ride_signup_mode == 'paperless') {
@@ -960,7 +960,7 @@ class PwtcMapdb {
 			else if (isset($_POST['unlock_signup'])) {
 				delete_post_meta( $postid, self::RIDE_SIGNUP_LOCKED);
 			}
-			$signup_locked = self::get_signup_locked();
+			$signup_locked = self::get_signup_locked($postid);
 			if ($signup_locked) {
 				$set_mileage = $take_attendance = false;
 			}
@@ -1551,13 +1551,13 @@ class PwtcMapdb {
 		
 		//self::init_online_signup($postid);
 
-		$ride_signup_mode = self::get_signup_mode();
+		$ride_signup_mode = self::get_signup_mode($postid);
 
-		$ride_signup_cutoff = self::get_signup_cutoff();
+		$ride_signup_cutoff = self::get_signup_cutoff($postid);
 		
-		$ride_signup_limit = self::get_signup_limit();
+		$ride_signup_limit = self::get_signup_limit($postid);
 		
-		$members_only = self::get_signup_members_only();
+		$members_only = self::get_signup_members_only($postid);
 
 		if ($ride_signup_mode == 'no') {
 			return '<div class="callout small warning"><p>The leader for ride "' . $ride_title . '" does not allow online sign up. ' . $return_to_ride . '</p></div>';			
@@ -1572,7 +1572,7 @@ class PwtcMapdb {
 			return $error;
 		}
 
-		$signup_locked = self::get_signup_locked();
+		$signup_locked = self::get_signup_locked($postid);
 		if ($signup_locked) {
 			return '<div class="callout small warning"><p>You cannot sign up for ride "' . $ride_title . '" because it is closed. ' . $return_to_ride . '</p></div>';	
 		}
@@ -3067,7 +3067,7 @@ class PwtcMapdb {
 		return $userids;		
 	}
 	
-	public static function get_signup_mode() {
+	public static function get_signup_mode($postid) {
 		$ride_signup_mode = get_post_meta($postid, self::RIDE_SIGNUP_MODE, true);
 		if (!$ride_signup_mode) {
 			$ride_signup_mode = 'no';
@@ -3075,7 +3075,7 @@ class PwtcMapdb {
 		return $ride_signup_mode;
 	}
 
-	public static function get_signup_cutoff() {
+	public static function get_signup_cutoff($postid) {
 		$ride_signup_cutoff = get_post_meta($postid, self::RIDE_SIGNUP_CUTOFF, true);
 		if (!$ride_signup_cutoff) {
 			$ride_signup_cutoff = 0;
@@ -3083,7 +3083,7 @@ class PwtcMapdb {
 		return $ride_signup_cutoff;	
 	}
 
-	public static function get_signup_limit() {
+	public static function get_signup_limit($postid) {
 		$ride_signup_limit = get_post_meta($postid, self::RIDE_SIGNUP_LIMIT, true);
 		if (!$ride_signup_limit) {
 			$ride_signup_limit = 0;
@@ -3091,11 +3091,11 @@ class PwtcMapdb {
 		return $ride_signup_limit;
 	}
 
-	public static function get_signup_members_only() {
+	public static function get_signup_members_only($postid) {
 		return get_post_meta($postid, self::RIDE_SIGNUP_MEMBERS_ONLY, true);
 	}
 
-	public static function get_signup_locked() {
+	public static function get_signup_locked($postid) {
 		return get_post_meta($postid, self::RIDE_SIGNUP_LOCKED, true);
 	}
 	
