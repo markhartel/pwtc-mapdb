@@ -2134,9 +2134,9 @@ class PwtcMapdb {
 	
 	// Generates the [pwtc_mapdb_edit_ride] shortcode.
 	public static function shortcode_edit_ride($atts) {
-		//$a = shortcode_atts(array('set_start_location' => 'no'), $atts);
-		//$set_start_location = $a['set_start_location'] == 'yes';
 		$set_start_location = true;
+		
+		$now_date = self::get_current_time();
 		
 		$copy_ride = false;
 		if (isset($_GET['action'])) {
@@ -2160,9 +2160,35 @@ class PwtcMapdb {
 			$postid = 0;
 		}
 		
+		if ($postid != 0) {
+			$ride_title = esc_html(get_the_title($postid));
+			$ride_link = esc_url(get_the_permalink($postid));
+			$return_to_ride = self::create_return_link($ride_link);
+		}
+		else {
+			$ride_title = '';
+			$ride_link = '';
+			$return_to_ride = '';
+		}	
+		
 		$current_user = wp_get_current_user();
 		if ( 0 == $current_user->ID ) {
 			return '<div class="callout small warning"><p>Please <a href="/wp-login.php">log in</a> to edit this ride.</p></div>';
+		}
+		
+		if ($copy_ride and !user_can($current_user,'edit_published_rides')) {
+			return '<div class="callout small warning"><p>You are not allowed to copy rides. ' . $return_to_ride . '</p></div>';
+		}
+
+		if ($postid == 0 and !user_can($current_user,'edit_published_rides')) {
+			return '<div class="callout small warning"><p>You are not allowed to create new rides. ' . $return_to_ride . '</p></div>';
+		}
+		
+		if ($postid != 0 and !$copy_ride) {
+			$ride_datetime = self::get_ride_start_time($postid);
+			if ($ride_datetime < $now_date) {
+				return '<div class="callout small warning"><p>Ride "' . $ride_title . '" has already finished so you cannot edit it. ' . $return_to_ride . '</p></div>';
+			}
 		}
 
 		$new_post = false;
@@ -2181,7 +2207,10 @@ class PwtcMapdb {
 					'post_status'   => 'publish'
 				);
 				$postid = wp_insert_post( $my_post );
-				$new_post = true;				
+				$new_post = true;
+				$ride_title = esc_html(get_the_title($postid));
+				$ride_link = esc_url(get_the_permalink($postid));
+				$return_to_ride = self::create_return_link($ride_link);	
 			}		
 		}
 		if ($postid != 0) {
@@ -2226,13 +2255,12 @@ class PwtcMapdb {
 				update_field(self::RIDE_DATE, $date_str, $postid);
 			}
 		}
-		$now_date = self::get_current_time();
 		if ($postid != 0) {
 			$ride_datetime = self::get_ride_start_time($postid);
 			if ($copy_ride) {
 				$ride_time = $ride_datetime->format('H:i');
 				$ride_datetime = self::get_current_time();
-				$interval = new DateInterval('P14D');
+				$interval = new DateInterval('P1D');
 				$ride_datetime->add($interval);
 				$ride_date = $ride_datetime->format('Y-m-d');
 				$edit_date = true;	
@@ -2240,13 +2268,18 @@ class PwtcMapdb {
 			else {
 				$ride_date = $ride_datetime->format('Y-m-d');
 				$ride_time = $ride_datetime->format('H:i');	
-				$edit_date = false;
+				if (user_can($current_user,'edit_published_rides')) {
+					$edit_date = true;
+				}
+				else {
+					$edit_date = false;
+				}
 			}
 			$min_date = $ride_date;
 		}
 		else {
 			$ride_datetime = self::get_current_time();
-			$interval = new DateInterval('P14D');
+			$interval = new DateInterval('P1D');
 			$ride_datetime->add($interval);
 			$ride_date = $ride_datetime->format('Y-m-d');
 			$ride_time = '10:00';
@@ -3005,7 +3038,7 @@ class PwtcMapdb {
 				<div class="row column errmsg"></div>
 				<div class="row column clearfix">
 					<button class="dark button float-left" type="submit"><?php echo $postid == 0 ? 'Create Ride' : 'Save Ride'; ?></button>
-					<?php if ($postid != 0) { ?>
+					<?php if (!empty($ride_link)) { ?>
 					<a href="<?php echo $ride_link; ?>" class="dark button float-right"><i class="fa fa-chevron-left"></i> Back to Ride</a>
 					<?php } ?>
 				</div>
@@ -3097,6 +3130,10 @@ class PwtcMapdb {
 
 	public static function get_signup_locked($postid) {
 		return get_post_meta($postid, self::RIDE_SIGNUP_LOCKED, true);
+	}
+	
+	public static function create_return_link($ride_url) {
+		return 'Click <a href="' . $ride_url . '">here</a> to return to the posted ride.';
 	}
 	
 	/*
