@@ -2832,12 +2832,13 @@ class PwtcMapdb {
 			$('#pwtc-mapdb-edit-ride-div .start-locations-div tr').on('click', function(evt) {
 				var itemid = $(this).attr('itemid');
 				var item = $('#pwtc-mapdb-edit-ride-div .start_locations table tbody tr:nth-child(' + itemid + ')');
+				var title = item.find('td').first().next().html();
 				var addr = item.find('td').first().next().next().html();
 				var comment = item.find('td').first().next().next().next().html();
 				var lat = item.data('lat');
 				var lng = item.data('lng');
 				var zoom = item.data('zoom');
-				$('#pwtc-mapdb-edit-ride-div input[name="start_address"]').val(addr);
+				$('#pwtc-mapdb-edit-ride-div input[name="start_address"]').val(title+', '+addr);
 				$('#pwtc-mapdb-edit-ride-div input[name="start_location_comment"]').val(comment);
 				$('#pwtc-mapdb-edit-ride-div input[name="start_lat"]').val(lat);
 				$('#pwtc-mapdb-edit-ride-div input[name="start_lng"]').val(lng);
