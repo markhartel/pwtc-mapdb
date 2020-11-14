@@ -2818,9 +2818,9 @@ class PwtcMapdb {
 			
 		<?php if ($set_start_location) { ?>
 			$('#pwtc-mapdb-edit-ride-div .start_locations table tbody tr').each(function(index) {
-				var lat = $(this).attr('lat');
-				var lng = $(this).attr('lng');
-				var zoom = $(this).attr('zoom');
+				var lat = $(this).data('lat');
+				var lng = $(this).data('lng');
+				var zoom = $(this).data('zoom');
 				if (lat && lng && zoom) {
 					var area = $(this).find('td').first().html();
 					var title = $(this).find('td').first().next().html();
@@ -2834,9 +2834,9 @@ class PwtcMapdb {
 				var item = $('#pwtc-mapdb-edit-ride-div .start_locations table tbody tr:nth-child(' + itemid + ')');
 				var addr = item.find('td').first().next().next().html();
 				var comment = item.find('td').first().next().next().next().html();
-				var lat = item.attr('lat');
-				var lng = item.attr('lng');
-				var zoom = item.attr('zoom');
+				var lat = item.data('lat');
+				var lng = item.data('lng');
+				var zoom = item.data('zoom');
 				$('#pwtc-mapdb-edit-ride-div input[name="start_address"]').val(addr);
 				$('#pwtc-mapdb-edit-ride-div input[name="start_location_comment"]').val(comment);
 				$('#pwtc-mapdb-edit-ride-div input[name="start_lat"]').val(lat);
@@ -2970,10 +2970,12 @@ class PwtcMapdb {
 					<label>Start Location
 						<input type="text" name="start_address" value="<?php echo esc_attr($start_location['address']); ?>" readonly/>	
 					</label>
-					<input type="hidden" name="start_location_comment" value="<?php echo $start_location_comment; ?>"/>
-					<input type="hidden" name="start_lat" value="<?php echo esc_attr($start_location['lat']); ?>"/>
-					<input type="hidden" name="start_lng" value="<?php echo esc_attr($start_location['lng']); ?>"/>
-					<input type="hidden" name="start_zoom" value="<?php echo esc_attr(isset($start_location['zoom']) ? $start_location['zoom'] : ''); ?>"/>
+					<label>Start Location Comment
+						<input type="text" name="start_location_comment" value="<?php echo $start_location_comment; ?>" readonly/>
+					</label>
+					<input type="type" name="start_lat" value="<?php echo esc_attr($start_location['lat']); ?>" readonly/>
+					<input type="type" name="start_lng" value="<?php echo esc_attr($start_location['lng']); ?>" readonly/>
+					<input type="type" name="start_zoom" value="<?php echo esc_attr(isset($start_location['zoom']) ? $start_location['zoom'] : ''); ?>" readonly/>
 				</div>
 				<!--
 				<div class="row column">
