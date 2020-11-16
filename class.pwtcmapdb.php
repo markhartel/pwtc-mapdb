@@ -2525,6 +2525,10 @@ class PwtcMapdb {
 	<script type="text/javascript">
 		jQuery(document).ready(function($) { 
 
+			function decodeHtml(html) {
+				return $('<div/>').html(html).text();
+			}
+
 			function show_warning(msg) {
 				$('#pwtc-mapdb-edit-ride-div .errmsg').html('<div class="callout small warning"><p>' + msg + '</p></div>');
 			}
@@ -2838,8 +2842,8 @@ class PwtcMapdb {
 				var lat = item.data('lat');
 				var lng = item.data('lng');
 				var zoom = item.data('zoom');
-				$('#pwtc-mapdb-edit-ride-div input[name="start_address"]').val(title+', '+addr);
-				$('#pwtc-mapdb-edit-ride-div input[name="start_location_comment"]').val(comment);
+				$('#pwtc-mapdb-edit-ride-div input[name="start_address"]').val(decodeHtml(title+', '+addr));
+				$('#pwtc-mapdb-edit-ride-div input[name="start_location_comment"]').val(decodeHtml(comment));
 				$('#pwtc-mapdb-edit-ride-div input[name="start_lat"]').val(lat);
 				$('#pwtc-mapdb-edit-ride-div input[name="start_lng"]').val(lng);
 				$('#pwtc-mapdb-edit-ride-div input[name="start_zoom"]').val(zoom);
