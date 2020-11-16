@@ -2849,6 +2849,15 @@ class PwtcMapdb {
 				$('#pwtc-mapdb-edit-ride-div input[name="start_zoom"]').val(zoom);
 				//$('#pwtc-mapdb-edit-ride-div .google-maps').hide();
 			});
+			
+			$('#pwtc-mapdb-edit-ride-div a.goolmap').on('click', function(evt) {
+				var lat = $('#pwtc-mapdb-edit-ride-div input[name="start_lat"]').val();
+				var lng = $('#pwtc-mapdb-edit-ride-div input[name="start_lng"]').val();
+				if (lat && lng) {
+        				var url = 'https://www.google.com/maps/search/?api=1&query=' + lat + ',' + lng;
+          				window.open(url, '_blank');
+       				}
+			});
 		<?php } ?>
 			
 		<?php if ($attach_maps) { ?>
@@ -2972,7 +2981,7 @@ class PwtcMapdb {
 				</div>
 		<?php if ($set_start_location) { ?>
 				<div class="row column">
-					<label>Start Location
+					<label>Start Location <a class="goolmap"><i class="fa fa-map-marker"></i></a>
 						<input type="text" name="start_address" value="<?php echo esc_attr($start_location['address']); ?>" readonly/>	
 					</label>
 					<label>Start Location Comment
@@ -2982,15 +2991,6 @@ class PwtcMapdb {
 					<input type="type" name="start_lng" value="<?php echo esc_attr($start_location['lng']); ?>" readonly/>
 					<input type="type" name="start_zoom" value="<?php echo esc_attr(isset($start_location['zoom']) ? $start_location['zoom'] : ''); ?>" readonly/>
 				</div>
-				<!--
-				<div class="row column">
-					<div class="google-maps">
-						<div class="acf-map" data-zoom="<?php echo esc_attr($start_location['zoom']); ?>">
-							<div class="marker" data-lat="<?php echo esc_attr($start_location['lat']); ?>" data-lng="<?php echo esc_attr($start_location['lng']); ?>"></div>
-						</div>
-					</div>			
-				</div>
-				-->
 				<div class="row column">
 					<ul class="accordion" data-accordion data-allow-all-closed="true">
 						<li class="accordion-item" data-accordion-item>
