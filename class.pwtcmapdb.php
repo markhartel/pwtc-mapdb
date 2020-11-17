@@ -2324,7 +2324,7 @@ class PwtcMapdb {
 		
 		if (isset($_POST['start_location_comment'])) {
 			if ($new_post) {
-				update_field(self::IDE_START_LOC_COMMENT_KEY, $_POST['start_location_comment'], $postid);
+				update_field(self::RIDE_START_LOC_COMMENT_KEY, $_POST['start_location_comment'], $postid);
 			}
 			else {
 				update_field(self::RIDE_START_LOC_COMMENT, $_POST['start_location_comment'], $postid);
