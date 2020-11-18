@@ -2248,6 +2248,9 @@ class PwtcMapdb {
 
 		if (isset($_POST['ride_date']) and isset($_POST['ride_time'])) {
 			$date_str = trim($_POST['ride_date']) . ' ' . trim($_POST['ride_time']) . ':00';
+			$timezone = new DateTimeZone(pwtc_get_timezone_string());
+			$date = DateTime::createFromFormat('Y-m-d H:i:s', $date_str, $timezone);
+			$date_str = $date->format('Y-m-d H:i:s');
 			if ($new_post) {
 				update_field(self::RIDE_DATE_KEY, $date_str, $postid);
 			}
