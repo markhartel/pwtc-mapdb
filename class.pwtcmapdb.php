@@ -2985,11 +2985,11 @@ class PwtcMapdb {
 						<input type="text" name="start_address" value="<?php echo esc_attr($start_location['address']); ?>" readonly/>	
 					</label>
 					<label>Start Location Comment
-						<input type="text" name="start_location_comment" value="<?php echo $start_location_comment; ?>" readonly/>
+						<input type="text" name="start_location_comment" value="<?php echo esc_attr($start_location_comment); ?>" readonly/>
 					</label>
-					<input type="type" name="start_lat" value="<?php echo esc_attr($start_location['lat']); ?>" readonly/>
-					<input type="type" name="start_lng" value="<?php echo esc_attr($start_location['lng']); ?>" readonly/>
-					<input type="type" name="start_zoom" value="<?php echo esc_attr(isset($start_location['zoom']) ? $start_location['zoom'] : ''); ?>" readonly/>
+					<input type="hidden" name="start_lat" value="<?php echo esc_attr($start_location['lat']); ?>"/>
+					<input type="hidden" name="start_lng" value="<?php echo esc_attr($start_location['lng']); ?>"/>
+					<input type="hidden" name="start_zoom" value="<?php echo esc_attr(isset($start_location['zoom']) ? $start_location['zoom'] : ''); ?>"/>
 				</div>
 				<div class="row column">
 					<ul class="accordion" data-accordion data-allow-all-closed="true">
