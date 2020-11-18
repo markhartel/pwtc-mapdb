@@ -2215,7 +2215,7 @@ class PwtcMapdb {
 		}
 		if ($postid != 0) {
 			$post = get_post($postid);
-			$title = esc_html($post->post_title);
+			$title = $post->post_title;
 		}
 		else {
 			$title = '';
@@ -2876,7 +2876,7 @@ class PwtcMapdb {
 			<form method="POST">
 				<div class="row column">
 					<label>Ride Title
-						<input type="text" name="title" value="<?php echo $title; ?>"/>
+						<input type="text" name="title" value="<?php esc_attr($title); ?>"/>
 						<input type="text" name="postid" value="<?php echo $postid; ?>" readonly/>
 					</label>
 				</div>
