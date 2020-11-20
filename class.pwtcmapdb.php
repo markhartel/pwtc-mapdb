@@ -2305,7 +2305,7 @@ class PwtcMapdb {
 			$leaders = self::get_leader_userids($postid);
 		}
 		else {
-			$leaders = array($current_user->ID);
+			$leaders = [];
 		}
 
 		if (isset($_POST['start_address']) and isset($_POST['start_lat']) and isset($_POST['start_lng']) and isset($_POST['start_zoom'])) {
