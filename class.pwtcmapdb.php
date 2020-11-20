@@ -3020,10 +3020,11 @@ class PwtcMapdb {
 					<div class= "leaders-div" style="border:1px solid; display:flex; flex-wrap:wrap;">
 						<?php foreach ($leaders as $leader) {
 							$info = get_userdata($leader);
-							$name = $info->first_name . ' ' . $info->last_name;
+							if ($info) {
+								$name = $info->first_name . ' ' . $info->last_name;
 						?>
 						<div userid="<?php echo $leader; ?>"><i class="fa fa-times"></i> <?php echo $name; ?></div>
-						<?php } ?>
+						<?php } } ?>
 					</div>
 				</div>
 				<div class="row column">
