@@ -1894,11 +1894,10 @@ class PwtcMapdb {
 				<div class="accordion-content" data-tab-content>
 					<form method="POST">
 						<div class="row column">
-							<div class="reset-signup callout small">Label</div>
-							<div class="reset-signup-confirm callout small warning">Warning</div>
-						</div>
+							<div class="reset-signup callout small">To remove all of the riders currently signed-up for this ride, press the remove button below.</div>
+							<div class="reset-signup-confirm callout small alert">Warning: this action will remove all of the riders currently signed-up for this ride! Do you really want to do this?</div>						</div>
 						<div class="row column clearfix">
-							<a class="reset-signup dark button float-left">Reset Sign-ups</a>
+							<a class="reset-signup dark button float-left">Remove Sign-ups</a>
 							<input class="reset-signup-confirm accent button float-left" type="submit" name="reset_ride_signups" value="OK"/>
 							<a class="reset-signup-confirm dark button float-right">Cancel</a>
 						</div>
