@@ -3100,6 +3100,10 @@ class PwtcMapdb {
 			return '<div class="callout small alert"><p>Cannot render shortcode, post type is not a scheduled ride.</p></div>';
 		}
 		
+		if (get_post_status($post) != 'publish') {
+			return '<div class="callout small alert"><p>Cannot render shortcode, post status is not published.</p></div>';
+		}
+		
 		return '';
 	}
 	
