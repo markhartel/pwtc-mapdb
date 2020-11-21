@@ -1894,7 +1894,7 @@ class PwtcMapdb {
 				<div class="accordion-content" data-tab-content>
 					<form method="POST">
 						<div class="row column">
-							<div class="reset-signup callout small">To remove all of the riders currently signed-up for this ride, press the remove button below.</div>
+							<div class="reset-signup callout small">To remove all of the riders currently signed-up for this ride, press the remove button below. This will also reset the ride to not allow sign-ups.</div>
 							<div class="reset-signup-confirm callout small alert">Warning: this action will remove all of the riders currently signed-up for this ride! Do you really want to do this?</div>						</div>
 						<div class="row column clearfix">
 							<a class="reset-signup dark button float-left">Remove Sign-ups</a>
