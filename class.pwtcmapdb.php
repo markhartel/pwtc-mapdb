@@ -704,7 +704,7 @@ class PwtcMapdb {
 			return $error;
 		}
 
-		$signup_locked = self::get_signup_locked();
+		$signup_locked = self::get_signup_locked($postid);
 		if ($signup_locked) {
 			return '<div class="callout small warning"><p>You cannot sign up for ride "' . $ride_title . '" because it is closed. ' . $return_to_ride . '</p></div>';	
 		}
