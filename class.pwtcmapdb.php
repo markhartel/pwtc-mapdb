@@ -311,7 +311,7 @@ class PwtcMapdb {
 
 			$map = [
 				'ID' => get_the_ID(),
-				'title' => get_the_title(),
+				'title' => esc_html(get_the_title()),
 				'terrain' => $terrain_str,
 				'distance' => $distance_str,
 				'media' => $url,
@@ -3044,7 +3044,7 @@ class PwtcMapdb {
 				<div class="row column attach-map-yes">
 					<div class= "maps-div" style="border:1px solid; display:flex; flex-wrap:wrap;">
 						<?php foreach ($maps_obj as $map) { ?>
-						<div mapid="<?php echo $map->ID; ?>"><i class="fa fa-times"></i> <?php echo $map->post_title; ?></div>
+						<div mapid="<?php echo $map->ID; ?>"><i class="fa fa-times"></i> <?php echo esc_html($map->post_title); ?></div>
 						<?php } ?>
 					</div>
 				</div>
