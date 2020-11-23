@@ -2048,12 +2048,19 @@ class PwtcMapdb {
 					return;
 				}
 			});
+			
+			$('#pwtc-mapdb-manage-rides-div a.refresh-page').on('click', function(evt) {
+				$('#pwtc-mapdb-manage-rides-div form').submit();
+			});
 
 		});
 	</script>			
 	<div id="pwtc-mapdb-manage-rides-div">
 		<div class="row column clearfix">
-			<a href="/ride-edit-fields" class="dark button float-left" target="_blank">New Ride</a>
+			<div class="button-group float-left">
+				<a class="refresh-page dark button">Refresh</a>
+				<a href="/ride-edit-fields" class="dark button" target="_blank">New Ride</a>
+			</div>
 		</div>
 		<ul class="accordion" data-accordion data-allow-all-closed="true">
 			<li class="accordion-item" data-accordion-item>
