@@ -3155,27 +3155,28 @@ class PwtcMapdb {
 
 	public static function check_post_id() {
 		if (!isset($_GET['post'])) {
-			return '<div class="callout small alert"><p>Cannot render shortcode, missing post ID parameter.</p></div>';
+			return '<div class="callout small alert"><p>Post ID parameter is missing.</p></div>';
 		}
 
 		$postid = intval($_GET['post']);
 		if ($postid == 0) {
-			return '<div class="callout small alert"><p>Cannot render shortcode, post ID is invalid.</p></div>';
+			return '<div class="callout small alert"><p>Post ID parameter is invalid.</p></div>';
 		}
 
 		$post = get_post($postid);
 		if (!$post) {
-			return '<div class="callout small alert"><p>Cannot render shortcode, post does not exist.</p></div>';
+			return '<div class="callout small alert"><p>Post ' . $postid . ' does not exist.</p></div>';
 		}
 
 		if (get_post_type($post) != self::POST_TYPE_RIDE) {
-			return '<div class="callout small alert"><p>Cannot render shortcode, post type is not a scheduled ride.</p></div>';
+			return '<div class="callout small alert"><p>Post ' . $postid . ' is not a scheduled ride.</p></div>';
 		}
-		
-		if (get_post_status($post) != 'publish') {
-			return '<div class="callout small alert"><p>Cannot render shortcode, post status is not published.</p></div>';
+
+		$post_status = get_post_status($post);
+		if ($post_status != 'publish') {
+			return '<div class="callout small alert"><p>Post ' . $postid . ' is not published. Current status is "' . $post_status . '"</p></div>';
 		}
-		
+
 		return '';
 	}
 	
