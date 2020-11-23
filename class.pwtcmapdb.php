@@ -120,6 +120,9 @@ class PwtcMapdb {
 		//add_shortcode('pwtc_mapdb_leader_details', 
 		//	array( 'PwtcMapdb', 'shortcode_leader_details'));
 		
+		add_shortcode('pwtc_mapdb_delete_ride', 
+			array( 'PwtcMapdb', 'shortcode_delete_ride'));
+		
 		add_shortcode('pwtc_mapdb_edit_ride', 
 			array( 'PwtcMapdb', 'shortcode_edit_ride'));
 		
@@ -2126,6 +2129,75 @@ class PwtcMapdb {
 		<?php } else { ?>
 		<div class="callout small"><p>No rides found for this month.</p></div>
 		<?php } ?>
+	</div>
+		<?php
+		return ob_get_clean();
+	}
+	
+	// Generates the [pwtc_mapdb_delete_ride] shortcode.
+	public static function shortcode_delete_ride($atts) {
+		$error = self::check_post_id();
+		if (!empty($error)) {
+			return $error;
+		}
+		$postid = intval($_GET['post']);
+
+		$current_user = wp_get_current_user();
+		if ( 0 == $current_user->ID ) {
+			return '<div class="callout small warning"><p>Please <a href="/wp-login.php">log in</a> to delete this ride.</p></div>';
+		}
+
+		if (!user_can($current_user,'edit_published_rides')) {
+			return '<div class="callout small warning"><p>You are not allowed to delete rides. </p></div>';
+		}
+
+		$ride_title = esc_html(get_the_title($postid));
+		$now_date = self::get_current_time();
+		$ride_datetime = self::get_ride_start_time($postid);
+		if ($ride_datetime < $now_date) {
+			return '<div class="callout small warning"><p>Ride "' . $ride_title . '" has already finished so you cannot delete it.</p></div>';
+		}
+		$ride_date = $ride_datetime->format('m/d/Y g:ia');
+
+		if (isset($_POST['delete_ride'])) {
+			if (wp_delete_post($postid)) {
+				return '<div class="callout small success"><p>Ride "' . $ride_title . '" has been deleted.</p></div>';
+			}
+			else {
+				return '<div class="callout small alert"><p>Could not delete ride "' . $ride_title . '."</p></div>';
+			}
+		}
+
+		ob_start();
+		?>
+	<script type="text/javascript">
+		jQuery(document).ready(function($) { 
+			$('#pwtc-mapdb-delete-ride-div a.delete-ride').on('click', function(evt) {
+				$('#pwtc-mapdb-delete-ride-div .delete-ride').hide();
+				$('#pwtc-mapdb-delete-ride-div .delete-ride-confirm').show();
+			});
+
+			$('#pwtc-mapdb-delete-ride-div a.delete-ride-confirm').on('click', function(evt) {
+				$('#pwtc-mapdb-delete-ride-div .delete-ride-confirm').hide();
+				$('#pwtc-mapdb-delete-ride-div .delete-ride').show();
+			});
+
+			$('#pwtc-mapdb-delete-ride-div .delete-ride-confirm').hide();
+			$('#pwtc-mapdb-delete-ride-div .delete-ride').show();
+		});
+	</script>
+	<div id="pwtc-mapdb-delete-ride-div">
+		<form method="POST">
+			<div class="row column">
+				<div class="delete-ride callout small">To delete ride "<?php echo $ride_title; ?>" on <?php echo $ride_date; ?>, press the delete button below.</div>
+				<div class="delete-ride-confirm callout small alert">Warning: this action will permanently delete ride "<?php echo $ride_title; ?>" on <?php echo $ride_date; ?>! Do you really want to do this?</div>
+			</div>
+			<div class="row column clearfix">
+				<a class="delete-ride dark button float-left">Delete Ride</a>
+				<input class="delete-ride-confirm accent button float-left" type="submit" name="delete_ride" value="OK"/>
+				<a class="delete-ride-confirm dark button float-right">Cancel</a>
+			</div>
+		</form>
 	</div>
 		<?php
 		return ob_get_clean();
