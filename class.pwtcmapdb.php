@@ -287,20 +287,19 @@ class PwtcMapdb {
 			}
 
 			$url = '';
-
+			$href = '';
+			$href_type = '';
 			while (have_rows(self::MAP_FIELD) ): the_row();
-				$type = get_sub_field(self::MAP_TYPE_FIELD);
-				if ($type == 'file') {
+				$href_type = get_sub_field(self::MAP_TYPE_FIELD);
+				if ($href_type == 'file') {
 					$file = get_sub_field(self::MAP_FILE_FIELD);
-					//$modtime = get_post_modified_time('M Y', false, $file['id']);
-					//self::write_log ($file);
-					//$url = '<a title="Download map file." target="_blank" href="' . $file['url'] . '">' . self::FILE_ANCHOR_LABEL . '</a>';
-					$url = '<a title="Download map file." target="_blank" href="' . $file['url'] . '">';
+					$href = esc_url($file['url']);
+					$url = '<a title="Download map file." target="_blank" href="' . $href . '">';
 				}
-				else if ($type == 'link') {
+				else if ($href_type == 'link') {
 					$link = get_sub_field(self::MAP_LINK_FIELD);
-					//$url = '<a title="Open map link." target="_blank" href="' . $link . '">' . self::LINK_ANCHOR_LABEL . '</a>';
-					$url = '<a title="Open map link." target="_blank" href="' . $link . '">';
+					$href = esc_url($link);
+					$url = '<a title="Open map link." target="_blank" href="' . $href . '">';
 				}
 			endwhile;
 
@@ -316,6 +315,8 @@ class PwtcMapdb {
 				'terrain' => $terrain_str,
 				'distance' => $distance_str,
 				'media' => $url,
+				'type' => $href_type,
+				'href' => $href,
 				'edit' => $edit_url
 			];
 			$results[] = $map;
