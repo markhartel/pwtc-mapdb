@@ -2031,7 +2031,7 @@ class PwtcMapdb {
 		}		
 		$query = new WP_Query($query_args);
 		
-		$disable_time_check = true;
+		$disable_time_check = false;
 
 		ob_start();
 		?>
