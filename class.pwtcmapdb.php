@@ -2030,6 +2030,8 @@ class PwtcMapdb {
 			$query_args['s'] = $ride_title;	
 		}		
 		$query = new WP_Query($query_args);
+		
+		$disable_time_check = true;
 
 		ob_start();
 		?>
@@ -2123,11 +2125,11 @@ class PwtcMapdb {
 				<td><span>1st Leader</span><?php echo $leader; ?></td>
 				<td><span>Actions</span>
 					<a href="<?php echo $view_link; ?>" target="_blank">View</a>
-					<?php if ($start > $now) { ?>
+					<?php if ($disable_time_check or $start > $now) { ?>
 					<a href="<?php echo $edit_link; ?>" target="_blank">Edit</a>
 					<?php } ?>
 					<a href="<?php echo $copy_link; ?>" target="_blank">Copy</a>
-					<?php if ($start > $now) { ?>
+					<?php if ($disable_time_check or $start > $now) { ?>
 					<a href="<?php echo $delete_link; ?>" target="_blank">Delete</a>
 					<?php } ?>
 				</td>	
