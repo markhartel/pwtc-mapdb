@@ -2105,6 +2105,7 @@ class PwtcMapdb {
 			$view_link = esc_url(get_the_permalink());
 			$edit_link = esc_url('/ride-edit-fields/?post='.$postid);
 			$copy_link = esc_url('/ride-edit-fields/?post='.$postid.'&action=copy');
+			$delete_link = esc_url('/ride-delete-page/?post='.$postid);
 			$start = DateTime::createFromFormat('Y-m-d H:i:s', get_field(self::RIDE_DATE));
 			$start_date = $start->format('m/d/Y g:ia');
 		?>
@@ -2118,6 +2119,9 @@ class PwtcMapdb {
 					<a href="<?php echo $edit_link; ?>" target="_blank">Edit</a>
 					<?php } ?>
 					<a href="<?php echo $copy_link; ?>" target="_blank">Copy</a>
+					<?php if ($start > $now) { ?>
+					<a href="<?php echo $delete_link; ?>" target="_blank">Delete</a>
+					<?php } ?>
 				</td>	
 			</tr>
 		<?php
