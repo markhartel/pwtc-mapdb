@@ -2978,7 +2978,7 @@ class PwtcMapdb {
 			<form method="POST">
 				<div class="row column">
 					<label>Ride Title
-						<input type="text" name="title" value="<?php esc_attr($title); ?>"/>
+						<input type="text" name="title" value="<?php echo esc_attr($title); ?>"/>
 						<input type="text" name="postid" value="<?php echo $postid; ?>" readonly/>
 					</label>
 				</div>
