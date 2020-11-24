@@ -2709,7 +2709,7 @@ class PwtcMapdb {
 							'<tr mapid="' + item.ID + '"><td>' + item.title + '</td><td>' + a + '</td><td>' + item.distance + '</td><td>' + item.terrain + '</td></tr>');    
 					});
 					if (res.offset !== undefined) {
-						$('#pwtc-mapdb-edit-ride-div .map-search-div').append('<a class="dark button" offset="' + res.offset + '" count="' + res.count + '">Fetch next 10 maps</a>');
+						$('#pwtc-mapdb-edit-ride-div .map-search-div').append('<a class="dark button fetch" offset="' + res.offset + '" count="' + res.count + '">Fetch next 10 maps</a>');
 					}
 					$('#pwtc-mapdb-edit-ride-div .map-search-div tr a').on('click', function(evt) {
 						evt.stopPropagation();
@@ -2723,7 +2723,7 @@ class PwtcMapdb {
 							});
 						}
 					});
-					$('#pwtc-mapdb-edit-ride-div .map-search-div a').on('click', function(evt) {
+					$('#pwtc-mapdb-edit-ride-div .map-search-div a.fetch').on('click', function(evt) {
 						var offset = $(this).attr('offset');
 						var count = $(this).attr('count');
 						var searchstr = $('#pwtc-mapdb-edit-ride-div input[name="map-pattern"]').val();
