@@ -2306,16 +2306,6 @@ class PwtcMapdb {
 			$title = '';
 		}
 
-		if ($postid != 0) {
-			$ride_title = esc_html(get_the_title($postid));
-			$ride_link = esc_url(get_the_permalink($postid));
-			$return_to_ride = 'Click <a href="' . $ride_link . '">here</a> to return to the posted ride.';
-		}
-		else {
-			$ride_title = '';
-			$return_to_ride = '';
-		}
-
 		if (isset($_POST['description'])) {
 			if ($new_post) {
 				update_field(self::RIDE_DESCRIPTION_KEY, $_POST['description'], $postid);
@@ -2967,6 +2957,18 @@ class PwtcMapdb {
 			$('#pwtc-mapdb-edit-ride-div form .attach-map-yes').hide();
 			$('#pwtc-mapdb-edit-ride-div form .attach-map-no').show();
 		<?php } ?>
+			
+			window.addEventListener('beforeunload', function(e) {
+				if (is_dirty) {
+					e.preventDefault();
+					e.returnValue = 'If you leave this page, any data you have entered will not be saved.';
+				}
+				else {
+					delete e['returnValue'];
+				}
+			});
+		    
+			var is_dirty = false;
 
 		});
 	</script>
