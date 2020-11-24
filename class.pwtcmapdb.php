@@ -2711,6 +2711,9 @@ class PwtcMapdb {
 					if (res.offset !== undefined) {
 						$('#pwtc-mapdb-edit-ride-div .map-search-div').append('<a class="dark button" offset="' + res.offset + '" count="' + res.count + '">Fetch next 10 maps</a>');
 					}
+					$('#pwtc-mapdb-edit-ride-div .map-search-div tr a').on('click', function(evt) {
+						evt.stopPropagation();
+					});
 					$('#pwtc-mapdb-edit-ride-div .map-search-div tr').on('click', function(evt) {
 						var mapid = $(this).attr('mapid');
 						if (!has_map_id(mapid)) {
