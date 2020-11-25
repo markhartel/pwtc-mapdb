@@ -2355,8 +2355,10 @@ class PwtcMapdb {
 					$edit_date = false;
 				}
 			}
-			$min_date = $ride_date;
-		}
+			$min_datetime = self::get_current_time();
+			$interval = new DateInterval('P1D');
+			$min_datetime->add($interval);
+			$min_date = $min_datetime->format('Y-m-d');		}
 		else {
 			$ride_datetime = self::get_current_time();
 			$interval = new DateInterval('P1D');
