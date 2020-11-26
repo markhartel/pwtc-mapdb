@@ -35,11 +35,15 @@ unused_rows|the number of unused rows added to the end of a downloaded ride sign
 
 `[pwtc_mapdb_show_userid_signups]` *renders a page that displays the upcoming rides for which a user is signed up*
 
-`[pwtc_mapdb_edit_ride]` *renders a form that allows a user to edit the title and description of a ride*
-
-`[pwtc_mapdb_leader_details]` *renders a form that allows a user to edit their ride leader preferences settings*
+`[pwtc_mapdb_edit_ride]` *renders a form that allows a user to create/copy/edit a scheduled ride*
 
 `[pwtc_mapdb_download_signup]` *renders a button that allows a user to download a blank ride sign-in sheet*
+
+`[pwtc_mapdb_delete_ride]` *renders a form that allows a user to delete a scheduled ride*
+
+`[pwtc_mapdb_manage_rides]` *renders a table that allows a user to view and manage (view/create/copy/edit) scheduled rides*
+
+`[pwtc_mapdb_reset_signups]` *renders a button that allows a user to remove all riders signed-up for a scheduled ride*
 
 ## Package Files Used By This Plugin
 - `README.md` *this file*
