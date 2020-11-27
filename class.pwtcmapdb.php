@@ -2289,7 +2289,7 @@ class PwtcMapdb {
 					return '<div class="callout small alert"><p>Failed to update scheduled ride (post ID ' . $postid . '.)</p></div>';
 				}
 				else {
-					$message = 'Successfully updated scheduled ride (post ID ' . $postid . '.)';
+					$message = 'You have successfully updated the scheduled ride (post ID ' . $postid . '.)';
 				}
 			}
 			else {
@@ -2303,7 +2303,7 @@ class PwtcMapdb {
 					return '<div class="callout small alert"><p>Failed to create new scheduled ride.</p></div>';
 				}
 				else {
-					$message = 'Successfully created new scheduled ride (post ID ' . $postid . '.)';
+					$message = 'You have successfully created a new scheduled ride (post ID ' . $postid . '.)';
 				}
 				$new_post = true;
 				$ride_title = esc_html(get_the_title($postid));
