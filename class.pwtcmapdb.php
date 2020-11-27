@@ -2276,6 +2276,7 @@ class PwtcMapdb {
 			}
 		}
 
+		$message = '';
 		$new_post = false;
 		if (isset($_POST['title'])) {
 			if ($postid != 0) {
@@ -2283,7 +2284,13 @@ class PwtcMapdb {
 					'ID' => $postid,
 					'post_title' => esc_html(trim($_POST['title']))
 				);
-				wp_update_post( $my_post );	
+				$status = wp_update_post( $my_post );	
+				if ($status != $postid) {
+					return '<div class="callout small alert"><p>Failed to update scheduled ride (post ID ' . $postid . '.)</p></div>';
+				}
+				else {
+					$message = 'Successfully updated scheduled ride (post ID ' . $postid . '.)';
+				}
 			}
 			else {
 				$my_post = array(
@@ -2292,6 +2299,12 @@ class PwtcMapdb {
 					'post_status'   => 'publish'
 				);
 				$postid = wp_insert_post( $my_post );
+				if ($postid == 0) {
+					return '<div class="callout small alert"><p>Failed to create new scheduled ride.</p></div>';
+				}
+				else {
+					$message = 'Successfully created new scheduled ride (post ID ' . $postid . '.)';
+				}
 				$new_post = true;
 				$ride_title = esc_html(get_the_title($postid));
 				$ride_link = esc_url(get_the_permalink($postid));
@@ -3015,12 +3028,15 @@ class PwtcMapdb {
 	</script>
 	<div id='pwtc-mapdb-edit-ride-div'>
 		<h1><?php if ($copy_ride) { ?>Copy Ride<?php } else if ($postid == 0) { ?>Create Ride<?php } else { ?>Edit Ride<?php } ?></h1>
+		<?php if ($message) { ?>
+		<div class="callout small success"><p><?php echo $message; ?></p></div>
+		<?php } ?>
 		<div class="callout">
 			<form method="POST">
 				<div class="row column">
 					<label>Ride Title
 						<input type="text" name="title" value="<?php echo esc_attr($title); ?>"/>
-						<input type="text" name="postid" value="<?php echo $postid; ?>" readonly/>
+						<input type="hidden" name="postid" value="<?php echo $postid; ?>"/>
 					</label>
 				</div>
 				<div class="row column">
