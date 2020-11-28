@@ -2158,7 +2158,7 @@ class PwtcMapdb {
 
 		$current_user = wp_get_current_user();
 		if ( 0 == $current_user->ID ) {
-			return '<div class="callout small warning"><p>Please <a href="/wp-login.php">log in</a> to delete this ride.</p></div>';
+			return '<div class="callout small warning"><p>You must be logged in to delete rides.</p></div>';
 		}
 
 		if (!user_can($current_user,'edit_published_rides')) {
@@ -2175,10 +2175,10 @@ class PwtcMapdb {
 
 		if (isset($_POST['delete_ride'])) {
 			if (wp_delete_post($postid)) {
-				return '<div class="callout small success"><p>Ride "' . $ride_title . '" has been deleted.</p></div>';
+				return '<div class="callout small success"><p>Ride "' . $ride_title . '" has been successfully deleted.</p></div>';
 			}
 			else {
-				return '<div class="callout small alert"><p>Could not delete ride "' . $ride_title . '."</p></div>';
+				return '<div class="callout small alert"><p>Failed to delete ride "' . $ride_title . '."</p></div>';
 			}
 		}
 
@@ -2186,12 +2186,12 @@ class PwtcMapdb {
 		?>
 	<script type="text/javascript">
 		jQuery(document).ready(function($) { 
-			$('#pwtc-mapdb-delete-ride-div a.delete-ride').on('click', function(evt) {
+			$('#pwtc-mapdb-delete-ride-div a.action-delete').on('click', function(evt) {
 				$('#pwtc-mapdb-delete-ride-div .delete-ride').hide();
 				$('#pwtc-mapdb-delete-ride-div .delete-ride-confirm').show();
 			});
 
-			$('#pwtc-mapdb-delete-ride-div a.delete-ride-confirm').on('click', function(evt) {
+			$('#pwtc-mapdb-delete-ride-div a.action-cancel').on('click', function(evt) {
 				$('#pwtc-mapdb-delete-ride-div .delete-ride-confirm').hide();
 				$('#pwtc-mapdb-delete-ride-div .delete-ride').show();
 			});
@@ -2207,9 +2207,9 @@ class PwtcMapdb {
 				<div class="delete-ride-confirm callout small alert">Warning: this action will permanently delete ride "<?php echo $ride_title; ?>" on <?php echo $ride_date; ?>! Do you really want to do this?</div>
 			</div>
 			<div class="row column clearfix">
-				<a class="delete-ride dark button float-left">Delete Ride</a>
+				<a class="action-delete delete-ride dark button float-left">Delete Ride</a>
 				<input class="delete-ride-confirm accent button float-left" type="submit" name="delete_ride" value="OK"/>
-				<a class="delete-ride-confirm dark button float-right">Cancel</a>
+				<a class="action-cancel delete-ride-confirm dark button float-right">Cancel</a>
 			</div>
 		</form>
 	</div>
