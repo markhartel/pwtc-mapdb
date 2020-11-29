@@ -11,13 +11,13 @@ function pwtc_mapdb_get_signup() {
 
     $result['view_signup_url'] = '/ride-view-signups/?post='.$postid;
     if ($start > $now) {
-        $result['edit_ride_url'] = '/ride-edit-fields/?post='.$postid;
+        $result['edit_ride_url'] = '/ride-edit-fields/?post='.$postid.'&return=yes';
     }
     else {
         $result['edit_ride_url'] = false;
     }
     if (user_can($current_user,'edit_published_rides')) {
-        $result['copy_ride_url'] = '/ride-edit-fields/?post='.$postid.'&action=copy';
+        $result['copy_ride_url'] = '/ride-edit-fields/?post='.$postid.'&action=copy&return=yes';
     }
     else {
         $result['copy_ride_url'] = false;
