@@ -2229,6 +2229,13 @@ class PwtcMapdb {
 				$copy_ride = true;
 			}
 		}
+		
+		$return = false;
+		if (isset($_GET['return'])) {
+			if ($_GET['return'] == 'yes') {
+				$return = true;
+			}
+		}
 
 		if (isset($_POST['postid'])) {
 			$postid = intval($_POST['postid']);
@@ -2245,20 +2252,20 @@ class PwtcMapdb {
 			$postid = 0;
 		}
 		
+		$ride_title = '';
+		$ride_link = '';
+		$return_to_ride = '';
 		if ($postid != 0) {
 			$ride_title = esc_html(get_the_title($postid));
-			$ride_link = esc_url(get_the_permalink($postid));
-			$return_to_ride = self::create_return_link($ride_link);
+			if ($return) {
+				$ride_link = esc_url(get_the_permalink($postid));
+				$return_to_ride = self::create_return_link($ride_link);
+			}
 		}
-		else {
-			$ride_title = '';
-			$ride_link = '';
-			$return_to_ride = '';
-		}	
 		
 		$current_user = wp_get_current_user();
 		if ( 0 == $current_user->ID ) {
-			return '<div class="callout small warning"><p>Please <a href="/wp-login.php">log in</a> to edit this ride.</p></div>';
+			return '<div class="callout small warning"><p>You must be logged in to edit rides.</p></div>';
 		}
 		
 		if ($copy_ride and !user_can($current_user,'edit_published_rides')) {
@@ -2307,8 +2314,10 @@ class PwtcMapdb {
 				}
 				$new_post = true;
 				$ride_title = esc_html(get_the_title($postid));
-				$ride_link = esc_url(get_the_permalink($postid));
-				$return_to_ride = self::create_return_link($ride_link);	
+				if ($return) {
+					$ride_link = esc_url(get_the_permalink($postid));
+					$return_to_ride = self::create_return_link($ride_link);	
+				}	
 			}		
 		}
 		if ($postid != 0) {
