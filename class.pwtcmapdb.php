@@ -2282,6 +2282,8 @@ class PwtcMapdb {
 				return '<div class="callout small warning"><p>Ride "' . $ride_title . '" has already finished so you cannot edit it. ' . $return_to_ride . '</p></div>';
 			}
 		}
+		
+		$road_captain = user_can($current_user,'edit_published_rides');
 
 		$message = '';
 		$new_post = false;
@@ -2967,6 +2969,13 @@ class PwtcMapdb {
 					evt.preventDefault();
 					return;
 				}
+		<?php if (!$road_captain) { ?>
+				if (!new_leaders.includes(<?php echo $current_user->ID; ?>)) {
+					show_warning('You must assign yourself as leader to this ride.');
+					evt.preventDefault();
+					return;
+				}
+		<?php } ?>
 				$('#pwtc-mapdb-edit-ride-div input[name="leaders"]').val(JSON.stringify(new_leaders));
 
 				is_dirty = false;
