@@ -3047,7 +3047,7 @@ class PwtcMapdb {
 	<div id='pwtc-mapdb-edit-ride-div'>
 		<h1><?php if ($copy_ride) { ?>Copy Ride<?php } else if ($postid == 0) { ?>Create Ride<?php } else { ?>Edit Ride<?php } ?></h1>
 		<?php if ($message) { ?>
-		<div class="callout small success"><p><?php echo $message; ?></p></div>
+		<div class="callout small success"><p><?php echo $message.' '.$return_to_ride; ?></p></div>
 		<?php } ?>
 		<div class="callout">
 			<form method="POST">
