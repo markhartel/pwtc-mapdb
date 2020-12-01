@@ -1853,7 +1853,7 @@ class PwtcMapdb {
 			return '';
 		}
 
-		if (!user_can($current_user,'edit_published_rides')) {
+		if (!user_can($current_user,'manage_options')) {
 			return '';
 		}
 
