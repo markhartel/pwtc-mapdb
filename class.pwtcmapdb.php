@@ -2089,7 +2089,8 @@ class PwtcMapdb {
 					</form>
 				</div>
 			</li>
-		</ul>		
+		</ul>	
+		<h3>Rides Scheduled for <?php echo $this_month->format('F Y'); ?></h3>
 		<?php if ($query->have_posts()) { ?>
 		<table class="pwtc-mapdb-rwd-table">
 			<thead><tr><th>Start Time</th><th>Ride Title</th><th>1st Leader</th><th>Actions</th></tr></thead>
