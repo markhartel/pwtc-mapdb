@@ -2151,6 +2151,9 @@ class PwtcMapdb {
 	
 	// Generates the [pwtc_mapdb_delete_ride] shortcode.
 	public static function shortcode_delete_ride($atts) {
+		$a = shortcode_atts(array('leaders' => 'no'), $atts);
+		$allow_leaders = $a['leaders'] == 'yes';
+
 		$error = self::check_post_id();
 		if (!empty($error)) {
 			return $error;
@@ -2162,11 +2165,20 @@ class PwtcMapdb {
 			return '<div class="callout small warning"><p>You must be logged in to delete rides.</p></div>';
 		}
 
-		if (!user_can($current_user,'edit_published_rides')) {
-			return '<div class="callout small warning"><p>You are not allowed to delete rides. </p></div>';
-		}
-
 		$ride_title = esc_html(get_the_title($postid));
+
+		if (!user_can($current_user,'edit_published_rides')) {
+			if ($allow_leaders) {
+				$leaders = self::get_leader_userids($postid);
+				if (!in_array($current_user->ID, $leaders)) {
+					return '<div class="callout small warning"><p>You do not lead ride "' . $ride_title . '" so you are not allowed to delete it.</p></div>';
+				}
+			}
+			else {
+				return '<div class="callout small warning"><p>You are not allowed to delete rides.</p></div>';				
+			}
+		}
+		
 		$now_date = self::get_current_time();
 		$ride_datetime = self::get_ride_start_time($postid);
 		if ($ride_datetime < $now_date) {
