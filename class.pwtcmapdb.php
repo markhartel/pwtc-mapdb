@@ -2402,12 +2402,17 @@ class PwtcMapdb {
 				}
 			}
 		}
+		if (user_can($current_user,'edit_published_rides')) {
+			$interval = new DateInterval('P1D');
+		}
+		else {
+			$interval = new DateInterval('P14D');
+		}
 		if ($postid != 0) {
 			$ride_datetime = self::get_ride_start_time($postid);
 			if ($copy_ride) {
 				$ride_time = $ride_datetime->format('H:i');
 				$ride_datetime = self::get_current_time();
-				$interval = new DateInterval('P1D');
 				$ride_datetime->add($interval);
 				$ride_date = $ride_datetime->format('Y-m-d');
 				$edit_date = true;	
@@ -2423,12 +2428,10 @@ class PwtcMapdb {
 				}
 			}
 			$min_datetime = self::get_current_time();
-			$interval = new DateInterval('P1D');
 			$min_datetime->add($interval);
 			$min_date = $min_datetime->format('Y-m-d');		}
 		else {
 			$ride_datetime = self::get_current_time();
-			$interval = new DateInterval('P1D');
 			$ride_datetime->add($interval);
 			$ride_date = $ride_datetime->format('Y-m-d');
 			$ride_time = '10:00';
