@@ -1982,13 +1982,24 @@ class PwtcMapdb {
 	
 	// Generates the [pwtc_mapdb_manage_rides] shortcode.
 	public static function shortcode_manage_rides($atts) {
+		$a = shortcode_atts(array('leaders' => 'no'), $atts);
+		$allow_leaders = $a['leaders'] == 'yes';
+
 		$current_user = wp_get_current_user();
 		if ( 0 == $current_user->ID ) {
 			return '<div class="callout small warning"><p>Please <a href="/wp-login.php">log in</a> to view the rides for which you have signed up.</p></div>';
 		}
 		
 		if (!user_can($current_user,'edit_published_rides')) {
-			return '<div class="callout small warning"><p>You are not allowed to manage rides.</p></div>';
+			if ($allow_leaders) {
+				$user_info = get_userdata($current_user->ID);
+				if (!in_array(self::ROLE_RIDE_LEADER, $user_info->roles)) {
+					return '<div class="callout small warning"><p>You must be a ride leader to manage rides.</p></div>';
+				}
+			}
+			else {
+				return '<div class="callout small warning"><p>You are not allowed to manage rides.</p></div>';
+			}
 		}
 
 		$now = self::get_current_time();
