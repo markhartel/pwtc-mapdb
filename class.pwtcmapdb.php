@@ -2254,8 +2254,6 @@ class PwtcMapdb {
 	public static function shortcode_edit_ride($atts) {
 		$a = shortcode_atts(array('leaders' => 'no'), $atts);
 		$allow_leaders = $a['leaders'] == 'yes';
-
-		$set_start_location = true;
 		
 		$now_date = self::get_current_time();
 		
@@ -3039,7 +3037,6 @@ class PwtcMapdb {
 				show_waiting();
 			});
 			
-		<?php if ($set_start_location) { ?>
 			$('#pwtc-mapdb-edit-ride-div .start_locations table tbody tr').each(function(index) {
 				var lat = $(this).data('lat');
 				var lng = $(this).data('lng');
@@ -3077,7 +3074,6 @@ class PwtcMapdb {
           				window.open(url, '_blank');
        				}
 			});
-		<?php } ?>
 			
 		<?php if ($attach_maps) { ?>
 			$('#pwtc-mapdb-edit-ride-div form .attach-map-no').hide();
@@ -3213,7 +3209,6 @@ class PwtcMapdb {
 						</li>
 					</ul>					
 				</div>
-		<?php if ($set_start_location) { ?>
 				<div class="row column">
 					<label>Start Location <a class="goolmap"><i class="fa fa-map-marker"></i></a>
 						<input type="text" name="start_address" value="<?php echo esc_attr($start_location['address']); ?>" readonly/>	
@@ -3239,7 +3234,6 @@ class PwtcMapdb {
 						</li>
 					</ul>
 				</div>
-		<?php } ?>
 				<div class="row column">
 					<label>Ride Leaders
 						<input type="hidden" name="leaders" value="<?php echo json_encode($leaders); ?>"/>	
