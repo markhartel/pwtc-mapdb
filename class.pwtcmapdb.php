@@ -2195,6 +2195,15 @@ class PwtcMapdb {
 		if ($ride_datetime < $now_date) {
 			return '<div class="callout small warning"><p>Ride "' . $ride_title . '" has already finished so you cannot delete it.</p></div>';
 		}
+		else if (!user_can($current_user,'edit_published_rides')) {
+			$min_date = self::get_current_time();
+			$interval = new DateInterval('P14D');
+			$min_date->add($interval);
+			if ($ride_datetime < $min_date) {
+				return '<div class="callout small warning"><p>Ride "' . $ride_title . '" is within 14 days of starting so you cannot delete it.</p></div>';
+			}	
+		}
+
 		$ride_date = $ride_datetime->format('m/d/Y g:ia');
 
 		if (isset($_POST['delete_ride'])) {
