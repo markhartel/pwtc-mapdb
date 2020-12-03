@@ -2394,6 +2394,22 @@ class PwtcMapdb {
 		else {
 			$description = '';
 		}
+		
+		if (isset($_POST['leaders'])) {
+			$new_leaders = json_decode($_POST['leaders']);
+			if ($new_post) {
+				update_field(self::RIDE_LEADERS_KEY, $new_leaders, $postid);
+			}
+			else {
+				update_field(self::RIDE_LEADERS, $new_leaders, $postid);
+			}
+		}
+		if ($postid != 0) {
+			$leaders = self::get_leader_userids($postid);
+		}
+		else {
+			$leaders = [];
+		}
 
 		if (isset($_POST['ride_date']) and isset($_POST['ride_time'])) {
 			$date_str = trim($_POST['ride_date']) . ' ' . trim($_POST['ride_time']) . ':00';
@@ -2416,6 +2432,9 @@ class PwtcMapdb {
 			$interval = new DateInterval('P14D');
 		}
 		if ($postid != 0) {
+			$min_datetime = self::get_current_time();
+			$min_datetime->add($interval);
+			$min_date = $min_datetime->format('Y-m-d');
 			$ride_datetime = self::get_ride_start_time($postid);
 			if ($copy_ride) {
 				$ride_time = $ride_datetime->format('H:i');
@@ -2432,11 +2451,16 @@ class PwtcMapdb {
 				}
 				else {
 					$edit_date = false;
+					if ($allow_leaders) {
+						if (in_array($current_user->ID, $leaders)) {
+							if ($ride_datetime > $min_datetime) {
+								$edit_date = true;
+							}
+						}
+					}
 				}
 			}
-			$min_datetime = self::get_current_time();
-			$min_datetime->add($interval);
-			$min_date = $min_datetime->format('Y-m-d');		}
+		}
 		else {
 			$ride_datetime = self::get_current_time();
 			$ride_datetime->add($interval);
@@ -2444,22 +2468,6 @@ class PwtcMapdb {
 			$ride_time = '10:00';
 			$min_date = $ride_date;
 			$edit_date = true;
-		}
-		
-		if (isset($_POST['leaders'])) {
-			$new_leaders = json_decode($_POST['leaders']);
-			if ($new_post) {
-				update_field(self::RIDE_LEADERS_KEY, $new_leaders, $postid);
-			}
-			else {
-				update_field(self::RIDE_LEADERS, $new_leaders, $postid);
-			}
-		}
-		if ($postid != 0) {
-			$leaders = self::get_leader_userids($postid);
-		}
-		else {
-			$leaders = [];
 		}
 
 		if (isset($_POST['start_address']) and isset($_POST['start_lat']) and isset($_POST['start_lng']) and isset($_POST['start_zoom'])) {
