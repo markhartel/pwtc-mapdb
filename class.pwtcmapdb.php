@@ -3449,6 +3449,13 @@ class PwtcMapdb {
 		return $now_date;
 	}
 	
+	public static function get_current_date() {
+		$timezone = new DateTimeZone(pwtc_get_timezone_string());
+		$now_time = new DateTime(null, $timezone);
+		$now_date = DateTime::createFromFormat('Y-m-d H:i:s', $now_time->format('Y-m-d 00:00:00'), $timezone);
+		return $now_date;
+	}
+	
 	public static function check_ride_start($postid, $mode, $pad, $return_to_ride) {
 		$ride_title = esc_html(get_the_title($postid));
 		$now_date = self::get_current_time();
