@@ -3045,7 +3045,7 @@ class PwtcMapdb {
 					var area = $(this).find('td').first().html();
 					var title = $(this).find('td').first().next().html();
 					$('#pwtc-mapdb-edit-ride-div .start-locations-div table').append(
-						'<tr itemid="' + (index+1) + '"><td>' + title + '</td><td>' + area + '</td></tr>');
+						'<tr itemid="' + (index+1) + '"><td>' + title + '</td><td><a><i class="fa fa-map-marker"></i></a></td><td>' + area + '</td></tr>');
 				}
 			});
 
@@ -3064,6 +3064,16 @@ class PwtcMapdb {
 				$('#pwtc-mapdb-edit-ride-div input[name="start_lng"]').val(lng);
 				$('#pwtc-mapdb-edit-ride-div input[name="start_zoom"]').val(zoom);
 				is_dirty = true;
+			});
+			
+			$('#pwtc-mapdb-edit-ride-div .start-locations-div tr a').on('click', function(e) {
+				e.stopPropagation();
+				var itemid = $(this).parent().parent().attr('itemid');
+				var item = $('#pwtc-mapdb-edit-ride-div .start_locations table tbody tr:nth-child(' + itemid + ')');
+				var lat = item.data('lat');
+				var lng = item.data('lng');
+				var url = 'https://www.google.com/maps/search/?api=1&query=' + lat + ',' + lng;
+          			window.open(url, '_blank');
 			});
 			
 			$('#pwtc-mapdb-edit-ride-div a.goolmap').on('click', function(evt) {
