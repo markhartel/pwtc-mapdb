@@ -2196,7 +2196,7 @@ class PwtcMapdb {
 			return '<div class="callout small warning"><p>Ride "' . $ride_title . '" has already finished so you cannot delete it.</p></div>';
 		}
 		else if (!user_can($current_user,'edit_published_rides')) {
-			$min_date = self::get_current_time();
+			$min_date = self::get_current_date();
 			$interval = new DateInterval('P14D');
 			$min_date->add($interval);
 			if ($ride_datetime < $min_date) {
@@ -2439,13 +2439,13 @@ class PwtcMapdb {
 			$interval = new DateInterval('P14D');
 		}
 		if ($postid != 0) {
-			$min_datetime = self::get_current_time();
+			$min_datetime = self::get_current_date();
 			$min_datetime->add($interval);
 			$min_date = $min_datetime->format('Y-m-d');
 			$ride_datetime = self::get_ride_start_time($postid);
 			if ($copy_ride) {
 				$ride_time = $ride_datetime->format('H:i');
-				$ride_datetime = self::get_current_time();
+				$ride_datetime = self::get_current_date();
 				$ride_datetime->add($interval);
 				$ride_date = $ride_datetime->format('Y-m-d');
 				$edit_date = true;	
