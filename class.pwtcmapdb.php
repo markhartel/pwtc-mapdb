@@ -2278,7 +2278,7 @@ class PwtcMapdb {
 		else if (isset($_GET['post'])) {
 			$error = self::check_post_id();
 			if (!empty($error)) {
-				return $error;
+				return self::create_page_title($copy_ride, -1) . $error;
 			}
 			$postid = intval($_GET['post']);
 		}
@@ -2297,9 +2297,11 @@ class PwtcMapdb {
 			}
 		}
 		
+		$page_title = self::create_page_title($copy_ride, $postid);
+		
 		$current_user = wp_get_current_user();
 		if ( 0 == $current_user->ID ) {
-			return '<div class="callout small warning"><p>You must be logged in to edit rides.</p></div>';
+			return $page_title . '<div class="callout small warning"><p>You must be logged in to edit rides.</p></div>';
 		}
 		
 		$user_info = get_userdata($current_user->ID);
@@ -2307,36 +2309,36 @@ class PwtcMapdb {
 		if ($copy_ride and !user_can($current_user,'edit_published_rides')) {
 			if ($allow_leaders) {
 				if (!in_array(self::ROLE_RIDE_LEADER, $user_info->roles)) {
-					return '<div class="callout small warning"><p>You must be a ride leader to copy rides. ' . $return_to_ride . '</p></div>';
+					return $page_title . '<div class="callout small warning"><p>You must be a ride leader to copy rides. ' . $return_to_ride . '</p></div>';
 				}
 			}
 			else {
-				return '<div class="callout small warning"><p>You are not allowed to copy rides. ' . $return_to_ride . '</p></div>';
+				return $page_title . '<div class="callout small warning"><p>You are not allowed to copy rides. ' . $return_to_ride . '</p></div>';
 			}
 		}
 
 		if ($postid == 0 and !user_can($current_user,'edit_published_rides')) {
 			if ($allow_leaders) {
 				if (!in_array(self::ROLE_RIDE_LEADER, $user_info->roles)) {
-					return '<div class="callout small warning"><p>You must be a ride leader to create new rides. ' . $return_to_ride . '</p></div>';
+					return $page_title . '<div class="callout small warning"><p>You must be a ride leader to create new rides. ' . $return_to_ride . '</p></div>';
 				}
 			}
 			else {
-				return '<div class="callout small warning"><p>You are not allowed to create new rides. ' . $return_to_ride . '</p></div>';
+				return $page_title . '<div class="callout small warning"><p>You are not allowed to create new rides. ' . $return_to_ride . '</p></div>';
 			}
 		}
 		
 		if ($postid != 0 and !$copy_ride and !user_can($current_user,'edit_published_rides')) {
 			$leaders = self::get_leader_userids($postid);
 			if (!in_array($current_user->ID, $leaders)) {
-				return '<div class="callout small warning"><p>You must be a leader for ride "' . $ride_title . '" to edit it. ' . $return_to_ride . '</p></div>';
+				return $page_title . '<div class="callout small warning"><p>You must be a leader for ride "' . $ride_title . '" to edit it. ' . $return_to_ride . '</p></div>';
 			}
 		}
 		
 		if ($postid != 0 and !$copy_ride) {
 			$ride_datetime = self::get_ride_start_time($postid);
 			if ($ride_datetime < $now_date) {
-				return '<div class="callout small warning"><p>Ride "' . $ride_title . '" has already finished so you cannot edit it. ' . $return_to_ride . '</p></div>';
+				return $page_title . '<div class="callout small warning"><p>Ride "' . $ride_title . '" has already finished so you cannot edit it. ' . $return_to_ride . '</p></div>';
 			}
 		}
 		
@@ -2352,7 +2354,7 @@ class PwtcMapdb {
 				);
 				$status = wp_update_post( $my_post );	
 				if ($status != $postid) {
-					return '<div class="callout small alert"><p>Failed to update scheduled ride (post ID ' . $postid . '.)</p></div>';
+					return $page_title . '<div class="callout small alert"><p>Failed to update scheduled ride (post ID ' . $postid . '.)</p></div>';
 				}
 				else {
 					$message = 'You have successfully updated the scheduled ride (post ID ' . $postid . '.)';
@@ -2366,7 +2368,7 @@ class PwtcMapdb {
 				);
 				$postid = wp_insert_post( $my_post );
 				if ($postid == 0) {
-					return '<div class="callout small alert"><p>Failed to create new scheduled ride.</p></div>';
+					return $page_title . '<div class="callout small alert"><p>Failed to create new scheduled ride.</p></div>';
 				}
 				else {
 					$message = 'You have successfully created a new scheduled ride (post ID ' . $postid . '.)';
@@ -3108,7 +3110,7 @@ class PwtcMapdb {
 		});
 	</script>
 	<div id='pwtc-mapdb-edit-ride-div'>
-		<h1><?php if ($copy_ride) { ?>Copy Ride<?php } else if ($postid == 0) { ?>Create Ride<?php } else { ?>Edit Ride<?php } ?></h1>
+		<?php echo $page_title; ?>
 		<?php if ($message) { ?>
 		<div class="callout small success"><p><?php echo $message.' '.$return_to_ride; ?></p></div>
 		<?php } ?>
@@ -3385,6 +3387,18 @@ class PwtcMapdb {
 	
 	public static function create_return_link($ride_url) {
 		return 'Click <a href="' . $ride_url . '">here</a> to return to the posted ride.';
+	}
+	
+	public static function create_page_title($copy_ride, $postid) {
+		if ($copy_ride) {
+			return '<h1>Copy Ride</h1>';
+		}
+		else if ($postid == 0) {
+			return '<h1>Create Ride</h1>';
+		}
+		else {
+			return '<h1>Edit Ride</h1>';
+		}
 	}
 	
 	/*
