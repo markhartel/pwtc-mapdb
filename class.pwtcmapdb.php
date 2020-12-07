@@ -2934,13 +2934,13 @@ class PwtcMapdb {
 
 			$('#pwtc-mapdb-edit-ride-div form').on('submit', function(evt) {
 				if ($('#pwtc-mapdb-edit-ride-div input[name="title"]').val().trim().length == 0) {
-					show_warning('The ride title cannot be blank.');
+					show_warning('The <strong>ride title</strong> cannot be blank.');
 					evt.preventDefault();
 					return;
 				}
 
 				if ($('#pwtc-mapdb-edit-ride-div textarea[name="description"]').val().trim().length == 0) {
-					show_warning('The ride description cannot be blank.');
+					show_warning('The <strong>ride description</strong> cannot be blank.');
 					evt.preventDefault();
 					return;
 				}
@@ -2950,16 +2950,15 @@ class PwtcMapdb {
 				var datergx = /^\d{4}-\d{2}-\d{2}$/;
 				var timergx = /^\d{2}:\d{2}$/;
 				if (!datergx.test(date)) {
-					show_warning('The ride date format is invalid.');
+					show_warning('The <strong>ride date</strong> format is invalid.');
 					evt.preventDefault();
 					return;
 				}
 				if (!timergx.test(time)) {
-					show_warning('The departure time format is invalid.');
+					show_warning('The <strong>departure time</strong> format is invalid.');
 					evt.preventDefault();
 					return;					
 				}
-				//alert('date=' + date + ' time=' + time);
 
 				var attach_map = $('#pwtc-mapdb-edit-ride-div input[name="attach_maps"]:checked').val() == '1';
 				if (attach_map) {
@@ -2969,7 +2968,7 @@ class PwtcMapdb {
 						new_maps.push(mapid); 
 					});
 					if (new_maps.length == 0) {
-						show_warning('You must attach at least one map to this ride.');
+						show_warning('You must attach at least one <strong>ride map</strong>.');
 						evt.preventDefault();
 						return;
 					}
@@ -2978,19 +2977,19 @@ class PwtcMapdb {
 				else {
 					var terrain_empty = $('#pwtc-mapdb-edit-ride-div input[name="ride_terrain[]"]:checked').length == 0;
 					if (terrain_empty) {
-						show_warning('You must choose at least one terrain for this ride.');
+						show_warning('You must choose at least one <strong>ride terrain</strong>.');
 						evt.preventDefault();
 						return;						
 					}
 					var dist = $('#pwtc-mapdb-edit-ride-div input[name="distance"]').val().trim();
 					if (dist.length == 0) {
-						show_warning('You must enter a distance for this ride.');
+						show_warning('You must enter a <strong>ride distance</strong>.');
 						evt.preventDefault();
 						return;							
 					}
 					dist = parseInt(dist, 10);
 					if (dist == NaN || dist < 0) {
-						show_warning('You must enter a distance that is a non-negative number.');
+						show_warning('You must enter a <strong>ride distance</strong> that is a non-negative number.');
 						evt.preventDefault();
 						return;							
 					}
@@ -2998,12 +2997,12 @@ class PwtcMapdb {
 					if (maxdist.length > 0) {
 						maxdist = parseInt(maxdist, 10);
 						if (maxdist == NaN || maxdist < 0) {
-							show_warning('You must enter a maximum distance that is a non-negative number.');
+							show_warning('You must enter a <strong>ride max distance</strong> that is a non-negative number.');
 							evt.preventDefault();
 							return;							
 						}
 						if (maxdist <= dist) {
-							show_warning('The maximum distance must be greater than the distance.');
+							show_warning('The <strong>ride max distance</strong> must be greater than the <strong>ride distance</strong>.');
 							evt.preventDefault();
 							return;									
 						}					
@@ -3011,7 +3010,7 @@ class PwtcMapdb {
 				}
 				
 				if ($('#pwtc-mapdb-edit-ride-div input[name="start_address"]').val().trim().length == 0) {
-					show_warning('You must choose a start location for this ride.');
+					show_warning('You must choose a <strong>start location</strong> for this ride.');
 					evt.preventDefault();
 					return;
 				}
@@ -3022,13 +3021,13 @@ class PwtcMapdb {
 					new_leaders.push(userid); 
 				});
 				if (new_leaders.length == 0) {
-					show_warning('You must assign at least one leader to this ride.');
+					show_warning('You must assign at least one <strong>ride leader</strong>.');
 					evt.preventDefault();
 					return;
 				}
 		<?php if (!$road_captain) { ?>
 				if (!new_leaders.includes(<?php echo $current_user->ID; ?>)) {
-					show_warning('You must assign yourself as leader to this ride.');
+					show_warning('You must assign yourself as a <strong>ride leader</strong>.');
 					evt.preventDefault();
 					return;
 				}
