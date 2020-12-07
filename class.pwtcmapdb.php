@@ -3110,7 +3110,7 @@ class PwtcMapdb {
 		});
 	</script>
 	<div id='pwtc-mapdb-edit-ride-div'>
-		<?php echo $page_title; ?>
+		<?php echo self::create_page_title($copy_ride, $postid); ?>
 		<?php if ($message) { ?>
 		<div class="callout small success"><p><?php echo $message.' '.$return_to_ride; ?></p></div>
 		<?php } ?>
@@ -3319,26 +3319,26 @@ class PwtcMapdb {
 
 	public static function check_post_id() {
 		if (!isset($_GET['post'])) {
-			return '<div class="callout small alert"><p>Post ID parameter is missing.</p></div>';
+			return '<div class="callout small alert"><p>Ride post ID parameter is missing.</p></div>';
 		}
 
 		$postid = intval($_GET['post']);
 		if ($postid == 0) {
-			return '<div class="callout small alert"><p>Post ID parameter is invalid.</p></div>';
+			return '<div class="callout small alert"><p>Ride post ID parameter is invalid, it must be an integer number.</p></div>';
 		}
 
 		$post = get_post($postid);
 		if (!$post) {
-			return '<div class="callout small alert"><p>Post ' . $postid . ' does not exist.</p></div>';
+			return '<div class="callout small alert"><p>Ride post ' . $postid . ' does not exist, it may have been deleted.</p></div>';
 		}
 
 		if (get_post_type($post) != self::POST_TYPE_RIDE) {
-			return '<div class="callout small alert"><p>Post ' . $postid . ' is not a scheduled ride.</p></div>';
+			return '<div class="callout small alert"><p>Ride post ' . $postid . ' is not a scheduled ride.</p></div>';
 		}
 
 		$post_status = get_post_status($post);
 		if ($post_status != 'publish') {
-			return '<div class="callout small alert"><p>Post ' . $postid . ' is not published. Current status is "' . $post_status . '"</p></div>';
+			return '<div class="callout small alert"><p>Ride post ' . $postid . ' is not published. Its current status is "' . $post_status . '"</p></div>';
 		}
 
 		return '';
