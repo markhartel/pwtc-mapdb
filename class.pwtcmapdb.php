@@ -3205,8 +3205,9 @@ class PwtcMapdb {
             						<a href="#" class="accordion-title">Add Ride Map...</a>
             						<div class="accordion-content" data-tab-content>
 								<div class="row column">
+									<p class="help-text">Find route maps by entering a name and pressing search, then choose the desired map from the resulting list.</p>
 									<div class="input-group">
-										<input class="input-group-field" type="text" name="map-pattern" placeholder="Enter map name">
+										<input class="input-group-field" type="text" name="map-pattern" placeholder="Enter map title">
 										<div class="input-group-button">
 											<input type="button" class="dark button" name= "search-maps" value="Search">
 										</div>
@@ -3237,6 +3238,7 @@ class PwtcMapdb {
             						<a href="#" class="accordion-title">Change Start Location...</a>
             						<div class="accordion-content" data-tab-content>
 								<div class="row column">
+									<p class="help-text">Choose the desired location from the list of popular start locations.</p>
 									<div class="start-locations-div" style="border:1px solid; overflow: auto; height: 100px;">
 										<table></table>
 									</div>
@@ -3267,6 +3269,7 @@ class PwtcMapdb {
             						<a href="#" class="accordion-title">Add Ride Leader...</a>
             						<div class="accordion-content" data-tab-content>
 								<div class="row column">
+									<p class="help-text">Find ride leaders by entering a name and pressing search, then choose the desired leader from the resulting list.</p>
 									<div class="input-group">
 										<input class="input-group-field" type="text" name="leader-pattern" placeholder="Enter leader name">
 										<div class="input-group-button">
