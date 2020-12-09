@@ -3199,7 +3199,7 @@ class PwtcMapdb {
 					</label>
 				</div>
 				<div class="row column attach-map-yes">
-					<div class= "maps-div" style="border:1px solid; display:flex; flex-wrap:wrap;">
+					<div class= "maps-div" style="min-height:40px; border:1px solid; display:flex; flex-wrap:wrap;">
 						<?php foreach ($maps_obj as $map) { ?>
 						<div mapid="<?php echo $map->ID; ?>"><i class="fa fa-times"></i> <?php echo esc_html($map->post_title); ?></div>
 						<?php } ?>
@@ -3211,7 +3211,7 @@ class PwtcMapdb {
             						<a href="#" class="accordion-title">Add Ride Map...</a>
             						<div class="accordion-content" data-tab-content>
 								<div class="row column">
-									<p class="help-text">Find route maps by entering a name and pressing search, then choose the desired map from the resulting list.</p>
+									<p class="help-text">Find ride route maps by entering a title and pressing search, then choose the desired map from the resulting list.</p>
 									<div class="input-group">
 										<input class="input-group-field" type="text" name="map-pattern" placeholder="Enter map title">
 										<div class="input-group-button">
@@ -3259,7 +3259,7 @@ class PwtcMapdb {
 					</label>
 				</div>
 				<div class="row column">
-					<div class= "leaders-div" style="border:1px solid; display:flex; flex-wrap:wrap;">
+					<div class= "leaders-div" style="min-height:40px; border:1px solid; display:flex; flex-wrap:wrap;">
 						<?php foreach ($leaders as $leader) {
 							$info = get_userdata($leader);
 							if ($info) {
