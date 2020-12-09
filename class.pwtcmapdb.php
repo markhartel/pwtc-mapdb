@@ -2063,6 +2063,11 @@ class PwtcMapdb {
 				}
 			});
 			
+			$('#pwtc-mapdb-manage-rides-div form a').on('click', function(evt) {
+				$('#pwtc-mapdb-manage-rides-div input[name="ride_title"]').val('');
+				$('#pwtc-mapdb-manage-rides-div input[name="ride_month"]').val('<?php echo $ride_month; ?>');
+			});
+			
 			$('#pwtc-mapdb-manage-rides-div a.refresh-page').on('click', function(evt) {
 				$('#pwtc-mapdb-manage-rides-div form').submit();
 			});
@@ -2096,6 +2101,7 @@ class PwtcMapdb {
 						<div class="row column errmsg"></div>
 						<div class="row column clearfix">
 							<input class="accent button float-left" type="submit" value="Submit"/>
+							<a class="dark button float-right">Reset</a>
 						</div>
 					</form>
 				</div>
