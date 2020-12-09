@@ -2213,7 +2213,7 @@ class PwtcMapdb {
 		$ride_date = $ride_datetime->format('m/d/Y g:ia');
 
 		if (isset($_POST['delete_ride'])) {
-			if (wp_delete_post($postid)) {
+			if (wp_trash_post($postid)) {
 				return '<div class="callout small success"><p>Ride "' . $ride_title . '" has been successfully deleted.</p></div>';
 			}
 			else {
