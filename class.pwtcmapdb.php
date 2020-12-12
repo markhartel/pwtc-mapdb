@@ -3053,7 +3053,7 @@ class PwtcMapdb {
 					var area = $(this).find('td').first().html();
 					var title = $(this).find('td').first().next().html();
 					$('#pwtc-mapdb-edit-ride-div .start-locations-div table').append(
-						'<tr itemid="' + (index+1) + '"><td>' + title + '</td><td><a><i class="fa fa-map-marker"></i></a></td><td>' + area + '</td></tr>');
+						'<tr itemid="' + (index+1) + '"><td>' + title + '</td><td><a title="Display location in Google Maps."><i class="fa fa-map-marker"></i></a></td><td>' + area + '</td></tr>');
 				}
 			});
 
@@ -3232,7 +3232,7 @@ class PwtcMapdb {
 					</ul>					
 				</div>
 				<div class="row column">
-					<label>Start Location <a class="goolmap"><i class="fa fa-map-marker"></i></a>
+					<label>Start Location <a class="goolmap" title="Display start location in Google Maps."><i class="fa fa-map-marker"></i></a>
 						<input type="text" name="start_address" value="<?php echo esc_attr($start_location['address']); ?>" readonly/>	
 					</label>
 					<p class="help-text">You cannot edit the start location directly, instead press the "Change Start Location" button below.</p>
