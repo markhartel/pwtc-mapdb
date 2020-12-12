@@ -3138,6 +3138,9 @@ class PwtcMapdb {
 						<label>Ride Date
 							<input type="date" name="ride_date" value="<?php echo $ride_date; ?>" min="<?php echo $min_date; ?>" <?php echo $edit_date ? '': 'readonly'; ?>/>	
 						</label>
+						<?php if (!$edit_date) { ?>
+						<p class="help-text">You are not allowed to edit the ride date.</p>
+						<?php } ?>
 					</div>
 					<div class="small-12 medium-6 columns">
 						<label>Departure Time
@@ -3232,6 +3235,7 @@ class PwtcMapdb {
 					<label>Start Location <a class="goolmap"><i class="fa fa-map-marker"></i></a>
 						<input type="text" name="start_address" value="<?php echo esc_attr($start_location['address']); ?>" readonly/>	
 					</label>
+					<p class="help-text">You cannot edit the start location directly, instead press the "Change Start Location" button below.</p>
 					<label>Start Location Comment
 						<input type="text" name="start_location_comment" value="<?php echo esc_attr($start_location_comment); ?>"/>
 					</label>
