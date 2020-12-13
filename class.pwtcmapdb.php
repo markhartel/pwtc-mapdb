@@ -3353,7 +3353,12 @@ class PwtcMapdb {
 
 		$post_status = get_post_status($post);
 		if ($post_status != 'publish') {
-			return '<div class="callout small alert"><p>Ride post ' . $postid . ' is not published. Its current status is "' . $post_status . '"</p></div>';
+			if ($post_status == 'trash') {
+				return '<div class="callout small alert"><p>Ride post ' . $postid . ' has been deleted.</p></div>';
+			}
+			else {
+				return '<div class="callout small alert"><p>Ride post ' . $postid . ' is not published. Its current status is "' . $post_status . '"</p></div>';
+			}
 		}
 
 		return '';
