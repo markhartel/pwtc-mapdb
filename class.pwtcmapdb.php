@@ -294,12 +294,12 @@ class PwtcMapdb {
 				if ($href_type == 'file') {
 					$file = get_sub_field(self::MAP_FILE_FIELD);
 					$href = esc_url($file['url']);
-					$url = '<a title="Download map file." target="_blank" href="' . $href . '">';
+					$url = '<a title="Download ride route map file." target="_blank" href="' . $href . '">';
 				}
 				else if ($href_type == 'link') {
 					$link = get_sub_field(self::MAP_LINK_FIELD);
 					$href = esc_url($link);
-					$url = '<a title="Open map link." target="_blank" href="' . $href . '">';
+					$url = '<a title="Display online ride route map." target="_blank" href="' . $href . '">';
 				}
 			endwhile;
 
@@ -2781,10 +2781,10 @@ class PwtcMapdb {
 					res.maps.forEach(function(item) {
 						var a = '';
 						if (item.type == 'file') {
-							a = '<a href="' + item.href + '" target="_blank" download><i class="fa fa-download"></i></a>';
+							a = '<a title="Download ride route map file." href="' + item.href + '" target="_blank" download><i class="fa fa-download"></i></a>';
 						}
 						else if (item.type == 'link') {
-							a = '<a href="' + item.href + '" target="_blank"><i class="fa fa-link"></i></a>';
+							a = '<a title="Display online ride route map." href="' + item.href + '" target="_blank"><i class="fa fa-link"></i></a>';
 						}
             					$('#pwtc-mapdb-edit-ride-div .map-search-div table').append(
 							'<tr mapid="' + item.ID + '"><td>' + item.title + '</td><td>' + a + '</td><td>' + item.distance + '</td><td>' + item.terrain + '</td></tr>');    
