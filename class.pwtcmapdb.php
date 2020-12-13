@@ -2487,6 +2487,8 @@ class PwtcMapdb {
 			$min_date = $ride_date;
 			$edit_date = true;
 		}
+		
+		$edit_start_location = $edit_date;
 
 		if (isset($_POST['start_address']) and isset($_POST['start_lat']) and isset($_POST['start_lng']) and isset($_POST['start_zoom'])) {
 			$location = array('address' => $_POST['start_address'], 'lat' => floatval($_POST['start_lat']), 'lng' => floatval($_POST['start_lng']));
@@ -3047,6 +3049,7 @@ class PwtcMapdb {
 				show_waiting();
 			});
 			
+		<?php if ($edit_start_location) { ?>
 			$('#pwtc-mapdb-edit-ride-div .start_locations table tbody tr').each(function(index) {
 				var lat = $(this).data('lat');
 				var lng = $(this).data('lng');
@@ -3085,6 +3088,7 @@ class PwtcMapdb {
 				var url = 'https://www.google.com/maps/search/?api=1&query=' + lat + ',' + lng;
           			window.open(url, '_blank');
 			});
+		<?php } ?>
 			
 			$('#pwtc-mapdb-edit-ride-div a.goolmap').on('click', function(evt) {
 				var lat = $('#pwtc-mapdb-edit-ride-div input[name="start_lat"]').val();
@@ -3237,7 +3241,11 @@ class PwtcMapdb {
 					<label>Start Location <a class="goolmap" title="Display start location in Google Maps."><i class="fa fa-map-marker"></i></a>
 						<input type="text" name="start_address" value="<?php echo esc_attr($start_location['address']); ?>" readonly/>	
 					</label>
+		<?php if ($edit_start_location) { ?>
 					<p class="help-text">You cannot edit the start location directly, instead press the "Change Start Location" button below.</p>
+		<?php } else { ?>
+					<p class="help-text">You are not allowed to edit the start location.</p>
+		<?php } ?>
 					<label>Start Location Comment
 						<input type="text" name="start_location_comment" value="<?php echo esc_attr($start_location_comment); ?>"/>
 					</label>
@@ -3245,6 +3253,7 @@ class PwtcMapdb {
 					<input type="hidden" name="start_lng" value="<?php echo esc_attr($start_location['lng']); ?>"/>
 					<input type="hidden" name="start_zoom" value="<?php echo esc_attr(isset($start_location['zoom']) ? $start_location['zoom'] : ''); ?>"/>
 				</div>
+		<?php if ($edit_start_location) { ?>
 				<div class="row column">
 					<ul class="accordion" data-accordion data-allow-all-closed="true">
 						<li class="accordion-item" data-accordion-item>
@@ -3260,6 +3269,7 @@ class PwtcMapdb {
 						</li>
 					</ul>
 				</div>
+		<?php } ?>
 				<div class="row column">
 					<label>Ride Leaders
 						<input type="hidden" name="leaders" value="<?php echo json_encode($leaders); ?>"/>	
@@ -3307,6 +3317,7 @@ class PwtcMapdb {
 				</div>
 			</form>
 		</div>
+		<?php if ($edit_start_location) { ?>
 		<div class="start_locations" style="display:none">
 			<?php
 			$content = get_page_by_title('Ride Start Locations');
@@ -3315,6 +3326,7 @@ class PwtcMapdb {
 			}
 			?>
 		</div>
+		<?php } ?>
 	</div>
 	<?php
 		return ob_get_clean();
