@@ -3249,7 +3249,7 @@ class PwtcMapdb {
             						<a href="#" class="accordion-title">Change Start Location...</a>
             						<div class="accordion-content" data-tab-content>
 								<div class="row column">
-									<p class="help-text">Choose the desired location from the list of popular start locations.</p>
+									<p class="help-text">Below is a list of popular club ride start locations. Scroll through the list and select your desired start location. Contact a road captain to add a new start location to the list.</p>
 									<div class="start-locations-div" style="border:1px solid; overflow: auto; height: 100px;">
 										<table></table>
 									</div>
