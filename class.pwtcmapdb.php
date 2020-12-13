@@ -1927,6 +1927,7 @@ class PwtcMapdb {
 		$now = self::get_current_time();
 		$query_args = [
 			'posts_per_page' => -1,
+			'post_status' => 'publish',
 			'post_type' => self::POST_TYPE_RIDE,
 			'meta_query' => [
 				[
@@ -2027,6 +2028,7 @@ class PwtcMapdb {
 		$next_month->add($interval);
 		$query_args = [
 			'posts_per_page' => -1,
+			'post_status' => 'publish',
 			'post_type' => self::POST_TYPE_RIDE,
 			'meta_query' => [
 				[
