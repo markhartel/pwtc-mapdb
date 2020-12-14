@@ -2147,11 +2147,11 @@ class PwtcMapdb {
 				<td><span>Actions</span>
 					<a href="<?php echo $view_link; ?>" target="_blank">View</a>
 					<?php if ($disable_time_check or $start > $now) { ?>
-					<a href="<?php echo $edit_link; ?>" target="_blank">Edit</a>
+					<a href="<?php echo $edit_link; ?>" target="_blank" rel="opener">Edit</a>
 					<?php } ?>
-					<a href="<?php echo $copy_link; ?>" target="_blank">Copy</a>
+					<a href="<?php echo $copy_link; ?>" target="_blank" rel="opener">Copy</a>
 					<?php if ($disable_time_check or $start > $now) { ?>
-					<a href="<?php echo $delete_link; ?>" target="_blank">Delete</a>
+					<a href="<?php echo $delete_link; ?>" target="_blank" rel="opener">Delete</a>
 					<?php } ?>
 				</td>	
 			</tr>
@@ -2217,7 +2217,19 @@ class PwtcMapdb {
 
 		if (isset($_POST['delete_ride'])) {
 			if (wp_trash_post($postid)) {
-				return '<div class="callout small success"><p>Ride "' . $ride_title . '" has been successfully deleted.</p></div>';
+				ob_start();
+				?>
+	<script type="text/javascript">
+		jQuery(document).ready(function($) { 
+			var opener_win = window.opener;
+			if (opener_win) {
+				$('#pwtc-mapdb-manage-rides-div form', opener_win.document).submit();
+			}
+		});
+	</script>
+	<div class="callout small success"><p>Ride "<?php echo $ride_title; ?>" has been successfully deleted.</p></div>
+				<?php
+				return ob_get_clean();
 			}
 			else {
 				return '<div class="callout small alert"><p>Failed to delete ride "' . $ride_title . '."</p></div>';
@@ -3118,6 +3130,13 @@ class PwtcMapdb {
 			});
 		    
 			var is_dirty = false;
+			
+		<?php if ($message and !$return) { ?>
+			var opener_win = window.opener;
+			if (opener_win) {
+				$('#pwtc-mapdb-manage-rides-div form', opener_win.document).submit();
+			}
+		<?php } ?>
 
 		});
 	</script>
