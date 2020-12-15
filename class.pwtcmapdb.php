@@ -1992,6 +1992,7 @@ class PwtcMapdb {
 		}
 		
 		if (!user_can($current_user,'edit_published_rides')) {
+			$is_captain = false;
 			if ($allow_leaders) {
 				$user_info = get_userdata($current_user->ID);
 				if (!in_array(self::ROLE_RIDE_LEADER, $user_info->roles)) {
@@ -2002,8 +2003,15 @@ class PwtcMapdb {
 				return '<div class="callout small warning"><p>You are not allowed to manage rides.</p></div>';
 			}
 		}
+		else {
+			$is_captain = true;
+		}
+
 
 		$now = self::get_current_time();
+		$later = self::get_current_date();
+		$interval = new DateInterval('P14D');
+		$later->add($interval);
 		
 		if (isset($_POST['ride_title'])) {
 			$ride_title = trim($_POST['ride_title']);
@@ -2120,9 +2128,9 @@ class PwtcMapdb {
 			$query->the_post();
 			$postid = get_the_ID();
 			$title = esc_html(get_the_title());
-			$leaders = get_field(self::RIDE_LEADERS);
+			$leaders = self::get_leader_userids($postid);
 			if (count($leaders)) {
-				$user_info = get_userdata($leaders[0]['ID']);
+				$user_info = get_userdata($leaders[0]);
 				if ($user_info) {
 					$leader = $user_info->first_name . ' ' . $user_info->last_name;	
 				}
@@ -2133,11 +2141,12 @@ class PwtcMapdb {
 			else {
 				$leader = '';
 			}
+			$is_leader = in_array($current_user->ID, $leaders);
 			$view_link = esc_url(get_the_permalink());
 			$edit_link = esc_url('/ride-edit-fields/?post='.$postid);
 			$copy_link = esc_url('/ride-edit-fields/?post='.$postid.'&action=copy');
 			$delete_link = esc_url('/ride-delete-page/?post='.$postid);
-			$start = DateTime::createFromFormat('Y-m-d H:i:s', get_field(self::RIDE_DATE));
+			$start = self::get_ride_start_time($postid);
 			$start_date = $start->format('m/d/Y g:ia');
 		?>
 			<tr>
@@ -2146,11 +2155,11 @@ class PwtcMapdb {
 				<td><span>1st Leader</span><?php echo $leader; ?></td>
 				<td><span>Actions</span>
 					<a href="<?php echo $view_link; ?>" target="_blank">View</a>
-					<?php if ($disable_time_check or $start > $now) { ?>
+					<a href="<?php echo $copy_link; ?>" target="_blank" rel="opener">Copy</a>
+					<?php if (($is_captain or $is_leader) and $start > $now) { ?>
 					<a href="<?php echo $edit_link; ?>" target="_blank" rel="opener">Edit</a>
 					<?php } ?>
-					<a href="<?php echo $copy_link; ?>" target="_blank" rel="opener">Copy</a>
-					<?php if ($disable_time_check or $start > $now) { ?>
+					<?php if (($is_captain and $start > $now) or ($is_leader and $start > $later)) { ?>
 					<a href="<?php echo $delete_link; ?>" target="_blank" rel="opener">Delete</a>
 					<?php } ?>
 				</td>	
