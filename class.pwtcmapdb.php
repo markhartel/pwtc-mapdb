@@ -2237,7 +2237,7 @@ class PwtcMapdb {
 			}
 		});
 	</script>
-	<div class="callout small success"><p>Ride "<?php echo $ride_title; ?>" has been successfully deleted.</p></div>
+	<div class="callout small success"><p>Ride "<?php echo $ride_title; ?>" has been successfully deleted. You may now close this page.</p></div>
 				<?php
 				return ob_get_clean();
 			}
@@ -2319,7 +2319,7 @@ class PwtcMapdb {
 		
 		$ride_title = '';
 		$ride_link = '';
-		$return_to_ride = '';
+		$return_to_ride = 'You may now close this page.';
 		if ($postid != 0) {
 			$ride_title = esc_html(get_the_title($postid));
 			if ($return) {
