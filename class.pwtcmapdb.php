@@ -2077,6 +2077,7 @@ class PwtcMapdb {
 			$('#pwtc-mapdb-manage-rides-div form a').on('click', function(evt) {
 				$('#pwtc-mapdb-manage-rides-div input[name="ride_title"]').val('');
 				$('#pwtc-mapdb-manage-rides-div input[name="ride_month"]').val('<?php echo $reset_month; ?>');
+				$('#pwtc-mapdb-manage-rides-div form').submit();
 			});
 			
 			$('#pwtc-mapdb-manage-rides-div a.refresh-page').on('click', function(evt) {
