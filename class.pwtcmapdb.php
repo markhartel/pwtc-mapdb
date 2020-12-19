@@ -3110,6 +3110,42 @@ class PwtcMapdb {
 				var url = 'https://www.google.com/maps/search/?api=1&query=' + lat + ',' + lng;
           			window.open(url, '_blank');
 			});
+			
+			function show_geocode_error(message) {
+				$('#pwtc-mapdb-edit-ride-div .find-location-div').html('<div class="callout small alert"><p>' + message + '</p></div>');
+			}
+
+			$('#pwtc-mapdb-edit-ride-div input[name="find-location"]').on('click', function(evt) {
+				var addrstr = $('#pwtc-mapdb-edit-ride-div input[name="location-address"]').val();
+				try {
+					if (!geocoder) {
+						geocoder = new google.maps.Geocoder();
+					}
+					geocoder.geocode({ address: addrstr }, function(results, status) {
+						if (status !== 'OK') {
+							show_geocode_error('Geocode status not OK: ' + status);
+						}
+						else if (results.length == 0) {
+							show_geocode_error('Geocode results array is empty');
+						}
+						else {
+							var lat = results[0].geometry.location.lat();
+							var lng = results[0].geometry.location.lng();
+							$('#pwtc-mapdb-edit-ride-div .find-location-div').html('<span>lat=' + lat + ' lng=' + lng + '</span>');
+						}
+					});
+				}
+				catch (e) {
+					show_geocode_error(e.message);
+				}
+			});
+
+			$('#pwtc-mapdb-edit-ride-div input[name="location-address"]').on('keypress', function(evt) {
+				var keyPressed = evt.keyCode || evt.which; 
+				if (keyPressed === 13) { 
+					$('#pwtc-mapdb-edit-ride-div input[name="find-location"]').trigger( 'click');
+				} 
+			});
 		<?php } ?>
 			
 			$('#pwtc-mapdb-edit-ride-div a.goolmap').on('click', function(evt) {
@@ -3140,6 +3176,7 @@ class PwtcMapdb {
 			});
 		    
 			var is_dirty = false;
+			var geocoder = false;
 			
 		<?php if ($message and !$return) { ?>
 			var opener_win = window.opener;
@@ -3292,6 +3329,24 @@ class PwtcMapdb {
 									<p class="help-text">Below is a list of popular club ride start locations. Scroll through the list and select your desired start location. Contact a road captain to add a new start location to the list.</p>
 									<div class="start-locations-div" style="border:1px solid; overflow: auto; height: 100px;">
 										<table></table>
+									</div>
+								</div>
+							</div>
+						</li>
+						<li class="accordion-item" data-accordion-item>
+            						<a href="#" class="accordion-title">Find Start Location...</a>
+            						<div class="accordion-content" data-tab-content>
+								<div class="row column">
+									<p class="help-text">Find a start location by entering a street address and pressing search.</p>
+									<div class="input-group">
+										<input class="input-group-field" type="text" name="location-address" placeholder="Enter map title">
+										<div class="input-group-button">
+											<input type="button" class="dark button" name= "find-location" value="Search">
+										</div>
+									</div>
+								</div>
+								<div class="row column">
+									<div class="find-location-div" style="border:1px solid; height: 100px;">
 									</div>
 								</div>
 							</div>
