@@ -3098,6 +3098,7 @@ class PwtcMapdb {
 				$('#pwtc-mapdb-edit-ride-div input[name="start_lat"]').val(lat);
 				$('#pwtc-mapdb-edit-ride-div input[name="start_lng"]').val(lng);
 				$('#pwtc-mapdb-edit-ride-div input[name="start_zoom"]').val(zoom);
+				load_google_map();
 				is_dirty = true;
 			});
 			
@@ -3114,13 +3115,48 @@ class PwtcMapdb {
 			function show_geocode_error(message) {
 				$('#pwtc-mapdb-edit-ride-div .find-location-div').html('<div class="callout small alert"><p>' + message + '</p></div>');
 			}
+			
+			function show_google_map(lat, lng, zoom) {
+				$('#pwtc-mapdb-edit-ride-div .find-location-div').each(function() {
+					var latlng = new google.maps.LatLng(lat, lng);
+					var mapArgs = {
+						zoom: zoom,
+						center: latlng,
+        				mapTypeId: google.maps.MapTypeId.ROADMAP
+    				};
+					var map = new google.maps.Map($(this)[0], mapArgs);
+					var marker = new google.maps.Marker({
+        				position: latlng,
+        				map: map
+    				});
+    			});
+			}
+
+			function load_google_map() {
+				$('#pwtc-mapdb-edit-ride-div input[name="start_address"]').each(function() {
+					var address = $(this).val();
+					if (address) {
+						$('#pwtc-mapdb-edit-ride-div input[name="location-address"]').val(address);
+						var lat = $('#pwtc-mapdb-edit-ride-div input[name="start_lat"]').val();
+						var lng = $('#pwtc-mapdb-edit-ride-div input[name="start_lng"]').val();
+						var zoom = $('#pwtc-mapdb-edit-ride-div input[name="start_zoom"]').val();
+						if (zoom) {
+							zoom = parseFloat(zoom);
+						}
+						else {
+							zoom = 16;
+						}
+						lat = parseFloat(lat);
+						lng = parseFloat(lng);
+						show_google_map(lat, lng, zoom);
+					}
+				});
+			}
 
 			$('#pwtc-mapdb-edit-ride-div input[name="find-location"]').on('click', function(evt) {
 				var addrstr = $('#pwtc-mapdb-edit-ride-div input[name="location-address"]').val();
 				try {
-					if (!geocoder) {
-						geocoder = new google.maps.Geocoder();
-					}
+					var geocoder = new google.maps.Geocoder();
 					geocoder.geocode({ address: addrstr }, function(results, status) {
 						if (status !== 'OK') {
 							show_geocode_error('Geocode status not OK: ' + status);
@@ -3131,9 +3167,10 @@ class PwtcMapdb {
 						else {
 							var lat = results[0].geometry.location.lat();
 							var lng = results[0].geometry.location.lng();
-							$('#pwtc-mapdb-edit-ride-div .find-location-div').html('<span>lat=' + lat + ' lng=' + lng + '</span>');
+							show_google_map(lat, lng, 17);
 						}
 					});
+					$('#pwtc-mapdb-edit-ride-div .find-location-div').html('<div class="callout small"><i class="fa fa-spinner fa-pulse"></i> please wait...</div>');
 				}
 				catch (e) {
 					show_geocode_error(e.message);
@@ -3146,6 +3183,8 @@ class PwtcMapdb {
 					$('#pwtc-mapdb-edit-ride-div input[name="find-location"]').trigger( 'click');
 				} 
 			});
+			
+			load_google_map();
 		<?php } ?>
 			
 			$('#pwtc-mapdb-edit-ride-div a.goolmap').on('click', function(evt) {
@@ -3176,7 +3215,6 @@ class PwtcMapdb {
 			});
 		    
 			var is_dirty = false;
-			var geocoder = false;
 			
 		<?php if ($message and !$return) { ?>
 			var opener_win = window.opener;
