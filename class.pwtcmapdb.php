@@ -3116,20 +3116,26 @@ class PwtcMapdb {
 				$('#pwtc-mapdb-edit-ride-div .find-location-div').html('<div class="callout small alert"><p>' + message + '</p></div>');
 			}
 			
-			function show_google_map(lat, lng, zoom) {
+			function show_google_map(lat, lng, zoom, drag_marker) {
 				$('#pwtc-mapdb-edit-ride-div .find-location-div').each(function() {
 					var latlng = new google.maps.LatLng(lat, lng);
 					var mapArgs = {
 						zoom: zoom,
 						center: latlng,
-        				mapTypeId: google.maps.MapTypeId.ROADMAP
-    				};
+						marker:	{
+			        			draggable: drag_marker,
+			        			raiseOnDrag: drag_marker
+		    				},
+        					mapTypeId: google.maps.MapTypeId.ROADMAP
+    					};
 					var map = new google.maps.Map($(this)[0], mapArgs);
 					var marker = new google.maps.Marker({
-        				position: latlng,
-        				map: map
+        					position: latlng,
+						draggable: drag_marker,
+						raiseOnDrag: drag_marker,
+        					map: map
+    					});
     				});
-    			});
 			}
 
 			function load_google_map() {
@@ -3148,7 +3154,7 @@ class PwtcMapdb {
 						}
 						lat = parseFloat(lat);
 						lng = parseFloat(lng);
-						show_google_map(lat, lng, zoom);
+						show_google_map(lat, lng, zoom, false);
 					}
 				});
 			}
@@ -3167,7 +3173,7 @@ class PwtcMapdb {
 						else {
 							var lat = results[0].geometry.location.lat();
 							var lng = results[0].geometry.location.lng();
-							show_google_map(lat, lng, 17);
+							show_google_map(lat, lng, 17, true);
 						}
 					});
 					$('#pwtc-mapdb-edit-ride-div .find-location-div').html('<div class="callout small"><i class="fa fa-spinner fa-pulse"></i> please wait...</div>');
