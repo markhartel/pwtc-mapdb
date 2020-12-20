@@ -3117,6 +3117,7 @@ class PwtcMapdb {
 			}
 			
 			function show_google_map(lat, lng, zoom, drag_marker) {
+				google_map = false;
 				$('#pwtc-mapdb-edit-ride-div .find-location-div').each(function() {
 					var latlng = new google.maps.LatLng(lat, lng);
 					var mapArgs = {
@@ -3128,13 +3129,14 @@ class PwtcMapdb {
 		    				},
         					mapTypeId: google.maps.MapTypeId.ROADMAP
     					};
-					var map = new google.maps.Map($(this)[0], mapArgs);
+					google_map = new google.maps.Map($(this)[0], mapArgs);
 					var marker = new google.maps.Marker({
-        					position: latlng,
+						position: latlng,
 						draggable: drag_marker,
 						raiseOnDrag: drag_marker,
-        					map: map
-    					});
+        					map: google_map
+					});
+					google_map.marker = marker;
     				});
 			}
 
@@ -3157,29 +3159,30 @@ class PwtcMapdb {
 						show_google_map(lat, lng, zoom, false);
 					}
 				});
+				$('#pwtc-mapdb-edit-ride-div .accept-location-div').hide();
 			}
 
 			$('#pwtc-mapdb-edit-ride-div input[name="find-location"]').on('click', function(evt) {
-				var addrstr = $('#pwtc-mapdb-edit-ride-div input[name="location-address"]').val();
-				try {
+				$('#pwtc-mapdb-edit-ride-div .accept-location-div').hide();
+				var addrstr = $('#pwtc-mapdb-edit-ride-div input[name="location-address"]').val().trim();
+				if (addrstr.length > 0) {
+					google_map = false;
 					var geocoder = new google.maps.Geocoder();
 					geocoder.geocode({ address: addrstr }, function(results, status) {
-						if (status !== 'OK') {
-							show_geocode_error('Geocode status not OK: ' + status);
-						}
-						else if (results.length == 0) {
-							show_geocode_error('Geocode results array is empty');
-						}
-						else {
+						if (status === 'OK') {
 							var lat = results[0].geometry.location.lat();
 							var lng = results[0].geometry.location.lng();
-							show_google_map(lat, lng, 17, true);
+							show_google_map(lat, lng, 16, true);
+							$('#pwtc-mapdb-edit-ride-div .accept-location-div').show();
+						}
+						else if (status === 'ZERO_RESULTS') {
+							show_geocode_error('Geocoder could not locate address.');
+						}
+						else {
+							show_geocode_error('Error returned from geocoder: ' + status);
 						}
 					});
 					$('#pwtc-mapdb-edit-ride-div .find-location-div').html('<div class="callout small"><i class="fa fa-spinner fa-pulse"></i> please wait...</div>');
-				}
-				catch (e) {
-					show_geocode_error(e.message);
 				}
 			});
 
@@ -3190,6 +3193,31 @@ class PwtcMapdb {
 				} 
 			});
 			
+			$('#pwtc-mapdb-edit-ride-div .accept-location-btn').on('click', function(evt) {
+				if (google_map) {
+					var position = google_map.marker.getPosition();
+					if (position) {
+						var lat = position.lat();
+						var lng = position.lng();
+						var zoom = google_map.getZoom();
+						var addr = $('#pwtc-mapdb-edit-ride-div input[name="location-address"]').val();
+						$('#pwtc-mapdb-edit-ride-div input[name="start_address"]').val(addr);
+						$('#pwtc-mapdb-edit-ride-div input[name="start_lat"]').val(lat);
+						$('#pwtc-mapdb-edit-ride-div input[name="start_lng"]').val(lng);
+						$('#pwtc-mapdb-edit-ride-div input[name="start_zoom"]').val(zoom);
+						is_dirty = true;
+						load_google_map();
+					}
+				}
+				$('#pwtc-mapdb-edit-ride-div .accept-location-div').hide();
+			});
+
+			$('#pwtc-mapdb-edit-ride-div .cancel-location-btn').on('click', function(evt) {
+				load_google_map();
+				$('#pwtc-mapdb-edit-ride-div .accept-location-div').hide();
+			});
+
+			var google_map = false;			
 			load_google_map();
 		<?php } ?>
 			
@@ -3352,7 +3380,7 @@ class PwtcMapdb {
 						<input type="text" name="start_address" value="<?php echo esc_attr($start_location['address']); ?>" readonly/>	
 					</label>
 		<?php if ($edit_start_location) { ?>
-					<p class="help-text">You cannot edit the start location directly, instead press the "Change Start Location" button below.</p>
+					<p class="help-text">You cannot edit the start location directly, instead press the find or choose start location buttons below.</p>
 		<?php } else { ?>
 					<p class="help-text">You are not allowed to edit the start location.</p>
 		<?php } ?>
@@ -3367,30 +3395,36 @@ class PwtcMapdb {
 				<div class="row column">
 					<ul class="accordion" data-accordion data-allow-all-closed="true">
 						<li class="accordion-item" data-accordion-item>
-            						<a href="#" class="accordion-title">Change Start Location...</a>
-            						<div class="accordion-content" data-tab-content>
-								<div class="row column">
-									<p class="help-text">Below is a list of popular club ride start locations. Scroll through the list and select your desired start location. Contact a road captain to add a new start location to the list.</p>
-									<div class="start-locations-div" style="border:1px solid; overflow: auto; height: 100px;">
-										<table></table>
-									</div>
-								</div>
-							</div>
-						</li>
-						<li class="accordion-item" data-accordion-item>
             						<a href="#" class="accordion-title">Find Start Location...</a>
             						<div class="accordion-content" data-tab-content>
 								<div class="row column">
-									<p class="help-text">Find a start location by entering a street address and pressing search.</p>
+									<p class="help-text">Find a start location by entering a street address and pressing search. A Google map of the location will display, press accept to use a the start location.</p>
 									<div class="input-group">
-										<input class="input-group-field" type="text" name="location-address" placeholder="Enter map title">
+										<input class="input-group-field" type="text" name="location-address" placeholder="Enter street address">
 										<div class="input-group-button">
 											<input type="button" class="dark button" name= "find-location" value="Search">
 										</div>
 									</div>
 								</div>
 								<div class="row column">
-									<div class="find-location-div" style="border:1px solid; height: 100px;">
+									<div class="find-location-div" style="border:1px solid; height: 200px;">
+									</div>
+								</div>
+								<div class="accept-location-div row column" style="display:none">
+									<div class="button-group">
+										<a class="accept-location-btn dark button">Accept</a>
+										<a class="cancel-location-btn dark button">Cancel</a>
+									</dev>
+								</div>
+							</div>
+						</li>
+						<li class="accordion-item" data-accordion-item>
+            						<a href="#" class="accordion-title">Choose Start Location...</a>
+            						<div class="accordion-content" data-tab-content>
+								<div class="row column">
+									<p class="help-text">Below is a list of popular club ride start locations. Scroll through the list and select your desired start location. Contact a road captain to add a new start location to the list.</p>
+									<div class="start-locations-div" style="border:1px solid; overflow: auto; height: 100px;">
+										<table></table>
 									</div>
 								</div>
 							</div>
