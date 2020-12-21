@@ -2528,7 +2528,7 @@ class PwtcMapdb {
 			$start_location = get_field(self::RIDE_START_LOCATION, $postid);
 		}
 		else {
-			$start_location = array('address' => '', 'lat' => 0.0, 'lng' => 0.0, 'zoom' => 17);
+			$start_location = array('address' => '', 'lat' => 0.0, 'lng' => 0.0, 'zoom' => 16);
 		}
 		
 		if (isset($_POST['start_location_comment'])) {
