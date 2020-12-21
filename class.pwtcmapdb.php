@@ -3399,7 +3399,7 @@ class PwtcMapdb {
 				<div class="row column">
 					<ul class="accordion" data-accordion data-allow-all-closed="true">
 						<li class="accordion-item" data-accordion-item>
-            						<a href="#" class="accordion-title">Find Start Location...</a>
+            						<a href="#" class="accordion-title">Find New Start Location...</a>
             						<div class="accordion-content" data-tab-content>
 								<div class="row column">
 									<p class="help-text">Find a start location by entering a street address and pressing search. A Google map with the location will display, press accept to use it as the start location.</p>
@@ -3423,7 +3423,7 @@ class PwtcMapdb {
 							</div>
 						</li>
 						<li class="accordion-item" data-accordion-item>
-            						<a href="#" class="accordion-title">Choose Start Location...</a>
+            						<a href="#" class="accordion-title">Choose Popular Start Location...</a>
             						<div class="accordion-content" data-tab-content>
 								<div class="row column">
 									<p class="help-text">Below is a list of popular club ride start locations. Scroll through the list and select your desired start location. Contact a road captain to add a new start location to the list.</p>
