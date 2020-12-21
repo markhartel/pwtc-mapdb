@@ -3162,6 +3162,10 @@ class PwtcMapdb {
 						lng = parseFloat(lng);
 						show_google_map(lat, lng, zoom, false);
 					}
+					else {
+						$('#pwtc-mapdb-edit-ride-div input[name="location-address"]').val('');
+						$('#pwtc-mapdb-edit-ride-div .find-location-div').html('');
+					}
 				});
 				$('#pwtc-mapdb-edit-ride-div .accept-location-div').hide();
 			}
@@ -3181,10 +3185,10 @@ class PwtcMapdb {
 							$('#pwtc-mapdb-edit-ride-div .accept-location-div').show();
 						}
 						else if (status === 'ZERO_RESULTS') {
-							show_geocode_error('Geocoder could not locate address.');
+							show_geocode_error('Google geocoder could not locate address.');
 						}
 						else {
-							show_geocode_error('Error returned from geocoder: ' + status);
+							show_geocode_error('Error returned from Google geocoder: ' + status);
 						}
 					});
 					$('#pwtc-mapdb-edit-ride-div .find-location-div').html('<div class="callout small"><i class="fa fa-spinner fa-pulse"></i> please wait...</div>');
