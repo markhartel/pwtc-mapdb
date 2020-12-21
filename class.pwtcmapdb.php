@@ -3173,6 +3173,7 @@ class PwtcMapdb {
 							var lat = results[0].geometry.location.lat();
 							var lng = results[0].geometry.location.lng();
 							show_google_map(lat, lng, 16, true);
+							google_map.marker_address = addrstr;
 							$('#pwtc-mapdb-edit-ride-div .accept-location-div').show();
 						}
 						else if (status === 'ZERO_RESULTS') {
@@ -3203,7 +3204,7 @@ class PwtcMapdb {
 						var lat = position.lat();
 						var lng = position.lng();
 						var zoom = google_map.getZoom();
-						var addr = $('#pwtc-mapdb-edit-ride-div input[name="location-address"]').val();
+						var addr = google_map.marker_address;
 						$('#pwtc-mapdb-edit-ride-div input[name="start_address"]').val(addr);
 						$('#pwtc-mapdb-edit-ride-div input[name="start_lat"]').val(lat);
 						$('#pwtc-mapdb-edit-ride-div input[name="start_lng"]').val(lng);
