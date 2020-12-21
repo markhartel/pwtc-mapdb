@@ -2964,6 +2964,10 @@ class PwtcMapdb {
 				}
 				is_dirty = true;
 			});
+			
+			$('#pwtc-mapdb-edit-ride-div input[name="start_location_comment"]').on('input', function() {
+				is_dirty = true;
+			});
 
 			$('#pwtc-mapdb-edit-ride-div form').on('submit', function(evt) {
 				if ($('#pwtc-mapdb-edit-ride-div input[name="title"]').val().trim().length == 0) {
