@@ -3113,7 +3113,7 @@ class PwtcMapdb {
 			});
 			
 			function show_geocode_error(message) {
-				$('#pwtc-mapdb-edit-ride-div .find-location-div').html('<div class="callout small alert"><p>' + message + '</p></div>');
+				$('#pwtc-mapdb-edit-ride-div .find-location-div').html('<div class="callout small warning"><p>' + message + '</p></div>');
 			}
 			
 			function show_google_map(lat, lng, zoom, drag_marker) {
@@ -3183,6 +3183,9 @@ class PwtcMapdb {
 						}
 					});
 					$('#pwtc-mapdb-edit-ride-div .find-location-div').html('<div class="callout small"><i class="fa fa-spinner fa-pulse"></i> please wait...</div>');
+				}
+				else {
+					show_geocode_error('You must enter a street address.');
 				}
 			});
 
