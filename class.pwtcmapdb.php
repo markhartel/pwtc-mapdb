@@ -3402,7 +3402,7 @@ class PwtcMapdb {
             						<a href="#" class="accordion-title">Find Start Location...</a>
             						<div class="accordion-content" data-tab-content>
 								<div class="row column">
-									<p class="help-text">Find a start location by entering a street address and pressing search. A Google map of the location will display, press accept to use a the start location.</p>
+									<p class="help-text">Find a start location by entering a street address and pressing search. A Google map with the location will display, press accept to use it as the start location.</p>
 									<div class="input-group">
 										<input class="input-group-field" type="text" name="location-address" placeholder="Enter street address">
 										<div class="input-group-button">
