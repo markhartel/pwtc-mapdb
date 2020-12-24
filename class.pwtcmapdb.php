@@ -2717,6 +2717,15 @@ class PwtcMapdb {
 		#pwtc-mapdb-edit-ride-div .start-locations-div table tr:nth-child(odd) {
 			background-color: #f2f2f2;
 		}
+		#pwtc-mapdb-edit-ride-div .find-location-div ul {
+			list-style-type: none;
+		}
+		#pwtc-mapdb-edit-ride-div .find-location-div li {
+			cursor: pointer;
+		}
+		#pwtc-mapdb-edit-ride-div .find-location-div li:hover {
+			font-weight: bold;
+		}
 	</style>
 	<script type="text/javascript">
 		jQuery(document).ready(function($) { 
@@ -3178,11 +3187,29 @@ class PwtcMapdb {
 					var geocoder = new google.maps.Geocoder();
 					geocoder.geocode({ address: addrstr }, function(results, status) {
 						if (status === 'OK') {
-							var lat = results[0].geometry.location.lat();
-							var lng = results[0].geometry.location.lng();
-							show_google_map(lat, lng, 16, true);
-							google_map.marker_address = addrstr;
-							$('#pwtc-mapdb-edit-ride-div .accept-location-div').show();
+							if (results.length > 1) {
+								$('#pwtc-mapdb-edit-ride-div .find-location-div').empty();
+								$('#pwtc-mapdb-edit-ride-div .find-location-div').append('<ul></ul>');
+								results.forEach(function(item) {
+									$('#pwtc-mapdb-edit-ride-div .find-location-div ul').append(
+										'<li data-lat="' + item.geometry.location.lat() + '" data-lng="' + item.geometry.location.lng() + '">' + item.formatted_address + '</li>');    
+								});
+								$('#pwtc-mapdb-edit-ride-div .find-location-div li').on('click', function(evt) {
+									var lat = parseFloat($(this).data('lat'));
+									var lng = parseFloat($(this).data('lng'));
+									show_google_map(lat, lng, 16, true);
+									google_map.marker_address = $(this).html();
+									$('#pwtc-mapdb-edit-ride-div input[name="location-address"]').val(google_map.marker_address);
+									$('#pwtc-mapdb-edit-ride-div .accept-location-div').show();
+								});
+							}
+							else {
+								var lat = results[0].geometry.location.lat();
+								var lng = results[0].geometry.location.lng();
+								show_google_map(lat, lng, 16, true);
+								google_map.marker_address = results[0].formatted_address;
+								$('#pwtc-mapdb-edit-ride-div .accept-location-div').show();
+							}
 						}
 						else if (status === 'ZERO_RESULTS') {
 							show_geocode_error('Google geocoder could not locate address.');
@@ -3419,7 +3446,7 @@ class PwtcMapdb {
 									</div>
 								</div>
 								<div class="row column">
-									<div class="find-location-div" style="border:1px solid; height: 200px;">
+									<div class="find-location-div" style="border:1px solid; overflow: auto; height: 200px;">
 									</div>
 								</div>
 								<div class="accept-location-div row column" style="display:none">
@@ -3435,7 +3462,7 @@ class PwtcMapdb {
             						<div class="accordion-content" data-tab-content>
 								<div class="row column">
 									<p class="help-text">Below is a list of popular club ride start locations. Scroll through the list and select your desired start location. Contact a road captain to add a new start location to the list.</p>
-									<div class="start-locations-div" style="border:1px solid; overflow: auto; height: 100px;">
+									<div class="start-locations-div" style="border:1px solid; overflow: auto; height: 200px;">
 										<table></table>
 									</div>
 								</div>
