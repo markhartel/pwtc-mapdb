@@ -3126,12 +3126,14 @@ class PwtcMapdb {
 			});
 			
 			function show_geocode_error(message) {
+				google_map = false;
 				$('#pwtc-mapdb-edit-ride-div .find-location-div').html('<div class="callout small warning"><p>' + message + '</p></div>');
 			}
 			
 			function show_google_map(lat, lng, zoom, drag_marker) {
 				google_map = false;
 				$('#pwtc-mapdb-edit-ride-div .find-location-div').each(function() {
+					$(this).empty();
 					var latlng = new google.maps.LatLng(lat, lng);
 					var mapArgs = {
 						zoom: zoom,
@@ -3173,6 +3175,7 @@ class PwtcMapdb {
 					}
 					else {
 						$('#pwtc-mapdb-edit-ride-div input[name="location-address"]').val('');
+						google_map = false;
 						$('#pwtc-mapdb-edit-ride-div .find-location-div').html('');
 					}
 				});
@@ -3183,11 +3186,11 @@ class PwtcMapdb {
 				$('#pwtc-mapdb-edit-ride-div .accept-location-div').hide();
 				var addrstr = $('#pwtc-mapdb-edit-ride-div input[name="location-address"]').val().trim();
 				if (addrstr.length > 0) {
-					google_map = false;
 					var geocoder = new google.maps.Geocoder();
 					geocoder.geocode({ address: addrstr }, function(results, status) {
 						if (status === 'OK') {
 							if (results.length > 1) {
+								google_map = false;
 								$('#pwtc-mapdb-edit-ride-div .find-location-div').empty();
 								$('#pwtc-mapdb-edit-ride-div .find-location-div').append('<ul></ul>');
 								results.forEach(function(item) {
@@ -3218,6 +3221,7 @@ class PwtcMapdb {
 							show_geocode_error('Error returned from Google geocoder: ' + status);
 						}
 					});
+					google_map = false;
 					$('#pwtc-mapdb-edit-ride-div .find-location-div').html('<div class="callout small"><i class="fa fa-spinner fa-pulse"></i> please wait...</div>');
 				}
 				else {
