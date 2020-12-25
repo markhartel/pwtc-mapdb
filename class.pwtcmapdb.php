@@ -3105,7 +3105,10 @@ class PwtcMapdb {
 				var comment = item.find('td').first().next().next().next().html();
 				var lat = item.data('lat');
 				var lng = item.data('lng');
-				var zoom = item.data('zoom');
+				var zoom = '16';
+				if (!hardcode_zoom) {
+					zoom = item.data('zoom');
+				}
 				$('#pwtc-mapdb-edit-ride-div input[name="start_address"]').val(decodeHtml(title+', '+addr));
 				$('#pwtc-mapdb-edit-ride-div input[name="start_location_comment"]').val(decodeHtml(comment));
 				$('#pwtc-mapdb-edit-ride-div input[name="start_lat"]').val(lat);
@@ -3163,7 +3166,7 @@ class PwtcMapdb {
 						var lat = $('#pwtc-mapdb-edit-ride-div input[name="start_lat"]').val();
 						var lng = $('#pwtc-mapdb-edit-ride-div input[name="start_lng"]').val();
 						var zoom = $('#pwtc-mapdb-edit-ride-div input[name="start_zoom"]').val();
-						if (zoom) {
+						if (zoom && !hardcode_zoom) {
 							zoom = parseFloat(zoom);
 						}
 						else {
@@ -3242,7 +3245,10 @@ class PwtcMapdb {
 					if (position) {
 						var lat = position.lat();
 						var lng = position.lng();
-						var zoom = google_map.getZoom();
+						var zoom = 16;
+						if (!hardcode_zoom) {
+							zoom = google_map.getZoom();
+						}
 						var addr = google_map.marker_address;
 						$('#pwtc-mapdb-edit-ride-div input[name="start_address"]').val(addr);
 						$('#pwtc-mapdb-edit-ride-div input[name="start_lat"]').val(lat);
@@ -3260,6 +3266,7 @@ class PwtcMapdb {
 				$('#pwtc-mapdb-edit-ride-div .accept-location-div').hide();
 			});
 
+			var hardcode_zoom = true;
 			var google_map = false;			
 			load_google_map();
 		<?php } ?>
