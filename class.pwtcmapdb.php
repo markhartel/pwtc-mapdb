@@ -3214,6 +3214,7 @@ class PwtcMapdb {
 								var lng = results[0].geometry.location.lng();
 								show_google_map(lat, lng, 16, true);
 								google_map.marker_address = results[0].formatted_address;
+								$('#pwtc-mapdb-edit-ride-div input[name="location-address"]').val(google_map.marker_address);
 								$('#pwtc-mapdb-edit-ride-div .accept-location-div').show();
 							}
 						}
