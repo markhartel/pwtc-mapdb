@@ -27,22 +27,23 @@ function pwtc_mapdb_get_signup() {
         $result['ride_signup_url'] = false;
     }
     else {
+        $instruction_link = 'For more information on how to sign up online, click <a href="/online-signup-instructions-2" target="_blank" rel="noopener noreferrer">here</a>.';
         if ($current_user->ID != 0) {
             $result['ride_signup_url'] = '/ride-online-signup/?post='.$postid;
             if ($signup_mode == 'paperless') {
-                $result['ride_signup_msg'] = 'You <em>must</em> sign up online to attend this ride.';
+                $result['ride_signup_msg'] = 'You <em>must</em> sign up online to attend this ride. ' . $instruction_link;
             }
             else {
-                $result['ride_signup_msg'] = 'Online sign up is available for this ride.';
+                $result['ride_signup_msg'] = 'Online sign up is available for this ride. ' . $instruction_link;
             }
         }
         else if (!$members_only) {
             $result['ride_signup_url'] = '/ride-nonmember-signup/?post='.$postid;
             if ($signup_mode == 'paperless') {
-                $result['ride_signup_msg'] = 'You <em>must</em> sign up online to attend this ride.';
+                $result['ride_signup_msg'] = 'You <em>must</em> sign up online to attend this ride. ' . $instruction_link;
             }
             else {
-                $result['ride_signup_msg'] = 'Online sign up is available for this ride.';
+                $result['ride_signup_msg'] = 'Online sign up is available for this ride. ' . $instruction_link;
             }
         }
         else {
