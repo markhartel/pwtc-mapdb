@@ -2478,9 +2478,10 @@ class PwtcMapdb {
 			$ride_datetime = self::get_ride_start_time($postid);
 			if ($copy_ride) {
 				$ride_time = $ride_datetime->format('H:i');
-				$ride_datetime = self::get_current_date();
-				$ride_datetime->add($interval);
-				$ride_date = $ride_datetime->format('Y-m-d');
+				//$ride_datetime = self::get_current_date();
+				//$ride_datetime->add($interval);
+				//$ride_date = $ride_datetime->format('Y-m-d');
+				$ride_date = '';
 				$edit_date = true;	
 			}
 			else {
@@ -2504,9 +2505,12 @@ class PwtcMapdb {
 		else {
 			$ride_datetime = self::get_current_time();
 			$ride_datetime->add($interval);
-			$ride_date = $ride_datetime->format('Y-m-d');
-			$ride_time = '10:00';
-			$min_date = $ride_date;
+			//$ride_date = $ride_datetime->format('Y-m-d');
+			//$ride_time = '10:00';
+			//$min_date = $ride_date;
+			$ride_date = '';
+			$ride_time = '';
+			$min_date = $ride_datetime->format('Y-m-d');			
 			$edit_date = true;
 		}
 		
@@ -2993,6 +2997,16 @@ class PwtcMapdb {
 				
 				var date = $('#pwtc-mapdb-edit-ride-div input[name="ride_date"]').val().trim();
 				var time = $('#pwtc-mapdb-edit-ride-div input[name="ride_time"]').val().trim();
+				if (date.length == 0) {
+					show_warning('The <strong>ride date</strong> must be set.');
+					evt.preventDefault();
+					return;
+				}
+				if (time.length == 0) {
+					show_warning('The <strong>departure time</strong> must be set.');
+					evt.preventDefault();
+					return;			
+				}
 				var datergx = /^\d{4}-\d{2}-\d{2}$/;
 				var timergx = /^\d{2}:\d{2}$/;
 				if (!datergx.test(date)) {
