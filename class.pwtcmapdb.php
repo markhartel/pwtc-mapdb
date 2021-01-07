@@ -2090,7 +2090,7 @@ class PwtcMapdb {
 		<div class="row column clearfix">
 			<div class="button-group float-left">
 				<a class="refresh-page dark button">Refresh</a>
-				<a href="/ride-edit-fields" class="dark button" target="_blank">New Ride</a>
+				<a href="/ride-edit-fields" class="dark button" target="_blank" rel="opener">New Ride</a>
 			</div>
 		</div>
 		<ul class="accordion" data-accordion data-allow-all-closed="true">
