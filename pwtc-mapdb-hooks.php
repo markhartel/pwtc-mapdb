@@ -1,6 +1,16 @@
 <?php
 
 function pwtc_mapdb_get_signup() {
+    $disable = false;
+    if ($disable) {
+        $result['view_signup_url'] = false;
+        $result['edit_ride_url'] = false;
+        $result['copy_ride_url'] = false;
+        $result['ride_signup_msg'] = false;
+        $result['ride_signup_url'] = false;
+        return $result;
+    }
+
     $current_user = wp_get_current_user();
     $now = PwtcMapdb::get_current_time();
     $postid = get_the_ID();
