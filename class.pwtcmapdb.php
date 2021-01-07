@@ -684,9 +684,7 @@ class PwtcMapdb {
 		if (in_array(self::ROLE_EXPIRED_MEMBER, (array) $current_user->roles)) {
 			$expired = true;
 		}
-		
-		//self::init_online_signup($postid);
-		
+				
 		$ride_signup_mode = self::get_signup_mode($postid);
 
 		$ride_signup_cutoff = self::get_signup_cutoff($postid);
@@ -721,13 +719,14 @@ class PwtcMapdb {
 		}
 
 		if (isset($_POST['accept_user_signup'])) {
-			self::delete_all_signups($postid, $current_user->ID);
-			$value = json_encode(array('userid' => $current_user->ID, 'mileage' => ''.$mileage, 'attended' => true));
-			add_post_meta($postid, self::RIDE_SIGNUP_USERID, $value);
-		}
-
-		if (isset($_POST['cancel_user_signup'])) {
-			self::delete_all_signups($postid, $current_user->ID);
+			if ($_POST['accept_user_signup'] == 'yes') {
+				self::delete_all_signups($postid, $current_user->ID);
+				$value = json_encode(array('userid' => $current_user->ID, 'mileage' => ''.$mileage, 'attended' => true));
+				add_post_meta($postid, self::RIDE_SIGNUP_USERID, $value);
+			}
+			else {
+				self::delete_all_signups($postid, $current_user->ID);
+			}
 		}
 
 		if (isset($_POST['contact_phone'])) {
@@ -772,6 +771,13 @@ class PwtcMapdb {
 		$contact_name = get_field(self::USER_EMER_NAME, 'user_'.$current_user->ID);
 		$release_accepted = get_field(self::USER_RELEASE_ACCEPTED, 'user_'.$current_user->ID);
 
+		if (isset($_POST['accept_user_signup'])) {
+			wp_redirect(add_query_arg(array(
+				'post' => $postid
+			), get_permalink()), 303);
+			exit;
+		}
+
 		ob_start();
 	?>
 	<script type="text/javascript">
@@ -791,10 +797,12 @@ class PwtcMapdb {
 					}
 					else {
 						show_waiting();
+						$('#pwtc-mapdb-rider-signup-div button[type="submit"]').prop('disabled',true);
 					}
 				});
 				<?php } else { ?>
 				show_waiting();
+				$('#pwtc-mapdb-rider-signup-div button[type="submit"]').prop('disabled',true);
 				<?php } ?>
      			});
 
@@ -856,7 +864,7 @@ class PwtcMapdb {
 				<form method="POST">
 					<div class="row column errmsg"></div>
 					<div class="row column clearfix">
-						<input type="hidden" name="cancel_user_signup" value="yes"/>
+						<input type="hidden" name="accept_user_signup" value="no"/>
 						<button class="dark button float-left" type="submit"><i class="fa fa-user-times"></i> Cancel Sign-up</button>
 						<a href="<?php echo $ride_link; ?>" class="dark button float-right"><i class="fa fa-chevron-left"></i> Back to Ride</a>
 					</div>
