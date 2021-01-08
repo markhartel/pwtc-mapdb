@@ -938,9 +938,7 @@ class PwtcMapdb {
 			delete_post_meta($postid, self::RIDE_SIGNUP_MEMBERS_ONLY);
 			add_post_meta($postid, self::RIDE_SIGNUP_MEMBERS_ONLY, $_POST['signup_members_only'] == 'yes', true);
 		}
-		
-		//self::init_online_signup($postid);
-		
+				
 		$ride_signup_mode = self::get_signup_mode($postid);
 
 		$ride_signup_cutoff = self::get_signup_cutoff($postid);
@@ -967,10 +965,12 @@ class PwtcMapdb {
 			$nonmember_signup_list = get_post_meta($postid, self::RIDE_SIGNUP_NONMEMBER);
 
 			if (isset($_POST['lock_signup'])) {
-				add_post_meta($postid, self::RIDE_SIGNUP_LOCKED, true, true);
-			}
-			else if (isset($_POST['unlock_signup'])) {
-				delete_post_meta( $postid, self::RIDE_SIGNUP_LOCKED);
+				if ($_POST['lock_signup'] == 'yes') {
+					add_post_meta($postid, self::RIDE_SIGNUP_LOCKED, true, true);
+				}
+				else {
+					delete_post_meta( $postid, self::RIDE_SIGNUP_LOCKED);
+				}
 			}
 			$signup_locked = self::get_signup_locked($postid);
 			if ($signup_locked) {
@@ -981,6 +981,13 @@ class PwtcMapdb {
 			$cutoff_units = '(hours)';
 		}
 		
+		if (isset($_POST['lock_signup']) or isset($_POST['ride_signup_mode'])) {
+			wp_redirect(add_query_arg(array(
+				'post' => $postid
+			), get_permalink()), 303);
+			exit;
+		}
+
 		ob_start();
 	?>
 
@@ -1315,7 +1322,10 @@ class PwtcMapdb {
 				$.post(action, data, log_mileage_cb);
 				show_errmsg2_wait();
 			});
-		
+	
+			$('#pwtc-mapdb-view-signup-div .download_sheet').on('click', function(evt) {
+				$('#pwtc-mapdb-view-signup-div .download-frm').submit();
+			});
 		
 			<?php if ($paperless and !$signup_locked) { ?>
 			$('#pwtc-mapdb-view-signup-div .show_more').on('click', function(evt) {
@@ -1346,6 +1356,12 @@ class PwtcMapdb {
 
 			$('#pwtc-mapdb-view-signup-div .accordion form').on('submit', function(evt) {
 				show_errmsg3_wait();
+				$('#pwtc-mapdb-view-signup-div button[type="submit"]').prop('disabled',true);
+     			});
+
+			$('#pwtc-mapdb-view-signup-div .action-btns form').on('submit', function(evt) {
+				show_errmsg2_wait();
+				$('#pwtc-mapdb-view-signup-div button[type="submit"]').prop('disabled',true);
      			});
 
 		});
@@ -1387,7 +1403,7 @@ class PwtcMapdb {
 						</div>
 						<div class="row column errmsg3"></div>
 						<div class="row column clearfix">
-							<input class="accent button float-left" type="submit" value="Submit"/>
+							<button class="accent button float-left" type="submit">Submit</button>
 						</div>
 					</form>
 				</div>
@@ -1483,25 +1499,30 @@ class PwtcMapdb {
 			<?php } ?>
 		<?php } ?>
 		<div class="errmsg2"></div>
-		<div class="row column clearfix">
+		<div class="row column clearfix action-btns">
 			<form method="POST">
 		<?php if ($signup_locked) { ?>
 				<div class="button-group float-left">
 			<?php if ($paperless) { ?>
 				<a class="log_mileage dark button"><i class="fa fa-bicycle"></i> Log Mileage</a>
 			<?php } else { ?>
-				<input type="hidden" name="ride_id" value="<?php echo $postid; ?>"/>
-				<input type="hidden" name="unused_rows" value="<?php echo $unused_rows; ?>"/>
-				<button class="dark button" type="submit" name="pwtc_mapdb_download_signup"><i class="fa fa-download"></i> Sign-in Sheet</button>
+				<a class="download_sheet dark button"><i class="fa fa-download"></i> Sign-in Sheet</a>
 			<?php } ?>
-				<button class="dark button" type="submit" name="unlock_signup"><i class="fa fa-unlock"></i> Reopen Sign-up</button>
+				<input type="hidden" name="lock_signup" value="no"/>
+				<button class="dark button" type="submit"><i class="fa fa-unlock"></i> Reopen Sign-up</button>
 				</div>
 		<?php } else { ?>
-				<button class="dark button float-left" type="submit" name="lock_signup" <?php echo $now_date < $cutoff_date ? 'disabled': ''; ?>><i class="fa fa-lock"></i> Close Sign-up</button>
+				<input type="hidden" name="lock_signup" value="yes"/>
+				<button class="dark button float-left" type="submit" <?php echo $now_date < $cutoff_date ? 'disabled': ''; ?>><i class="fa fa-lock"></i> Close Sign-up</button>
 		<?php } ?>
 				<a href="<?php echo $ride_link; ?>" class="dark button float-right"><i class="fa fa-chevron-left"></i> Back to Ride</a>
 			</form>
 		</div>
+		<form class="download-frm" method="POST">
+			<input type="hidden" name="pwtc_mapdb_download_signup" value="yes"/>
+			<input type="hidden" name="ride_id" value="<?php echo $postid; ?>"/>
+			<input type="hidden" name="unused_rows" value="<?php echo $unused_rows; ?>"/>
+		</form>
 		<?php } ?>
 	</div>
 	<?php
