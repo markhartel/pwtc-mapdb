@@ -2,6 +2,7 @@
 
 function pwtc_mapdb_get_signup() {
     $disable = false;
+    $disable_nonmembers = false;
     if ($disable) {
         $result['view_signup_url'] = false;
         $result['edit_ride_url'] = false;
@@ -10,7 +11,6 @@ function pwtc_mapdb_get_signup() {
         $result['ride_signup_url'] = false;
         return $result;
     }
-
     $current_user = wp_get_current_user();
     $now = PwtcMapdb::get_current_time();
     $postid = get_the_ID();
@@ -48,12 +48,18 @@ function pwtc_mapdb_get_signup() {
             }
         }
         else if (!$members_only) {
-            $result['ride_signup_url'] = '/ride-nonmember-signup/?post='.$postid;
-            if ($signup_mode == 'paperless') {
-                $result['ride_signup_msg'] = 'You <em>must</em> sign up online to attend this ride.';
+            if ($disable_nonmembers) {
+                $result['ride_signup_msg'] = false;
+                $result['ride_signup_url'] = false;        
             }
             else {
-                $result['ride_signup_msg'] = 'Online sign up is available for this ride.';
+                $result['ride_signup_url'] = '/ride-online-nonmember-signup/?post='.$postid;
+                if ($signup_mode == 'paperless') {
+                    $result['ride_signup_msg'] = 'You <em>must</em> sign up online to attend this ride.';
+                }
+                else {
+                    $result['ride_signup_msg'] = 'Online sign up is available for this ride.';
+                }
             }
         }
         else {
