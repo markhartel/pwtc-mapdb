@@ -1900,6 +1900,11 @@ class PwtcMapdb {
 			delete_post_meta($postid, self::RIDE_SIGNUP_CUTOFF);
 			delete_post_meta($postid, self::RIDE_SIGNUP_LIMIT);
 			delete_post_meta($postid, self::RIDE_SIGNUP_MEMBERS_ONLY);
+			
+			wp_redirect(add_query_arg(array(
+				'post' => $postid
+			), get_permalink()), 303);
+			exit;
 		}
 
 		ob_start();
@@ -1915,6 +1920,10 @@ class PwtcMapdb {
 				$('#pwtc-mapdb-reset-signups-div .reset-signup-confirm').hide();
 				$('#pwtc-mapdb-reset-signups-div .reset-signup').show();
 			});
+			
+			$('#pwtc-mapdb-reset-signups-div form').on('submit', function(evt) {
+				$('#pwtc-mapdb-reset-signups-div button[type="submit"]').prop('disabled',true);
+			});
 
 			$('#pwtc-mapdb-reset-signups-div .reset-signup-confirm').hide();
 			$('#pwtc-mapdb-reset-signups-div .reset-signup').show();
@@ -1928,10 +1937,12 @@ class PwtcMapdb {
 					<form method="POST">
 						<div class="row column">
 							<div class="reset-signup callout small">To remove all of the riders currently signed-up for this ride, press the remove button below. This will also reset the ride to not allow sign-ups.</div>
-							<div class="reset-signup-confirm callout small alert">Warning: this action will remove all of the riders currently signed-up for this ride! Do you really want to do this?</div>						</div>
+							<div class="reset-signup-confirm callout small alert">Warning: this action will remove all of the riders currently signed-up for this ride! Do you really want to do this?</div>
+						</div>
 						<div class="row column clearfix">
 							<a class="reset-signup dark button float-left">Remove Sign-ups</a>
-							<input class="reset-signup-confirm accent button float-left" type="submit" name="reset_ride_signups" value="OK"/>
+							<input type="hidden" name="reset_ride_signups" value="yes"/>
+							<button class="reset-signup-confirm accent button float-left" type="submit">OK</button>
 							<a class="reset-signup-confirm dark button float-right">Cancel</a>
 						</div>
 					</form>
