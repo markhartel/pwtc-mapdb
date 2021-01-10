@@ -2233,6 +2233,27 @@ class PwtcMapdb {
 		$a = shortcode_atts(array('leaders' => 'no'), $atts);
 		$allow_leaders = $a['leaders'] == 'yes';
 
+		if (isset($_GET['post']) and isset($_GET['deleted'])) {
+			if ($_GET['deleted'] == 'yes') {
+				ob_start();
+				?>
+<script type="text/javascript">
+	jQuery(document).ready(function($) { 
+		var opener_win = window.opener;
+		if (opener_win) {
+			$('#pwtc-mapdb-manage-rides-div form', opener_win.document).submit();
+		}
+	});
+</script>
+<div class="callout small success"><p>Ride has been successfully deleted. You may now close this page.</p></div>
+				<?php
+				return ob_get_clean();
+			}
+			else {
+				return '<div class="callout small alert"><p>Failed to delete ride. You may now close this page.</p></div>';
+			}
+		}
+		
 		$error = self::check_post_id();
 		if (!empty($error)) {
 			return $error;
@@ -2276,23 +2297,18 @@ class PwtcMapdb {
 
 		if (isset($_POST['delete_ride'])) {
 			if (wp_trash_post($postid)) {
-				ob_start();
-				?>
-	<script type="text/javascript">
-		jQuery(document).ready(function($) { 
-			var opener_win = window.opener;
-			if (opener_win) {
-				$('#pwtc-mapdb-manage-rides-div form', opener_win.document).submit();
-			}
-		});
-	</script>
-	<div class="callout small success"><p>Ride "<?php echo $ride_title; ?>" has been successfully deleted. You may now close this page.</p></div>
-				<?php
-				return ob_get_clean();
+				wp_redirect(add_query_arg(array(
+					'post' => $postid,
+					'deleted' => 'yes'
+				), get_permalink()), 303);
 			}
 			else {
-				return '<div class="callout small alert"><p>Failed to delete ride "' . $ride_title . '."</p></div>';
+				wp_redirect(add_query_arg(array(
+					'post' => $postid,
+					'deleted' => 'no'
+				), get_permalink()), 303);
 			}
+			exit;
 		}
 
 		ob_start();
