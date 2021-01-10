@@ -2047,33 +2047,41 @@ class PwtcMapdb {
 			$is_captain = true;
 		}
 
-
-		$now = self::get_current_time();
-		$later = self::get_current_date();
-		$interval = new DateInterval('P14D');
-		$later->add($interval);
+		if (isset($_POST['ride_title']) and isset($_POST['ride_month'])) {
+			wp_redirect(add_query_arg(array(
+				'month' => $_POST['ride_month'],
+				'title' => urlencode(trim($_POST['ride_title']))
+			), get_permalink()), 303);
+			exit;
+		}
 		
-		if (isset($_POST['ride_title'])) {
-			$ride_title = trim($_POST['ride_title']);
+		if (isset($_GET['title'])) {
+			$ride_title = $_GET['title'];
 		}
 		else {
 			$ride_title = '';
 		}
 
-		if (isset($_POST['ride_month'])) {
-			$timezone = new DateTimeZone(pwtc_get_timezone_string());
-			$this_month = DateTime::createFromFormat('Y-m-d H:i:s', $_POST['ride_month'].'-15 00:00:00', $timezone);
-			$next_month = DateTime::createFromFormat('Y-m-d H:i:s', $_POST['ride_month'].'-15 00:00:00', $timezone);
+		$timezone = new DateTimeZone(pwtc_get_timezone_string());
+		$interval = new DateInterval('P1M');
+		if (isset($_GET['month'])) {
+			$this_month = DateTime::createFromFormat('Y-m-d H:i:s', $_GET['month'].'-01 00:00:00', $timezone);
+			$next_month = DateTime::createFromFormat('Y-m-d H:i:s', $_GET['month'].'-01 00:00:00', $timezone);
+			$next_month->add($interval);
 		}
 		else {
-			$this_month = self::get_current_time();
-			$next_month = self::get_current_time();
+			$this_month = self::get_current_date();
+			$next_month = self::get_current_date();
+			$next_month->add($interval);
 		}
+
+		$now = self::get_current_time();
+		$later = self::get_current_date();
+		$interval = new DateInterval('P14D');
+		$later->add($interval);
 
 		$ride_month = $this_month->format('Y-m');
 		$reset_month = $now->format('Y-m');
-		$interval = new DateInterval('P1M');
-		$next_month->add($interval);
 		$query_args = [
 			'posts_per_page' => -1,
 			'post_status' => 'publish',
@@ -2103,6 +2111,10 @@ class PwtcMapdb {
 			function show_warning(msg) {
 				$('#pwtc-mapdb-manage-rides-div .errmsg').html('<div class="callout small warning"><p>' + msg + '</p></div>');
 			}
+			
+			function show_waiting() {
+				$('#pwtc-mapdb-manage-rides-div .errmsg').html('<div class="callout small"><i class="fa fa-spinner fa-pulse waiting"></i> please wait...</div>');
+			}
 
 			$('#pwtc-mapdb-manage-rides-div form').on('submit', function(evt) {
 				var month = $('#pwtc-mapdb-manage-rides-div input[name="ride_month"]').val().trim();
@@ -2112,6 +2124,8 @@ class PwtcMapdb {
 					evt.preventDefault();
 					return;
 				}
+				show_waiting();
+				$('#pwtc-mapdb-manage-rides-div button[type="submit"]').prop('disabled',true);
 			});
 			
 			$('#pwtc-mapdb-manage-rides-div form a').on('click', function(evt) {
@@ -2120,16 +2134,11 @@ class PwtcMapdb {
 				$('#pwtc-mapdb-manage-rides-div form').submit();
 			});
 			
-			$('#pwtc-mapdb-manage-rides-div a.refresh-page').on('click', function(evt) {
-				$('#pwtc-mapdb-manage-rides-div form').submit();
-			});
-
 		});
 	</script>			
 	<div id="pwtc-mapdb-manage-rides-div">
 		<div class="row column clearfix">
 			<div class="button-group float-left">
-				<a class="refresh-page dark button">Refresh</a>
 				<a href="/ride-edit-fields" class="dark button" target="_blank" rel="opener">New Ride</a>
 			</div>
 		</div>
@@ -2152,7 +2161,7 @@ class PwtcMapdb {
 						</div>
 						<div class="row column errmsg"></div>
 						<div class="row column clearfix">
-							<input class="accent button float-left" type="submit" value="Submit"/>
+							<button class="accent button float-left" type="submit">Submit</button>
 							<a class="dark button float-right">Reset</a>
 						</div>
 					</form>
