@@ -3,6 +3,7 @@
 function pwtc_mapdb_get_signup() {
     $disable = false;
     $disable_nonmembers = false;
+    $disable_edit = false;
     if ($disable) {
         $result['view_signup_url'] = false;
         $result['edit_ride_url'] = false;
@@ -20,18 +21,26 @@ function pwtc_mapdb_get_signup() {
     $start = PwtcMapdb::get_ride_start_time($postid);
 
     $result['view_signup_url'] = '/ride-view-signups/?post='.$postid;
-    if ($start > $now) {
-        $result['edit_ride_url'] = '/ride-edit-fields/?post='.$postid.'&return=yes';
-    }
-    else {
+    
+    if ($disable_edit) {
         $result['edit_ride_url'] = false;
-    }
-    if (user_can($current_user,'edit_published_rides')) {
-        $result['copy_ride_url'] = '/ride-edit-fields/?post='.$postid.'&action=copy&return=yes';
-    }
-    else {
         $result['copy_ride_url'] = false;
     }
+    else {
+        if ($start > $now) {
+            $result['edit_ride_url'] = '/ride-edit-fields/?post='.$postid.'&return=yes';
+        }
+        else {
+            $result['edit_ride_url'] = false;
+        }
+        if (user_can($current_user,'edit_published_rides')) {
+            $result['copy_ride_url'] = '/ride-edit-fields/?post='.$postid.'&action=copy&return=yes';
+        }
+        else {
+            $result['copy_ride_url'] = false;
+        }
+    }
+    
     if ($signup_mode == 'no' or $signup_locked) {
         $result['ride_signup_msg'] = false;
         $result['ride_signup_url'] = false;
