@@ -2395,9 +2395,20 @@ class PwtcMapdb {
 		
 		$page_title = self::create_page_title($copy_ride, $postid);
 		
+		if (isset($_GET['op']) and isset($_GET['success'])) {
+			if ($_GET['success'] == 'no') {
+				if ($_GET['op'] == 'insert') {
+					return $page_title . '<div class="callout small alert"><p>Failed to create new scheduled ride. ' . $return_to_ride . '</p></div>';
+				}
+				else {
+					return $page_title . '<div class="callout small alert"><p>Failed to update scheduled ride. ' . $return_to_ride . '</p></div>';
+				}
+			}
+		}
+		
 		$current_user = wp_get_current_user();
 		if ( 0 == $current_user->ID ) {
-			return $page_title . '<div class="callout small warning"><p>You must be logged in to edit rides.</p></div>';
+			return $page_title . '<div class="callout small warning"><p>You must be logged in to edit rides. ' . $return_to_ride . '</p></div>';
 		}
 		
 		$user_info = get_userdata($current_user->ID);
@@ -2440,7 +2451,8 @@ class PwtcMapdb {
 		
 		$road_captain = user_can($current_user,'edit_published_rides');
 
-		$message = '';
+		$success = '';
+		$operation = '';
 		$new_post = false;
 		if (isset($_POST['title'])) {
 			if ($postid != 0) {
@@ -2448,12 +2460,20 @@ class PwtcMapdb {
 					'ID' => $postid,
 					'post_title' => esc_html(trim($_POST['title']))
 				);
+				$operation = 'update';
 				$status = wp_update_post( $my_post );	
 				if ($status != $postid) {
-					return $page_title . '<div class="callout small alert"><p>Failed to update scheduled ride (post ID ' . $postid . '.)</p></div>';
+					$success = 'no';
+					wp_redirect(add_query_arg(array(
+						'post' => $postid,
+						'return' => $return ? 'yes':'no',
+						'op' => $operation,
+						'success' => $success
+					), get_permalink()), 303);
+					exit;
 				}
 				else {
-					$message = 'You have successfully updated the scheduled ride (post ID ' . $postid . '.)';
+					$success = 'yes';
 				}
 			}
 			else {
@@ -2462,12 +2482,30 @@ class PwtcMapdb {
 					'post_type'     => self::POST_TYPE_RIDE,
 					'post_status'   => 'publish'
 				);
+				$operation = 'insert';
 				$postid = wp_insert_post( $my_post );
 				if ($postid == 0) {
-					return $page_title . '<div class="callout small alert"><p>Failed to create new scheduled ride.</p></div>';
+					$success = 'no';
+					if (isset($_GET['post'])) {
+						wp_redirect(add_query_arg(array(
+							'post' => $_GET['post'],
+							'action' => 'copy',
+							'return' => $return ? 'yes':'no',
+							'op' => $operation,
+							'success' => $success
+						), get_permalink()), 303);
+					}
+					else {
+						wp_redirect(add_query_arg(array(
+							'return' => $return ? 'yes':'no',
+							'op' => $operation,
+							'success' => $success
+						), get_permalink()), 303);
+					}
+					exit;
 				}
 				else {
-					$message = 'You have successfully created a new scheduled ride (post ID ' . $postid . '.)';
+					$success = 'yes';
 				}
 				$new_post = true;
 				$ride_title = esc_html(get_the_title($postid));
@@ -2726,6 +2764,21 @@ class PwtcMapdb {
 			$ride_terrain = [];
 			$maps_obj = [];
 			$maps = [];
+		}
+		
+		if (isset($_POST['postid'])) {
+			wp_redirect(add_query_arg(array(
+				'post' => $postid,
+				'return' => $return ? 'yes':'no',
+				'op' => $operation,
+				'success' => $success
+			), get_permalink()), 303);
+			exit;
+		}
+
+		if (isset($_GET['op']) and isset($_GET['success'])) {
+			$operation = $_GET['op'];
+			$success = $_GET['success'];
 		}
 		
 		if ($copy_ride) {
@@ -3380,7 +3433,7 @@ class PwtcMapdb {
 		    
 			var is_dirty = false;
 			
-		<?php if ($message and !$return) { ?>
+		<?php if ($success == 'yes' and !$return) { ?>
 			var opener_win = window.opener;
 			if (opener_win) {
 				$('#pwtc-mapdb-manage-rides-div form', opener_win.document).submit();
@@ -3391,8 +3444,14 @@ class PwtcMapdb {
 	</script>
 	<div id='pwtc-mapdb-edit-ride-div'>
 		<?php echo self::create_page_title($copy_ride, $postid); ?>
-		<?php if ($message) { ?>
-		<div class="callout small success"><p><?php echo $message.' '.$return_to_ride; ?></p></div>
+		<?php if ($success == 'yes') { ?>
+		<div class="callout small success">
+			<?php if ($operation == 'update') { ?>
+			<p>You have successfully updated the scheduled ride. <?php echo $return_to_ride; ?></p>
+			<?php } else if ($operation == 'insert') { ?>
+			<p>You have successfully created a new scheduled ride. <?php echo $return_to_ride; ?></p>
+			<?php } ?>
+		</div>
 		<?php } ?>
 		<div class="callout">
 			<form method="POST">
