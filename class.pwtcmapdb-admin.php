@@ -83,13 +83,25 @@ class PwtcMapdb_Admin {
                     }
                 endif;
 
+                $exclude_list = [];
+                if ($post->post_type == 'scheduled_rides') {
+                    $exclude_list[] = PwtcMapdb::RIDE_SIGNUP_LOCKED;
+                    $exclude_list[] = PwtcMapdb::RIDE_SIGNUP_USERID;
+                    $exclude_list[] = PwtcMapdb::RIDE_SIGNUP_NONMEMBER;
+                    $exclude_list[] = PwtcMapdb::RIDE_SIGNUP_MODE;
+                    $exclude_list[] = PwtcMapdb::RIDE_SIGNUP_CUTOFF;
+                    $exclude_list[] = PwtcMapdb::RIDE_SIGNUP_LIMIT;
+                    $exclude_list[] = PwtcMapdb::RIDE_SIGNUP_MEMBERS_ONLY;
+                }
                 $post_meta_infos = $wpdb->get_results("SELECT meta_key, meta_value FROM $wpdb->postmeta WHERE post_id=$post_id");
                 if (count($post_meta_infos)!=0) {
                     $sql_query = "INSERT INTO $wpdb->postmeta (post_id, meta_key, meta_value) ";
                     foreach ($post_meta_infos as $meta_info) {
                         $meta_key = sanitize_text_field($meta_info->meta_key);
-                        $meta_value = addslashes($meta_info->meta_value);
-                        $sql_query_sel[]= "SELECT $new_post_id, '$meta_key', '$meta_value'";
+			if (!in_array($meta_key, $exclude_list)) {
+                        	$meta_value = addslashes($meta_info->meta_value);
+                        	$sql_query_sel[]= "SELECT $new_post_id, '$meta_key', '$meta_value'";
+			}
                     }
                     $sql_query.= implode(" UNION ALL ", $sql_query_sel);
                     $wpdb->query($sql_query);
