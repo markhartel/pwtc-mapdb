@@ -26,3 +26,8 @@ require_once( PWTC_MAPDB__PLUGIN_DIR . 'pwtc-mapdb-hooks.php' );
 require_once( PWTC_MAPDB__PLUGIN_DIR . 'class.pwtcmapdb.php' );
 
 add_action( 'init', array( 'PwtcMapdb', 'init' ) );
+
+if ( is_admin() ) {
+	require_once( PWTC_MAPDB__PLUGIN_DIR . 'class.pwtcmapdb-admin.php' );
+	add_action( 'init', array( 'PwtcMapdb_Admin', 'init' ) );
+}
