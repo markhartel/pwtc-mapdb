@@ -3,10 +3,10 @@
 class PwtcMapdb_Admin {
     private static $initiated = false;
 
-	public static function init() {
-		if ( ! self::$initiated ) {
-			self::init_hooks();
-		}
+    public static function init() {
+	if ( ! self::$initiated ) {
+		self::init_hooks();
+	}
     }
     
     // Initializes plugin WordPress hooks.
