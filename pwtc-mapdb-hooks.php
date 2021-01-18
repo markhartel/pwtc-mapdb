@@ -2,8 +2,8 @@
 
 function pwtc_mapdb_get_signup() {
     $disable = false;
-    $disable_nonmembers = false;
-    $disable_edit = false;
+    $disable_nonmembers = true;
+    $disable_edit = true;
     if ($disable) {
         $result['view_signup_url'] = false;
         $result['edit_ride_url'] = false;
@@ -58,7 +58,7 @@ function pwtc_mapdb_get_signup() {
         }
         else if (!$members_only) {
             if ($disable_nonmembers) {
-                $result['ride_signup_msg'] = false;
+                $result['ride_signup_msg'] = 'Online sign up is available for this ride. Members must first log in <a href="/wp-login.php">here</a> to sign up.';
                 $result['ride_signup_url'] = false;        
             }
             else {
