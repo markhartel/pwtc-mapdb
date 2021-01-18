@@ -2398,6 +2398,14 @@ class PwtcMapdb {
 			exit;
 		}
 
+		$lock_user = self::check_post_lock($postid);
+		if ($lock_user) {
+			$info = get_userdata($lock_user);
+			$name = $info->first_name . ' ' . $info->last_name;	
+			return '<div class="callout small warning"><p>Ride "' . $ride_title . '" is currently being edited by ' . $name . '.</p></div>';
+		}
+		self::set_post_lock($postid);
+		
 		ob_start();
 		?>
 	<script type="text/javascript">
@@ -2414,6 +2422,25 @@ class PwtcMapdb {
 
 			$('#pwtc-mapdb-delete-ride-div .delete-ride-confirm').hide();
 			$('#pwtc-mapdb-delete-ride-div .delete-ride').show();
+			
+			$(document).on( 'heartbeat-send', function( e, data ) {
+				var send = {};
+				send.post_id = '<?php echo $postid; ?>';
+				data['pwtc-refresh-post-lock'] = send;
+			});
+
+			$(document).on( 'heartbeat-tick', function( e, data ) {
+				if ( data['pwtc-refresh-post-lock'] ) {
+					var received = data['pwtc-refresh-post-lock'];
+					if ( received.lock_error ) {
+						$('#pwtc-mapdb-delete-ride-div').html('<div class="callout small alert">You cannot delete ride "<?php echo $ride_title; ?>" on <?php echo $ride_date; ?>. ' + received.lock_error.text + '</div>');
+					} 
+					else if ( received.new_lock ) {
+					}
+				}
+			});
+
+			wp.heartbeat.interval( 15 );
 		});
 	</script>
 	<div id="pwtc-mapdb-delete-ride-div">
