@@ -938,6 +938,25 @@ class PwtcMapdb {
 			delete_post_meta($postid, self::RIDE_SIGNUP_MEMBERS_ONLY);
 			add_post_meta($postid, self::RIDE_SIGNUP_MEMBERS_ONLY, $_POST['signup_members_only'] == 'yes', true);
 		}
+		
+		if (isset($_POST['signup_riderid'])) {
+			$riderid = trim($_POST['signup_riderid']);
+			if (!empty($riderid) and function_exists('pwtc_mileage_lookup_user')) {
+				$users = pwtc_mileage_lookup_user($riderid);
+				if (!empty($users)) {
+					$userid = $users[0]->ID;
+					$mileage = '';
+					if (isset($_POST['signup_rider_mileage'])) {
+						if (!empty(trim($_POST['signup_rider_mileage']))) {
+							$mileage = abs(intval($_POST['signup_rider_mileage']));
+						}
+					}
+					self::delete_all_signups($postid, $userid);
+					$value = json_encode(array('userid' => $userid, 'mileage' => ''.$mileage, 'attended' => true));
+					add_post_meta($postid, self::RIDE_SIGNUP_USERID, $value);
+				}
+			}
+		}
 				
 		$ride_signup_mode = self::get_signup_mode($postid);
 
@@ -981,7 +1000,7 @@ class PwtcMapdb {
 			$cutoff_units = '(hours)';
 		}
 		
-		if (isset($_POST['lock_signup']) or isset($_POST['ride_signup_mode'])) {
+		if (isset($_POST['lock_signup']) or isset($_POST['ride_signup_mode']) or isset($_POST['signup_riderid'])) {
 			wp_redirect(add_query_arg(array(
 				'post' => $postid
 			), get_permalink()), 303);
@@ -1039,6 +1058,10 @@ class PwtcMapdb {
 			
 			function show_errmsg3_wait() {
 				$('#pwtc-mapdb-view-signup-div .errmsg3').html('<div class="callout small"><i class="fa fa-spinner fa-pulse waiting"></i> please wait...</div>');
+			}
+			
+			function show_errmsg4_wait() {
+				$('#pwtc-mapdb-view-signup-div .errmsg4').html('<div class="callout small"><i class="fa fa-spinner fa-pulse waiting"></i> please wait...</div>');
 			}
 		
 		<?php if ($ride_signup_mode != 'no') { ?>
@@ -1341,7 +1364,7 @@ class PwtcMapdb {
 		
 		<?php } ?>
 		
-			$("#pwtc-mapdb-view-signup-div .accordion form select[name='ride_signup_mode']").change(function() {
+			$("#pwtc-mapdb-view-signup-div .signup-options-frm select[name='ride_signup_mode']").change(function() {
 				$(this).find('option:selected').each(function() {
 					var mode = $(this).val();
 					var label = '(hours)';
@@ -1353,8 +1376,13 @@ class PwtcMapdb {
 					$('#pwtc-mapdb-view-signup-div .cutoff_units').html(label);
 				});
 			});
+		
+			$('#pwtc-mapdb-view-signup-div .rider-signup-frm').on('submit', function(evt) {
+				show_errmsg4_wait();
+				$('#pwtc-mapdb-view-signup-div button[type="submit"]').prop('disabled',true);
+     			});
 
-			$('#pwtc-mapdb-view-signup-div .accordion form').on('submit', function(evt) {
+			$('#pwtc-mapdb-view-signup-div .signup-options-frm').on('submit', function(evt) {
 				show_errmsg3_wait();
 				$('#pwtc-mapdb-view-signup-div button[type="submit"]').prop('disabled',true);
      			});
@@ -1371,7 +1399,7 @@ class PwtcMapdb {
 			<li class="accordion-item" data-accordion-item>
             			<a href="#" class="accordion-title">Click Here For Sign-up Options</a>
             			<div class="accordion-content" data-tab-content>
-					<form method="POST">
+					<form class="signup-options-frm" method="POST">
 						<div class="row">
 							<div class="small-12 medium-4 columns">
 								<label>Online Ride Sign-up
@@ -1408,6 +1436,32 @@ class PwtcMapdb {
 					</form>
 				</div>
 			</li>
+		<?php if ($paperless and !$signup_locked) { ?>
+			<li class="accordion-item" data-accordion-item>
+            			<a href="#" class="accordion-title">Click Here to Sign-up a Rider</a>
+            			<div class="accordion-content" data-tab-content>
+					<form class="rider-signup-frm" method="POST">
+						<div class="row column help-text">Normally a rider would log in to their club member account to sign up for this ride. However, if they don't have access to a computer, the ride leader can do it for them here.</div>
+						<div class="row">
+							<div class="small-12 medium-4 columns">
+								<label>Rider ID
+									<input type="text" name="signup_riderid" value=""/>
+								</label>
+							</div>
+							<div class="small-12 medium-4 columns">
+								<label>Rider Mileage
+									<input type="number" name="signup_rider_mileage" value=""/>
+								</label>
+							</div>
+						</div>
+						<div class="row column errmsg4"></div>
+						<div class="row column clearfix">
+							<button class="accent button float-left" type="submit">Submit</button>
+						</div>
+					</form>
+				</div>
+			</li>
+		<?php } ?>
 		</ul>		
 		<?php if ($ride_signup_mode == 'no') { ?>
 			<div class="callout small"><p>Online sign up is not enabled for ride "<?php echo $ride_title; ?>." <?php echo $return_to_ride; ?></p></div>
