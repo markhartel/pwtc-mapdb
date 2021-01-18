@@ -92,11 +92,11 @@ class PwtcMapdb {
 		add_action( 'wp_enqueue_scripts', 
 			array( 'PwtcMapdb', 'load_report_scripts' ) );
 
-		add_action( 'wp_ajax_pwtc_mapdb_lookup_maps', 
-			array( 'PwtcMapdb', 'lookup_maps_callback') );
-		
 		add_action( 'template_redirect', 
 			array( 'PwtcMapdb', 'download_ride_signup' ) );
+		
+		add_filter( 'heartbeat_received', 
+			array( 'PwtcMapdb', 'refresh_post_lock'), 10, 3 );
 
 		// Register shortcode callbacks
 		add_shortcode('pwtc_search_mapdb', 
@@ -133,6 +133,9 @@ class PwtcMapdb {
 			array( 'PwtcMapdb', 'shortcode_reset_signups'));
 		
 		/* Register AJAX request/response callbacks */
+		
+		add_action( 'wp_ajax_pwtc_mapdb_lookup_maps', 
+			array( 'PwtcMapdb', 'lookup_maps_callback') );
 
 		add_action( 'wp_ajax_pwtc_mapdb_edit_signup', 
 			array( 'PwtcMapdb', 'edit_signup_callback') );
@@ -171,14 +174,44 @@ class PwtcMapdb {
 	/*************************************************************/
 
 	public static function load_report_scripts() {
-/*
-        wp_enqueue_style('pwtc_mapdb_report_css', 
-			PWTC_MAPDB__PLUGIN_URL . 'reports-style.css', array(),
-			filemtime(PWTC_MAPDB__PLUGIN_DIR . 'reports-style.css'));
-*/
+		if (strpos(get_the_permalink(), "ride-delete-page") !== false) {
+			wp_enqueue_script('heartbeat');
+		}
 		wp_enqueue_style('pwtc_mapdb_report_css', 
 			PWTC_MAPDB__PLUGIN_URL . 'reports-style-v2.css', array());
 
+	}
+	
+	public static function refresh_post_lock( $response, $data, $screen_id ) {
+		if ( array_key_exists( 'pwtc-refresh-post-lock', $data ) ) {
+			$received = $data['pwtc-refresh-post-lock'];
+			$send     = array();
+	
+			$post_id = absint( $received['post_id'] );
+			if ( ! $post_id ) {
+				return $response;
+			}
+		
+			$user_id = self::check_post_lock( $post_id );
+			$user    = get_userdata( $user_id );
+			if ( $user ) {
+				$name = $user->first_name . ' ' . $user->last_name;
+				$error = array(
+					'text' => sprintf('%s has taken over and is currently editing.', $name ),
+				);
+				$send['lock_error'] = $error;
+			} 
+			else {
+				$new_lock = self::set_post_lock( $post_id );
+				if ( $new_lock ) {
+					$send['new_lock'] = implode( ':', $new_lock );
+				}
+			}
+	
+			$response['pwtc-refresh-post-lock'] = $send;
+		}	
+
+		return $response;
 	}
 
 	/*************************************************************/
@@ -4297,6 +4330,52 @@ class PwtcMapdb {
 			$contact .= ' (' . $contact_name . ')';
 		}
 		return $contact;
+	}
+	
+	public static function set_post_lock( $post_id ) {
+		$post = get_post( $post_id );
+		if ( ! $post ) {
+			return false;
+		}
+	 
+		$user_id = get_current_user_id();
+		if ( 0 == $user_id ) {
+			return false;
+		}
+	 
+		$now  = time();
+		$lock = "$now:$user_id";
+	 
+		update_post_meta( $post->ID, '_edit_lock', $lock );
+	 
+		return array( $now, $user_id );
+	}
+
+	public static function check_post_lock( $post_id ) {
+		$post = get_post( $post_id );
+		if ( ! $post ) {
+			return false;
+		}
+	 
+		$lock = get_post_meta( $post->ID, '_edit_lock', true );
+		if ( ! $lock ) {
+			return false;
+		}
+	 
+		$lock = explode( ':', $lock );
+		$time = $lock[0];
+		$user = isset( $lock[1] ) ? $lock[1] : get_post_meta( $post->ID, '_edit_last', true );
+	 
+		if ( ! get_userdata( $user ) ) {
+			return false;
+		}
+	 
+		$time_window = 150;
+		if ( $time && $time > time() - $time_window && get_current_user_id() != $user ) {
+			return $user;
+		}
+	 
+		return false;
 	}
 
 	public static function get_release_waiver() {
