@@ -1438,6 +1438,21 @@ class PwtcMapdb {
 					show_errmsg4_warning('You must enter a Rider ID.');
 				}		
 			});
+		
+			$('#pwtc-mapdb-view-signup-div .rider-signup-frm').on('keypress', function(evt) {
+				var keyPressed = evt.keyCode || evt.which; 
+				if (keyPressed === 13) { 
+					evt.preventDefault(); 
+					return false; 
+				} 
+			});	
+
+			$('#pwtc-mapdb-view-signup-div .rider-signup-frm input[name="signup_riderid"]').on('keypress', function(evt) {
+				var keyPressed = evt.keyCode || evt.which; 
+				if (keyPressed === 13) { 
+					$('#pwtc-mapdb-view-signup-div .rider-signup-frm input[type="button"]').trigger( 'click');
+				} 
+			});
 
 			$('#pwtc-mapdb-view-signup-div .rider-signup-frm').on('submit', function(evt) {
 				show_errmsg4_wait();
@@ -1460,6 +1475,14 @@ class PwtcMapdb {
 					$('#pwtc-mapdb-view-signup-div .cutoff_units').html(label);
 				});
 			});
+		
+			$('#pwtc-mapdb-view-signup-div .signup-options-frm').on('keypress', function(evt) {
+				var keyPressed = evt.keyCode || evt.which; 
+				if (keyPressed === 13) { 
+					evt.preventDefault(); 
+					return false; 
+				} 
+			});	
 		
 			$('#pwtc-mapdb-view-signup-div .signup-options-frm').on('submit', function(evt) {
 				show_errmsg3_wait();
