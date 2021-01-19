@@ -158,6 +158,9 @@ class PwtcMapdb {
 		add_action( 'wp_ajax_pwtc_mapdb_cancel_nonmember_signup', 
 			array( 'PwtcMapdb', 'cancel_nonmember_signup_callback') );
 		
+		add_action( 'wp_ajax_pwtc_mapdb_lookup_riderid', 
+			array( 'PwtcMapdb', 'lookup_riderid_callback') );
+		
 		add_action( 'wp_ajax_nopriv_pwtc_mapdb_check_nonmember_signup', 
 			array( 'PwtcMapdb', 'check_nonmember_signup_callback') );
 
@@ -972,22 +975,18 @@ class PwtcMapdb {
 			add_post_meta($postid, self::RIDE_SIGNUP_MEMBERS_ONLY, $_POST['signup_members_only'] == 'yes', true);
 		}
 		
-		if (isset($_POST['signup_riderid'])) {
-			$riderid = trim($_POST['signup_riderid']);
-			if (!empty($riderid) and function_exists('pwtc_mileage_lookup_user')) {
-				$users = pwtc_mileage_lookup_user($riderid);
-				if (!empty($users)) {
-					$userid = $users[0]->ID;
-					$mileage = '';
-					if (isset($_POST['signup_rider_mileage'])) {
-						if (!empty(trim($_POST['signup_rider_mileage']))) {
-							$mileage = abs(intval($_POST['signup_rider_mileage']));
-						}
+		if (isset($_POST['signup_userid'])) {
+			$userid = intval($_POST['signup_userid']);
+			if ($userid != 0) {
+				$mileage = '';
+				if (isset($_POST['signup_rider_mileage'])) {
+					if (!empty(trim($_POST['signup_rider_mileage']))) {
+						$mileage = abs(intval($_POST['signup_rider_mileage']));
 					}
-					self::delete_all_signups($postid, $userid);
-					$value = json_encode(array('userid' => $userid, 'mileage' => ''.$mileage, 'attended' => true));
-					add_post_meta($postid, self::RIDE_SIGNUP_USERID, $value);
 				}
+				self::delete_all_signups($postid, $userid);
+				$value = json_encode(array('userid' => $userid, 'mileage' => ''.$mileage, 'attended' => true));
+				add_post_meta($postid, self::RIDE_SIGNUP_USERID, $value);
 			}
 		}
 				
@@ -1033,7 +1032,7 @@ class PwtcMapdb {
 			$cutoff_units = '(hours)';
 		}
 		
-		if (isset($_POST['lock_signup']) or isset($_POST['ride_signup_mode']) or isset($_POST['signup_riderid'])) {
+		if (isset($_POST['lock_signup']) or isset($_POST['ride_signup_mode']) or isset($_POST['signup_userid'])) {
 			wp_redirect(add_query_arg(array(
 				'post' => $postid
 			), get_permalink()), 303);
@@ -1091,10 +1090,6 @@ class PwtcMapdb {
 			
 			function show_errmsg3_wait() {
 				$('#pwtc-mapdb-view-signup-div .errmsg3').html('<div class="callout small"><i class="fa fa-spinner fa-pulse waiting"></i> please wait...</div>');
-			}
-			
-			function show_errmsg4_wait() {
-				$('#pwtc-mapdb-view-signup-div .errmsg4').html('<div class="callout small"><i class="fa fa-spinner fa-pulse waiting"></i> please wait...</div>');
 			}
 		
 		<?php if ($ride_signup_mode != 'no') { ?>
@@ -1384,6 +1379,7 @@ class PwtcMapdb {
 			});
 		
 			<?php if ($paperless and !$signup_locked) { ?>
+		
 			$('#pwtc-mapdb-view-signup-div .show_more').on('click', function(evt) {
 				$(this).hide();
 				$('#pwtc-mapdb-view-signup-div .more_details').show();
@@ -1393,6 +1389,61 @@ class PwtcMapdb {
 				$('#pwtc-mapdb-view-signup-div .more_details').hide();
 				$('#pwtc-mapdb-view-signup-div .show_more').show();
 			});
+		
+			function show_errmsg4_wait() {
+				$('#pwtc-mapdb-view-signup-div .errmsg4').html('<div class="callout small"><i class="fa fa-spinner fa-pulse waiting"></i> please wait...</div>');
+			}
+
+			function show_errmsg4_warning(msg) {
+				$('#pwtc-mapdb-view-signup-div .errmsg4').html('<div class="callout small warning">' + msg + '</div>');
+			}
+
+			function show_errmsg4_success(msg) {
+				$('#pwtc-mapdb-view-signup-div .errmsg4').html('<div class="callout small success">' + msg + '</div>');
+			}
+
+			function riderid_lookup_cb(response) {
+				var res;
+				try {
+					res = JSON.parse(response);
+				}
+				catch (e) {
+					show_errmsg4_warning(e.message);
+					$('#pwtc-mapdb-view-signup-div .rider-signup-frm button[type="submit"]').prop('disabled',true);
+					return;
+				}
+				if (res.error) {
+					$('#pwtc-mapdb-view-signup-div .rider-signup-frm button[type="submit"]').prop('disabled',true);
+					show_errmsg4_warning(res.error);
+				}
+				else {
+					$('#pwtc-mapdb-view-signup-div .rider-signup-frm input[name="signup_userid"]').val(res.userid);
+					show_errmsg4_success(res.name + ' found, press submit to sign up.');
+					$('#pwtc-mapdb-view-signup-div .rider-signup-frm button[type="submit"]').prop('disabled',false);
+				}
+			}
+
+			$('#pwtc-mapdb-view-signup-div .rider-signup-frm input[type="button"]').on('click', function(evt) {
+				var riderid = $('#pwtc-mapdb-view-signup-div .rider-signup-frm input[name="signup_riderid"]').val().trim();
+				if (riderid.length > 0) {
+					var action = "<?php echo admin_url('admin-ajax.php'); ?>";
+					var data = {
+						'action': 'pwtc_mapdb_lookup_riderid',
+						'riderid': riderid
+					};
+					$.post(action, data, riderid_lookup_cb);
+					show_errmsg4_wait();
+				}
+				else {
+					show_errmsg4_warning('You must enter a Rider ID.');
+				}		
+			});
+
+			$('#pwtc-mapdb-view-signup-div .rider-signup-frm').on('submit', function(evt) {
+				show_errmsg4_wait();
+				$('#pwtc-mapdb-view-signup-div button[type="submit"]').prop('disabled',true);
+     			});
+		
 			<?php } ?>
 		
 		<?php } ?>
@@ -1410,11 +1461,6 @@ class PwtcMapdb {
 				});
 			});
 		
-			$('#pwtc-mapdb-view-signup-div .rider-signup-frm').on('submit', function(evt) {
-				show_errmsg4_wait();
-				$('#pwtc-mapdb-view-signup-div button[type="submit"]').prop('disabled',true);
-     			});
-
 			$('#pwtc-mapdb-view-signup-div .signup-options-frm').on('submit', function(evt) {
 				show_errmsg3_wait();
 				$('#pwtc-mapdb-view-signup-div button[type="submit"]').prop('disabled',true);
@@ -1474,11 +1520,17 @@ class PwtcMapdb {
             			<a href="#" class="accordion-title">Click Here to Sign-up a Rider</a>
             			<div class="accordion-content" data-tab-content>
 					<form class="rider-signup-frm" method="POST">
+						<input type="hidden" name="signup_userid" value="0"/>
 						<div class="row column help-text">Normally a rider would log in to their club member account to sign up for this ride. However, if they don't have access to a computer, the ride leader can do it for them here.</div>
 						<div class="row">
 							<div class="small-12 medium-4 columns">
 								<label>Rider ID
-									<input type="text" name="signup_riderid" value=""/>
+									<div class="input-group">
+										<input class="input-group-field" type="text" name="signup_riderid" value="">
+										<div class="input-group-button">
+											<input class="dark button" type="button" value="Lookup"/>
+										</div>
+									</div>
 								</label>
 							</div>
 							<div class="small-12 medium-4 columns">
@@ -1489,7 +1541,7 @@ class PwtcMapdb {
 						</div>
 						<div class="row column errmsg4"></div>
 						<div class="row column clearfix">
-							<button class="accent button float-left" type="submit">Submit</button>
+							<button class="accent button float-left" type="submit" disabled>Submit</button>
 						</div>
 					</form>
 				</div>
@@ -4821,6 +4873,47 @@ EOT;
 		wp_die();
 	}
 
+	public static function lookup_riderid_callback() {
+		if (isset($_POST['riderid'])) {
+			$riderid = trim($_POST['riderid']);
+			if (function_exists('pwtc_mileage_lookup_user')) {
+				$users = pwtc_mileage_lookup_user($riderid);
+				if (!empty($users)) {
+					$userid = $users[0]->ID;
+					$info = get_userdata($userid);
+					if ($info) {
+						$name = $info->first_name . ' ' . $info->last_name;
+					}
+					else {
+						$name = 'Unknown';
+					}
+					$response = array(
+						'riderid' => $riderid,
+						'userid' => $userid,
+						'name' => $name
+					);
+				}
+				else {
+					$response = array(
+						'error' => 'Lookup failed, rider ID ' . $riderid . ' not found.'
+					);
+				}
+			}
+			else {
+				$response = array(
+					'error' => 'Lookup failed, PWTC Mileage plugin not installed.'
+				);
+			}
+		}
+		else {
+			$response = array(
+				'error' => 'Lookup failed, server post arguments missing.'
+			);		
+		}		
+		echo wp_json_encode($response);
+		wp_die();
+	}
+	
 	/*************************************************************/
 	/* Plugin installation and removal functions.
 	/*************************************************************/
