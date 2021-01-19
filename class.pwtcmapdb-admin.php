@@ -10,15 +10,16 @@ class PwtcMapdb_Admin {
     }
     
     // Initializes plugin WordPress hooks.
-	private static function init_hooks() {
+    private static function init_hooks() {
         self::$initiated = true;
         add_action('admin_action_pwtc_copy_post_as_draft', array('PwtcMapdb_Admin', 'copy_post_as_draft'));
         add_filter('post_row_actions', array('PwtcMapdb_Admin', 'copy_post_link'), 10, 2);
         add_filter('page_row_actions', array('PwtcMapdb_Admin', 'copy_post_link'), 10, 2);
         add_action('post_submitbox_misc_actions', array('PwtcMapdb_Admin', 'copy_page_custom_button'));
+	add_action('wp_before_admin_bar_render', array('PwtcMapdb_Admin', 'admin_bar_link'));
     }
 
-    public function copy_page_custom_button() {
+    public static function copy_page_custom_button() {
         global $post;
         $post_status = 'draft';
         $html = '<div id="major-publishing-actions">';
@@ -35,6 +36,24 @@ class PwtcMapdb_Admin {
             $actions['copy'] = '<a href="admin.php?action=pwtc_copy_post_as_draft&amp;post='.$post->ID.'&amp;nonce='.wp_create_nonce( 'pwtc-copy-page-'.$post->ID ).'" title="Copy this as '.$post_status.'" rel="permalink">Copy This</a>';
         }
         return $actions;
+    }
+	
+    public static function admin_bar_link() {
+        global $wp_admin_bar, $post;
+        $post_status = 'draft';
+        $current_object = get_queried_object();
+        if (empty($current_object)) {
+            return;
+        }
+        if (!empty($current_object->post_type)
+            && ($post_type_object = get_post_type_object($current_object->post_type))
+            && ($post_type_object->show_ui || $current_object->post_type == 'attachment')) {
+            $wp_admin_bar->add_menu(array(
+                'id' => 'copy_this',
+                'title' => 'Copy This',
+                'href' => admin_url().'admin.php?action=pwtc_copy_post_as_draft&amp;post='.$post->ID.'&amp;nonce='.wp_create_nonce( 'pwtc-copy-page-'.$post->ID )
+            ));
+        }
     }
 
     public static function copy_post_as_draft() {
