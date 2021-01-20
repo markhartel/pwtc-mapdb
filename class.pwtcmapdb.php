@@ -978,15 +978,30 @@ class PwtcMapdb {
 		if (isset($_POST['signup_userid'])) {
 			$userid = intval($_POST['signup_userid']);
 			if ($userid != 0) {
-				$mileage = '';
+				$mileage = false;
 				if (isset($_POST['signup_rider_mileage'])) {
 					if (!empty(trim($_POST['signup_rider_mileage']))) {
-						$mileage = abs(intval($_POST['signup_rider_mileage']));
+						$mileage = $_POST['signup_rider_mileage'];
 					}
 				}
-				self::delete_all_signups($postid, $userid);
-				$value = json_encode(array('userid' => $userid, 'mileage' => ''.$mileage, 'attended' => true));
-				add_post_meta($postid, self::RIDE_SIGNUP_USERID, $value);
+				$signup = self::fetch_user_signup($postid, $userid);
+				if ($signup) {
+					if ($mileage) {
+						$signup['mileage'] = ''.abs(intval($mileage));
+					}
+					self::delete_all_signups($postid, $userid);
+					$value = json_encode($signup);
+					add_post_meta($postid, self::RIDE_SIGNUP_USERID, $value);
+				}
+				else {
+					if ($mileage) {
+						$value = json_encode(array('userid' => $userid, 'mileage' => ''.abs(intval($mileage)), 'attended' => true));
+					}
+					else {
+						$value = json_encode(array('userid' => $userid, 'mileage' => '', 'attended' => true));
+					}
+					add_post_meta($postid, self::RIDE_SIGNUP_USERID, $value);	
+				}
 			}
 		}
 				
@@ -4196,6 +4211,17 @@ class PwtcMapdb {
 		return ob_get_clean();
 	}
 	*/
+	
+	public static function fetch_user_signup($postid, $userid) {
+		$signup_list = get_post_meta($postid, self::RIDE_SIGNUP_USERID);
+		foreach($signup_list as $item) {
+			$arr = json_decode($item, true);
+			if ($arr['userid'] == $userid) {
+				return $arr;
+			}
+		}
+		return false;
+	}
 	
 	public static function delete_all_signups($postid, $userid) {
 		$signup_list = get_post_meta($postid, self::RIDE_SIGNUP_USERID);
