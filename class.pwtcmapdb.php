@@ -1567,7 +1567,7 @@ class PwtcMapdb {
             			<div class="accordion-content" data-tab-content>
 					<form class="rider-signup-frm" method="POST">
 						<input type="hidden" name="signup_userid" value="0"/>
-						<div class="row column help-text">Normally a rider would log in to their club member account to sign up for this ride. However, if they don't have access to a computer, the ride leader can do it for them here.</div>
+						<div class="callout small warning">A rider should use their club member account to sign up for rides. However, if they don't have access to a computer, the ride leader can do it for them here.</div>
 						<div class="row">
 							<div class="small-12 medium-4 columns">
 								<label>Rider ID
