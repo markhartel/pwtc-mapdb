@@ -1522,7 +1522,7 @@ class PwtcMapdb {
 	<div id='pwtc-mapdb-view-signup-div'>
 		<ul class="accordion" data-accordion data-allow-all-closed="true">
 			<li class="accordion-item" data-accordion-item>
-            			<a href="#" class="accordion-title">Click Here For Sign-up Options</a>
+            			<a href="#" class="accordion-title">Set Sign-up Options...</a>
             			<div class="accordion-content" data-tab-content>
 					<form class="signup-options-frm" method="POST">
 						<div class="row">
@@ -1563,11 +1563,11 @@ class PwtcMapdb {
 			</li>
 		<?php if ($paperless and !$signup_locked) { ?>
 			<li class="accordion-item" data-accordion-item>
-            			<a href="#" class="accordion-title">Click Here to Sign-up a Rider</a>
+            			<a href="#" class="accordion-title">Sign-up a Rider...</a>
             			<div class="accordion-content" data-tab-content>
 					<form class="rider-signup-frm" method="POST">
 						<input type="hidden" name="signup_userid" value="0"/>
-						<div class="callout small warning">A rider should use their club member account to sign up for rides. However, if they don't have access to a computer, the ride leader can do it for them here.</div>
+						<div class="help-text"><p>A rider should use their club member account to sign up for rides. However, if they don't have access to a computer, the ride leader can do it for them here. Enter their rider ID and press lookup. After a rider matching that ID is found, you can enter their mileage and press submit.</p></div>
 						<div class="row">
 							<div class="small-12 medium-4 columns">
 								<label>Rider ID
@@ -2117,7 +2117,7 @@ class PwtcMapdb {
 	<div id="pwtc-mapdb-reset-signups-div">
 		<ul class="accordion" data-accordion data-allow-all-closed="true">
 			<li class="accordion-item" data-accordion-item>
-				<a href="#" class="accordion-title">Click Here For Sign-up Admin Options</a>
+				<a href="#" class="accordion-title">Purge Sign-up Settings...</a>
 				<div class="accordion-content" data-tab-content>
 					<form method="POST">
 						<div class="row column">
