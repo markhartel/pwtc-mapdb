@@ -841,6 +841,14 @@ class PwtcMapdb {
 				$('#pwtc-mapdb-rider-signup-div button[type="submit"]').prop('disabled',true);
 				<?php } ?>
      			});
+			
+			$('#pwtc-mapdb-rider-signup-div form').on('keypress', function(evt) {
+				var keyPressed = evt.keyCode || evt.which; 
+				if (keyPressed === 13) { 
+					evt.preventDefault(); 
+					return false; 
+				} 
+			});
 
 		});
 	</script>
