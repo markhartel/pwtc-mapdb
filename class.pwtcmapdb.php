@@ -1448,18 +1448,22 @@ class PwtcMapdb {
 
 			$('#pwtc-mapdb-view-signup-div .rider-signup-frm input[type="button"]').on('click', function(evt) {
 				var riderid = $('#pwtc-mapdb-view-signup-div .rider-signup-frm input[name="signup_riderid"]').val().trim();
-				if (riderid.length > 0) {
-					var action = "<?php echo admin_url('admin-ajax.php'); ?>";
-					var data = {
-						'action': 'pwtc_mapdb_lookup_riderid',
-						'riderid': riderid
-					};
-					$.post(action, data, riderid_lookup_cb);
-					show_errmsg4_wait();
-				}
-				else {
+				if (riderid.length == 0) {
 					show_errmsg4_warning('You must enter a Rider ID.');
-				}		
+					return;
+				}
+				var rideridrgx = /^\d{5}$/;
+				if (!rideridrgx.test(riderid)) {
+					show_errmsg4_warning('The Rider ID must be a 5 digit number.');
+					return;
+				}
+				var action = "<?php echo admin_url('admin-ajax.php'); ?>";
+				var data = {
+					'action': 'pwtc_mapdb_lookup_riderid',
+					'riderid': riderid
+				};
+				$.post(action, data, riderid_lookup_cb);
+				show_errmsg4_wait();
 			});
 		
 			$('#pwtc-mapdb-view-signup-div .rider-signup-frm').on('keypress', function(evt) {
