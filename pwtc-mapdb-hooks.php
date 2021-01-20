@@ -46,7 +46,8 @@ function pwtc_mapdb_get_signup() {
         $result['ride_signup_url'] = false;
     }
     else {
-        $instruction_link = 'For more information on how to sign up online, click <a href="/online-signup-instructions-2" target="_blank" rel="noopener noreferrer">here</a>.';
+        //$instruction_link = 'For more information on how to sign up online, click <a href="/online-signup-instructions-2" target="_blank" rel="noopener noreferrer">here</a>.';
+        $instruction_link = '';
         if ($current_user->ID != 0) {
             $result['ride_signup_url'] = '/ride-online-signup/?post='.$postid;
             if ($signup_mode == 'paperless') {
