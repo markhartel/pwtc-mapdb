@@ -2576,17 +2576,14 @@ class PwtcMapdb {
 			}
 		}
 
-		if (isset($_POST['postid']) and $current_user->ID > 0) {
+		if (isset($_POST['postid']) and isset($_POST['title']) and $current_user->ID != 0) {
 
 			$success = '';
 			$operation = '';
 			$new_post = false;
 			$postid = intval($_POST['postid']);
 
-			$title = 'Unnamed';
-			if (isset($_POST['title'])) {
-				$title = trim($_POST['title']);
-			}
+			$title = trim($_POST['title']);
 			if ($postid != 0) {
 				$my_post = array(
 					'ID' => $postid,
