@@ -2949,7 +2949,7 @@ class PwtcMapdb {
 			$edit_date = true;
 		}
 
-		$edit_start_location = $edit_date;
+		$edit_title = $edit_start_location = $edit_date;
 
 		if ($postid != 0) {
 			$start_location = get_field(self::RIDE_START_LOCATION, $postid);
@@ -3721,9 +3721,12 @@ class PwtcMapdb {
 			<form method="POST">
 				<div class="row column">
 					<label>Ride Title
-						<input type="text" name="title" value="<?php echo esc_attr($title); ?>"/>
+						<input type="text" name="title" value="<?php echo esc_attr($title); ?>" <?php echo $edit_title ? '': 'readonly'; ?>/>
 						<input type="hidden" name="postid" value="<?php echo $postid; ?>"/>
 					</label>
+					<?php if (!$edit_title) { ?>
+						<p class="help-text">You are not allowed to edit the ride title.</p>
+					<?php } ?>
 				</div>
 				<div class="row column">
 					<label>Ride Description
