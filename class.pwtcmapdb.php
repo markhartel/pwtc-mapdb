@@ -3741,8 +3741,11 @@ class PwtcMapdb {
 					</div>
 					<div class="small-12 medium-6 columns">
 						<label>Departure Time
-							<input type="time" name="ride_time" value="<?php echo $ride_time; ?>"/>	
+							<input type="time" name="ride_time" value="<?php echo $ride_time; ?>" <?php echo $edit_date ? '': 'readonly'; ?>/>	
 						</label>
+						<?php if (!$edit_date) { ?>
+						<p class="help-text">You are not allowed to edit the departure time.</p>
+						<?php } ?>
 					</div>
 					<div class="small-12 medium-6 columns">
 						<label>Ride Type
