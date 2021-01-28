@@ -11,11 +11,11 @@ class PwtcMapdb_Ride {
 	}
 
 	private static function init_hooks() {
-        self::$initiated = true;
+		self::$initiated = true;
 
-        add_shortcode('pwtc_mapdb_edit_ride2', 
-        array( 'PwtcMapdb_Ride', 'shortcode_edit_ride'));
-    }
+        	add_shortcode('pwtc_mapdb_edit_ride2', 
+        	array( 'PwtcMapdb_Ride', 'shortcode_edit_ride'));
+    	}
 
 	// Generates the [pwtc_mapdb_edit_ride] shortcode.
 	public static function shortcode_edit_ride($atts) {
