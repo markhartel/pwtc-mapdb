@@ -63,7 +63,7 @@ function pwtc_mapdb_get_signup() {
                 $result['ride_signup_url'] = false;        
             }
             else {
-                $result['ride_signup_url'] = '/ride-online-nonmember-signup/?post='.$postid;
+                $result['ride_signup_url'] = '/ride-nonmember-signup/?post='.$postid;
                 if ($signup_mode == 'paperless') {
                     $result['ride_signup_msg'] = 'You <em>must</em> sign up online to attend this ride.';
                 }
