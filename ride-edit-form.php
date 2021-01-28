@@ -677,7 +677,7 @@
     });
 </script>
 <div id='pwtc-mapdb-edit-ride-div'>
-    <?php echo self::create_page_title($copy_ride, $postid); ?>
+    <?php echo PwtcMapdb::create_page_title($copy_ride, $postid); ?>
     <?php if ($success == 'yes') { ?>
     <div class="callout small success">
         <?php if ($operation == 'update') { ?>
