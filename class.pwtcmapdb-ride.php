@@ -19,9 +19,6 @@ class PwtcMapdb_Ride {
 
 	// Generates the [pwtc_mapdb_edit_ride] shortcode.
 	public static function shortcode_edit_ride($atts) {
-		$a = shortcode_atts(array('leaders' => 'no'), $atts);
-		$allow_leaders = $a['leaders'] == 'yes';
-
 		$current_user = wp_get_current_user();
 
 		$return = false;
