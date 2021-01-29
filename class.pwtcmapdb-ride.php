@@ -65,7 +65,8 @@ class PwtcMapdb_Ride {
 				$my_post = array(
 					'post_title'    => esc_html($title),
 					'post_type'     => PwtcMapdb::POST_TYPE_RIDE,
-					'post_status'   => 'publish'
+                    			'post_status'   => 'draft',
+                    			'post_author'   => $current_user->ID
 				);
 				$operation = 'insert';
 				$postid = wp_insert_post( $my_post );
@@ -253,7 +254,7 @@ class PwtcMapdb_Ride {
 		}
 
 		if (isset($_GET['post'])) {
-			$error = PwtcMapdb::check_post_id();
+			$error = self::check_post_id();
 			if (!empty($error)) {
 				return PwtcMapdb::create_page_title($copy_ride, -1) . $error;
 			}
@@ -291,6 +292,18 @@ class PwtcMapdb_Ride {
 
 		if ( 0 == $current_user->ID ) {
 			return $page_title . '<div class="callout small warning"><p>You must be logged in to edit rides. ' . $return_to_ride . '</p></div>';
+        	}
+        
+        	if ($postid != 0) {
+			$post = get_post($postid);
+            		$title = $post->post_title;
+            		$author = $post->$post_author;
+            		$status = $post->$post_status;
+		}
+		else {
+            		$title = '';
+            		$author = $current_user->ID;
+            		$status = 'draft';
 		}
 
 		$user_info = get_userdata($current_user->ID);
@@ -318,10 +331,12 @@ class PwtcMapdb_Ride {
 		}
 
 		if ($postid != 0 and !$copy_ride and !user_can($current_user,'edit_published_rides')) {
-			$leaders = PwtcMapdb::get_leader_userids($postid);
-			if (!in_array($current_user->ID, $leaders)) {
-				return $page_title . '<div class="callout small warning"><p>You must be a leader for ride "' . $ride_title . '" to edit it. ' . $return_to_ride . '</p></div>';
-			}
+            		if ($status == 'publish') {
+                		return $page_title . '<div class="callout small warning"><p>Ride "' . $ride_title . '" is published so you cannot edit it. ' . $return_to_ride . '</p></div>';
+            		}
+            		if ($author != $current_user->ID) {
+                		return $page_title . '<div class="callout small warning"><p>You must be the author of ride "' . $ride_title . '" to edit it. ' . $return_to_ride . '</p></div>';
+            		}
 		}
 
 		if ($postid != 0 and !$copy_ride) {
@@ -332,14 +347,6 @@ class PwtcMapdb_Ride {
 		}
 
 		$road_captain = user_can($current_user,'edit_published_rides');
-
-		if ($postid != 0) {
-			$post = get_post($postid);
-			$title = $post->post_title;
-		}
-		else {
-			$title = '';
-		}
 
 		if ($postid != 0) {
 			$description = get_field(PwtcMapdb::RIDE_DESCRIPTION, $postid, false);
@@ -368,9 +375,6 @@ class PwtcMapdb_Ride {
 			$ride_datetime = PwtcMapdb::get_ride_start_time($postid);
 			if ($copy_ride) {
 				$ride_time = $ride_datetime->format('H:i');
-				//$ride_datetime = PwtcMapdb::get_current_date();
-				//$ride_datetime->add($interval);
-				//$ride_date = $ride_datetime->format('Y-m-d');
 				$ride_date = '';
 				$edit_date = true;	
 			}
@@ -382,22 +386,15 @@ class PwtcMapdb_Ride {
 				}
 				else {
 					$edit_date = false;
-					if ($allow_leaders) {
-						if (in_array($current_user->ID, $leaders)) {
-							if ($ride_datetime > $min_datetime) {
-								$edit_date = true;
-							}
-						}
-					}
+                    			if ($ride_datetime > $min_datetime) {
+                        			$edit_date = true;
+                    			}
 				}
 			}
 		}
 		else {
 			$ride_datetime = PwtcMapdb::get_current_time();
 			$ride_datetime->add($interval);
-			//$ride_date = $ride_datetime->format('Y-m-d');
-			//$ride_time = '10:00';
-			//$min_date = $ride_date;
 			$ride_date = '';
 			$ride_time = '';
 			$min_date = $ride_datetime->format('Y-m-d');
@@ -473,7 +470,7 @@ class PwtcMapdb_Ride {
 
 		if ($postid != 0) {
 			$lock_user = PwtcMapdb::check_post_lock($postid);
-		    if ($lock_user) {
+		    	if ($lock_user) {
 				$info = get_userdata($lock_user);
 				$name = $info->first_name . ' ' . $info->last_name;	
 				return $page_title . '<div class="callout small warning"><p>Ride "' . $ride_title . '" is currently being edited by ' . $name . '. ' . $return_to_ride . '</p></div>';
@@ -481,8 +478,40 @@ class PwtcMapdb_Ride {
 			PwtcMapdb::set_post_lock($postid);
 		}
 		
-        ob_start();
-        include('ride-edit-form.php');
-        return ob_get_clean();
+        	ob_start();
+        	include('ride-edit-form.php');
+        	return ob_get_clean();
+	}
+	
+	public static function check_post_id() {
+		if (!isset($_GET['post'])) {
+			return '<div class="callout small alert"><p>Ride post ID parameter is missing.</p></div>';
+		}
+
+		$postid = intval($_GET['post']);
+		if ($postid == 0) {
+			return '<div class="callout small alert"><p>Ride post ID parameter is invalid, it must be an integer number.</p></div>';
+		}
+
+		$post = get_post($postid);
+		if (!$post) {
+			return '<div class="callout small alert"><p>Ride post ' . $postid . ' does not exist, it may have been deleted.</p></div>';
+		}
+
+		if (get_post_type($post) != self::POST_TYPE_RIDE) {
+			return '<div class="callout small alert"><p>Ride post ' . $postid . ' is not a scheduled ride.</p></div>';
+		}
+
+		$post_status = get_post_status($post);
+		if ($post_status != 'publish' and $post_status != 'draft') {
+			if ($post_status == 'trash') {
+				return '<div class="callout small alert"><p>Ride post ' . $postid . ' has been deleted.</p></div>';
+			}
+			else {
+				return '<div class="callout small alert"><p>Ride post ' . $postid . ' is not draft or published. Its current status is "' . $post_status . '"</p></div>';
+			}
+		}
+
+		return '';
 	}
 }
