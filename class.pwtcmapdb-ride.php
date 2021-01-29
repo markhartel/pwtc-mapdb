@@ -16,6 +16,8 @@ class PwtcMapdb_Ride {
         	add_shortcode('pwtc_mapdb_edit_ride2', 
         	array( 'PwtcMapdb_Ride', 'shortcode_edit_ride'));
     	}
+	
+	/******************* Shortcode Functions ******************/
 
 	// Generates the [pwtc_mapdb_edit_ride] shortcode.
 	public static function shortcode_edit_ride($atts) {
@@ -321,6 +323,9 @@ class PwtcMapdb_Ride {
             		if ($status == 'publish') {
                 		return $page_title . '<div class="callout small warning"><p>Ride "' . $ride_title . '" is published so you cannot edit it. ' . $return_to_ride . '</p></div>';
             		}
+			else if ($status == 'pending') {
+                		return $page_title . '<div class="callout small warning"><p>Ride "' . $ride_title . '" is pending review so you cannot edit it. ' . $return_to_ride . '</p></div>';
+            		}
             		if ($author != $current_user->ID) {
                 		return $page_title . '<div class="callout small warning"><p>You must be the author of ride "' . $ride_title . '" to edit it. ' . $return_to_ride . '</p></div>';
             		}
@@ -469,6 +474,8 @@ class PwtcMapdb_Ride {
         	include('ride-edit-form.php');
         	return ob_get_clean();
 	}
+	
+	/******************* Utility Functions ******************/
 	
 	public static function check_post_id() {
 		if (!isset($_GET['post'])) {
