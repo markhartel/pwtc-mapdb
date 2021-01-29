@@ -309,25 +309,15 @@ class PwtcMapdb_Ride {
 		$user_info = get_userdata($current_user->ID);
 
 		if ($copy_ride and !user_can($current_user,'edit_published_rides')) {
-			if ($allow_leaders) {
-				if (!in_array(PwtcMapdb::ROLE_RIDE_LEADER, $user_info->roles)) {
-					return $page_title . '<div class="callout small warning"><p>You must be a ride leader to copy rides. ' . $return_to_ride . '</p></div>';
-				}
-			}
-			else {
-				return $page_title . '<div class="callout small warning"><p>You are not allowed to copy rides. ' . $return_to_ride . '</p></div>';
-			}
+            		if (!in_array(PwtcMapdb::ROLE_RIDE_LEADER, $user_info->roles)) {
+                		return $page_title . '<div class="callout small warning"><p>You must be a ride leader to copy rides. ' . $return_to_ride . '</p></div>';
+            		}
 		}
 
 		if ($postid == 0 and !user_can($current_user,'edit_published_rides')) {
-			if ($allow_leaders) {
-				if (!in_array(PwtcMapdb::ROLE_RIDE_LEADER, $user_info->roles)) {
-					return $page_title . '<div class="callout small warning"><p>You must be a ride leader to create new rides. ' . $return_to_ride . '</p></div>';
-				}
-			}
-			else {
-				return $page_title . '<div class="callout small warning"><p>You are not allowed to create new rides. ' . $return_to_ride . '</p></div>';
-			}
+            		if (!in_array(PwtcMapdb::ROLE_RIDE_LEADER, $user_info->roles)) {
+                		return $page_title . '<div class="callout small warning"><p>You must be a ride leader to create new rides. ' . $return_to_ride . '</p></div>';
+            		}
 		}
 
 		if ($postid != 0 and !$copy_ride and !user_can($current_user,'edit_published_rides')) {
@@ -498,7 +488,7 @@ class PwtcMapdb_Ride {
 			return '<div class="callout small alert"><p>Ride post ' . $postid . ' does not exist, it may have been deleted.</p></div>';
 		}
 
-		if (get_post_type($post) != self::POST_TYPE_RIDE) {
+		if (get_post_type($post) != PwtcMapdb::POST_TYPE_RIDE) {
 			return '<div class="callout small alert"><p>Ride post ' . $postid . ' is not a scheduled ride.</p></div>';
 		}
 
