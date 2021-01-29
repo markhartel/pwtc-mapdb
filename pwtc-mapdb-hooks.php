@@ -32,12 +32,12 @@ function pwtc_mapdb_get_signup() {
         //    $result['edit_ride_url'] = '/ride-edit-fields/?post='.$postid.'&return=yes';
         //}
         
-        $user_info = get_userdata($current_user->ID);
-        if (user_can($current_user,'edit_published_rides') or in_array(PwtcMapdb::ROLE_RIDE_LEADER, $user_info->roles)) {
-            $result['copy_ride_url'] = '/ride-edit-fields/?post='.$postid.'&action=copy&return=yes';
-        }
-        else {
-            $result['copy_ride_url'] = false;
+        $result['copy_ride_url'] = false;
+        if ($current_user->ID != 0) {
+            $user_info = get_userdata($current_user->ID);
+            if (user_can($current_user,'edit_published_rides') or in_array(PwtcMapdb::ROLE_RIDE_LEADER, $user_info->roles)) {
+                $result['copy_ride_url'] = '/ride-edit-fields/?post='.$postid.'&action=copy&return=yes';
+            }
         }
     }
     
