@@ -490,12 +490,12 @@ class PwtcMapdb_Ride {
 		}
 
 		$post_status = get_post_status($post);
-		if ($post_status != 'publish' and $post_status != 'draft') {
+		if ($post_status != 'publish' and $post_status != 'draft' and $post_status != 'pending') {
 			if ($post_status == 'trash') {
 				return '<div class="callout small alert"><p>Ride post ' . $postid . ' has been deleted.</p></div>';
 			}
 			else {
-				return '<div class="callout small alert"><p>Ride post ' . $postid . ' is not draft or published. Its current status is "' . $post_status . '"</p></div>';
+				return '<div class="callout small alert"><p>Ride post ' . $postid . ' is not draft, pending or published. Its current status is "' . $post_status . '"</p></div>';
 			}
 		}
 
