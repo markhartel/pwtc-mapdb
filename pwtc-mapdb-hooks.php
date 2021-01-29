@@ -28,10 +28,9 @@ function pwtc_mapdb_get_signup() {
     }
     else {
         $result['edit_ride_url'] = false;
-        //if ($start > $now) {
-        //    $result['edit_ride_url'] = '/ride-edit-fields/?post='.$postid.'&return=yes';
-        //}
-        
+        if (user_can($current_user,'edit_published_rides') and $start > $now) {
+            $result['edit_ride_url'] = '/ride-edit-fields/?post='.$postid.'&return=yes';
+        }
         $result['copy_ride_url'] = false;
         if ($current_user->ID != 0) {
             $user_info = get_userdata($current_user->ID);
