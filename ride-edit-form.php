@@ -414,13 +414,6 @@
                 evt.preventDefault();
                 return;
             }
-    <?php if (!$road_captain) { ?>
-            if (!new_leaders.includes(<?php echo $current_user->ID; ?>)) {
-                show_warning('You must assign yourself as a <strong>ride leader</strong>.');
-                evt.preventDefault();
-                return;
-            }
-    <?php } ?>
             $('#pwtc-mapdb-edit-ride-div input[name="leaders"]').val(JSON.stringify(new_leaders));
 
             is_dirty = false;
