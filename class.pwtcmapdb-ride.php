@@ -338,8 +338,6 @@ class PwtcMapdb_Ride {
 			}
 		}
 
-		$road_captain = user_can($current_user,'edit_published_rides');
-
 		if ($postid != 0) {
 			$description = get_field(PwtcMapdb::RIDE_DESCRIPTION, $postid, false);
 		}
@@ -348,10 +346,15 @@ class PwtcMapdb_Ride {
 		}
 
 		if ($postid != 0) {
-			$leaders = PwtcMapdb::get_leader_userids($postid);
+			if ($copy_ride) {
+				$leaders = [$author];
+			}
+			else {
+				$leaders = PwtcMapdb::get_leader_userids($postid);
+			}
 		}
 		else {
-			$leaders = [];
+			$leaders = [$author];
 		}
 
 		if (user_can($current_user,'edit_published_rides')) {
