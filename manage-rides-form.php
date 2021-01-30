@@ -8,6 +8,7 @@
             <a href="/ride-edit-fields" class="dark button" target="_blank" rel="opener">New Ride</a>
         </div>
     </div>
+    <h3>Hello <?php echo $author_name; ?>, you are the author of the following draft and pending rides.</h3>
 <?php if ($query->have_posts()) { ?>
     <table class="pwtc-mapdb-rwd-table">
         <thead><tr><th>Start Time</th><th>Ride Title</th><th>Status</th><th>Actions</th></tr></thead>
@@ -23,7 +24,10 @@
         $copy_link = esc_url('/ride-edit-fields/?post='.$postid.'&action=copy');
         $delete_link = esc_url('/ride-delete-page/?post='.$postid);
         $start = PwtcMapdb::get_ride_start_time($postid);
-        $start_date = $start->format('m/d/Y g:ia');
+        $start_date = '';
+        if ($start) {
+            $start_date = $start->format('m/d/Y g:ia');
+        }
     ?>
         <tr>
             <td><span>Start Time</span><?php echo $start_date; ?></td>
@@ -47,7 +51,7 @@
         </tbody>
     </table>
     <?php } else { ?>
-    <div class="callout small"><p>No rides found.</p></div>
+    <div class="callout small"><p>No draft or pending rides found.</p></div>
     <?php } ?>
 </div>
 <?php 
