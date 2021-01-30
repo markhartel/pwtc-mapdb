@@ -493,6 +493,8 @@ class PwtcMapdb_Ride {
 				return '<div class="callout small warning"><p>You must be a ride leader to manage rides.</p></div>';
 			}
 		}
+		
+		$author_name = $user_info->first_name . ' ' . $user_info->last_name;
 
 		$query_args = [
 			'posts_per_page' => -1,
