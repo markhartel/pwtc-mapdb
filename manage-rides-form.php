@@ -8,7 +8,7 @@
             <a href="/ride-edit-fields" class="dark button" target="_blank" rel="opener">New Ride</a>
         </div>
     </div>
-    <h3>Hello <?php echo $author_name; ?>, you are the author of the following draft and pending rides.</h3>
+    <p>Hello <?php echo $author_name; ?>, you are the author of the following draft and pending rides.</p>
 <?php if ($query->have_posts()) { ?>
     <table class="pwtc-mapdb-rwd-table">
         <thead><tr><th>Start Time</th><th>Ride Title</th><th>Status</th><th>Actions</th></tr></thead>
