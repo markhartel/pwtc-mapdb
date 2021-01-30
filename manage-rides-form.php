@@ -1,0 +1,53 @@
+<script type="text/javascript">
+	jQuery(document).ready(function($) { 
+	});
+</script>			
+<div id="pwtc-mapdb-manage-rides-div">
+    <div class="row column clearfix">
+        <div class="button-group float-left">
+            <a href="/ride-edit-fields" class="dark button" target="_blank" rel="opener">New Ride</a>
+        </div>
+    </div>
+<?php if ($query->have_posts()) { ?>
+    <table class="pwtc-mapdb-rwd-table">
+        <thead><tr><th>Start Time</th><th>Ride Title</th><th>Status</th><th>Actions</th></tr></thead>
+        <tbody>
+    <?php
+    while ($query->have_posts()) {
+        $query->the_post();
+        $postid = get_the_ID();
+        $title = esc_html(get_the_title());
+        $status = get_post_status();
+        $view_link = esc_url(get_the_permalink());
+        $edit_link = esc_url('/ride-edit-fields/?post='.$postid);
+        $copy_link = esc_url('/ride-edit-fields/?post='.$postid.'&action=copy');
+        $delete_link = esc_url('/ride-delete-page/?post='.$postid);
+        $start = PwtcMapdb::get_ride_start_time($postid);
+        $start_date = $start->format('m/d/Y g:ia');
+    ?>
+        <tr>
+            <td><span>Start Time</span><?php echo $start_date; ?></td>
+            <td><span>Ride Title</span><?php echo $title; ?></td>
+            <td><span>Status</span><?php echo $status; ?></td>
+            <td><span>Actions</span>
+                <a href="<?php echo $view_link; ?>" target="_blank">View</a>
+                <a href="<?php echo $copy_link; ?>" target="_blank" rel="opener">Copy</a>
+                <?php if ($status == 'draft') { ?>
+                <a href="<?php echo $edit_link; ?>" target="_blank" rel="opener">Edit</a>
+                <?php } ?>
+                <?php if ($status == 'draft') { ?>
+                <a href="<?php echo $delete_link; ?>" target="_blank" rel="opener">Delete</a>
+                <?php } ?>
+            </td>	
+        </tr>
+    <?php
+    }
+    wp_reset_postdata();
+    ?>
+        </tbody>
+    </table>
+    <?php } else { ?>
+    <div class="callout small"><p>No rides found.</p></div>
+    <?php } ?>
+</div>
+<?php 
