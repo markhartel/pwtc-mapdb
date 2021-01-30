@@ -347,14 +347,14 @@ class PwtcMapdb_Ride {
 
 		if ($postid != 0) {
 			if ($copy_ride) {
-				$leaders = [$author];
+				$leaders = [$current_user->ID];
 			}
 			else {
 				$leaders = PwtcMapdb::get_leader_userids($postid);
 			}
 		}
 		else {
-			$leaders = [$author];
+			$leaders = [$current_user->ID];
 		}
 
 		if (user_can($current_user,'edit_published_rides')) {
