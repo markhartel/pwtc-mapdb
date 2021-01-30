@@ -13,8 +13,8 @@ class PwtcMapdb_Ride {
 	private static function init_hooks() {
 		self::$initiated = true;
 
-        	add_shortcode('pwtc_mapdb_edit_ride2', 
-        	array( 'PwtcMapdb_Ride', 'shortcode_edit_ride'));
+        	add_shortcode('pwtc_mapdb_edit_ride2', array('PwtcMapdb_Ride', 'shortcode_edit_ride'));
+		add_shortcode('pwtc_mapdb_manage_rides2', array('PwtcMapdb_Ride', 'shortcode_manage_rides'));
     	}
 	
 	/******************* Shortcode Functions ******************/
@@ -477,6 +477,36 @@ class PwtcMapdb_Ride {
         	include('ride-edit-form.php');
         	return ob_get_clean();
 	}
+	
+	// Generates the [pwtc_mapdb_manage_rides] shortcode.
+	public static function shortcode_manage_rides($atts) {
+		$current_user = wp_get_current_user();
+
+		if ( 0 == $current_user->ID ) {
+			return '<div class="callout small warning"><p>Please <a href="/wp-login.php">log in</a> to manage the rides that you have created.</p></div>';
+		}
+
+		$user_info = get_userdata($current_user->ID);
+
+		if (!user_can($current_user,'edit_published_rides')) {
+			if (!in_array(PwtcMapdb::ROLE_RIDE_LEADER, $user_info->roles)) {
+				return '<div class="callout small warning"><p>You must be a ride leader to manage rides.</p></div>';
+			}
+		}
+
+		$query_args = [
+			'posts_per_page' => -1,
+			'post_status' => array('pending', 'draft'),
+			'author' => $current_user->ID,
+			'post_type' => PwtcMapdb::POST_TYPE_RIDE,
+			'orderby' => [PwtcMapdb::RIDE_DATE => 'DESC'],
+		];
+		$query = new WP_Query($query_args);
+
+		ob_start();
+		include('manage-rides-form.php');
+		return ob_get_clean();
+	}	
 	
 	/******************* Utility Functions ******************/
 	
