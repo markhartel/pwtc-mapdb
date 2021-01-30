@@ -43,6 +43,16 @@ class PwtcMapdb_Ride {
 					'ID' => $postid,
 					'post_title' => esc_html($title)
 				);
+				if (isset($_POST['draft'])) {
+					$my_post['post_status'] = 'draft';
+				}
+				else if (isset($_POST['pending'])) {
+					$my_post['post_status'] = 'pending';
+				}
+				else if (isset($_POST['publish'])) {
+					$my_post['post_status'] = 'publish';
+				}
+				//error_log(print_r($my_post, true));
 				$operation = 'update';
 				$status = wp_update_post( $my_post );	
 				if ($status != $postid) {
