@@ -641,7 +641,7 @@
     <?php if ($success == 'yes' and !$return) { ?>
         var opener_win = window.opener;
         if (opener_win) {
-            $('#pwtc-mapdb-manage-rides-div form', opener_win.document).submit();
+            opener_win.location.reload();
         }
     <?php } ?>
 
@@ -674,9 +674,9 @@
     <?php if ($success == 'yes') { ?>
     <div class="callout small success">
         <?php if ($operation == 'update') { ?>
-        <p>You have successfully updated the scheduled ride. <?php echo $return_to_ride; ?></p>
+        <p>You have successfully updated this ride. <?php echo $return_to_ride; ?></p>
         <?php } else if ($operation == 'insert') { ?>
-        <p>You have successfully created a new scheduled ride. <?php echo $return_to_ride; ?></p>
+        <p>You have successfully created a new ride. <?php echo $return_to_ride; ?></p>
         <?php } ?>
     </div>
     <?php } ?>
@@ -894,10 +894,28 @@
             </div>
             <div class="row column errmsg"></div>
             <div class="row column clearfix">
-                <button class="dark button float-left" type="submit"><?php echo $postid == 0 ? 'Create Ride' : 'Save Ride'; ?></button>
-                <?php if (!empty($ride_link)) { ?>
+            <?php if ($postid == 0) { ?>
+                <button class="dark button float-left" type="submit">Save Draft</button>
+            <?php } else if ($status == 'draft') { ?>
+                <div class="button-group float-left">
+                    <input class="dark button" name="draft" value="Update" type="submit"/>
+                    <input class="dark button" name="pending" value="Submit for Review" type="submit"/>
+                </div>
+            <?php } else if ($status == 'pending') { ?>
+                <div class="button-group float-left">
+                    <input class="dark button" name="pending" value="Update" type="submit"/>
+                    <input class="dark button" name="publish" value="Publish" type="submit"/>
+                    <input class="dark button" name="draft" value="Reject" type="submit"/>
+                </div>
+            <?php } else { ?>
+                <div class="button-group float-left">
+                    <input class="dark button" name="publish" value="Update" type="submit"/>
+                    <input class="dark button" name="draft" value="Return to Draft" type="submit"/>
+                </div>
+            <?php } ?>
+            <?php if (!empty($ride_link)) { ?>
                 <a href="<?php echo $ride_link; ?>" class="dark button float-right"><i class="fa fa-chevron-left"></i> Back to Ride</a>
-                <?php } ?>
+            <?php } ?>
             </div>
         </form>
     </div>
