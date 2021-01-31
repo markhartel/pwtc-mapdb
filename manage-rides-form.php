@@ -3,11 +3,6 @@
 	});
 </script>			
 <div id="pwtc-mapdb-manage-rides-div">
-    <div class="row column clearfix">
-        <div class="button-group float-left">
-            <a href="/ride-edit-fields" class="dark button" target="_blank" rel="opener">New Ride</a>
-        </div>
-    </div>
     <p>Hello <?php echo $author_name; ?>, you are the author of the following draft and pending rides.</p>
 <?php if ($query->have_posts()) { ?>
     <table class="pwtc-mapdb-rwd-table">
@@ -21,7 +16,6 @@
         $status = get_post_status();
         $view_link = esc_url(get_the_permalink());
         $edit_link = esc_url('/ride-edit-fields/?post='.$postid);
-        $copy_link = esc_url('/ride-edit-fields/?post='.$postid.'&action=copy');
         $delete_link = esc_url('/ride-delete-page/?post='.$postid);
         $start = PwtcMapdb::get_ride_start_time($postid);
         $start_date = '';
@@ -37,7 +31,6 @@
                 <?php if (user_can($current_user,'edit_published_rides')) { ?>
                 <a href="<?php echo $view_link; ?>" target="_blank">View</a>
                 <?php } ?>
-                <a href="<?php echo $copy_link; ?>" target="_blank" rel="opener">Copy</a>
                 <?php if ($status == 'draft' or user_can($current_user,'edit_published_rides')) { ?>
                 <a href="<?php echo $edit_link; ?>" target="_blank" rel="opener">Edit</a>
                 <?php } ?>
