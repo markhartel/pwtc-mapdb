@@ -346,16 +346,7 @@ class PwtcMapdb_Ride {
 			
 			$refresh_script = '';
 			if (!$return) {
-				$refresh_script = <<<EOT
-<script type="text/javascript">
-	jQuery(document).ready(function($) { 
-		var opener_win = window.opener;
-		if (opener_win) {
-			opener_win.location.reload();
-		}
-	});
-</script>				
-EOT;
+				$refresh_script = self::get_refresh_script();
 			}
             		if ($status == 'publish') {
                 		return $refresh_script . '<div class="callout small warning"><p>Ride "' . $ride_title . '" is published so you cannot edit it. ' . $return_to_ride . '</p></div>';
@@ -363,6 +354,13 @@ EOT;
 			else if ($status == 'pending') {
                 		return $refresh_script . '<div class="callout small warning"><p>Ride "' . $ride_title . '" is pending review so you cannot edit it. ' . $return_to_ride . '</p></div>';
             		}
+		}
+		
+		if ($postid != 0 and !$copy_ride and $status == 'publish') {
+			$ride_datetime = PwtcMapdb::get_ride_start_time($postid);
+			if ($ride_datetime < $now_date) {
+				return '<div class="callout small warning"><p>Ride "' . $ride_title . '" has already finished so you cannot edit it. ' . $return_to_ride . '</p></div>';
+			}
 		}
 
 		if ($postid != 0) {
@@ -390,6 +388,7 @@ EOT;
 		else {
 			$interval = new DateInterval('P14D');
 		}
+		$edit_date = true;
 		if ($postid != 0) {
 			$min_datetime = PwtcMapdb::get_current_date();
 			$min_datetime->add($interval);
@@ -398,20 +397,10 @@ EOT;
 			if ($copy_ride) {
 				$ride_time = $ride_datetime->format('H:i');
 				$ride_date = '';
-				$edit_date = true;	
 			}
 			else {
 				$ride_date = $ride_datetime->format('Y-m-d');
 				$ride_time = $ride_datetime->format('H:i');	
-				if (user_can($current_user,'edit_published_rides') and $status == 'draft') {
-					$edit_date = true;
-				}
-				else {
-					$edit_date = false;
-                    			if ($ride_datetime > $min_datetime) {
-                        			$edit_date = true;
-                    			}
-				}
 			}
 		}
 		else {
@@ -420,7 +409,6 @@ EOT;
 			$ride_date = '';
 			$ride_time = '';
 			$min_date = $ride_datetime->format('Y-m-d');
-			$edit_date = true;
 		}
 
 		$edit_title = $edit_start_location = $edit_date;
@@ -625,13 +613,13 @@ EOT;
 		}
 
 		$is_captain = false;
-		if (!user_can($current_user,'edit_published_rides')) {
+		if (user_can($current_user,'edit_published_rides')) {
 			$is_captain = true;
 		}
 
 		$is_leader = false;
 		$user_info = get_userdata($current_user->ID);
-		if (!in_array(PwtcMapdb::ROLE_RIDE_LEADER, $user_info->roles)) {
+		if (in_array(PwtcMapdb::ROLE_RIDE_LEADER, $user_info->roles)) {
 			$is_leader = true;
 		}
 
