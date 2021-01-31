@@ -265,7 +265,7 @@ class PwtcMapdb_Ride {
 		if (isset($_GET['post'])) {
 			$error = self::check_post_id();
 			if (!empty($error)) {
-				return PwtcMapdb::create_page_title($copy_ride, -1) . $error;
+				return $error;
 			}
 			$postid = intval($_GET['post']);
 		}
