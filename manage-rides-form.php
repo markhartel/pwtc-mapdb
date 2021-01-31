@@ -38,7 +38,7 @@
                 <a href="<?php echo $view_link; ?>" target="_blank">View</a>
                 <?php } ?>
                 <a href="<?php echo $copy_link; ?>" target="_blank" rel="opener">Copy</a>
-                <?php if ($status == 'draft') { ?>
+                <?php if ($status == 'draft' or user_can($current_user,'edit_published_rides')) { ?>
                 <a href="<?php echo $edit_link; ?>" target="_blank" rel="opener">Edit</a>
                 <?php } ?>
                 <?php if ($status == 'draft') { ?>
