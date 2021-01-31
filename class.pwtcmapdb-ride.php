@@ -254,6 +254,21 @@ class PwtcMapdb_Ride {
 			), get_permalink()), 303);
 			exit;
 		}
+		
+		if (isset($_GET['op']) and isset($_GET['success'])) {
+			if ($_GET['success'] == 'no') {
+				if ($_GET['op'] == 'insert') {
+					return '<div class="callout small alert"><p>Failed to create a new ride.</p></div>';
+				}
+				else {
+					return '<div class="callout small alert"><p>Failed to update this ride.</p></div>';
+				}
+			}
+		}
+		
+		if ( 0 == $current_user->ID ) {
+			return '<div class="callout small alert"><p>You must be logged in to submit rides.</p></div>';
+        	}
 
 		$copy_ride = false;
 		if (isset($_GET['action'])) {
@@ -274,32 +289,6 @@ class PwtcMapdb_Ride {
 		}
 
 		$now_date = PwtcMapdb::get_current_time();
-
-		$ride_title = '';
-		$ride_link = '';
-		$return_to_ride = 'You may now close this page.';
-		if ($postid != 0) {
-			$ride_title = esc_html(get_the_title($postid));
-			if ($return) {
-				$ride_link = esc_url(get_the_permalink($postid));
-				$return_to_ride = PwtcMapdb::create_return_link($ride_link);
-			}
-		}
-
-		if (isset($_GET['op']) and isset($_GET['success'])) {
-			if ($_GET['success'] == 'no') {
-				if ($_GET['op'] == 'insert') {
-					return '<div class="callout small alert"><p>Failed to create a new ride. ' . $return_to_ride . '</p></div>';
-				}
-				else {
-					return '<div class="callout small alert"><p>Failed to update this ride. ' . $return_to_ride . '</p></div>';
-				}
-			}
-		}
-
-		if ( 0 == $current_user->ID ) {
-			return '<div class="callout small warning"><p>You must be logged in to edit rides. ' . $return_to_ride . '</p></div>';
-        	}
         
         	if ($postid != 0) {
 			$post = get_post($postid);
@@ -311,6 +300,17 @@ class PwtcMapdb_Ride {
             		$title = '';
             		$author = $current_user->ID;
             		$status = 'draft';
+		}
+		
+		$ride_title = '';
+		$ride_link = '';
+		$return_to_ride = '';
+		if ($postid != 0) {
+			$ride_title = esc_html(get_the_title($postid));
+			if ($return and $status == 'publish') {
+				$ride_link = esc_url(get_the_permalink($postid));
+				$return_to_ride = PwtcMapdb::create_return_link($ride_link);
+			}
 		}
 
 		$user_info = get_userdata($current_user->ID);
