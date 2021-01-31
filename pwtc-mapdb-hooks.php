@@ -3,7 +3,7 @@
 function pwtc_mapdb_get_signup() {
     $disable = false;
     $disable_nonmembers = true;
-    $disable_edit = false;
+    $disable_edit = true;
     if ($disable) {
         $result['view_signup_url'] = false;
         $result['edit_ride_url'] = false;
