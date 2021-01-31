@@ -120,14 +120,14 @@ class PwtcMapdb {
 		//add_shortcode('pwtc_mapdb_leader_details', 
 		//	array( 'PwtcMapdb', 'shortcode_leader_details'));
 		
-		add_shortcode('pwtc_mapdb_delete_ride', 
-			array( 'PwtcMapdb', 'shortcode_delete_ride'));
+		//add_shortcode('pwtc_mapdb_delete_ride', 
+		//	array( 'PwtcMapdb', 'shortcode_delete_ride'));
 		
-		add_shortcode('pwtc_mapdb_edit_ride', 
-			array( 'PwtcMapdb', 'shortcode_edit_ride'));
+		//add_shortcode('pwtc_mapdb_edit_ride', 
+		//	array( 'PwtcMapdb', 'shortcode_edit_ride'));
 		
-		add_shortcode('pwtc_mapdb_manage_rides', 
-			array( 'PwtcMapdb', 'shortcode_manage_rides'));
+		//add_shortcode('pwtc_mapdb_manage_rides', 
+		//	array( 'PwtcMapdb', 'shortcode_manage_rides'));
 		
 		add_shortcode('pwtc_mapdb_reset_signups', 
 			array( 'PwtcMapdb', 'shortcode_reset_signups'));
