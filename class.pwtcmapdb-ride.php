@@ -400,7 +400,7 @@ EOT;
 			else {
 				$ride_date = $ride_datetime->format('Y-m-d');
 				$ride_time = $ride_datetime->format('H:i');	
-				if (user_can($current_user,'edit_published_rides')) {
+				if (user_can($current_user,'edit_published_rides') and $status == 'draft') {
 					$edit_date = true;
 				}
 				else {
