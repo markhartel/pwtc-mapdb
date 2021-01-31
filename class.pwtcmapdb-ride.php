@@ -342,7 +342,7 @@ class PwtcMapdb_Ride {
 			}
 			
 			$refresh_script = '';
-			if ($success == 'yes' and !$return) {
+			if (!$return) {
 				$refresh_script = <<<EOT
 <script type="text/javascript">
 	jQuery(document).ready(function($) { 
