@@ -15,6 +15,8 @@ class PwtcMapdb_Ride {
 
         	add_shortcode('pwtc_mapdb_edit_ride2', array('PwtcMapdb_Ride', 'shortcode_edit_ride'));
 		add_shortcode('pwtc_mapdb_manage_rides2', array('PwtcMapdb_Ride', 'shortcode_manage_rides'));
+		add_shortcode('pwtc_mapdb_delete_ride2', array( 'PwtcMapdb_Ride', 'shortcode_delete_ride'));
+
     	}
 	
 	/******************* Shortcode Functions ******************/
@@ -493,6 +495,81 @@ EOT;
 		
         	ob_start();
         	include('ride-edit-form.php');
+        	return ob_get_clean();
+	}
+	
+	// Generates the [pwtc_mapdb_delete_ride] shortcode.
+	public static function shortcode_delete_ride($atts) {
+
+		$current_user = wp_get_current_user();
+
+		if (isset($_GET['post']) and isset($_GET['deleted'])) {
+			if ($_GET['deleted'] == 'yes') {
+				$refresh_script = self::get_refresh_script();
+				return $refresh_script . '<div class="callout small success"><p>This ride has been successfully deleted. You may now close this page.</p></div>';
+			}
+			else {
+				return '<div class="callout small alert"><p>Failed to delete this ride.</p></div>';
+			}
+		}
+
+		$error = self::check_post_id();
+		if (!empty($error)) {
+			return $error;
+		}
+		$postid = intval($_GET['post']);
+
+		if (isset($_POST['delete_ride']) and $current_user->ID != 0) {
+			if (wp_trash_post($postid)) {
+				wp_redirect(add_query_arg(array(
+					'post' => $postid,
+					'deleted' => 'yes'
+				), get_permalink()), 303);
+			}
+			else {
+				wp_redirect(add_query_arg(array(
+					'post' => $postid,
+					'deleted' => 'no'
+				), get_permalink()), 303);
+			}
+			exit;
+		}
+
+		if ( 0 == $current_user->ID ) {
+			return '<div class="callout small alert"><p>You must be logged in to delete rides.</p></div>';
+		}
+
+		$ride_title = esc_html(get_the_title($postid));
+
+		$post = get_post($postid);
+		$author = $post->post_author;
+		$status = $post->post_status;
+
+		if ($status == 'publish') {
+			return '<div class="callout small warning"><p>Ride "' . $ride_title . '" is published so you cannot delete it.</p></div>';
+		}
+		else if ($status == 'pending') {
+			return '<div class="callout small warning"><p>Ride "' . $ride_title . '" is pending review so you cannot delete it.</p></div>';
+		}
+
+		if ($author != $current_user->ID and !user_can($current_user,'edit_published_rides')) {
+			return '<div class="callout small warning"><p>You must be the author of ride "' . $ride_title . '" to delete it.</p></div>';
+		}
+
+		$lock_user = PwtcMapdb::check_post_lock($postid);
+		if ($lock_user) {
+			$info = get_userdata($lock_user);
+			$name = $info->first_name . ' ' . $info->last_name;	
+			return '<div class="callout small warning"><p>Ride "' . $ride_title . '" is currently being edited by ' . $name . '.</p></div>';
+		}
+
+		PwtcMapdb::set_post_lock($postid);
+
+		$ride_datetime = PwtcMapdb::get_ride_start_time($postid);
+		$ride_date = $ride_datetime->format('m/d/Y g:ia');
+
+        	ob_start();
+        	include('ride-delete-form.php');
         	return ob_get_clean();
 	}
 	
