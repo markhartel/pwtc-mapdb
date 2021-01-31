@@ -291,10 +291,10 @@ class PwtcMapdb_Ride {
 		if (isset($_GET['op']) and isset($_GET['success'])) {
 			if ($_GET['success'] == 'no') {
 				if ($_GET['op'] == 'insert') {
-					return $page_title . '<div class="callout small alert"><p>Failed to create new scheduled ride. ' . $return_to_ride . '</p></div>';
+					return $page_title . '<div class="callout small alert"><p>Failed to create a new ride. ' . $return_to_ride . '</p></div>';
 				}
 				else {
-					return $page_title . '<div class="callout small alert"><p>Failed to update scheduled ride. ' . $return_to_ride . '</p></div>';
+					return $page_title . '<div class="callout small alert"><p>Failed to update this ride. ' . $return_to_ride . '</p></div>';
 				}
 			}
 		}
@@ -328,24 +328,27 @@ class PwtcMapdb_Ride {
                 		return $page_title . '<div class="callout small warning"><p>You must be a ride leader to create new rides. ' . $return_to_ride . '</p></div>';
             		}
 		}
+		
+		if ($postid != 0 and !$copy_ride) {
+			$lock_user = PwtcMapdb::check_post_lock($postid);
+		    	if ($lock_user) {
+				$info = get_userdata($lock_user);
+				$name = $info->first_name . ' ' . $info->last_name;	
+				return $page_title . '<div class="callout small warning"><p>Ride "' . $ride_title . '" is currently being edited by ' . $name . '. ' . $return_to_ride . '</p></div>';
+			}
+		}
 
 		if ($postid != 0 and !$copy_ride and !user_can($current_user,'edit_published_rides')) {
+			if ($author != $current_user->ID) {
+                		return $page_title . '<div class="callout small warning"><p>You must be the author of ride "' . $ride_title . '" to edit it. ' . $return_to_ride . '</p></div>';
+			}
+			
             		if ($status == 'publish') {
                 		return $page_title . '<div class="callout small warning"><p>Ride "' . $ride_title . '" is published so you cannot edit it. ' . $return_to_ride . '</p></div>';
             		}
 			else if ($status == 'pending') {
                 		return $page_title . '<div class="callout small warning"><p>Ride "' . $ride_title . '" is pending review so you cannot edit it. ' . $return_to_ride . '</p></div>';
             		}
-            		if ($author != $current_user->ID) {
-                		return $page_title . '<div class="callout small warning"><p>You must be the author of ride "' . $ride_title . '" to edit it. ' . $return_to_ride . '</p></div>';
-            		}
-		}
-
-		if ($postid != 0 and !$copy_ride) {
-			$ride_datetime = PwtcMapdb::get_ride_start_time($postid);
-			if ($ride_datetime < $now_date) {
-				return $page_title . '<div class="callout small warning"><p>Ride "' . $ride_title . '" has already finished so you cannot edit it. ' . $return_to_ride . '</p></div>';
-			}
 		}
 
 		if ($postid != 0) {
@@ -474,12 +477,6 @@ class PwtcMapdb_Ride {
 		}
 
 		if ($postid != 0) {
-			$lock_user = PwtcMapdb::check_post_lock($postid);
-		    	if ($lock_user) {
-				$info = get_userdata($lock_user);
-				$name = $info->first_name . ' ' . $info->last_name;	
-				return $page_title . '<div class="callout small warning"><p>Ride "' . $ride_title . '" is currently being edited by ' . $name . '. ' . $return_to_ride . '</p></div>';
-			}
 			PwtcMapdb::set_post_lock($postid);
 		}
 		
