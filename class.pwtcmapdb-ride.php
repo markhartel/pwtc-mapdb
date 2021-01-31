@@ -638,4 +638,18 @@ EOT;
 
 		return '';
 	}
+	
+	public static function get_refresh_script() {
+		return <<<EOT
+<script type="text/javascript">
+	jQuery(document).ready(function($) { 
+		var opener_win = window.opener;
+		if (opener_win) {
+			opener_win.location.reload();
+		}
+	});
+</script>	
+EOT;
+	}
+	
 }
