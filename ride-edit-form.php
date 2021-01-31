@@ -910,7 +910,7 @@
             <?php } else { ?>
                 <div class="button-group float-left">
                     <input class="dark button" name="publish" value="Update" type="submit"/>
-                    <input class="dark button" name="draft" value="Return to Draft" type="submit"/>
+                    <input class="dark button" name="draft" value="Unpublish" type="submit"/>
                 </div>
             <?php } ?>
             <?php if (!empty($ride_link)) { ?>
