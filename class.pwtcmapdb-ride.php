@@ -16,6 +16,7 @@ class PwtcMapdb_Ride {
         	add_shortcode('pwtc_mapdb_edit_ride2', array('PwtcMapdb_Ride', 'shortcode_edit_ride'));
 		add_shortcode('pwtc_mapdb_manage_rides2', array('PwtcMapdb_Ride', 'shortcode_manage_rides'));
 		add_shortcode('pwtc_mapdb_delete_ride2', array( 'PwtcMapdb_Ride', 'shortcode_delete_ride'));
+		add_shortcode('pwtc_mapdb_manage_published_rides', array('PwtcMapdb_Ride', 'shortcode_manage_published_rides'));
 
     	}
 	
@@ -602,6 +603,82 @@ EOT;
 
 		ob_start();
 		include('manage-rides-form.php');
+		return ob_get_clean();
+	}
+	
+	public static function shortcode_manage_published_rides($atts) {
+		$a = shortcode_atts(array('leaders' => 'no'), $atts);
+		$allow_leaders = $a['leaders'] == 'yes';
+
+		$current_user = wp_get_current_user();
+
+		if (isset($_POST['ride_title']) and isset($_POST['ride_month'])) {
+			wp_redirect(add_query_arg(array(
+				'month' => $_POST['ride_month'],
+				'title' => urlencode(trim($_POST['ride_title']))
+			), get_permalink()), 303);
+			exit;
+		}
+
+		if ( 0 == $current_user->ID ) {
+			return '<div class="callout small warning"><p>Please <a href="/wp-login.php">log in</a> to manage the scheduled rides.</p></div>';
+		}
+
+		$is_captain = false;
+		if (!user_can($current_user,'edit_published_rides')) {
+			$is_captain = true;
+		}
+
+		$is_leader = false;
+		$user_info = get_userdata($current_user->ID);
+		if (!in_array(PwtcMapdb::ROLE_RIDE_LEADER, $user_info->roles)) {
+			$is_leader = true;
+		}
+
+		if (isset($_GET['title'])) {
+			$ride_title = $_GET['title'];
+		}
+		else {
+			$ride_title = '';
+		}
+
+		$timezone = new DateTimeZone(pwtc_get_timezone_string());
+		$interval = new DateInterval('P1M');
+		if (isset($_GET['month'])) {
+			$this_month = DateTime::createFromFormat('Y-m-d H:i:s', $_GET['month'].'-01 00:00:00', $timezone);
+			$next_month = DateTime::createFromFormat('Y-m-d H:i:s', $_GET['month'].'-01 00:00:00', $timezone);
+			$next_month->add($interval);
+		}
+		else {
+			$this_month = PwtcMapdb::get_current_date();
+			$next_month = PwtcMapdb::get_current_date();
+			$next_month->add($interval);
+		}
+
+		$now = PwtcMapdb::get_current_time();
+		$ride_month = $this_month->format('Y-m');
+		$reset_month = $now->format('Y-m');
+		$query_args = [
+			'posts_per_page' => -1,
+			'post_status' => 'publish',
+			'post_type' => PwtcMapdb::POST_TYPE_RIDE,
+			'meta_query' => [
+				[
+					'key' => PwtcMapdb::RIDE_DATE,
+					'value' => [$this_month->format('Y-m-01 00:00:00'), $next_month->format('Y-m-01 00:00:00')],
+					'compare' => 'BETWEEN',
+					'type' => 'DATETIME'
+				],
+			],
+			'orderby' => [PwtcMapdb::RIDE_DATE => 'ASC'],
+		];
+		if (!empty($ride_title)) {
+			$query_args['s'] = $ride_title;	
+		}		
+		$query = new WP_Query($query_args);
+
+		ob_start();
+		include('manage-published-rides-form.php');
 		return ob_get_clean();
 	}	
 	
