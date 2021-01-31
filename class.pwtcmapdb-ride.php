@@ -286,21 +286,19 @@ class PwtcMapdb_Ride {
 			}
 		}
 
-		$page_title = PwtcMapdb::create_page_title($copy_ride, $postid);
-
 		if (isset($_GET['op']) and isset($_GET['success'])) {
 			if ($_GET['success'] == 'no') {
 				if ($_GET['op'] == 'insert') {
-					return $page_title . '<div class="callout small alert"><p>Failed to create a new ride. ' . $return_to_ride . '</p></div>';
+					return '<div class="callout small alert"><p>Failed to create a new ride. ' . $return_to_ride . '</p></div>';
 				}
 				else {
-					return $page_title . '<div class="callout small alert"><p>Failed to update this ride. ' . $return_to_ride . '</p></div>';
+					return '<div class="callout small alert"><p>Failed to update this ride. ' . $return_to_ride . '</p></div>';
 				}
 			}
 		}
 
 		if ( 0 == $current_user->ID ) {
-			return $page_title . '<div class="callout small warning"><p>You must be logged in to edit rides. ' . $return_to_ride . '</p></div>';
+			return '<div class="callout small warning"><p>You must be logged in to edit rides. ' . $return_to_ride . '</p></div>';
         	}
         
         	if ($postid != 0) {
@@ -319,13 +317,13 @@ class PwtcMapdb_Ride {
 
 		if ($copy_ride and !user_can($current_user,'edit_published_rides')) {
             		if (!in_array(PwtcMapdb::ROLE_RIDE_LEADER, $user_info->roles)) {
-                		return $page_title . '<div class="callout small warning"><p>You must be a ride leader to copy rides. ' . $return_to_ride . '</p></div>';
+                		return '<div class="callout small warning"><p>You must be a ride leader to copy rides. ' . $return_to_ride . '</p></div>';
             		}
 		}
 
 		if ($postid == 0 and !user_can($current_user,'edit_published_rides')) {
             		if (!in_array(PwtcMapdb::ROLE_RIDE_LEADER, $user_info->roles)) {
-                		return $page_title . '<div class="callout small warning"><p>You must be a ride leader to create new rides. ' . $return_to_ride . '</p></div>';
+                		return '<div class="callout small warning"><p>You must be a ride leader to create new rides. ' . $return_to_ride . '</p></div>';
             		}
 		}
 		
@@ -334,20 +332,33 @@ class PwtcMapdb_Ride {
 		    	if ($lock_user) {
 				$info = get_userdata($lock_user);
 				$name = $info->first_name . ' ' . $info->last_name;	
-				return $page_title . '<div class="callout small warning"><p>Ride "' . $ride_title . '" is currently being edited by ' . $name . '. ' . $return_to_ride . '</p></div>';
+				return '<div class="callout small warning"><p>Ride "' . $ride_title . '" is currently being edited by ' . $name . '. ' . $return_to_ride . '</p></div>';
 			}
 		}
 
 		if ($postid != 0 and !$copy_ride and !user_can($current_user,'edit_published_rides')) {
 			if ($author != $current_user->ID) {
-                		return $page_title . '<div class="callout small warning"><p>You must be the author of ride "' . $ride_title . '" to edit it. ' . $return_to_ride . '</p></div>';
+                		return '<div class="callout small warning"><p>You must be the author of ride "' . $ride_title . '" to edit it. ' . $return_to_ride . '</p></div>';
 			}
 			
+			$refresh_script = '';
+			if ($success == 'yes' and !$return) {
+				$refresh_script = <<<EOT
+<script type="text/javascript">
+	jQuery(document).ready(function($) { 
+		var opener_win = window.opener;
+		if (opener_win) {
+			opener_win.location.reload();
+		}
+	});
+</script>				
+EOT;
+			}
             		if ($status == 'publish') {
-                		return $page_title . '<div class="callout small warning"><p>Ride "' . $ride_title . '" is published so you cannot edit it. ' . $return_to_ride . '</p></div>';
+                		return $refresh_script . '<div class="callout small warning"><p>Ride "' . $ride_title . '" is published so you cannot edit it. ' . $return_to_ride . '</p></div>';
             		}
 			else if ($status == 'pending') {
-                		return $page_title . '<div class="callout small warning"><p>Ride "' . $ride_title . '" is pending review so you cannot edit it. ' . $return_to_ride . '</p></div>';
+                		return $refresh_script . '<div class="callout small warning"><p>Ride "' . $ride_title . '" is pending review so you cannot edit it. ' . $return_to_ride . '</p></div>';
             		}
 		}
 
