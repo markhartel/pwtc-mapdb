@@ -30,13 +30,6 @@
     });
 </script>			
 <div id="pwtc-mapdb-manage-published-rides-div">
-    <?php if ($is_captain or ($is_leader and $allow_leaders)) { ?>
-    <div class="row column clearfix">
-        <div class="button-group float-left">
-            <a href="/ride-edit-fields" class="dark button" target="_blank" rel="opener">New Ride</a>
-        </div>
-    </div>
-    <?php } ?>
     <ul class="accordion" data-accordion data-allow-all-closed="true">
         <li class="accordion-item" data-accordion-item>
             <a href="#" class="accordion-title">Click Here to Search</a>
