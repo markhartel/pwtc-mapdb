@@ -2,15 +2,15 @@
     jQuery(document).ready(function($) { 
 
         function show_warning(msg) {
-            $('#pwtc-mapdb-manage-rides-div .errmsg').html('<div class="callout small warning"><p>' + msg + '</p></div>');
+            $('#pwtc-mapdb-manage-published-rides-div .errmsg').html('<div class="callout small warning"><p>' + msg + '</p></div>');
         }
 
         function show_waiting() {
-            $('#pwtc-mapdb-manage-rides-div .errmsg').html('<div class="callout small"><i class="fa fa-spinner fa-pulse waiting"></i> please wait...</div>');
+            $('#pwtc-mapdb-manage-published-rides-div .errmsg').html('<div class="callout small"><i class="fa fa-spinner fa-pulse waiting"></i> please wait...</div>');
         }
 
-        $('#pwtc-mapdb-manage-rides-div form').on('submit', function(evt) {
-            var month = $('#pwtc-mapdb-manage-rides-div input[name="ride_month"]').val().trim();
+        $('#pwtc-mapdb-manage-published-rides-div form').on('submit', function(evt) {
+            var month = $('#pwtc-mapdb-manage-published-rides-div input[name="ride_month"]').val().trim();
             var monthrgx = /^\d{4}-\d{2}$/;
             if (!monthrgx.test(month)) {
                 show_warning('The ride month format is invalid.');
@@ -18,18 +18,18 @@
                 return;
             }
             show_waiting();
-            $('#pwtc-mapdb-manage-rides-div button[type="submit"]').prop('disabled',true);
+            $('#pwtc-mapdb-manage-published-rides-div button[type="submit"]').prop('disabled',true);
         });
 
-        $('#pwtc-mapdb-manage-rides-div form a').on('click', function(evt) {
-            $('#pwtc-mapdb-manage-rides-div input[name="ride_title"]').val('');
-            $('#pwtc-mapdb-manage-rides-div input[name="ride_month"]').val('<?php echo $reset_month; ?>');
-            $('#pwtc-mapdb-manage-rides-div form').submit();
+        $('#pwtc-mapdb-manage-published-rides-div form a').on('click', function(evt) {
+            $('#pwtc-mapdb-manage-published-rides-div input[name="ride_title"]').val('');
+            $('#pwtc-mapdb-manage-published-rides-div input[name="ride_month"]').val('<?php echo $reset_month; ?>');
+            $('#pwtc-mapdb-manage-published-rides-div form').submit();
         });
 
     });
 </script>			
-<div id="pwtc-mapdb-manage-rides-div">
+<div id="pwtc-mapdb-manage-published-rides-div">
     <?php if ($is_captain or ($is_leader and $allow_leaders)) { ?>
     <div class="row column clearfix">
         <div class="button-group float-left">
