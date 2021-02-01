@@ -88,7 +88,7 @@ class PwtcMapdb_Ride {
 					if (isset($_GET['post'])) {
 						wp_redirect(add_query_arg(array(
 							'post' => $_GET['post'],
-							'action' => 'copy',
+							'action' => $_GET['action'],
 							'return' => $return ? 'yes':'no',
 							'op' => $operation,
 							'success' => $success
@@ -275,14 +275,19 @@ class PwtcMapdb_Ride {
         	}
 
 		$copy_ride = false;
+		$template = false;
 		if (isset($_GET['action'])) {
 			if ($_GET['action'] == 'copy') {
 				$copy_ride = true;
 			}
+			else if ($_GET['action'] == 'template') {
+				$copy_ride = true;
+				$template = true;
+			}
 		}
 
 		if (isset($_GET['post'])) {
-			$error = self::check_post_id();
+			$error = self::check_post_id($template);
 			if (!empty($error)) {
 				return $error;
 			}
@@ -311,7 +316,7 @@ class PwtcMapdb_Ride {
 		$return_to_ride = '';
 		if ($postid != 0) {
 			$ride_title = esc_html(get_the_title($postid));
-			if ($return and $status == 'publish') {
+			if ($return and $status == 'publish' and !$template) {
 				$ride_link = esc_url(get_the_permalink($postid));
 				$return_to_ride = PwtcMapdb::create_return_link($ride_link);
 			}
@@ -372,7 +377,7 @@ class PwtcMapdb_Ride {
 		}
 
 		if ($postid != 0) {
-			if ($copy_ride) {
+			if ($copy_ride and !$template) {
 				$leaders = [$current_user->ID];
 			}
 			else {
@@ -394,12 +399,17 @@ class PwtcMapdb_Ride {
 			$min_datetime = PwtcMapdb::get_current_date();
 			$min_datetime->add($interval);
 			$min_date = $min_datetime->format('Y-m-d');
-			$ride_datetime = PwtcMapdb::get_ride_start_time($postid);
-			if ($copy_ride) {
+			if ($template) {
+				$ride_date = '';
+				$ride_time = '';	
+			}
+			else if ($copy_ride) {
+				$ride_datetime = PwtcMapdb::get_ride_start_time($postid);
 				$ride_time = $ride_datetime->format('H:i');
 				$ride_date = '';
 			}
 			else {
+				$ride_datetime = PwtcMapdb::get_ride_start_time($postid);
 				$ride_date = $ride_datetime->format('Y-m-d');
 				$ride_time = $ride_datetime->format('H:i');	
 			}
@@ -421,7 +431,7 @@ class PwtcMapdb_Ride {
 			$start_location = array('address' => '', 'lat' => 0.0, 'lng' => 0.0, 'zoom' => 16);
 		}
 
-		if ($postid != 0) {
+		if ($postid != 0 and !$template) {
 			$start_location_comment = get_field(PwtcMapdb::RIDE_START_LOC_COMMENT, $postid);
 		}
 		else {
@@ -725,7 +735,7 @@ class PwtcMapdb_Ride {
 	
 	/******************* Utility Functions ******************/
 	
-	public static function check_post_id() {
+	public static function check_post_id($template = false) {
 		if (!isset($_GET['post'])) {
 			return '<div class="callout small alert"><p>Ride post ID parameter is missing.</p></div>';
 		}
@@ -740,17 +750,36 @@ class PwtcMapdb_Ride {
 			return '<div class="callout small alert"><p>Ride post ' . $postid . ' does not exist, it may have been deleted.</p></div>';
 		}
 
-		if (get_post_type($post) != PwtcMapdb::POST_TYPE_RIDE) {
-			return '<div class="callout small alert"><p>Ride post ' . $postid . ' is not a scheduled ride.</p></div>';
+		if ($template) {
+			if (get_post_type($post) != 'ride_template') {
+				return '<div class="callout small alert"><p>Ride post ' . $postid . ' is not a ride template.</p></div>';
+			}
+		}
+		else {
+			if (get_post_type($post) != PwtcMapdb::POST_TYPE_RIDE) {
+				return '<div class="callout small alert"><p>Ride post ' . $postid . ' is not a scheduled ride.</p></div>';
+			}
 		}
 
 		$post_status = get_post_status($post);
-		if ($post_status != 'publish' and $post_status != 'draft' and $post_status != 'pending') {
-			if ($post_status == 'trash') {
-				return '<div class="callout small alert"><p>Ride post ' . $postid . ' has been deleted.</p></div>';
+		if ($template) {
+			if ($post_status != 'publish') {
+				if ($post_status == 'trash') {
+					return '<div class="callout small alert"><p>Ride template post ' . $postid . ' has been deleted.</p></div>';
+				}
+				else {
+					return '<div class="callout small alert"><p>Ride template post ' . $postid . ' is not published. Its current status is "' . $post_status . '"</p></div>';
+				}
 			}
-			else {
-				return '<div class="callout small alert"><p>Ride post ' . $postid . ' is not draft, pending or published. Its current status is "' . $post_status . '"</p></div>';
+		}
+		else {
+			if ($post_status != 'publish' and $post_status != 'draft' and $post_status != 'pending') {
+				if ($post_status == 'trash') {
+					return '<div class="callout small alert"><p>Ride post ' . $postid . ' has been deleted.</p></div>';
+				}
+				else {
+					return '<div class="callout small alert"><p>Ride post ' . $postid . ' is not draft, pending or published. Its current status is "' . $post_status . '"</p></div>';
+				}
 			}
 		}
 
