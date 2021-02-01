@@ -3,7 +3,7 @@
 	});
 </script>			
 <div id="pwtc-mapdb-manage-rides-div">
-    <p>Hello <?php echo $author_name; ?>, you are the author of the following draft and pending rides.</p>
+    <p>Hello <?php echo $author_name; ?>, you are the author of the following draft and pending rides. To submit a new ride, click <a href="/ride-edit-fields" target="_blank" rel="opener">here.</a></p>
 <?php if ($query->have_posts()) { ?>
     <table class="pwtc-mapdb-rwd-table">
         <thead><tr><th>Start Time</th><th>Ride Title</th><th>Status</th><th>Actions</th></tr></thead>
