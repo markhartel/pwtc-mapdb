@@ -73,7 +73,7 @@
             <td><span>1st Leader</span><?php echo $leader; ?></td>
             <td><span>Actions</span>
                 <?php if ($is_captain or ($is_leader and $allow_leaders)) { ?>
-                <a href="<?php echo $copy_link; ?>" target="_blank" rel="opener">Copy</a>
+                <a href="<?php echo $copy_link; ?>" target="_blank" rel="opener">Schedule</a>
                 <?php } ?>
             </td>	
         </tr>
