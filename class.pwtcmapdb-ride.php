@@ -17,6 +17,7 @@ class PwtcMapdb_Ride {
 		add_shortcode('pwtc_mapdb_manage_rides', array('PwtcMapdb_Ride', 'shortcode_manage_rides'));
 		add_shortcode('pwtc_mapdb_delete_ride', array( 'PwtcMapdb_Ride', 'shortcode_delete_ride'));
 		add_shortcode('pwtc_mapdb_manage_published_rides', array('PwtcMapdb_Ride', 'shortcode_manage_published_rides'));
+		add_shortcode('pwtc_mapdb_manage_ride_templates', array('PwtcMapdb_Ride', 'shortcode_manage_ride_templates'));
 
     	}
 	
@@ -667,6 +668,58 @@ class PwtcMapdb_Ride {
 
 		ob_start();
 		include('manage-published-rides-form.php');
+		return ob_get_clean();
+	}
+	
+	public static function shortcode_manage_ride_templates($atts) {
+		$a = shortcode_atts(array('leaders' => 'no'), $atts);
+		$allow_leaders = $a['leaders'] == 'yes';
+
+		$current_user = wp_get_current_user();
+
+		if (isset($_POST['ride_title'])) {
+			wp_redirect(add_query_arg(array(
+				'title' => urlencode(trim($_POST['ride_title']))
+			), get_permalink()), 303);
+			exit;
+		}
+
+		if ( 0 == $current_user->ID ) {
+			return '<div class="callout small warning"><p>Please <a href="/wp-login.php">log in</a> to manage the ride templates.</p></div>';
+		}
+
+		$is_captain = false;
+		if (user_can($current_user,'edit_published_rides')) {
+			$is_captain = true;
+		}
+
+		$is_leader = false;
+		$user_info = get_userdata($current_user->ID);
+		if (in_array(PwtcMapdb::ROLE_RIDE_LEADER, $user_info->roles)) {
+			$is_leader = true;
+		}
+
+		if (isset($_GET['title'])) {
+			$ride_title = $_GET['title'];
+		}
+		else {
+			$ride_title = '';
+		}
+
+		$query_args = [
+			'posts_per_page' => -1,
+			'post_status' => 'publish',
+			'post_type' => 'ride_template',
+			'orderby' => 'title',
+			'order'   => 'ASC',
+		];
+		if (!empty($ride_title)) {
+			$query_args['s'] = $ride_title;	
+		}		
+		$query = new WP_Query($query_args);
+
+		ob_start();
+		include('manage-ride-templates-form.php');
 		return ob_get_clean();
 	}	
 	
