@@ -585,7 +585,7 @@ class PwtcMapdb_Ride {
 
 		if (!user_can($current_user,'edit_published_rides')) {
 			if (!in_array(PwtcMapdb::ROLE_RIDE_LEADER, $user_info->roles)) {
-				return '<div class="callout small warning"><p>You must be a ride leader to manage rides.</p></div>';
+				return '<div class="callout small warning"><p>You must be a ride leader to manage the rides that you have created.</p></div>';
 			}
 		}
 		
