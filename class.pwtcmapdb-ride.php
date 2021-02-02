@@ -40,8 +40,12 @@ class PwtcMapdb_Ride {
 			$operation = '';
 			$new_post = false;
 			$postid = intval($_POST['postid']);
-
 			$title = trim($_POST['title']);
+			$post_status = '';
+			if (isset($_POST['post_status'])) {
+				$post_status = $_POST['post_status'];
+			}
+			
 			if ($postid != 0) {
 				$my_post = array(
 					'ID' => $postid,
@@ -49,15 +53,35 @@ class PwtcMapdb_Ride {
 				);
 				if (isset($_POST['draft'])) {
 					$my_post['post_status'] = 'draft';
+					if ($post_status == 'pending') {
+						$operation = 'rejected';
+					}
+					else if ($post_status == 'publish') {
+						$operation = 'unpublished';
+					}
+					else {
+						$operation = 'update_draft';
+					}
 				}
 				else if (isset($_POST['pending'])) {
 					$my_post['post_status'] = 'pending';
+					if ($post_status == 'draft') {
+						$operation = 'submit_review';
+					}
+					else {
+						$operation = 'update_pending';
+					}
 				}
 				else if (isset($_POST['publish'])) {
 					$my_post['post_status'] = 'publish';
+					if ($post_status == 'pending') {
+						$operation = 'published';
+					}
+					else {
+						$operation = 'update_published';
+					}
 				}
 				//error_log(print_r($my_post, true));
-				$operation = 'update';
 				$status = wp_update_post( $my_post );	
 				if ($status != $postid) {
 					$success = 'no';
