@@ -673,22 +673,35 @@
     <?php if ($success == 'yes') { ?>
     <div class="callout small success">
         <?php if ($operation == 'update_draft') { ?>
-        <p>You have successfully updated the draft ride. It can also be submitted for review.</p>
+        <p>You have successfully updated the draft ride.</p>
         <?php } else if ($operation == 'submit_review') { ?>
-        <p>You have successfully submitted the draft ride for review. It can now be published or rejected.</p>
+        <p>You have successfully submitted the draft ride for review.</p>
         <?php } else if ($operation == 'update_pending') { ?>
-        <p>You have successfully updated the pending ride. It can also be published or rejected.</p>
+        <p>You have successfully updated the pending ride.</p>
         <?php } else if ($operation == 'published') { ?>
-        <p>You have successfully published the pending ride. It can now be unpublished.</p>
+        <p>You have successfully published the pending ride.</p>
         <?php } else if ($operation == 'rejected') { ?>
-        <p>You have successfully rejected the pending ride. It can now be re-submitted for review.</p>
+        <p>You have successfully rejected the pending ride.</p>
         <?php } else if ($operation == 'update_published') { ?>
-        <p>You have successfully updated the published ride. It can also be unpublished.</p>
+        <p>You have successfully updated the published ride.</p>
         <?php } else if ($operation == 'unpublished') { ?>
-        <p>You have successfully unpublished the published ride. It can now be re-submitted for review.</p>
+        <p>You have successfully unpublished the published ride.</p>
         <?php } else if ($operation == 'insert') { ?>
-        <p>You have successfully saved the first draft of your ride. It can now be submitted for review.</p>
+        <p>You have successfully saved the first draft of your ride.</p>
         <?php } ?>
+    </div>
+    <?php } ?>
+    <?php if ($postid != 0) { ?>
+    <div class="callout small">
+        <p>This ride was authored by <?php echo $author_name; ?> and is 
+        <?php if ($status == 'draft') { ?>
+        a draft. If desired, it can be submitted for review.
+        <?php } else if ($status == 'pending') { ?>
+        pending review by a road captain. If desired, it can be published or rejected.
+        <?php } else if ($status == 'publish') { ?>
+        published and is on the ride calendar. If desired, it can be unpublished.
+        <?php } ?>
+        </p>
     </div>
     <?php } ?>
     <div class="callout">
