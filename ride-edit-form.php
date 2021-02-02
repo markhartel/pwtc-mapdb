@@ -708,7 +708,7 @@
         <?php } else if ($status == 'pending') { ?>
         pending review by a road captain. If desired, it can be published or rejected.
         <?php } else if ($status == 'publish') { ?>
-        published and is on the ride calendar. If desired, it can be unpublished.
+        published and on the ride calendar. If desired, it can be unpublished.
         <?php } ?>
         </p>
     </div>
