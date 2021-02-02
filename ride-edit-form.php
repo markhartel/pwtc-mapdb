@@ -348,6 +348,15 @@
                 evt.preventDefault();
                 return;					
             }
+            
+            var date_elem = $('#pwtc-mapdb-edit-ride-div input[name="ride_date"]')[0];
+            if (date_elem.validity) {
+                if (!date_elem.validity.valid) {
+                    show_warning('The <strong>ride date</strong> must be no earlier than <?php echo $min_date_pretty; ?>.');
+                    evt.preventDefault();
+                    return; 
+                }
+            }
 
             var attach_map = $('#pwtc-mapdb-edit-ride-div input[name="attach_maps"]:checked').val() == '1';
             if (attach_map) {
@@ -705,7 +714,7 @@
     </div>
     <?php } ?>
     <div class="callout">
-        <form method="POST">
+        <form method="POST" novalidate>
             <div class="row column">
                 <label>Ride Title
                     <input type="text" name="title" value="<?php echo esc_attr($title); ?>" <?php echo $edit_title ? '': 'readonly'; ?>/>
