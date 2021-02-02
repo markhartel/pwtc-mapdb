@@ -335,6 +335,17 @@ class PwtcMapdb_Ride {
             		$status = 'draft';
 		}
 		
+		$author_name = '';
+		if ($author != 0) {
+			$info = get_userdata($author);
+			if ($info) {
+				$author_name = $info->first_name . ' ' . $info->last_name;
+			}
+			else {
+				$author_name = 'Unknown';
+			}
+		}
+		
 		$ride_title = '';
 		$ride_link = '';
 		$return_to_ride = 'You can now close this page.';
