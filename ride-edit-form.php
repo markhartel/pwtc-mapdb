@@ -685,6 +685,7 @@
                 <label>Ride Title
                     <input type="text" name="title" value="<?php echo esc_attr($title); ?>" <?php echo $edit_title ? '': 'readonly'; ?>/>
                     <input type="hidden" name="postid" value="<?php echo $postid; ?>"/>
+                    <input type="hidden" name="post_status" value="<?php echo $status; ?>"/>
                 </label>
                 <?php if (!$edit_title) { ?>
                     <p class="help-text">You are not allowed to edit the ride title.</p>
