@@ -313,7 +313,7 @@ class PwtcMapdb_Ride {
 		
 		$ride_title = '';
 		$ride_link = '';
-		$return_to_ride = '';
+		$return_to_ride = 'You can now close this page.';
 		if ($postid != 0) {
 			$ride_title = esc_html(get_the_title($postid));
 			if ($return and $status == 'publish' and !$template) {
