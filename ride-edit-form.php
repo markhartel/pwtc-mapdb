@@ -672,10 +672,22 @@
 <div id='pwtc-mapdb-edit-ride-div'>
     <?php if ($success == 'yes') { ?>
     <div class="callout small success">
-        <?php if ($operation == 'update') { ?>
-        <p>You have successfully updated this ride. <?php echo $return_to_ride; ?></p>
+        <?php if ($operation == 'update_draft') { ?>
+        <p>You have successfully updated the draft ride. It can also be submitted for review.</p>
+        <?php } else if ($operation == 'submit_review') { ?>
+        <p>You have successfully submitted the draft ride for review. It can now be published or rejected.</p>
+        <?php } else if ($operation == 'update_pending') { ?>
+        <p>You have successfully updated the pending ride. It can also be published or rejected.</p>
+        <?php } else if ($operation == 'published') { ?>
+        <p>You have successfully published the pending ride. It can now be unpublished.</p>
+        <?php } else if ($operation == 'rejected') { ?>
+        <p>You have successfully rejected the pending ride. It can now be re-submitted for review.</p>
+        <?php } else if ($operation == 'update_published') { ?>
+        <p>You have successfully updated the published ride. It can also be unpublished.</p>
+        <?php } else if ($operation == 'unpublished') { ?>
+        <p>You have successfully unpublished the published ride. It can now be re-submitted for review.</p>
         <?php } else if ($operation == 'insert') { ?>
-        <p>You have successfully created a new ride. <?php echo $return_to_ride; ?></p>
+        <p>You have successfully saved the first draft of your ride. It can now be submitted for review.</p>
         <?php } ?>
     </div>
     <?php } ?>
