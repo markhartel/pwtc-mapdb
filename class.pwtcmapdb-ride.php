@@ -354,7 +354,7 @@ class PwtcMapdb_Ride {
 			$ride_title = esc_html(get_the_title($postid));
 			if ($return and $status == 'publish' and !$template) {
 				$ride_link = esc_url(get_the_permalink($postid));
-				$return_to_ride = PwtcMapdb::create_return_link($ride_link);
+				$return_to_ride = self::create_return_link($ride_link);
 			}
 		}
 
@@ -373,7 +373,7 @@ class PwtcMapdb_Ride {
 		}
 		
 		if ($postid != 0 and !$copy_ride) {
-			$lock_user = PwtcMapdb::check_post_lock($postid);
+			$lock_user = self::check_post_lock($postid);
 		    	if ($lock_user) {
 				$info = get_userdata($lock_user);
 				$name = $info->first_name . ' ' . $info->last_name;	
@@ -532,7 +532,7 @@ class PwtcMapdb_Ride {
 		}
 
 		if ($postid != 0) {
-			PwtcMapdb::set_post_lock($postid);
+			self::set_post_lock($postid);
 		}
 		
         	ob_start();
@@ -598,14 +598,14 @@ class PwtcMapdb_Ride {
 			return '<div class="callout small warning"><p>You must be the author of ride "' . $ride_title . '" to delete it.</p></div>';
 		}
 
-		$lock_user = PwtcMapdb::check_post_lock($postid);
+		$lock_user = self::check_post_lock($postid);
 		if ($lock_user) {
 			$info = get_userdata($lock_user);
 			$name = $info->first_name . ' ' . $info->last_name;	
 			return '<div class="callout small warning"><p>Ride "' . $ride_title . '" is currently being edited by ' . $name . '.</p></div>';
 		}
 
-		PwtcMapdb::set_post_lock($postid);
+		self::set_post_lock($postid);
 
 		$ride_datetime = PwtcMapdb::get_ride_start_time($postid);
 		$ride_date = $ride_datetime->format('m/d/Y g:ia');
@@ -866,6 +866,56 @@ class PwtcMapdb_Ride {
 	});
 </script>	
 EOT;
+	}
+	
+	public static function create_return_link($ride_url) {
+		return 'Click <a href="' . $ride_url . '">here</a> to return to the posted ride.';
+	}
+
+	public static function set_post_lock( $post_id ) {
+		$post = get_post( $post_id );
+		if ( ! $post ) {
+			return false;
+		}
+	 
+		$user_id = get_current_user_id();
+		if ( 0 == $user_id ) {
+			return false;
+		}
+	 
+		$now  = time();
+		$lock = "$now:$user_id";
+	 
+		update_post_meta( $post->ID, '_edit_lock', $lock );
+	 
+		return array( $now, $user_id );
+	}
+
+	public static function check_post_lock( $post_id ) {
+		$post = get_post( $post_id );
+		if ( ! $post ) {
+			return false;
+		}
+	 
+		$lock = get_post_meta( $post->ID, '_edit_lock', true );
+		if ( ! $lock ) {
+			return false;
+		}
+	 
+		$lock = explode( ':', $lock );
+		$time = $lock[0];
+		$user = isset( $lock[1] ) ? $lock[1] : get_post_meta( $post->ID, '_edit_last', true );
+	 
+		if ( ! get_userdata( $user ) ) {
+			return false;
+		}
+	 
+		$time_window = 150;
+		if ( $time && $time > time() - $time_window && get_current_user_id() != $user ) {
+			return $user;
+		}
+	 
+		return false;
 	}
 	
 }
