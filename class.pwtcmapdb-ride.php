@@ -18,6 +18,7 @@ class PwtcMapdb_Ride {
 		add_shortcode('pwtc_mapdb_delete_ride', array( 'PwtcMapdb_Ride', 'shortcode_delete_ride'));
 		add_shortcode('pwtc_mapdb_manage_published_rides', array('PwtcMapdb_Ride', 'shortcode_manage_published_rides'));
 		add_shortcode('pwtc_mapdb_manage_ride_templates', array('PwtcMapdb_Ride', 'shortcode_manage_ride_templates'));
+		add_shortcode('pwtc_mapdb_manage_pending_rides', array('PwtcMapdb_Ride', 'shortcode_manage_pending_rides'));
 
     	}
 	
@@ -646,6 +647,32 @@ class PwtcMapdb_Ride {
 		return ob_get_clean();
 	}
 	
+	// Generates the [pwtc_mapdb_manage_pending_rides] shortcode.
+	public static function shortcode_manage_pending_rides($atts) {
+		$current_user = wp_get_current_user();
+
+		if ( 0 == $current_user->ID ) {
+			return '<div class="callout small warning"><p>Please <a href="/wp-login.php">log in</a> to manage the pending rides.</p></div>';
+		}
+
+		if (!user_can($current_user,'edit_published_rides')) {
+			return '<div class="callout small warning"><p>You must be a road captain to manage the pending rides.</p></div>';
+		}
+
+		$query_args = [
+			'posts_per_page' => -1,
+			'post_status' => 'pending',
+			'post_type' => PwtcMapdb::POST_TYPE_RIDE,
+			'orderby' => [PwtcMapdb::RIDE_DATE => 'ASC'],
+		];
+		$query = new WP_Query($query_args);
+
+		ob_start();
+		include('manage-pending-rides-form.php');
+		return ob_get_clean();
+	}	
+
+	// Generates the [pwtc_mapdb_manage_published_rides] shortcode.
 	public static function shortcode_manage_published_rides($atts) {
 		$a = shortcode_atts(array('leaders' => 'no'), $atts);
 		$allow_leaders = $a['leaders'] == 'yes';
@@ -722,6 +749,7 @@ class PwtcMapdb_Ride {
 		return ob_get_clean();
 	}
 	
+	// Generates the [pwtc_mapdb_manage_ride_templates] shortcode.
 	public static function shortcode_manage_ride_templates($atts) {
 		$a = shortcode_atts(array('leaders' => 'no'), $atts);
 		$allow_leaders = $a['leaders'] == 'yes';
