@@ -95,8 +95,8 @@ class PwtcMapdb {
 		add_action( 'template_redirect', 
 			array( 'PwtcMapdb', 'download_ride_signup' ) );
 		
-		add_filter( 'heartbeat_received', 
-			array( 'PwtcMapdb', 'refresh_post_lock'), 10, 3 );
+		//add_filter( 'heartbeat_received', 
+		//	array( 'PwtcMapdb', 'refresh_post_lock'), 10, 3 );
 
 		// Register shortcode callbacks
 		add_shortcode('pwtc_search_mapdb', 
@@ -177,10 +177,12 @@ class PwtcMapdb {
 	/*************************************************************/
 
 	public static function load_report_scripts() {
+		/*
 		$link = get_the_permalink();
 		if ($link and (strpos($link, "ride-delete-page")!==false or strpos($link, "ride-edit-fields")!==false)) {
 			wp_enqueue_script('heartbeat');
 		}
+		*/
 		wp_enqueue_style('pwtc_mapdb_report_css', 
 			PWTC_MAPDB__PLUGIN_URL . 'reports-style-v2.css', array());
 	}
