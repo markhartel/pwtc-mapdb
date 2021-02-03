@@ -13,6 +13,13 @@ class PwtcMapdb_Ride {
 	private static function init_hooks() {
 		self::$initiated = true;
 
+		// Register action callbacks
+		add_action('wp_enqueue_scripts', array('PwtcMapdb_Ride', 'load_javascripts'));
+
+		// Register filter callbacks
+		add_filter('heartbeat_received', array('PwtcMapdb_Ride', 'refresh_post_lock'), 10, 3);
+
+		// Register shortcode callbacks
         	add_shortcode('pwtc_mapdb_edit_ride', array('PwtcMapdb_Ride', 'shortcode_edit_ride'));
 		add_shortcode('pwtc_mapdb_manage_rides', array('PwtcMapdb_Ride', 'shortcode_manage_rides'));
 		add_shortcode('pwtc_mapdb_delete_ride', array( 'PwtcMapdb_Ride', 'shortcode_delete_ride'));
@@ -21,6 +28,49 @@ class PwtcMapdb_Ride {
 		add_shortcode('pwtc_mapdb_manage_pending_rides', array('PwtcMapdb_Ride', 'shortcode_manage_pending_rides'));
 
     	}
+	
+	/******************* Action Functions ******************/
+
+	public static function load_javascripts() {
+		$link = get_the_permalink();
+		if ($link and (strpos($link, "ride-delete-page")!==false or strpos($link, "ride-edit-fields")!==false)) {
+			wp_enqueue_script('heartbeat');
+		}
+	}
+
+	/******************* Filter Functions ******************/
+
+	public static function refresh_post_lock($response, $data, $screen_id) {
+		if ( array_key_exists( 'pwtc-refresh-post-lock', $data ) ) {
+			$received = $data['pwtc-refresh-post-lock'];
+			$send     = array();
+	
+			$post_id = absint( $received['post_id'] );
+			if ( ! $post_id ) {
+				return $response;
+			}
+		
+			$user_id = self::check_post_lock( $post_id );
+			$user    = get_userdata( $user_id );
+			if ( $user ) {
+				$name = $user->first_name . ' ' . $user->last_name;
+				$error = array(
+					'text' => sprintf('%s has taken over and is currently editing.', $name ),
+				);
+				$send['lock_error'] = $error;
+			} 
+			else {
+				$new_lock = self::set_post_lock( $post_id );
+				if ( $new_lock ) {
+					$send['new_lock'] = implode( ':', $new_lock );
+				}
+			}
+	
+			$response['pwtc-refresh-post-lock'] = $send;
+		}	
+
+		return $response;
+	}
 	
 	/******************* Shortcode Functions ******************/
 
