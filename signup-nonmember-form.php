@@ -23,17 +23,17 @@
 
         function set_accept_form() {
             var form = $('#pwtc-mapdb-nonmember-signup-div .accept_div form');
-            var your_name = window.localStorage.getItem('<?php echo PwtcMapdb::LOCAL_SIGNUP_NAME; ?>');
+            var your_name = window.localStorage.getItem('<?php echo self::LOCAL_SIGNUP_NAME; ?>');
             if (!your_name) {
                 your_name = '';
             }
             form.find('input[name="your_name"]').val(your_name);
-            var contact_phone = window.localStorage.getItem('<?php echo PwtcMapdb::LOCAL_EMER_PHONE; ?>');
+            var contact_phone = window.localStorage.getItem('<?php echo self::LOCAL_EMER_PHONE; ?>');
             if (!contact_phone) {
                 contact_phone = '';
             }
             form.find('input[name="contact_phone"]').val(contact_phone);
-            var contact_name = window.localStorage.getItem('<?php echo PwtcMapdb::LOCAL_EMER_NAME; ?>');
+            var contact_name = window.localStorage.getItem('<?php echo self::LOCAL_EMER_NAME; ?>');
             if (!contact_name) {
                 contact_name = '';	
             }	
@@ -94,9 +94,9 @@
                         $('#pwtc-mapdb-nonmember-signup-div .accept_div').show();
                     }
                     else {
-                        window.localStorage.setItem('<?php echo PwtcMapdb::LOCAL_SIGNUP_NAME; ?>', res.signup_name);
-                        window.localStorage.setItem('<?php echo PwtcMapdb::LOCAL_EMER_NAME; ?>', res.signup_contact_name);
-                        window.localStorage.setItem('<?php echo PwtcMapdb::LOCAL_EMER_PHONE; ?>', res.signup_contact_phone);
+                        window.localStorage.setItem('<?php echo self::LOCAL_SIGNUP_NAME; ?>', res.signup_name);
+                        window.localStorage.setItem('<?php echo self::LOCAL_EMER_NAME; ?>', res.signup_contact_name);
+                        window.localStorage.setItem('<?php echo self::LOCAL_EMER_PHONE; ?>', res.signup_contact_phone);
                         $('#pwtc-mapdb-nonmember-signup-div .accept_div').hide();
                         $('#pwtc-mapdb-nonmember-signup-div .cancel_div .your_name').html(res.signup_name);
                         $('#pwtc-mapdb-nonmember-signup-div .cancel_div').show();
@@ -147,7 +147,7 @@
             }
             else if (your_name) {
                 clear_warnmsg();
-                var signup_id = window.localStorage.getItem('<?php echo PwtcMapdb::LOCAL_SIGNUP_ID; ?>');
+                var signup_id = window.localStorage.getItem('<?php echo self::LOCAL_SIGNUP_ID; ?>');
                 var contact_phone = $(this).find('input[name="contact_phone"]').val().trim();
                 var contact_name = $(this).find('input[name="contact_name"]').val().trim();
                 var action = "<?php echo admin_url('admin-ajax.php'); ?>";
@@ -172,7 +172,7 @@
 
         $('#pwtc-mapdb-nonmember-signup-div .cancel_div form').on('submit', function(evt) {
             evt.preventDefault();
-            var signup_id = window.localStorage.getItem('<?php echo PwtcMapdb::LOCAL_SIGNUP_ID; ?>');
+            var signup_id = window.localStorage.getItem('<?php echo self::LOCAL_SIGNUP_ID; ?>');
             var action = "<?php echo admin_url('admin-ajax.php'); ?>";
             var data = {
                 'action': 'pwtc_mapdb_cancel_nonmember_signup',
@@ -186,10 +186,10 @@
         });
 
         if (window.localStorage) {
-            var signup_id = window.localStorage.getItem('<?php echo PwtcMapdb::LOCAL_SIGNUP_ID; ?>');
+            var signup_id = window.localStorage.getItem('<?php echo self::LOCAL_SIGNUP_ID; ?>');
             if (!signup_id) {
                 signup_id = '<?php echo $timestamp ?>';
-                window.localStorage.setItem('<?php echo PwtcMapdb::LOCAL_SIGNUP_ID; ?>', signup_id);
+                window.localStorage.setItem('<?php echo self::LOCAL_SIGNUP_ID; ?>', signup_id);
             }
 
             var action = "<?php echo admin_url('admin-ajax.php'); ?>";
