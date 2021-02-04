@@ -67,14 +67,14 @@ class PwtcMapdb {
 	const ROLE_EXPIRED_MEMBER = 'expired_member';
 	const ROLE_RIDE_LEADER = 'ride_leader';
 
-	const LOCAL_SIGNUP_ID = 'ride_signup_id';
-	const LOCAL_SIGNUP_NAME = 'ride_signup_name';
-	const LOCAL_EMER_NAME = 'ride_signup_contact_name';
-	const LOCAL_EMER_PHONE = 'ride_signup_contact_phone';
+	//const LOCAL_SIGNUP_ID = 'ride_signup_id';
+	//const LOCAL_SIGNUP_NAME = 'ride_signup_name';
+	//const LOCAL_EMER_NAME = 'ride_signup_contact_name';
+	//const LOCAL_EMER_PHONE = 'ride_signup_contact_phone';
 
 	const POST_TYPE_RIDE = 'scheduled_rides';
 	
-	const TIMESTAMP_OFFSET = 50*365*24*60*60;
+	//const TIMESTAMP_OFFSET = 50*365*24*60*60;
 
     	private static $initiated = false;
 
@@ -92,8 +92,8 @@ class PwtcMapdb {
 		add_action( 'wp_enqueue_scripts', 
 			array( 'PwtcMapdb', 'load_report_scripts' ) );
 
-		add_action( 'template_redirect', 
-			array( 'PwtcMapdb', 'download_ride_signup' ) );
+		//add_action( 'template_redirect', 
+		//	array( 'PwtcMapdb', 'download_ride_signup' ) );
 		
 		//add_filter( 'heartbeat_received', 
 		//	array( 'PwtcMapdb', 'refresh_post_lock'), 10, 3 );
@@ -102,6 +102,7 @@ class PwtcMapdb {
 		add_shortcode('pwtc_search_mapdb', 
 			array( 'PwtcMapdb', 'shortcode_search_mapdb'));
 		
+		/*
 		add_shortcode('pwtc_mapdb_rider_signup', 
 			array( 'PwtcMapdb', 'shortcode_rider_signup'));
 
@@ -116,6 +117,7 @@ class PwtcMapdb {
 		
 		add_shortcode('pwtc_mapdb_download_signup', 
 			array( 'PwtcMapdb', 'shortcode_download_signup'));
+		*/
 
 		//add_shortcode('pwtc_mapdb_leader_details', 
 		//	array( 'PwtcMapdb', 'shortcode_leader_details'));
@@ -129,14 +131,15 @@ class PwtcMapdb {
 		//add_shortcode('pwtc_mapdb_manage_rides', 
 		//	array( 'PwtcMapdb', 'shortcode_manage_rides'));
 		
-		add_shortcode('pwtc_mapdb_reset_signups', 
-			array( 'PwtcMapdb', 'shortcode_reset_signups'));
+		//add_shortcode('pwtc_mapdb_reset_signups', 
+		//	array( 'PwtcMapdb', 'shortcode_reset_signups'));
 		
 		/* Register AJAX request/response callbacks */
 		
 		add_action( 'wp_ajax_pwtc_mapdb_lookup_maps', 
 			array( 'PwtcMapdb', 'lookup_maps_callback') );
 
+		/*
 		add_action( 'wp_ajax_pwtc_mapdb_edit_signup', 
 			array( 'PwtcMapdb', 'edit_signup_callback') );
 		
@@ -145,10 +148,12 @@ class PwtcMapdb {
 		
 		add_action( 'wp_ajax_pwtc_mapdb_log_mileage', 
 			array( 'PwtcMapdb', 'log_mileage_callback') );
+		*/
 		
 		add_action( 'wp_ajax_pwtc_mapdb_lookup_ride_leaders', 
 			array( 'PwtcMapdb', 'lookup_ride_leaders_callback') );
 		
+		/*
 		add_action( 'wp_ajax_pwtc_mapdb_check_nonmember_signup', 
 			array( 'PwtcMapdb', 'check_nonmember_signup_callback') );
 
@@ -157,10 +162,12 @@ class PwtcMapdb {
 
 		add_action( 'wp_ajax_pwtc_mapdb_cancel_nonmember_signup', 
 			array( 'PwtcMapdb', 'cancel_nonmember_signup_callback') );
+		*/
 		
 		add_action( 'wp_ajax_pwtc_mapdb_lookup_riderid', 
 			array( 'PwtcMapdb', 'lookup_riderid_callback') );
 		
+		/*
 		add_action( 'wp_ajax_nopriv_pwtc_mapdb_check_nonmember_signup', 
 			array( 'PwtcMapdb', 'check_nonmember_signup_callback') );
 
@@ -169,6 +176,7 @@ class PwtcMapdb {
 
 		add_action( 'wp_ajax_nopriv_pwtc_mapdb_cancel_nonmember_signup', 
 			array( 'PwtcMapdb', 'cancel_nonmember_signup_callback') );
+		*/
 
 	}
 
