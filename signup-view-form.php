@@ -567,7 +567,7 @@
                 $attended = true;
             }
             $rider_id = PwtcMapdb::get_rider_id($userid);
-            $contact = PwtcMapdb::get_emergency_contact($userid, true);
+            $contact = self::get_emergency_contact($userid, true);
         ?>
             <tr userid="<?php echo $userid; ?>">
             <td attended="<?php echo $attended ? '1':'0'; ?>"><span>Name</span><?php echo $attended ? '':'<i class="fa fa-times"></i>'; ?> <?php echo $name; ?> </td>
@@ -584,7 +584,7 @@
             $name = $arr['name'];
             $contact_phone = $arr['contact_phone'];
             $contact_name = $arr['contact_name'];
-            $contact = PwtcMapdb::get_nonmember_emergency_contact($contact_phone, $contact_name, true);
+            $contact = self::get_nonmember_emergency_contact($contact_phone, $contact_name, true);
             if ($paperless) {
                 $mileage = 'XXX';
                 $mileage_label = 'n/a';
