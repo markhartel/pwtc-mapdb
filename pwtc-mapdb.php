@@ -25,8 +25,10 @@ register_uninstall_hook( __FILE__, array( 'PwtcMapdb', 'plugin_uninstall' ) );
 require_once( PWTC_MAPDB__PLUGIN_DIR . 'pwtc-mapdb-hooks.php' );
 require_once( PWTC_MAPDB__PLUGIN_DIR . 'class.pwtcmapdb.php' );
 require_once( PWTC_MAPDB__PLUGIN_DIR . 'class.pwtcmapdb-ride.php' );
+require_once( PWTC_MAPDB__PLUGIN_DIR . 'class.pwtcmapdb-signup.php' );
 require_once( PWTC_MAPDB__PLUGIN_DIR . 'class.pwtcmapdb-admin.php' );
 
 add_action( 'init', array( 'PwtcMapdb', 'init' ) );
 add_action( 'init', array( 'PwtcMapdb_Ride', 'init' ) );
+add_action( 'init', array( 'PwtcMapdb_Signup', 'init' ) );
 add_action( 'init', array( 'PwtcMapdb_Admin', 'init' ) );
