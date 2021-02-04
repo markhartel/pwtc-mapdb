@@ -15,9 +15,9 @@ function pwtc_mapdb_get_signup() {
     $current_user = wp_get_current_user();
     $now = PwtcMapdb::get_current_time();
     $postid = get_the_ID();
-    $signup_mode = PwtcMapdb::get_signup_mode($postid);
-    $members_only = PwtcMapdb::get_signup_members_only($postid);
-    $signup_locked = PwtcMapdb::get_signup_locked($postid);
+    $signup_mode = PwtcMapdb_Signup::get_signup_mode($postid);
+    $members_only = PwtcMapdb_Signup::get_signup_members_only($postid);
+    $signup_locked = PwtcMapdb_Signup::get_signup_locked($postid);
     $start = PwtcMapdb::get_ride_start_time($postid);
 
     $result['view_signup_url'] = '/ride-view-signups/?post='.$postid;
