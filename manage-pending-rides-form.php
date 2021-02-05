@@ -6,7 +6,7 @@
     <h3>Pending Rides - Ready for Review</h3>
     <?php if ($query->have_posts()) { ?>
     <table class="pwtc-mapdb-rwd-table">
-        <thead><tr><th>Ride Title</th><th>Author</th><th>Actions</th></tr></thead>
+        <thead><tr><th>Start Time</th><th>Ride Title</th><th>Author</th><th>Actions</th></tr></thead>
         <tbody>
     <?php
     while ($query->have_posts()) {
@@ -22,8 +22,11 @@
             $author_name = 'Unknown';
         }
         $edit_link = esc_url('/ride-edit-fields/?post='.$postid);
+	$start = PwtcMapdb::get_ride_start_time($postid);
+        $start_date = $start->format('m/d/Y g:ia');
     ?>
         <tr>
+	    <td><span>Start Time</span><?php echo $start_date; ?></td>
             <td><span>Ride Title</span><?php echo $title; ?></td>
             <td><span>Author</span><?php echo $author_name; ?></td>
             <td><span>Actions</span>
