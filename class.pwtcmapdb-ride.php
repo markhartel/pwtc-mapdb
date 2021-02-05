@@ -715,7 +715,9 @@ class PwtcMapdb_Ride {
 			'posts_per_page' => -1,
 			'post_status' => 'pending',
 			'post_type' => PwtcMapdb::POST_TYPE_RIDE,
-			'orderby' => [PwtcMapdb::RIDE_DATE => 'ASC'],
+			'meta_key'  => PwtcMapdb::RIDE_DATE,
+			'meta_type' => 'DATETIME',
+			'orderby' => ['meta_value' => 'ASC'],
 		];
 		$query = new WP_Query($query_args);
 
