@@ -30,7 +30,7 @@
     });
 </script>			
 <div id="pwtc-mapdb-manage-published-rides-div">
-    <h3>Rides Scheduled for <?php echo $this_month->format('M Y'); ?></h3>		
+    <p>The following rides are scheduled for <?php echo $this_month->format('F Y'); ?>:</p>		
     <ul class="accordion" data-accordion data-allow-all-closed="true">
         <li class="accordion-item" data-accordion-item>
             <a href="#" class="accordion-title">Click Here to Search</a>
