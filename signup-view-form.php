@@ -502,7 +502,7 @@
         <li class="accordion-item" data-accordion-item>
                     <a href="#" class="accordion-title">Sign-up a Rider...</a>
                     <div class="accordion-content" data-tab-content>
-                <form class="rider-signup-frm" method="POST">
+                <form class="rider-signup-frm" method="POST" novalidate>
                     <input type="hidden" name="signup_userid" value="0"/>
                     <div class="help-text"><p>A rider should use their club member account to sign up for rides. However, if they don't have access to a computer, the ride leader can do it for them here. Enter their rider ID and press lookup. After a rider matching that ID is found, you can enter their mileage and press submit.</p></div>
                     <div class="row">
