@@ -704,11 +704,11 @@
     <div class="callout small">
         <p>This ride was authored by <?php echo $author_name; ?> and is 
         <?php if ($status == 'draft') { ?>
-        a draft. If desired, it can be submitted for review.
+        a draft. It can be updated or submitted for review.
         <?php } else if ($status == 'pending') { ?>
-        pending review by a road captain. If desired, it can be published or rejected.
+        pending review by a road captain. It can be updated, published or rejected.
         <?php } else if ($status == 'publish') { ?>
-        published and on the ride calendar. If desired, it can be unpublished.
+        published and on the ride calendar. It can be updated or unpublished.
         <?php } ?>
         </p>
     </div>
