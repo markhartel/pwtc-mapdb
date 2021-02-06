@@ -22,7 +22,7 @@
     });
 </script>			
 <div id="pwtc-mapdb-manage-templates-div">
-    <h3>Ride Templates</h3>		
+    <p>The following templates are available from which to schedule new rides:</p>		
     <ul class="accordion" data-accordion data-allow-all-closed="true">
         <li class="accordion-item" data-accordion-item>
             <a href="#" class="accordion-title">Click Here to Search</a>
