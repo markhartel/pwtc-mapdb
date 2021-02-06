@@ -11,9 +11,14 @@
 
         $('#pwtc-mapdb-manage-published-rides-div form').on('submit', function(evt) {
             var month = $('#pwtc-mapdb-manage-published-rides-div input[name="ride_month"]').val().trim();
+            if (month.length == 0) {
+                show_warning('The <strong>ride month</strong> must be set.');
+                evt.preventDefault();
+                return;
+            }
             var monthrgx = /^\d{4}-\d{2}$/;
             if (!monthrgx.test(month)) {
-                show_warning('The ride month format is invalid.');
+                show_warning('The <strong>ride month</strong> format is invalid.');
                 evt.preventDefault();
                 return;
             }
@@ -35,7 +40,7 @@
         <li class="accordion-item" data-accordion-item>
             <a href="#" class="accordion-title">Click Here to Search</a>
             <div class="accordion-content" data-tab-content>
-                <form method="POST">
+                <form method="POST" novalidate>
                     <div class="row">
                         <div class="small-12 medium-6 columns">
                             <label>Ride Title 
