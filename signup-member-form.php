@@ -43,7 +43,7 @@
             <em>You may ask the leader to change your mileage at ride start if desired. If you don't want your mileage logged, leave the mileage field blank.</em>
         <?php } ?>
             </p>
-            <form method="POST">
+            <form method="POST" novalidate>
                 <div class="row">
                     <div class="small-12 medium-6 columns">
                         <label>Accept Terms and Conditions
