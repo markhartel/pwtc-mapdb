@@ -3,7 +3,7 @@
 	});
 </script>			
 <div id="pwtc-mapdb-manage-pending-rides-div">
-    <h3>Pending Rides - Ready for Review</h3>
+    <p>Hello road captain, the following rides are ready for your review:</p>
     <?php if ($query->have_posts()) { ?>
     <table class="pwtc-mapdb-rwd-table">
         <thead><tr><th>Start Time</th><th>Ride Title</th><th>Author</th><th>Actions</th></tr></thead>
