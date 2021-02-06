@@ -461,7 +461,7 @@
         <li class="accordion-item" data-accordion-item>
                     <a href="#" class="accordion-title">Set Sign-up Options...</a>
                     <div class="accordion-content" data-tab-content>
-                <form class="signup-options-frm" method="POST">
+                <form class="signup-options-frm" method="POST" novalidate>
                     <div class="row">
                         <div class="small-12 medium-4 columns">
                             <label>Online Ride Sign-up
