@@ -29,7 +29,7 @@
             <td><span>Status</span><?php echo $status; ?></td>
             <td><span>Actions</span>
                 <?php if (user_can($current_user,'edit_published_rides')) { ?>
-                <a href="<?php echo $view_link; ?>" target="_blank">View</a>
+                <a href="<?php echo $view_link; ?>" target="_blank">Preview</a>
                 <?php } ?>
                 <?php if ($status == 'draft' or user_can($current_user,'edit_published_rides')) { ?>
                 <a href="<?php echo $edit_link; ?>" target="_blank" rel="opener">Edit</a>
