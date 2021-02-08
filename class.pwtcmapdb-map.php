@@ -254,7 +254,7 @@ class PwtcMapdb_Map {
 			$edit_url = '';
 			if (current_user_can(PwtcMapdb::EDIT_CAPABILITY)) {
 				$edit_href = admin_url('post.php?post=' . get_the_ID() . '&action=edit');
-				$edit_url = '<a title="Edit map post." target="_blank" href="' . $edit_href . '">' . PwtcMapdb::EDIT_ANCHOR_LABEL . '</a>';
+				$edit_url = '<a title="Edit map post." target="_blank" href="' . $edit_href . '">Edit</a>';
 			}
 
 			$map = [
