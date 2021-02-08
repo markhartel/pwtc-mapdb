@@ -1,4 +1,8 @@
 <style>
+    .indicate-error {
+        border-color: #900 !important;
+        background-color: #FDD !important;
+    }
     #pwtc-mapdb-edit-ride-div .maps-div div {
         margin: 10px; 
         padding: 10px; 
@@ -312,14 +316,22 @@
         });
 
         $('#pwtc-mapdb-edit-ride-div form').on('submit', function(evt) {
+            $('#pwtc-mapdb-edit-ride-div input').removeClass('indicate-error');
+            $('#pwtc-mapdb-edit-ride-div textarea').removeClass('indicate-error');
+            $('#pwtc-mapdb-edit-ride-div .maps-div').removeClass('indicate-error');
+            $('#pwtc-mapdb-edit-ride-div .leaders-div').removeClass('indicate-error');
+            $('#pwtc-mapdb-edit-ride-div .terrain-fst').removeClass('indicate-error');
+
             if ($('#pwtc-mapdb-edit-ride-div input[name="title"]').val().trim().length == 0) {
                 show_warning('The <strong>ride title</strong> cannot be blank.');
+                $('#pwtc-mapdb-edit-ride-div input[name="title"]').addClass('indicate-error');
                 evt.preventDefault();
                 return;
             }
 
             if ($('#pwtc-mapdb-edit-ride-div textarea[name="description"]').val().trim().length == 0) {
                 show_warning('The <strong>ride description</strong> cannot be blank.');
+                $('#pwtc-mapdb-edit-ride-div textarea[name="description"]').addClass('indicate-error');
                 evt.preventDefault();
                 return;
             }
@@ -328,11 +340,13 @@
             var time = $('#pwtc-mapdb-edit-ride-div input[name="ride_time"]').val().trim();
             if (date.length == 0) {
                 show_warning('The <strong>ride date</strong> must be set.');
+                $('#pwtc-mapdb-edit-ride-div input[name="ride_date"]').addClass('indicate-error');
                 evt.preventDefault();
                 return;
             }
             if (time.length == 0) {
                 show_warning('The <strong>departure time</strong> must be set.');
+                $('#pwtc-mapdb-edit-ride-div input[name="ride_time"]').addClass('indicate-error');
                 evt.preventDefault();
                 return;			
             }
@@ -340,11 +354,13 @@
             var timergx = /^\d{2}:\d{2}$/;
             if (!datergx.test(date)) {
                 show_warning('The <strong>ride date</strong> format is invalid.');
+                $('#pwtc-mapdb-edit-ride-div input[name="ride_date"]').addClass('indicate-error');
                 evt.preventDefault();
                 return;
             }
             if (!timergx.test(time)) {
                 show_warning('The <strong>departure time</strong> format is invalid.');
+                $('#pwtc-mapdb-edit-ride-div input[name="ride_time"]').addClass('indicate-error');
                 evt.preventDefault();
                 return;					
             }
@@ -353,6 +369,7 @@
             if (date_elem.validity) {
                 if (!date_elem.validity.valid) {
                     show_warning('The <strong>ride date</strong> must be no earlier than <?php echo $min_date_pretty; ?>.');
+                    $('#pwtc-mapdb-edit-ride-div input[name="ride_date"]').addClass('indicate-error');
                     evt.preventDefault();
                     return; 
                 }
@@ -367,6 +384,7 @@
                 });
                 if (new_maps.length == 0) {
                     show_warning('You must attach at least one <strong>ride map</strong>.');
+                    $('#pwtc-mapdb-edit-ride-div .maps-div').addClass('indicate-error');
                     evt.preventDefault();
                     return;
                 }
@@ -376,18 +394,21 @@
                 var terrain_empty = $('#pwtc-mapdb-edit-ride-div input[name="ride_terrain[]"]:checked').length == 0;
                 if (terrain_empty) {
                     show_warning('You must choose at least one <strong>ride terrain</strong>.');
+                    $('#pwtc-mapdb-edit-ride-div .terrain-fst').addClass('indicate-error');
                     evt.preventDefault();
                     return;						
                 }
                 var dist = $('#pwtc-mapdb-edit-ride-div input[name="distance"]').val().trim();
                 if (dist.length == 0) {
                     show_warning('You must enter a <strong>ride distance</strong>.');
+                    $('#pwtc-mapdb-edit-ride-div input[name="distance"]').addClass('indicate-error');
                     evt.preventDefault();
                     return;							
                 }
                 dist = parseInt(dist, 10);
                 if (dist == NaN || dist < 0) {
                     show_warning('You must enter a <strong>ride distance</strong> that is a non-negative number.');
+                    $('#pwtc-mapdb-edit-ride-div input[name="distance"]').addClass('indicate-error');
                     evt.preventDefault();
                     return;							
                 }
@@ -396,11 +417,13 @@
                     maxdist = parseInt(maxdist, 10);
                     if (maxdist == NaN || maxdist < 0) {
                         show_warning('You must enter a <strong>ride max distance</strong> that is a non-negative number.');
+                        $('#pwtc-mapdb-edit-ride-div input[name="max_distance"]').addClass('indicate-error');
                         evt.preventDefault();
                         return;							
                     }
                     if (maxdist <= dist) {
                         show_warning('The <strong>ride max distance</strong> must be greater than the <strong>ride distance</strong>.');
+                        $('#pwtc-mapdb-edit-ride-div input[name="max_distance"]').addClass('indicate-error');
                         evt.preventDefault();
                         return;									
                     }					
@@ -409,6 +432,7 @@
 
             if ($('#pwtc-mapdb-edit-ride-div input[name="start_address"]').val().trim().length == 0) {
                 show_warning('You must choose a <strong>start location</strong> for this ride.');
+                $('#pwtc-mapdb-edit-ride-div input[name="start_address"]').addClass('indicate-error');
                 evt.preventDefault();
                 return;
             }
@@ -420,6 +444,7 @@
             });
             if (new_leaders.length == 0) {
                 show_warning('You must assign at least one <strong>ride leader</strong>.');
+                $('#pwtc-mapdb-edit-ride-div .leaders-div').addClass('indicate-error');
                 evt.preventDefault();
                 return;
             }
@@ -777,7 +802,7 @@
                 </div>
                 <div class="small-12 medium-6 columns attach-map-no">
                     <label>Ride Terrain
-                    <fieldset>
+                    <fieldset class="terrain-fst">
                         <input type="checkbox" name="ride_terrain[]" value="a" id="terrain-a" <?php echo in_array('a', $ride_terrain) ? 'checked': ''; ?>><label for="terrain-a">A</label>
                         <input type="checkbox" name="ride_terrain[]" value="b" id="terrain-b" <?php echo in_array('b', $ride_terrain) ? 'checked': ''; ?>><label for="terrain-b">B</label>
                         <input type="checkbox" name="ride_terrain[]" value="c" id="terrain-c" <?php echo in_array('c', $ride_terrain) ? 'checked': ''; ?>><label for="terrain-c">C</label>
