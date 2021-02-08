@@ -99,8 +99,8 @@ class PwtcMapdb {
 		//	array( 'PwtcMapdb', 'refresh_post_lock'), 10, 3 );
 
 		// Register shortcode callbacks
-		add_shortcode('pwtc_search_mapdb', 
-			array( 'PwtcMapdb', 'shortcode_search_mapdb'));
+		//add_shortcode('pwtc_search_mapdb', 
+		//	array( 'PwtcMapdb', 'shortcode_search_mapdb'));
 		
 		/*
 		add_shortcode('pwtc_mapdb_rider_signup', 
@@ -136,8 +136,8 @@ class PwtcMapdb {
 		
 		/* Register AJAX request/response callbacks */
 		
-		add_action( 'wp_ajax_pwtc_mapdb_lookup_maps', 
-			array( 'PwtcMapdb', 'lookup_maps_callback') );
+		//add_action( 'wp_ajax_pwtc_mapdb_lookup_maps', 
+		//	array( 'PwtcMapdb', 'lookup_maps_callback') );
 
 		/*
 		add_action( 'wp_ajax_pwtc_mapdb_edit_signup', 
