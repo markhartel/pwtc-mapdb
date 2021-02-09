@@ -16,22 +16,30 @@
 
         $('#pwtc-mapdb-manage-templates-div form a').on('click', function(evt) {
             $('#pwtc-mapdb-manage-templates-div input[name="ride_title"]').val('');
+            $('#pwtc-mapdb-manage-templates-div select[name="ride_leader"]').val('anyone');
             $('#pwtc-mapdb-manage-templates-div form').submit();
         });
 
     });
 </script>			
 <div id="pwtc-mapdb-manage-templates-div">
-    <p>The following templates are available from which to schedule new rides:</p>		
     <ul class="accordion" data-accordion data-allow-all-closed="true">
         <li class="accordion-item" data-accordion-item>
-            <a href="#" class="accordion-title">Click Here to Search</a>
+            <a href="#" class="accordion-title">Search Ride Templates...</a>
             <div class="accordion-content" data-tab-content>
                 <form method="POST">
                     <div class="row">
-                        <div class="small-12 medium-6 columns">
+                        <div class="small-12 medium-8 columns">
                             <label>Ride Title 
                                 <input type="text" name="ride_title" value="<?php echo $ride_title; ?>">
+                            </label>
+                        </div>
+                        <div class="small-12 medium-4 columns">
+                            <label>Ride Leader
+                                <select name="ride_leader">
+                                    <option value="anyone" <?php echo $ride_leader == 'anyone' ? 'selected': ''; ?>>Anyone</option>
+                                    <option value="me"  <?php echo $ride_leader == 'me' ? 'selected': ''; ?>>Me Only</option>
+                                </select>
                             </label>
                         </div>
                     </div>
@@ -73,7 +81,7 @@
             <td><span>1st Leader</span><?php echo $leader; ?></td>
             <td><span>Actions</span>
                 <?php if ($is_captain or ($is_leader and $allow_leaders)) { ?>
-                <a href="<?php echo $copy_link; ?>" target="_blank" rel="opener">Schedule</a>
+                <a href="<?php echo $copy_link; ?>" target="_blank" rel="opener">Copy</a>
                 <?php } ?>
             </td>	
         </tr>
