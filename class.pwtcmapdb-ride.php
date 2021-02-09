@@ -467,12 +467,15 @@ class PwtcMapdb_Ride {
 		}
 
 		if ($postid != 0) {
+			$leaders = PwtcMapdb::get_leader_userids($postid);
+			/*
 			if ($copy_ride and !$template) {
 				$leaders = [$current_user->ID];
 			}
 			else {
 				$leaders = PwtcMapdb::get_leader_userids($postid);
 			}
+			*/
 		}
 		else {
 			$leaders = [$current_user->ID];
