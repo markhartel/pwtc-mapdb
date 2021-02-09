@@ -28,6 +28,7 @@
 
         $('#pwtc-mapdb-manage-published-rides-div form a').on('click', function(evt) {
             $('#pwtc-mapdb-manage-published-rides-div input[name="ride_title"]').val('');
+            $('#pwtc-mapdb-manage-published-rides-div select[name="ride_leader"]').val('anyone');
             $('#pwtc-mapdb-manage-published-rides-div input[name="ride_month"]').val('<?php echo $reset_month; ?>');
             $('#pwtc-mapdb-manage-published-rides-div form').submit();
         });
@@ -38,16 +39,24 @@
     <p>The following rides are scheduled for <?php echo $this_month->format('F Y'); ?>:</p>		
     <ul class="accordion" data-accordion data-allow-all-closed="true">
         <li class="accordion-item" data-accordion-item>
-            <a href="#" class="accordion-title">Click Here to Search</a>
+            <a href="#" class="accordion-title">Search Scheduled Rides...</a>
             <div class="accordion-content" data-tab-content>
                 <form method="POST" novalidate>
                     <div class="row">
-                        <div class="small-12 medium-6 columns">
+                        <div class="small-12 medium-8 columns">
                             <label>Ride Title 
                                 <input type="text" name="ride_title" value="<?php echo $ride_title; ?>">
                             </label>
                         </div>
-                        <div class="small-12 medium-6 columns">
+                        <div class="small-12 medium-2 columns">
+                            <label>Ride Leader
+                                <select name="ride_leader">
+                                    <option value="anyone" <?php echo $ride_leader == 'anyone' ? 'selected': ''; ?>>Anyone</option>
+                                    <option value="me"  <?php echo $ride_leader == 'me' ? 'selected': ''; ?>>Me Only</option>
+                                </select>
+                            </label>
+                        </div>
+                        <div class="small-12 medium-2 columns">
                             <label>Ride Month 
                                 <input type="month" name="ride_month" value="<?php echo $ride_month; ?>">
                             </label>
