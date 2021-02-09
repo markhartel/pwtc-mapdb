@@ -814,8 +814,9 @@ class PwtcMapdb_Ride {
 
 		$current_user = wp_get_current_user();
 
-		if (isset($_POST['ride_title'])) {
+		if (isset($_POST['ride_title']) and isset($_POST['ride_leader'])) {
 			wp_redirect(add_query_arg(array(
+				'leader' => $_POST['ride_leader'],
 				'title' => urlencode(trim($_POST['ride_title']))
 			), get_permalink()), 303);
 			exit;
@@ -842,6 +843,13 @@ class PwtcMapdb_Ride {
 		else {
 			$ride_title = '';
 		}
+		
+		if (isset($_GET['leader'])) {
+			$ride_leader = $_GET['leader'];
+		}
+		else {
+			$ride_leader = 'anyone';
+		}
 
 		$query_args = [
 			'posts_per_page' => -1,
@@ -852,7 +860,14 @@ class PwtcMapdb_Ride {
 		];
 		if (!empty($ride_title)) {
 			$query_args['s'] = $ride_title;	
-		}		
+		}
+		if ($ride_leader == 'me') {
+			$query_args['meta_query'] = [[
+				'key' => PwtcMapdb::RIDE_LEADERS,
+				'value' => '"' . $current_user->ID . '"',
+				'compare' => 'LIKE'
+			]];
+		}	
 		$query = new WP_Query($query_args);
 
 		ob_start();
