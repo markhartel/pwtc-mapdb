@@ -26,6 +26,7 @@ class PwtcMapdb_Ride {
 		add_shortcode('pwtc_mapdb_manage_published_rides', array('PwtcMapdb_Ride', 'shortcode_manage_published_rides'));
 		add_shortcode('pwtc_mapdb_manage_ride_templates', array('PwtcMapdb_Ride', 'shortcode_manage_ride_templates'));
 		add_shortcode('pwtc_mapdb_manage_pending_rides', array('PwtcMapdb_Ride', 'shortcode_manage_pending_rides'));
+		add_shortcode('pwtc_mapdb_new_ride_link', array('PwtcMapdb_Ride', 'shortcode_new_ride_link'));
 
     	}
 	
@@ -857,7 +858,15 @@ class PwtcMapdb_Ride {
 		ob_start();
 		include('manage-ride-templates-form.php');
 		return ob_get_clean();
-	}	
+	}
+	
+	// Generates the [pwtc_mapdb_new_ride_link] shortcode.
+	public static function shortcode_new_ride_link($atts, $content) {
+		if (empty($content)) {
+			$content = 'new ride';
+		}
+		return '<a href="/ride-edit-fields" target="_blank" rel="opener">' . $content . '</a>';
+	}
 	
 	/******************* Utility Functions ******************/
 	
