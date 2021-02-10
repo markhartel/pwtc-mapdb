@@ -824,15 +824,17 @@ class PwtcMapdb_Ride {
 	
 	// Generates the [pwtc_mapdb_manage_ride_templates] shortcode.
 	public static function shortcode_manage_ride_templates($atts) {
-		$a = shortcode_atts(array('leaders' => 'no'), $atts);
+		$a = shortcode_atts(array('leaders' => 'no', 'limit' => '0'), $atts);
 		$allow_leaders = $a['leaders'] == 'yes';
-
+		$limit = intval($a['limit']);
+		
 		$current_user = wp_get_current_user();
 
-		if (isset($_POST['ride_title']) and isset($_POST['ride_leader'])) {
+		if (isset($_POST['ride_title']) and isset($_POST['ride_leader']) and isset($_POST['offset'])) {
 			wp_redirect(add_query_arg(array(
 				'leader' => $_POST['ride_leader'],
-				'title' => urlencode(trim($_POST['ride_title']))
+				'title' => urlencode(trim($_POST['ride_title'])),
+				'offset' => intval($_POST['offset'])
 			), get_permalink()), 303);
 			exit;
 		}
@@ -865,9 +867,16 @@ class PwtcMapdb_Ride {
 		else {
 			$ride_leader = 'anyone';
 		}
+		
+		if (isset($_GET['offset'])) {
+			$offset = intval($_GET['offset']);
+		}
+		else {
+			$offset = 0;
+		}
 
 		$query_args = [
-			'posts_per_page' => -1,
+			'posts_per_page' => $limit > 0 ? $limit : -1,
 			'post_status' => 'publish',
 			'post_type' => 'ride_template',
 			'orderby' => 'title',
@@ -882,7 +891,10 @@ class PwtcMapdb_Ride {
 				'value' => '"' . $current_user->ID . '"',
 				'compare' => 'LIKE'
 			]];
-		}	
+		}
+		if ($limit > 0)	{
+			$query_args['offset'] = $offset;
+		}
 		$query = new WP_Query($query_args);
 
 		ob_start();
