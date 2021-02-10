@@ -2,22 +2,26 @@
     jQuery(document).ready(function($) { 
 
         function show_warning(msg) {
-            $('#pwtc-mapdb-manage-templates-div .errmsg').html('<div class="callout small warning"><p>' + msg + '</p></div>');
+            $('#pwtc-mapdb-manage-templates-div .search-frm .errmsg').html('<div class="callout small warning"><p>' + msg + '</p></div>');
         }
 
         function show_waiting() {
-            $('#pwtc-mapdb-manage-templates-div .errmsg').html('<div class="callout small"><i class="fa fa-spinner fa-pulse waiting"></i> please wait...</div>');
+            $('#pwtc-mapdb-manage-templates-div .search-frm .errmsg').html('<div class="callout small"><i class="fa fa-spinner fa-pulse waiting"></i> please wait...</div>');
         }
 
-        $('#pwtc-mapdb-manage-templates-div form').on('submit', function(evt) {
-            show_waiting();
-            $('#pwtc-mapdb-manage-rides-div button[type="submit"]').prop('disabled',true);
+        $('#pwtc-mapdb-manage-templates-div .load-more-frm').on('submit', function(evt) {
+            $('#pwtc-mapdb-manage-templates-div .load-more-frm .errmsg').html('<div class="callout small"><i class="fa fa-spinner fa-pulse waiting"></i> please wait...</div>');
+            $('#pwtc-mapdb-manage-templates-div button[type="submit"]').prop('disabled',true);
         });
 
-        $('#pwtc-mapdb-manage-templates-div form a').on('click', function(evt) {
-            $('#pwtc-mapdb-manage-templates-div input[name="ride_title"]').val('');
-            $('#pwtc-mapdb-manage-templates-div select[name="ride_leader"]').val('anyone');
-            $('#pwtc-mapdb-manage-templates-div form').submit();
+        $('#pwtc-mapdb-manage-templates-div .search-frm').on('submit', function(evt) {
+            show_waiting();
+            $('#pwtc-mapdb-manage-templates-div button[type="submit"]').prop('disabled',true);
+        });
+
+        $('#pwtc-mapdb-manage-templates-div .search-frm a').on('click', function(evt) {
+            $('#pwtc-mapdb-manage-templates-div .search-frm input[name="ride_title"]').val('');
+            $('#pwtc-mapdb-manage-templates-div .search-frm select[name="ride_leader"]').val('anyone');
         });
 
     });
@@ -27,7 +31,8 @@
         <li class="accordion-item" data-accordion-item>
             <a href="#" class="accordion-title">Search Ride Templates...</a>
             <div class="accordion-content" data-tab-content>
-                <form method="POST">
+                <form class="search-frm" method="POST">
+                    <input type="hidden" name="offset" value="0">
                     <div class="row">
                         <div class="small-12 medium-8 columns">
                             <label>Ride Title 
@@ -57,6 +62,11 @@
         <thead><tr><th>Ride Title</th><th>1st Leader</th><th>Actions</th></tr></thead>
         <tbody>
     <?php
+    $is_more = ($limit > 0) && ($query->found_posts > ($offset + $limit));
+    //error_log('found_posts='.$query->found_posts);
+    //error_log('limit='.$limit);
+    //error_log('offset='.$offset);
+    //error_log('is_more='.$is_more);
     while ($query->have_posts()) {
         $query->the_post();
         $postid = get_the_ID();
@@ -91,6 +101,17 @@
     ?>
         </tbody>
     </table>
+    <?php if ($is_more) { ?>
+    <form class="load-more-frm" method="POST">
+        <input type="hidden" name="offset" value="<?php echo $offset + $limit; ?>">
+        <input type="hidden" name="ride_title" value="<?php echo $ride_title; ?>">
+        <input type="hidden" name="ride_leader" value="<?php echo $ride_leader; ?>">
+        <div class="row column errmsg"></div>
+        <div class="row column clearfix">
+            <button class="dark button float-left" type="submit">Load more templates...</button>
+        </div>
+    </form>
+    <?php } ?>
     <?php } else { ?>
     <div class="callout small"><p>No ride templates found.</p></div>
     <?php } ?>
