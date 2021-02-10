@@ -34,12 +34,12 @@
                 <form class="search-frm" method="POST">
                     <input type="hidden" name="offset" value="0">
                     <div class="row">
-                        <div class="small-12 medium-8 columns">
+                        <div class="small-12 medium-10 columns">
                             <label>Ride Title 
                                 <input type="text" name="ride_title" value="<?php echo $ride_title; ?>">
                             </label>
                         </div>
-                        <div class="small-12 medium-4 columns">
+                        <div class="small-12 medium-2 columns">
                             <label>Ride Leader
                                 <select name="ride_leader">
                                     <option value="anyone" <?php echo $ride_leader == 'anyone' ? 'selected': ''; ?>>Anyone</option>
