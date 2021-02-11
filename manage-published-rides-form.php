@@ -2,47 +2,48 @@
     jQuery(document).ready(function($) { 
 
         function show_warning(msg) {
-            $('#pwtc-mapdb-manage-published-rides-div .errmsg').html('<div class="callout small warning"><p>' + msg + '</p></div>');
+            $('#pwtc-mapdb-manage-published-rides-div .search-frm .errmsg').html('<div class="callout small warning"><p>' + msg + '</p></div>');
         }
 
         function show_waiting() {
-            $('#pwtc-mapdb-manage-published-rides-div .errmsg').html('<div class="callout small"><i class="fa fa-spinner fa-pulse waiting"></i> please wait...</div>');
+            $('#pwtc-mapdb-manage-published-rides-div .search-frm .errmsg').html('<div class="callout small"><i class="fa fa-spinner fa-pulse waiting"></i> please wait...</div>');
         }
 
-        $('#pwtc-mapdb-manage-published-rides-div form').on('submit', function(evt) {
-            var month = $('#pwtc-mapdb-manage-published-rides-div input[name="ride_month"]').val().trim();
-            if (month.length == 0) {
-                show_warning('The <strong>ride month</strong> must be set.');
-                evt.preventDefault();
-                return;
-            }
-            var monthrgx = /^\d{4}-\d{2}$/;
-            if (!monthrgx.test(month)) {
-                show_warning('The <strong>ride month</strong> format is invalid.');
-                evt.preventDefault();
-                return;
+        $('#pwtc-mapdb-manage-published-rides-div .load-more-frm').on('submit', function(evt) {
+            $('#pwtc-mapdb-manage-published-rides-div .load-more-frm .errmsg').html('<div class="callout small"><i class="fa fa-spinner fa-pulse waiting"></i> please wait...</div>');
+            $('#pwtc-mapdb-manage-published-rides-div button[type="submit"]').prop('disabled',true);
+        });
+
+        $('#pwtc-mapdb-manage-published-rides-div .search-frm').on('submit', function(evt) {
+            var month = $('#pwtc-mapdb-manage-published-rides-div .search-frm input[name="ride_month"]').val().trim();
+            if (month.length > 0) {
+                var monthrgx = /^\d{4}-\d{2}$/;
+                if (!monthrgx.test(month)) {
+                    show_warning('The <strong>ride month</strong> format is invalid.');
+                    evt.preventDefault();
+                    return;
+                }
             }
             show_waiting();
             $('#pwtc-mapdb-manage-published-rides-div button[type="submit"]').prop('disabled',true);
         });
 
-        $('#pwtc-mapdb-manage-published-rides-div form a').on('click', function(evt) {
-            $('#pwtc-mapdb-manage-published-rides-div input[name="ride_title"]').val('');
-            $('#pwtc-mapdb-manage-published-rides-div select[name="ride_leader"]').val('anyone');
-            $('#pwtc-mapdb-manage-published-rides-div input[name="ride_month"]').val('<?php echo $reset_month; ?>');
-            $('#pwtc-mapdb-manage-published-rides-div form').submit();
+        $('#pwtc-mapdb-manage-published-rides-div .search-frm a').on('click', function(evt) {
+            $('#pwtc-mapdb-manage-published-rides-div .search-frm input[name="ride_title"]').val('');
+            $('#pwtc-mapdb-manage-published-rides-div .search-frm select[name="ride_leader"]').val('anyone');
+            $('#pwtc-mapdb-manage-published-rides-div .search-frm input[name="ride_month"]').val('');
         });
 
     });
 </script>			
 <div id="pwtc-mapdb-manage-published-rides-div">
-    <p>The following rides are scheduled for <?php echo $this_month->format('F Y'); ?>:</p>		
     <ul class="accordion" data-accordion data-allow-all-closed="true">
         <li class="accordion-item" data-accordion-item>
             <a href="#" class="accordion-title">Search Scheduled Rides...</a>
             <div class="accordion-content" data-tab-content>
-                <form method="POST" novalidate>
+                <form class="search-frm" method="POST" novalidate>
                     <div class="row">
+                        <input type="hidden" name="offset" value="0">
                         <div class="small-12 medium-8 columns">
                             <label>Ride Title 
                                 <input type="text" name="ride_title" value="<?php echo $ride_title; ?>">
@@ -76,6 +77,7 @@
         <thead><tr><th>Start Time</th><th>Ride Title</th><th>1st Leader</th><th>Actions</th></tr></thead>
         <tbody>
     <?php
+    $is_more = ($limit > 0) && ($query->found_posts > ($offset + $limit));
     while ($query->have_posts()) {
         $query->the_post();
         $postid = get_the_ID();
@@ -119,6 +121,19 @@
     ?>
         </tbody>
     </table>
+    <?php if ($is_more) { ?>
+    <form class="load-more-frm" method="POST">
+        <input type="hidden" name="offset" value="<?php echo $offset + $limit; ?>">
+        <input type="hidden" name="ride_title" value="<?php echo $ride_title; ?>">
+        <input type="hidden" name="ride_leader" value="<?php echo $ride_leader; ?>">
+        <input type="hidden" name="ride_month" value="<?php echo $ride_month; ?>">
+        <div class="row column errmsg"></div>
+        <div class="row column clearfix">
+            <button class="dark button float-left" type="submit">Load more rides...</button>
+            <label class="float-right">Remaining rides: <?php echo ($query->found_posts - ($offset + $limit)); ?></label>
+        </div>
+    </form>
+    <?php } ?>
     <?php } else { ?>
     <div class="callout small"><p>No scheduled rides found for this month.</p></div>
     <?php } ?>
