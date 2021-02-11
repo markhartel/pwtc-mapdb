@@ -732,16 +732,18 @@ class PwtcMapdb_Ride {
 
 	// Generates the [pwtc_mapdb_manage_published_rides] shortcode.
 	public static function shortcode_manage_published_rides($atts) {
-		$a = shortcode_atts(array('leaders' => 'no'), $atts);
+		$a = shortcode_atts(array('leaders' => 'no', 'limit' => '10'), $atts);
 		$allow_leaders = $a['leaders'] == 'yes';
-
+		$limit = intval($a['limit']);
+		
 		$current_user = wp_get_current_user();
 
-		if (isset($_POST['ride_title']) and isset($_POST['ride_leader']) and isset($_POST['ride_month'])) {
+		if (isset($_POST['ride_title']) and isset($_POST['ride_leader']) and isset($_POST['ride_month']) and isset($_POST['offset'])) {
 			wp_redirect(add_query_arg(array(
 				'month' => $_POST['ride_month'],
 				'leader' => $_POST['ride_leader'],
-				'title' => urlencode(trim($_POST['ride_title']))
+				'title' => urlencode(trim($_POST['ride_title'])),
+				'offset' => intval($_POST['offset'])
 			), get_permalink()), 303);
 			exit;
 		}
@@ -775,36 +777,46 @@ class PwtcMapdb_Ride {
 			$ride_leader = 'anyone';
 		}
 
-		$timezone = new DateTimeZone(pwtc_get_timezone_string());
-		$interval = new DateInterval('P1M');
 		if (isset($_GET['month'])) {
-			$this_month = DateTime::createFromFormat('Y-m-d H:i:s', $_GET['month'].'-01 00:00:00', $timezone);
-			$next_month = DateTime::createFromFormat('Y-m-d H:i:s', $_GET['month'].'-01 00:00:00', $timezone);
-			$next_month->add($interval);
+			$ride_month = $_GET['month'];
+			if (!empty($ride_month)) {
+				$timezone = new DateTimeZone(pwtc_get_timezone_string());
+				$interval = new DateInterval('P1M');	
+				$this_month = DateTime::createFromFormat('Y-m-d H:i:s', $ride_month.'-01 00:00:00', $timezone);
+				$next_month = DateTime::createFromFormat('Y-m-d H:i:s', $ride_month.'-01 00:00:00', $timezone);
+				$next_month->add($interval);
+				$ride_month = $this_month->format('Y-m');
+			}
 		}
 		else {
-			$this_month = PwtcMapdb::get_current_date();
-			$next_month = PwtcMapdb::get_current_date();
-			$next_month->add($interval);
+			$ride_month = '';
+		}
+		
+		if (isset($_GET['offset'])) {
+			$offset = intval($_GET['offset']);
+		}
+		else {
+			$offset = 0;
 		}
 
 		$now = PwtcMapdb::get_current_time();
-		$ride_month = $this_month->format('Y-m');
-		$reset_month = $now->format('Y-m');
 		$query_args = [
-			'posts_per_page' => -1,
+			'posts_per_page' => $limit > 0 ? $limit : -1,
 			'post_status' => 'publish',
 			'post_type' => PwtcMapdb::POST_TYPE_RIDE,
-			'meta_query' => [
-				[
-					'key' => PwtcMapdb::RIDE_DATE,
-					'value' => [$this_month->format('Y-m-01 00:00:00'), $next_month->format('Y-m-01 00:00:00')],
-					'compare' => 'BETWEEN',
-					'type' => 'DATETIME'
-				],
-			],
-			'orderby' => [PwtcMapdb::RIDE_DATE => 'ASC'],
+			'meta_query' => [],
+			'meta_key'  => PwtcMapdb::RIDE_DATE,
+			'meta_type' => 'DATETIME',
+			'orderby' => ['meta_value' => 'DESC'],
 		];
+		if (!empty($ride_month)) {
+			$query_args['meta_query'][] = [
+				'key' => PwtcMapdb::RIDE_DATE,
+				'value' => [$this_month->format('Y-m-01 00:00:00'), $next_month->format('Y-m-01 00:00:00')],
+				'compare' => 'BETWEEN',
+				'type' => 'DATETIME'
+			];
+		}
 		if (!empty($ride_title)) {
 			$query_args['s'] = $ride_title;	
 		}
@@ -814,7 +826,10 @@ class PwtcMapdb_Ride {
 				'value' => '"' . $current_user->ID . '"',
 				'compare' => 'LIKE'
 			];
-		}	 
+		}
+		if ($limit > 0)	{
+			$query_args['offset'] = $offset;
+		}	
 		$query = new WP_Query($query_args);
 
 		ob_start();
