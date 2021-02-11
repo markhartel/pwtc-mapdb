@@ -109,6 +109,7 @@
         <div class="row column errmsg"></div>
         <div class="row column clearfix">
             <button class="dark button float-left" type="submit">Load more templates...</button>
+            <label class="float-right">Remaining templates: <?php echo ($query->found_posts - ($offset + $limit)); ?></label>
         </div>
     </form>
     <?php } ?>
