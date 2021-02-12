@@ -364,7 +364,7 @@
                 evt.preventDefault();
                 return;					
             }
-            
+
             var date_elem = $('#pwtc-mapdb-edit-ride-div input[name="ride_date"]')[0];
             if (date_elem.validity) {
                 if (!date_elem.validity.valid) {
@@ -672,7 +672,7 @@
 
         var is_dirty = false;
 
-    <?php if ($success == 'yes' and !$return) { ?>
+    <?php if ($success == 'yes' and empty($return)) { ?>
         var opener_win = window.opener;
         if (opener_win) {
             opener_win.location.reload();
@@ -706,23 +706,26 @@
 <div id='pwtc-mapdb-edit-ride-div'>
     <?php if ($success == 'yes') { ?>
     <div class="callout small success">
+        <p>
         <?php if ($operation == 'update_draft') { ?>
-        <p>You have successfully updated the draft ride.</p>
+        You have successfully updated the draft ride.
         <?php } else if ($operation == 'submit_review') { ?>
-        <p>You have successfully submitted the draft ride for review.</p>
+        You have successfully submitted the draft ride for review.
         <?php } else if ($operation == 'update_pending') { ?>
-        <p>You have successfully updated the pending ride.</p>
+        You have successfully updated the pending ride.
         <?php } else if ($operation == 'published') { ?>
-        <p>You have successfully published the pending ride.</p>
+        You have successfully published the pending ride.
         <?php } else if ($operation == 'rejected') { ?>
-        <p>You have successfully rejected the pending ride.</p>
+        You have successfully rejected the pending ride.
         <?php } else if ($operation == 'update_published') { ?>
-        <p>You have successfully updated the published ride.</p>
+        You have successfully updated the published ride.
         <?php } else if ($operation == 'unpublished') { ?>
-        <p>You have successfully unpublished the published ride.</p>
+        You have successfully unpublished the published ride.
         <?php } else if ($operation == 'insert') { ?>
-        <p>You have successfully saved the first draft of your ride.</p>
+        You have successfully saved the first draft of your ride.
         <?php } ?>
+        <?php echo $return_to_ride; ?>
+        </p>
     </div>
     <?php } ?>
     <?php if ($postid != 0) { ?>
@@ -973,7 +976,7 @@
                 </div>
             <?php } ?>
             <?php if (!empty($ride_link)) { ?>
-                <a href="<?php echo $ride_link; ?>" class="dark button float-right"><i class="fa fa-chevron-left"></i> Back to Ride</a>
+                <a href="<?php echo $ride_link; ?>" class="dark button float-right"><i class="fa fa-chevron-left"></i> Return</a>
             <?php } ?>
             </div>
         </form>
