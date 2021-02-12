@@ -42,6 +42,9 @@
         </div>
         <div class="row column clearfix">
             <a class="action-delete delete-ride dark button float-left">Delete Ride</a>
+            <?php if (!empty($ride_link)) { ?>
+            <a href="<?php echo $ride_link; ?>" class="delete-ride dark button float-right"><i class="fa fa-chevron-left"></i> Return</a>
+            <?php } ?>
             <input class="delete-ride-confirm accent button float-left" type="submit" name="delete_ride" value="OK"/>
             <a class="action-cancel delete-ride-confirm dark button float-right">Cancel</a>
         </div>
