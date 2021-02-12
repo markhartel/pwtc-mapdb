@@ -84,14 +84,14 @@
         else {
             $leader = '';
         }
-        $copy_link = esc_url('/ride-edit-fields/?post='.$postid.'&action=template');
+        $copy_link = esc_url('/ride-edit-fields/?post='.$postid.'&action=template&return='.$return_uri);
     ?>
         <tr>
             <td><span>Ride Title</span><?php echo $title; ?></td>
             <td><span>1st Leader</span><?php echo $leader; ?></td>
             <td><span>Actions</span>
                 <?php if ($is_captain or ($is_leader and $allow_leaders)) { ?>
-                <a href="<?php echo $copy_link; ?>" target="_blank" rel="opener">Copy</a>
+                <a href="<?php echo $copy_link; ?>">Copy</a>
                 <?php } ?>
             </td>	
         </tr>
