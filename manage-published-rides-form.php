@@ -42,9 +42,9 @@
             <a href="#" class="accordion-title">Search Scheduled Rides...</a>
             <div class="accordion-content" data-tab-content>
                 <form class="search-frm" method="POST" novalidate>
+                    <input type="hidden" name="offset" value="0">
                     <div class="row">
-                        <input type="hidden" name="offset" value="0">
-                        <div class="small-12 medium-8 columns">
+                        <div class="small-12 medium-7 columns">
                             <label>Ride Title 
                                 <input type="text" name="ride_title" value="<?php echo $ride_title; ?>">
                             </label>
@@ -57,7 +57,7 @@
                                 </select>
                             </label>
                         </div>
-                        <div class="small-12 medium-2 columns">
+                        <div class="small-12 medium-3 columns">
                             <label>Ride Month 
                                 <input type="month" name="ride_month" value="<?php echo $ride_month; ?>">
                             </label>
@@ -96,8 +96,8 @@
             $leader = '';
         }
         $view_link = esc_url(get_the_permalink());
-        $edit_link = esc_url('/ride-edit-fields/?post='.$postid);
-        $copy_link = esc_url('/ride-edit-fields/?post='.$postid.'&action=copy');
+        $edit_link = esc_url('/ride-edit-fields/?post='.$postid.'&return='.$return_uri);
+        $copy_link = esc_url('/ride-edit-fields/?post='.$postid.'&action=copy&return='.$return_uri);
         $start = PwtcMapdb::get_ride_start_time($postid);
         $start_date = $start->format('m/d/Y g:ia');
     ?>
@@ -106,12 +106,12 @@
             <td><span>Ride Title</span><?php echo $title; ?></td>
             <td><span>1st Leader</span><?php echo $leader; ?></td>
             <td><span>Actions</span>
-                <a href="<?php echo $view_link; ?>" target="_blank">View</a>
+                <a href="<?php echo $view_link; ?>">View</a>
                 <?php if ($is_captain or ($is_leader and $allow_leaders)) { ?>
-                <a href="<?php echo $copy_link; ?>" target="_blank" rel="opener">Copy</a>
+                <a href="<?php echo $copy_link; ?>">Copy</a>
                 <?php } ?>
                 <?php if ($is_captain and $start > $now) { ?>
-                <a href="<?php echo $edit_link; ?>" target="_blank" rel="opener">Edit</a>
+                <a href="<?php echo $edit_link; ?>">Edit</a>
                 <?php } ?>
             </td>	
         </tr>
