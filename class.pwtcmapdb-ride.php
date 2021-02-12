@@ -11,7 +11,7 @@ class PwtcMapdb_Ride {
 	}
 
 	private static function init_hooks() {
-		self::$initiated = true;
+        self::$initiated = true;
 
 		// Register action callbacks
 		add_action('wp_enqueue_scripts', array('PwtcMapdb_Ride', 'load_javascripts'));
@@ -20,15 +20,15 @@ class PwtcMapdb_Ride {
 		add_filter('heartbeat_received', array('PwtcMapdb_Ride', 'refresh_post_lock'), 10, 3);
 
 		// Register shortcode callbacks
-        	add_shortcode('pwtc_mapdb_edit_ride', array('PwtcMapdb_Ride', 'shortcode_edit_ride'));
+        add_shortcode('pwtc_mapdb_edit_ride', array('PwtcMapdb_Ride', 'shortcode_edit_ride'));
 		add_shortcode('pwtc_mapdb_manage_rides', array('PwtcMapdb_Ride', 'shortcode_manage_rides'));
 		add_shortcode('pwtc_mapdb_delete_ride', array( 'PwtcMapdb_Ride', 'shortcode_delete_ride'));
 		add_shortcode('pwtc_mapdb_manage_published_rides', array('PwtcMapdb_Ride', 'shortcode_manage_published_rides'));
 		add_shortcode('pwtc_mapdb_manage_ride_templates', array('PwtcMapdb_Ride', 'shortcode_manage_ride_templates'));
 		add_shortcode('pwtc_mapdb_manage_pending_rides', array('PwtcMapdb_Ride', 'shortcode_manage_pending_rides'));
 		add_shortcode('pwtc_mapdb_new_ride_link', array('PwtcMapdb_Ride', 'shortcode_new_ride_link'));
-
-    	}
+		
+	}
 	
 	/******************* Action Functions ******************/
 
@@ -72,18 +72,16 @@ class PwtcMapdb_Ride {
 
 		return $response;
 	}
-	
+
 	/******************* Shortcode Functions ******************/
 
 	// Generates the [pwtc_mapdb_edit_ride] shortcode.
 	public static function shortcode_edit_ride($atts) {
 		$current_user = wp_get_current_user();
 
-		$return = false;
+		$return = '';
 		if (isset($_GET['return'])) {
-			if ($_GET['return'] == 'yes') {
-				$return = true;
-			}
+			$return = $_GET['return'];
 		}
 
 		if (isset($_POST['postid']) and isset($_POST['title']) and $current_user->ID != 0) {
@@ -97,7 +95,7 @@ class PwtcMapdb_Ride {
 			if (isset($_POST['post_status'])) {
 				$post_status = $_POST['post_status'];
 			}
-			
+
 			if ($postid != 0) {
 				$my_post = array(
 					'ID' => $postid,
@@ -139,7 +137,7 @@ class PwtcMapdb_Ride {
 					$success = 'no';
 					wp_redirect(add_query_arg(array(
 						'post' => $postid,
-						'return' => $return ? 'yes':'no',
+						'return' => urlencode($return),
 						'op' => $operation,
 						'success' => $success
 					), get_permalink()), 303);
@@ -154,8 +152,8 @@ class PwtcMapdb_Ride {
 				$my_post = array(
 					'post_title'    => esc_html($title),
 					'post_type'     => PwtcMapdb::POST_TYPE_RIDE,
-                    			'post_status'   => 'draft',
-                    			'post_author'   => $current_user->ID
+                    'post_status'   => 'draft',
+                    'post_author'   => $current_user->ID
 				);
 				$operation = 'insert';
 				$postid = wp_insert_post( $my_post );
@@ -165,14 +163,14 @@ class PwtcMapdb_Ride {
 						wp_redirect(add_query_arg(array(
 							'post' => $_GET['post'],
 							'action' => $_GET['action'],
-							'return' => $return ? 'yes':'no',
+							'return' => urlencode($return),
 							'op' => $operation,
 							'success' => $success
 						), get_permalink()), 303);
 					}
 					else {
 						wp_redirect(add_query_arg(array(
-							'return' => $return ? 'yes':'no',
+							'return' => urlencode($return),
 							'op' => $operation,
 							'success' => $success
 						), get_permalink()), 303);
@@ -328,13 +326,13 @@ class PwtcMapdb_Ride {
 
 			wp_redirect(add_query_arg(array(
 				'post' => $postid,
-				'return' => $return ? 'yes':'no',
+				'return' => urlencode($return),
 				'op' => $operation,
 				'success' => $success
 			), get_permalink()), 303);
 			exit;
 		}
-		
+
 		if (isset($_GET['op']) and isset($_GET['success'])) {
 			if ($_GET['success'] == 'no') {
 				if ($_GET['op'] == 'insert') {
@@ -345,10 +343,10 @@ class PwtcMapdb_Ride {
 				}
 			}
 		}
-		
+
 		if ( 0 == $current_user->ID ) {
 			return '<div class="callout small alert"><p>You must be logged in to submit rides.</p></div>';
-        	}
+        }
 
 		$copy_ride = false;
 		$template = false;
@@ -374,19 +372,19 @@ class PwtcMapdb_Ride {
 		}
 
 		$now_date = PwtcMapdb::get_current_time();
-        
-        	if ($postid != 0) {
+
+        if ($postid != 0) {
 			$post = get_post($postid);
-            		$title = $post->post_title;
-            		$author = $post->post_author;
-            		$status = $post->post_status;
+            $title = $post->post_title;
+            $author = $post->post_author;
+            $status = $post->post_status;
 		}
 		else {
-            		$title = '';
-            		$author = $current_user->ID;
-            		$status = 'draft';
+            $title = '';
+            $author = $current_user->ID;
+            $status = 'draft';
 		}
-		
+
 		$author_name = '';
 		if ($author != 0) {
 			$info = get_userdata($author);
@@ -397,35 +395,36 @@ class PwtcMapdb_Ride {
 				$author_name = 'Unknown';
 			}
 		}
-		
+
 		$ride_title = '';
-		$ride_link = '';
-		$return_to_ride = 'You can now close this page.';
 		if ($postid != 0) {
 			$ride_title = esc_html(get_the_title($postid));
-			if ($return and $status == 'publish' and !$template) {
-				$ride_link = esc_url(get_the_permalink($postid));
-				$return_to_ride = self::create_return_link($ride_link);
-			}
+		}
+
+		$ride_link = '';
+		$return_to_ride = 'You can now close this page.';
+		if (!empty($return)) {
+			$ride_link = esc_url($return);
+			$return_to_ride = self::create_return_link($ride_link);
 		}
 
 		$user_info = get_userdata($current_user->ID);
 
 		if ($copy_ride and !user_can($current_user,'edit_published_rides')) {
-            		if (!in_array(PwtcMapdb::ROLE_RIDE_LEADER, $user_info->roles)) {
-                		return '<div class="callout small warning"><p>You must be a ride leader to copy rides. ' . $return_to_ride . '</p></div>';
-            		}
+            if (!in_array(PwtcMapdb::ROLE_RIDE_LEADER, $user_info->roles)) {
+                return '<div class="callout small warning"><p>You must be a ride leader to copy rides. ' . $return_to_ride . '</p></div>';
+            }
 		}
 
 		if ($postid == 0 and !user_can($current_user,'edit_published_rides')) {
-            		if (!in_array(PwtcMapdb::ROLE_RIDE_LEADER, $user_info->roles)) {
-                		return '<div class="callout small warning"><p>You must be a ride leader to create new rides. ' . $return_to_ride . '</p></div>';
-            		}
+            if (!in_array(PwtcMapdb::ROLE_RIDE_LEADER, $user_info->roles)) {
+                return '<div class="callout small warning"><p>You must be a ride leader to create new rides. ' . $return_to_ride . '</p></div>';
+            }
 		}
-		
+
 		if ($postid != 0 and !$copy_ride) {
 			$lock_user = self::check_post_lock($postid);
-		    	if ($lock_user) {
+		    if ($lock_user) {
 				$info = get_userdata($lock_user);
 				$name = $info->first_name . ' ' . $info->last_name;	
 				return '<div class="callout small warning"><p>Ride "' . $ride_title . '" is currently being edited by ' . $name . '. ' . $return_to_ride . '</p></div>';
@@ -434,25 +433,25 @@ class PwtcMapdb_Ride {
 
 		if ($postid != 0 and !$copy_ride and !user_can($current_user,'edit_published_rides')) {
 			if (!in_array(PwtcMapdb::ROLE_RIDE_LEADER, $user_info->roles)) {
-                		return '<div class="callout small warning"><p>You must be a ride leader to edit rides. ' . $return_to_ride . '</p></div>';
+                return '<div class="callout small warning"><p>You must be a ride leader to edit rides. ' . $return_to_ride . '</p></div>';
 			}
 			
 			if ($author != $current_user->ID) {
-                		return '<div class="callout small warning"><p>You must be the author of ride "' . $ride_title . '" to edit it. ' . $return_to_ride . '</p></div>';
+                return '<div class="callout small warning"><p>You must be the author of ride "' . $ride_title . '" to edit it. ' . $return_to_ride . '</p></div>';
 			}
 			
 			$refresh_script = '';
-			if (!$return) {
+			if (empty($return)) {
 				$refresh_script = self::get_refresh_script();
 			}
-            		if ($status == 'publish') {
-                		return $refresh_script . '<div class="callout small warning"><p>Ride "' . $ride_title . '" is published so you cannot edit it. ' . $return_to_ride . '</p></div>';
-            		}
+            if ($status == 'publish') {
+                return $refresh_script . '<div class="callout small warning"><p>Ride "' . $ride_title . '" is published so you cannot edit it. ' . $return_to_ride . '</p></div>';
+			}
 			else if ($status == 'pending') {
-                		return $refresh_script . '<div class="callout small warning"><p>Ride "' . $ride_title . '" is pending review so you cannot edit it. ' . $return_to_ride . '</p></div>';
-            		}
+                return $refresh_script . '<div class="callout small warning"><p>Ride "' . $ride_title . '" is pending review so you cannot edit it. ' . $return_to_ride . '</p></div>';
+            }
 		}
-		
+
 		if ($postid != 0 and !$copy_ride and $status == 'publish') {
 			$ride_datetime = PwtcMapdb::get_ride_start_time($postid);
 			if ($ride_datetime < $now_date) {
@@ -589,20 +588,35 @@ class PwtcMapdb_Ride {
 			self::set_post_lock($postid);
 		}
 		
-        	ob_start();
-        	include('ride-edit-form.php');
-        	return ob_get_clean();
+        ob_start();
+        include('ride-edit-form.php');
+        return ob_get_clean();
 	}
-	
+
 	// Generates the [pwtc_mapdb_delete_ride] shortcode.
 	public static function shortcode_delete_ride($atts) {
+
+		$return = '';
+		if (isset($_GET['return'])) {
+			$return = $_GET['return'];
+		}
+
+		$ride_link = '';
+		$return_to_ride = 'You can now close this page.';
+		if (!empty($return)) {
+			$ride_link = esc_url($return);
+			$return_to_ride = self::create_return_link($ride_link);
+		}
 
 		$current_user = wp_get_current_user();
 
 		if (isset($_GET['post']) and isset($_GET['deleted'])) {
 			if ($_GET['deleted'] == 'yes') {
-				$refresh_script = self::get_refresh_script();
-				return $refresh_script . '<div class="callout small success"><p>This ride has been successfully deleted. You may now close this page.</p></div>';
+				$refresh_script = '';
+				if (empty($return)) {
+					$refresh_script = self::get_refresh_script();
+				}
+				return $refresh_script . '<div class="callout small success"><p>This ride has been successfully deleted. ' . $return_to_ride . '</p></div>';
 			}
 			else {
 				return '<div class="callout small alert"><p>Failed to delete this ride.</p></div>';
@@ -619,12 +633,14 @@ class PwtcMapdb_Ride {
 			if (wp_trash_post($postid)) {
 				wp_redirect(add_query_arg(array(
 					'post' => $postid,
+					'return' => urlencode($return),
 					'deleted' => 'yes'
 				), get_permalink()), 303);
 			}
 			else {
 				wp_redirect(add_query_arg(array(
 					'post' => $postid,
+					'return' => urlencode($return),
 					'deleted' => 'no'
 				), get_permalink()), 303);
 			}
@@ -642,21 +658,21 @@ class PwtcMapdb_Ride {
 		$status = $post->post_status;
 
 		if ($status == 'publish') {
-			return '<div class="callout small warning"><p>Ride "' . $ride_title . '" is published so you cannot delete it.</p></div>';
+			return '<div class="callout small warning"><p>Ride "' . $ride_title . '" is published so you cannot delete it. ' . $return_to_ride . '</p></div>';
 		}
 		else if ($status == 'pending') {
-			return '<div class="callout small warning"><p>Ride "' . $ride_title . '" is pending review so you cannot delete it.</p></div>';
+			return '<div class="callout small warning"><p>Ride "' . $ride_title . '" is pending review so you cannot delete it. ' . $return_to_ride . '</p></div>';
 		}
 
 		if ($author != $current_user->ID and !user_can($current_user,'edit_published_rides')) {
-			return '<div class="callout small warning"><p>You must be the author of ride "' . $ride_title . '" to delete it.</p></div>';
+			return '<div class="callout small warning"><p>You must be the author of ride "' . $ride_title . '" to delete it. ' . $return_to_ride . '</p></div>';
 		}
 
 		$lock_user = self::check_post_lock($postid);
 		if ($lock_user) {
 			$info = get_userdata($lock_user);
 			$name = $info->first_name . ' ' . $info->last_name;	
-			return '<div class="callout small warning"><p>Ride "' . $ride_title . '" is currently being edited by ' . $name . '.</p></div>';
+			return '<div class="callout small warning"><p>Ride "' . $ride_title . '" is currently being edited by ' . $name . '. ' . $return_to_ride . '</p></div>';
 		}
 
 		self::set_post_lock($postid);
@@ -664,11 +680,11 @@ class PwtcMapdb_Ride {
 		$ride_datetime = PwtcMapdb::get_ride_start_time($postid);
 		$ride_date = $ride_datetime->format('m/d/Y g:ia');
 
-        	ob_start();
-        	include('ride-delete-form.php');
-        	return ob_get_clean();
+        ob_start();
+        include('ride-delete-form.php');
+        return ob_get_clean();
 	}
-	
+
 	// Generates the [pwtc_mapdb_manage_rides] shortcode.
 	public static function shortcode_manage_rides($atts) {
 		$current_user = wp_get_current_user();
@@ -684,7 +700,7 @@ class PwtcMapdb_Ride {
 				return '<div class="callout small warning"><p>You must be a ride leader to manage the rides that you have created.</p></div>';
 			}
 		}
-		
+
 		$author_name = $user_info->first_name . ' ' . $user_info->last_name;
 
 		$query_args = [
@@ -698,11 +714,13 @@ class PwtcMapdb_Ride {
 		];
 		$query = new WP_Query($query_args);
 
+		$return_uri = urlencode($_SERVER['REQUEST_URI']);
+
 		ob_start();
 		include('manage-rides-form.php');
 		return ob_get_clean();
-	}
-	
+	}	
+
 	// Generates the [pwtc_mapdb_manage_pending_rides] shortcode.
 	public static function shortcode_manage_pending_rides($atts) {
 		$current_user = wp_get_current_user();
@@ -725,6 +743,8 @@ class PwtcMapdb_Ride {
 		];
 		$query = new WP_Query($query_args);
 
+		$return_uri = urlencode($_SERVER['REQUEST_URI']);
+
 		ob_start();
 		include('manage-pending-rides-form.php');
 		return ob_get_clean();
@@ -735,7 +755,7 @@ class PwtcMapdb_Ride {
 		$a = shortcode_atts(array('leaders' => 'no', 'limit' => '10'), $atts);
 		$allow_leaders = $a['leaders'] == 'yes';
 		$limit = intval($a['limit']);
-		
+
 		$current_user = wp_get_current_user();
 
 		if (isset($_POST['ride_title']) and isset($_POST['ride_leader']) and isset($_POST['ride_month']) and isset($_POST['offset'])) {
@@ -769,7 +789,7 @@ class PwtcMapdb_Ride {
 		else {
 			$ride_title = '';
 		}
-		
+
 		if (isset($_GET['leader'])) {
 			$ride_leader = $_GET['leader'];
 		}
@@ -791,7 +811,7 @@ class PwtcMapdb_Ride {
 		else {
 			$ride_month = '';
 		}
-		
+
 		if (isset($_GET['offset'])) {
 			$offset = intval($_GET['offset']);
 		}
@@ -819,7 +839,7 @@ class PwtcMapdb_Ride {
 		}
 		if (!empty($ride_title)) {
 			$query_args['s'] = $ride_title;	
-		}
+		}	
 		if ($ride_leader == 'me') {
 			$query_args['meta_query'][] = [
 				'key' => PwtcMapdb::RIDE_LEADERS,
@@ -829,20 +849,22 @@ class PwtcMapdb_Ride {
 		}
 		if ($limit > 0)	{
 			$query_args['offset'] = $offset;
-		}	
+		}	 
 		$query = new WP_Query($query_args);
+
+		$return_uri = urlencode($_SERVER['REQUEST_URI']);
 
 		ob_start();
 		include('manage-published-rides-form.php');
 		return ob_get_clean();
-	}
-	
+	}	
+
 	// Generates the [pwtc_mapdb_manage_ride_templates] shortcode.
 	public static function shortcode_manage_ride_templates($atts) {
 		$a = shortcode_atts(array('leaders' => 'no', 'limit' => '0'), $atts);
 		$allow_leaders = $a['leaders'] == 'yes';
 		$limit = intval($a['limit']);
-		
+
 		$current_user = wp_get_current_user();
 
 		if (isset($_POST['ride_title']) and isset($_POST['ride_leader']) and isset($_POST['offset'])) {
@@ -875,14 +897,14 @@ class PwtcMapdb_Ride {
 		else {
 			$ride_title = '';
 		}
-		
+
 		if (isset($_GET['leader'])) {
 			$ride_leader = $_GET['leader'];
 		}
 		else {
 			$ride_leader = 'anyone';
 		}
-		
+
 		if (isset($_GET['offset'])) {
 			$offset = intval($_GET['offset']);
 		}
@@ -899,7 +921,7 @@ class PwtcMapdb_Ride {
 		];
 		if (!empty($ride_title)) {
 			$query_args['s'] = $ride_title;	
-		}
+		}	
 		if ($ride_leader == 'me') {
 			$query_args['meta_query'] = [[
 				'key' => PwtcMapdb::RIDE_LEADERS,
@@ -909,25 +931,29 @@ class PwtcMapdb_Ride {
 		}
 		if ($limit > 0)	{
 			$query_args['offset'] = $offset;
-		}
+		}	
 		$query = new WP_Query($query_args);
+
+		$return_uri = urlencode($_SERVER['REQUEST_URI']);
 
 		ob_start();
 		include('manage-ride-templates-form.php');
 		return ob_get_clean();
-	}
-	
+	}	
+
 	// Generates the [pwtc_mapdb_new_ride_link] shortcode.
 	public static function shortcode_new_ride_link($atts, $content) {
+		$return_uri = urlencode($_SERVER['REQUEST_URI']);
 		if (empty($content)) {
 			$content = 'new ride';
 		}
-		return '<a href="/ride-edit-fields" target="_blank" rel="opener">' . $content . '</a>';
+		$new_link = esc_url('/ride-edit-fields/?return='.$return_uri);
+		return '<a href="' . $new_link . '">' . $content . '</a>';
 	}
-	
+
 	/******************* Utility Functions ******************/
-	
-	public static function check_post_id($template = false) {
+    
+    public static function check_post_id($template = false) {
 		if (!isset($_GET['post'])) {
 			return '<div class="callout small alert"><p>Ride post ID parameter is missing.</p></div>';
 		}
@@ -977,7 +1003,7 @@ class PwtcMapdb_Ride {
 
 		return '';
 	}
-	
+
 	public static function get_refresh_script() {
 		return <<<EOT
 <script type="text/javascript">
@@ -990,9 +1016,9 @@ class PwtcMapdb_Ride {
 </script>	
 EOT;
 	}
-	
+
 	public static function create_return_link($ride_url) {
-		return 'Click <a href="' . $ride_url . '">here</a> to return to the posted ride.';
+		return 'Click <a href="' . $ride_url . '">here</a> to return to previous page.';
 	}
 
 	public static function set_post_lock( $post_id ) {
@@ -1040,5 +1066,5 @@ EOT;
 	 
 		return false;
 	}
-	
+
 }
