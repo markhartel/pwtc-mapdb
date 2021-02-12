@@ -15,8 +15,8 @@
         $title = esc_html(get_the_title());
         $status = get_post_status();
         $view_link = esc_url(get_the_permalink());
-        $edit_link = esc_url('/ride-edit-fields/?post='.$postid);
-        $delete_link = esc_url('/ride-delete-page/?post='.$postid);
+        $edit_link = esc_url('/ride-edit-fields/?post='.$postid.'&return='.$return_uri);
+        $delete_link = esc_url('/ride-delete-page/?post='.$postid.'&return='.$return_uri);
         $start = PwtcMapdb::get_ride_start_time($postid);
         $start_date = '';
         if ($start) {
@@ -29,13 +29,13 @@
             <td><span>Status</span><?php echo $status; ?></td>
             <td><span>Actions</span>
                 <?php if (user_can($current_user,'edit_published_rides')) { ?>
-                <a href="<?php echo $view_link; ?>" target="_blank">Preview</a>
+                <a href="<?php echo $view_link; ?>">Preview</a>
                 <?php } ?>
                 <?php if ($status == 'draft' or user_can($current_user,'edit_published_rides')) { ?>
-                <a href="<?php echo $edit_link; ?>" target="_blank" rel="opener">Edit</a>
+                <a href="<?php echo $edit_link; ?>">Edit</a>
                 <?php } ?>
                 <?php if ($status == 'draft') { ?>
-                <a href="<?php echo $delete_link; ?>" target="_blank" rel="opener">Delete</a>
+                <a href="<?php echo $delete_link; ?>">Delete</a>
                 <?php } ?>
             </td>	
         </tr>
