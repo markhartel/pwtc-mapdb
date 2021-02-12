@@ -728,8 +728,8 @@
         </p>
     </div>
     <?php } ?>
-    <?php if ($postid != 0) { ?>
     <div class="callout small">
+    <?php if ($postid != 0) { ?>
         <p>This ride was authored by <?php echo $author_name; ?> and is 
         <?php if ($status == 'draft') { ?>
         a draft. It can be updated or submitted for review.
@@ -739,8 +739,16 @@
         published and on the ride calendar. It can be updated or unpublished.
         <?php } ?>
         </p>
-    </div>
+    <?php } else { ?>
+        <?php if ($template) { ?>
+        <p>This is a new ride created from a template, set the <em>ride date</em> and <em>departure time</em> in the form below (and modify any other desired fields) and press the save button at the bottom of the form.</p>
+        <?php } else if ($copy_ride) { ?>
+        <p>This is a new ride copied from an existing ride, set the <em>ride date</em> in the form below (and modify any other desired fields) and press the save button at the bottom of the form.</p>
+        <?php } else { ?>
+        <p>This is a new ride, fill out the form below and press the save button at the bottom of the form.</p>
+        <?php } ?>
     <?php } ?>
+    </div>
     <div class="callout">
         <form method="POST" novalidate>
             <div class="row column">
