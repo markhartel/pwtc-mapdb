@@ -21,18 +21,18 @@
         else {
             $author_name = 'Unknown';
         }
-	$view_link = esc_url(get_the_permalink());
-        $edit_link = esc_url('/ride-edit-fields/?post='.$postid);
-	$start = PwtcMapdb::get_ride_start_time($postid);
+        $view_link = esc_url(get_the_permalink());
+        $edit_link = esc_url('/ride-edit-fields/?post='.$postid.'&return='.$return_uri);
+        $start = PwtcMapdb::get_ride_start_time($postid);
         $start_date = $start->format('m/d/Y g:ia');
     ?>
         <tr>
-	    <td><span>Start Time</span><?php echo $start_date; ?></td>
+            <td><span>Start Time</span><?php echo $start_date; ?></td>
             <td><span>Ride Title</span><?php echo $title; ?></td>
             <td><span>Author</span><?php echo $author_name; ?></td>
             <td><span>Actions</span>
-		<a href="<?php echo $view_link; ?>" target="_blank">Preview</a>
-                <a href="<?php echo $edit_link; ?>" target="_blank" rel="opener">Edit</a>
+                <a href="<?php echo $view_link; ?>">Preview</a>
+                <a href="<?php echo $edit_link; ?>">Edit</a>
             </td>	
         </tr>
     <?php
