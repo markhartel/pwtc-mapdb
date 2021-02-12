@@ -27,19 +27,20 @@ function pwtc_mapdb_get_signup() {
         $result['copy_ride_url'] = false;
     }
     else {
+        $return_uri = urlencode($_SERVER['REQUEST_URI']);
         $result['edit_ride_url'] = false;
         if (user_can($current_user,'edit_published_rides') and $start > $now) {
-            $result['edit_ride_url'] = '/ride-edit-fields/?post='.$postid.'&return=yes';
+            $result['edit_ride_url'] = esc_url('/ride-edit-fields/?post='.$postid.'&return='.$return_uri);
         }
         $result['copy_ride_url'] = false;
         if ($current_user->ID != 0) {
             $user_info = get_userdata($current_user->ID);
             if (user_can($current_user,'edit_published_rides') or in_array(PwtcMapdb::ROLE_RIDE_LEADER, $user_info->roles)) {
-                $result['copy_ride_url'] = '/ride-edit-fields/?post='.$postid.'&action=copy&return=yes';
+                $result['copy_ride_url'] = esc_url('/ride-edit-fields/?post='.$postid.'&action=copy&return='.$return_uri);
             }
         }
     }
-    
+
     if ($signup_mode == 'no' or $signup_locked) {
         $result['ride_signup_msg'] = false;
         $result['ride_signup_url'] = false;
