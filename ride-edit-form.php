@@ -728,7 +728,7 @@
         </p>
     </div>
     <?php } ?>
-    <div class="callout small">
+    <div>
     <?php if ($postid != 0) { ?>
         <p>This ride was authored by <?php echo $author_name; ?> and is 
         <?php if ($status == 'draft') { ?>
