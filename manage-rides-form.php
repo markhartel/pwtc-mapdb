@@ -17,6 +17,9 @@
         $view_link = esc_url(get_the_permalink());
         $edit_link = esc_url('/ride-edit-fields/?post='.$postid.'&return='.$return_uri);
         $delete_link = esc_url('/ride-delete-page/?post='.$postid.'&return='.$return_uri);
+	$subject = 'Ride Submitted for Review';
+        $body = 'Ride URL: ' . urlencode(get_the_permalink());
+        $notify_link = esc_url('mailto:roadcaptain@portlandbicyclingclub.com?subject='.$subject.'&body='.$body);
         $start = PwtcMapdb::get_ride_start_time($postid);
         $start_date = '';
         if ($start) {
@@ -36,6 +39,9 @@
                 <?php } ?>
                 <?php if ($status == 'draft') { ?>
                 <a href="<?php echo $delete_link; ?>">Delete</a>
+                <?php } ?>
+		<?php if ($status == 'pending') { ?>
+                <a href="<?php echo $notify_link; ?>">Notify</a>
                 <?php } ?>
             </td>	
         </tr>
