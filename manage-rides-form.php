@@ -3,7 +3,6 @@
 	});
 </script>			
 <div id="pwtc-mapdb-manage-rides-div">
-    <p>You, <?php echo $author_name; ?>, are the author of the following draft and pending rides:</p>
 <?php if ($query->have_posts()) { ?>
     <table class="pwtc-mapdb-rwd-table">
         <thead><tr><th>Start Time</th><th>Ride Title</th><th>Status</th><th>Actions</th></tr></thead>
@@ -51,8 +50,9 @@
     ?>
         </tbody>
     </table>
+    <p class="help-text">These rides were authored by <?php echo $author_name; ?>.</p>
     <?php } else { ?>
-    <div class="callout small"><p>No draft or pending rides found.</p></div>
+    <div class="callout small"><p>No draft or pending rides authored by <?php echo $author_name; ?> found.</p></div>
     <?php } ?>
 </div>
 <?php 
