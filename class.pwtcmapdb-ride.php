@@ -84,7 +84,22 @@ class PwtcMapdb_Ride {
 			$return = $_GET['return'];
 		}
 
-		if (isset($_POST['postid']) and isset($_POST['title']) and $current_user->ID != 0) {
+		if (isset($_POST['postid']) and isset($_POST['revert'])) {
+			$postid = intval($_POST['postid']);
+
+			$my_post = array(
+				'ID' => $postid,
+				'post_status' => 'draft'
+			);
+			wp_update_post($my_post);
+
+			wp_redirect(add_query_arg(array(
+				'post' => $postid,
+				'return' => urlencode($return)
+			), get_permalink()), 303);
+			exit;
+		}
+		else if (isset($_POST['postid']) and isset($_POST['title']) and $current_user->ID != 0) {
 
 			$success = '';
 			$operation = '';
@@ -433,23 +448,25 @@ class PwtcMapdb_Ride {
 
 		if ($postid != 0 and !$copy_ride and !user_can($current_user,'edit_published_rides')) {
 			if (!in_array(PwtcMapdb::ROLE_RIDE_LEADER, $user_info->roles)) {
-                return '<div class="callout small warning"><p>You must be a ride leader to edit rides. ' . $return_to_ride . '</p></div>';
+                		return '<div class="callout small warning"><p>You must be a ride leader to edit rides. ' . $return_to_ride . '</p></div>';
 			}
 			
 			if ($author != $current_user->ID) {
-                return '<div class="callout small warning"><p>You must be the author of ride "' . $ride_title . '" to edit it. ' . $return_to_ride . '</p></div>';
+                		return '<div class="callout small warning"><p>You must be the author of ride "' . $ride_title . '" to edit it. ' . $return_to_ride . '</p></div>';
 			}
 			
 			$refresh_script = '';
 			if (empty($return)) {
 				$refresh_script = self::get_refresh_script();
 			}
-            if ($status == 'publish') {
-                return $refresh_script . '<div class="callout small warning"><p>Ride "' . $ride_title . '" is published so you cannot edit it. ' . $return_to_ride . '</p></div>';
+            		if ($status == 'publish') {
+               			return $refresh_script . '<div class="callout small warning"><p>Ride "' . $ride_title . '" is published so you cannot edit it. ' . $return_to_ride . '</p></div>';
 			}
 			else if ($status == 'pending') {
-                return $refresh_script . '<div class="callout small warning"><p>Ride "' . $ride_title . '" is pending review so you cannot edit it. ' . $return_to_ride . '</p></div>';
-            }
+				ob_start();
+				include('ride-pending-form.php');
+				return ob_get_clean();
+			}
 		}
 
 		if ($postid != 0 and !$copy_ride and $status == 'publish') {
