@@ -77,6 +77,9 @@ class PwtcMapdb_Ride {
 
 	// Generates the [pwtc_mapdb_edit_ride] shortcode.
 	public static function shortcode_edit_ride($atts) {
+		$a = shortcode_atts(array('leaders' => 'no'), $atts);
+		$allow_leaders = $a['leaders'] == 'yes';
+		
 		$current_user = wp_get_current_user();
 
 		$return = '';
@@ -425,16 +428,20 @@ class PwtcMapdb_Ride {
 
 		$user_info = get_userdata($current_user->ID);
 
+		if (!$allow_leaders and !user_can($current_user,'edit_published_rides')) {
+			return '<div class="callout small warning"><p>You are not allowed to submit rides. ' . $return_to_ride . '</p></div>';
+		}
+		
 		if ($copy_ride and !user_can($current_user,'edit_published_rides')) {
-            if (!in_array(PwtcMapdb::ROLE_RIDE_LEADER, $user_info->roles)) {
-                return '<div class="callout small warning"><p>You must be a ride leader to copy rides. ' . $return_to_ride . '</p></div>';
-            }
+            		if (!in_array(PwtcMapdb::ROLE_RIDE_LEADER, $user_info->roles)) {
+                		return '<div class="callout small warning"><p>You must be a ride leader to copy rides. ' . $return_to_ride . '</p></div>';
+            		}
 		}
 
 		if ($postid == 0 and !user_can($current_user,'edit_published_rides')) {
-            if (!in_array(PwtcMapdb::ROLE_RIDE_LEADER, $user_info->roles)) {
-                return '<div class="callout small warning"><p>You must be a ride leader to create new rides. ' . $return_to_ride . '</p></div>';
-            }
+            		if (!in_array(PwtcMapdb::ROLE_RIDE_LEADER, $user_info->roles)) {
+                		return '<div class="callout small warning"><p>You must be a ride leader to create new rides. ' . $return_to_ride . '</p></div>';
+            		}
 		}
 
 		if ($postid != 0 and !$copy_ride) {
@@ -612,7 +619,9 @@ class PwtcMapdb_Ride {
 
 	// Generates the [pwtc_mapdb_delete_ride] shortcode.
 	public static function shortcode_delete_ride($atts) {
-
+		$a = shortcode_atts(array('leaders' => 'no'), $atts);
+		$allow_leaders = $a['leaders'] == 'yes';
+		
 		$return = '';
 		if (isset($_GET['return'])) {
 			$return = $_GET['return'];
@@ -673,6 +682,10 @@ class PwtcMapdb_Ride {
 		$post = get_post($postid);
 		$author = $post->post_author;
 		$status = $post->post_status;
+		
+		if (!$allow_leaders and !user_can($current_user,'edit_published_rides')) {
+			return '<div class="callout small warning"><p>You are not allowed to delete rides. ' . $return_to_ride . '</p></div>';
+		}
 
 		if ($status == 'publish') {
 			return '<div class="callout small warning"><p>Ride "' . $ride_title . '" is published so you cannot delete it. ' . $return_to_ride . '</p></div>';
@@ -704,6 +717,9 @@ class PwtcMapdb_Ride {
 
 	// Generates the [pwtc_mapdb_manage_rides] shortcode.
 	public static function shortcode_manage_rides($atts) {
+		$a = shortcode_atts(array('leaders' => 'no'), $atts);
+		$allow_leaders = $a['leaders'] == 'yes';
+		
 		$current_user = wp_get_current_user();
 
 		if ( 0 == $current_user->ID ) {
@@ -713,6 +729,9 @@ class PwtcMapdb_Ride {
 		$user_info = get_userdata($current_user->ID);
 
 		if (!user_can($current_user,'edit_published_rides')) {
+			if (!$allow_leaders) {
+				return '<div class="callout small warning"><p>You are not allowed to manage the rides that you have created.</p></div>';
+			}
 			if (!in_array(PwtcMapdb::ROLE_RIDE_LEADER, $user_info->roles)) {
 				return '<div class="callout small warning"><p>You must be a ride leader to manage the rides that you have created.</p></div>';
 			}
