@@ -708,21 +708,25 @@
     <div class="callout small success">
         <p>
         <?php if ($operation == 'update_draft') { ?>
-        You have successfully updated the draft ride.
+        The draft ride was updated.
         <?php } else if ($operation == 'submit_review') { ?>
-        You have successfully submitted the draft ride for review.
+        The draft ride was submitted for review.
         <?php } else if ($operation == 'update_pending') { ?>
-        You have successfully updated the pending ride.
+        The pending ride was updated.
         <?php } else if ($operation == 'published') { ?>
-        You have successfully published the pending ride.
-        <?php } else if ($operation == 'rejected') { ?>
-        You have successfully rejected the pending ride.
+        The pending ride was published.
+        <?php } else if ($operation == 'rejected') { 
+            $subject = 'Rejected Your Ride';
+            $body = 'Ride URL: '.urlencode($edit_link).urlencode("\r\n").'(insert reason for rejection here...)';
+            $notify_link = esc_url('mailto:'.$author_email.'?subject='.$subject.'&body='.$body);            
+        ?>
+        The pending ride was rejected, click <a href="<?php echo $notify_link; ?>">here</a> to notify the author via email.
         <?php } else if ($operation == 'update_published') { ?>
-        You have successfully updated the published ride.
+        The published ride was updated.
         <?php } else if ($operation == 'unpublished') { ?>
-        You have successfully unpublished the published ride.
+        The published ride was unpublished.
         <?php } else if ($operation == 'insert') { ?>
-        You have successfully saved the first draft of your ride.
+        The first draft of your ride was saved.
         <?php } ?>
         <?php echo $return_to_ride; ?>
         </p>
