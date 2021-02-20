@@ -716,7 +716,7 @@
         <?php } else if ($operation == 'published') { ?>
         The pending ride was published.
         <?php } else if ($operation == 'rejected') { 
-            $subject = 'Rejected Your Ride';
+            $subject = 'Rejected Your Submitted Ride';
             $body = 'Ride URL: '.urlencode($edit_link).urlencode("\r\n").'(insert reason for rejection here...)';
             $notify_link = esc_url('mailto:'.$author_email.'?subject='.$subject.'&body='.$body);            
         ?>
