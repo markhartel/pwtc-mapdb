@@ -408,9 +408,11 @@ class PwtcMapdb_Ride {
 			$info = get_userdata($author);
 			if ($info) {
 				$author_name = $info->first_name . ' ' . $info->last_name;
+				$author_email = $info->user_email;
 			}
 			else {
 				$author_name = 'Unknown';
+				$author_email = '';
 			}
 		}
 
@@ -426,6 +428,14 @@ class PwtcMapdb_Ride {
 			$return_to_ride = self::create_return_link($ride_link);
 		}
 
+		$edit_link = '';
+		if ($postid != 0) {
+			$edit_link = add_query_arg(array(
+				'post' => $postid,
+				'return' => urlencode('/submit-ride')
+			), get_permalink());
+		}
+		
 		$user_info = get_userdata($current_user->ID);
 
 		if (!$allow_leaders and !user_can($current_user,'edit_published_rides')) {
@@ -470,6 +480,9 @@ class PwtcMapdb_Ride {
                			return $refresh_script . '<div class="callout small warning"><p>Ride "' . $ride_title . '" is published so you cannot edit it. ' . $return_to_ride . '</p></div>';
 			}
 			else if ($status == 'pending') {
+				$subject = 'Ride Submitted for Review';
+				$body = 'Ride URL: ' . urlencode(get_permalink($postid)).urlencode("\r\n").'(insert additional comments here...)';
+				$notify_link = esc_url('mailto:roadcaptain@portlandbicyclingclub.com?subject='.$subject.'&body='.$body);
 				ob_start();
 				include('ride-pending-form.php');
 				return ob_get_clean();
