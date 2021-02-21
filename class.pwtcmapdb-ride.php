@@ -1067,7 +1067,7 @@ EOT;
 	}
 
 	public static function create_return_link($ride_url) {
-		return 'Click <a href="' . $ride_url . '">here</a> to return to previous page.';
+		return 'Click <a href="' . $ride_url . '">here</a> to return to the previous page.';
 	}
 
 	public static function set_post_lock( $post_id ) {
