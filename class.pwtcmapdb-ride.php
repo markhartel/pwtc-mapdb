@@ -518,18 +518,8 @@ class PwtcMapdb_Ride {
 			$leaders = [$current_user->ID];
 		}
 
-		if (user_can($current_user,'edit_published_rides')) {
-			$interval = new DateInterval('P1D');
-		}
-		else {
-			$interval = new DateInterval('P14D');
-		}
 		$edit_date = true;
 		if ($postid != 0) {
-			$min_datetime = PwtcMapdb::get_current_date();
-			$min_datetime->add($interval);
-			$min_date = $min_datetime->format('Y-m-d');
-			$min_date_pretty = $min_datetime->format('m/d/Y');
 			if ($template) {
 				$ride_date = '';
 				$ride_time = '';	
@@ -546,12 +536,24 @@ class PwtcMapdb_Ride {
 			}
 		}
 		else {
-			$ride_datetime = PwtcMapdb::get_current_time();
-			$ride_datetime->add($interval);
 			$ride_date = '';
 			$ride_time = '';
-			$min_date = $ride_datetime->format('Y-m-d');
-			$min_date_pretty = $ride_datetime->format('m/d/Y');
+		}
+
+		if ($postid == 0 or $copy_ride or !user_can($current_user,'edit_published_rides')) {
+			if (user_can($current_user,'edit_published_rides')) {
+				$interval = new DateInterval('P1D');
+			}
+			else {
+				$interval = new DateInterval('P14D');
+			}
+			$min_datetime = PwtcMapdb::get_current_date();
+			$min_datetime->add($interval);
+			$min_date = $min_datetime->format('Y-m-d');
+			$min_date_pretty = $min_datetime->format('m/d/Y');
+		}
+		else {
+			$min_date = $min_date_pretty = '';
 		}
 
 		$edit_title = $edit_start_location = $edit_date;
