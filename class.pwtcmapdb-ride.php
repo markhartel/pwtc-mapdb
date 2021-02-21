@@ -481,7 +481,7 @@ class PwtcMapdb_Ride {
 			}
 			else if ($status == 'pending') {
 				$subject = 'Ride Submitted for Review';
-				$body = 'Ride URL: ' . urlencode(get_permalink($postid)).urlencode("\r\n").'(insert additional comments here...)';
+				$body = 'Dear Road Captain,'.urlencode("\r\n").'Please review the following ride:'.urlencode("\r\n").urlencode(get_permalink($postid)).urlencode("\r\n").urlencode("\r\n");
 				$notify_link = esc_url('mailto:roadcaptain@portlandbicyclingclub.com?subject='.$subject.'&body='.$body);
 				ob_start();
 				include('ride-pending-form.php');
