@@ -773,7 +773,7 @@
             <div class="row">
                 <div class="small-12 medium-6 columns">
                     <label>Ride Date
-                        <input type="date" name="ride_date" value="<?php echo $ride_date; ?>" min="<?php echo $min_date; ?>" <?php echo $edit_date ? '': 'readonly'; ?>/>	
+                        <input type="date" name="ride_date" value="<?php echo $ride_date; ?>" <?php echo empty($min_date) ? '': 'min="'.$min_date.'"'; ?> <?php echo $edit_date ? '': 'readonly'; ?>/>	
                     </label>
                     <?php if (!$edit_date) { ?>
                     <p class="help-text">You are not allowed to edit the ride date.</p>
