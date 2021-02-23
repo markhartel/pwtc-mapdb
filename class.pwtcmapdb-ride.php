@@ -492,7 +492,14 @@ class PwtcMapdb_Ride {
 		if ($postid != 0 and !$copy_ride and $status == 'publish') {
 			$ride_datetime = PwtcMapdb::get_ride_start_time($postid);
 			if ($ride_datetime < $now_date) {
-				return '<div class="callout small warning"><p>Ride "' . $ride_title . '" has already finished so you cannot edit it. ' . $return_to_ride . '</p></div>';
+				if (user_can($current_user,'edit_published_rides')) {
+					ob_start();
+					include('ride-published-form.php');
+					return ob_get_clean();
+				}
+				else {
+					return '<div class="callout small warning"><p>Ride "' . $ride_title . '" has already finished so you cannot edit it. ' . $return_to_ride . '</p></div>';
+				}
 			}
 		}
 
