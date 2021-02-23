@@ -110,7 +110,7 @@
                 <?php if ($is_captain or ($is_leader and $allow_leaders)) { ?>
                 <a href="<?php echo $copy_link; ?>">Copy</a>
                 <?php } ?>
-                <?php if ($is_captain and $start > $now) { ?>
+                <?php if ($is_captain) { ?>
                 <a href="<?php echo $edit_link; ?>">Edit</a>
                 <?php } ?>
             </td>	
