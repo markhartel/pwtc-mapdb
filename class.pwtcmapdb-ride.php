@@ -429,14 +429,6 @@ class PwtcMapdb_Ride {
 			$ride_link = esc_url($return);
 			$return_to_ride = self::create_return_link($ride_link);
 		}
-
-		$edit_link = '';
-		if ($postid != 0) {
-			$edit_link = add_query_arg(array(
-				'post' => $postid,
-				'return' => urlencode('/submit-ride')
-			), get_permalink());
-		}
 		
 		$user_info = get_userdata($current_user->ID);
 
@@ -636,9 +628,19 @@ class PwtcMapdb_Ride {
 			self::set_post_lock($postid);
 		}
 		
-        ob_start();
-        include('ride-edit-form.php');
-        return ob_get_clean();
+		$edit_link = '';
+		$view_link = '';
+		if ($postid != 0) {
+			$edit_link = add_query_arg(array(
+				'post' => $postid,
+				'return' => urlencode('/submit-ride')
+			), get_permalink());
+			$view_link = get_permalink($postid);
+		}
+		
+        	ob_start();
+        	include('ride-edit-form.php');
+        	return ob_get_clean();
 	}
 
 	// Generates the [pwtc_mapdb_delete_ride] shortcode.
