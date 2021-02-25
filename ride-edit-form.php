@@ -727,6 +727,8 @@
         The published ride was unpublished.
         <?php } else if ($operation == 'insert') { ?>
         The first draft of your ride was saved.
+        <?php } else if ($operation == 'revert_draft') { ?>
+        The ride was reverted back to draft.
         <?php } ?>
         <?php echo $return_to_ride; ?>
         </p>
