@@ -76,7 +76,7 @@ class PwtcMapdb_Ride {
 	/******************* Shortcode Functions ******************/
 
 	// Generates the [pwtc_mapdb_edit_ride] shortcode.
-	public static function shortcode_edit_ride($atts) {
+	public static function shortcode_edit_ride($atts, $content) {
 		$a = shortcode_atts(array('leaders' => 'no'), $atts);
 		$allow_leaders = $a['leaders'] == 'yes';
 		
@@ -502,6 +502,9 @@ class PwtcMapdb_Ride {
 		}
 		else {
 			$description = '';
+			if (!empty($content)) {
+				$description = wp_kses($content, array());
+			}
 		}
 
 		if ($postid != 0) {
