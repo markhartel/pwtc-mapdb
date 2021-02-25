@@ -98,7 +98,9 @@ class PwtcMapdb_Ride {
 
 			wp_redirect(add_query_arg(array(
 				'post' => $postid,
-				'return' => urlencode($return)
+				'return' => urlencode($return),
+				'op' => 'revert_draft',
+				'success' => 'yes'
 			), get_permalink()), 303);
 			exit;
 		}
