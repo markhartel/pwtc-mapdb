@@ -715,7 +715,7 @@
         The pending ride was updated.
         <?php } else if ($operation == 'published') { 
             $subject = 'Published Your Submitted Ride';
-            $body = 'Dear '.$author_name.','.urlencode("\r\n").'Your submitted ride'.urlencode("\r\n").urlencode($view_link).urlencode("\r\n").'has been published and is now o n the ride calendar.'.urlencode("\r\n").urlencode("\r\n");
+            $body = 'Dear '.$author_name.','.urlencode("\r\n").'Your submitted ride'.urlencode("\r\n").urlencode($view_link).urlencode("\r\n").'has been published and is now on the ride calendar.'.urlencode("\r\n").urlencode("\r\n");
             $notify_link = esc_url('mailto:'.$author_email.'?subject='.$subject.'&body='.$body);
         ?>
         The pending ride was published, click <a href="<?php echo $notify_link; ?>">here</a> to notify the author via email.
