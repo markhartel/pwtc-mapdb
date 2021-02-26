@@ -752,17 +752,17 @@ class PwtcMapdb_Ride {
 		$current_user = wp_get_current_user();
 
 		if ( 0 == $current_user->ID ) {
-			return '<div class="callout small warning"><p>Please <a href="/wp-login.php">log in</a> to manage the rides that you have created.</p></div>';
+			return '<div class="callout small warning"><p>Please <a href="/wp-login.php">log in</a> to view the rides that you have created.</p></div>';
 		}
 
 		$user_info = get_userdata($current_user->ID);
 
 		if (!user_can($current_user,'edit_published_rides')) {
 			if (!$allow_leaders) {
-				return '<div class="callout small warning"><p>You are not allowed to manage the rides that you have created.</p></div>';
+				return '<div class="callout small warning"><p>You are not allowed to view the rides that you have created.</p></div>';
 			}
 			if (!in_array(PwtcMapdb::ROLE_RIDE_LEADER, $user_info->roles)) {
-				return '<div class="callout small warning"><p>You must be a ride leader to manage the rides that you have created.</p></div>';
+				return '<div class="callout small warning"><p>You must be a ride leader to view the rides that you have created.</p></div>';
 			}
 		}
 
@@ -834,7 +834,7 @@ class PwtcMapdb_Ride {
 		}
 
 		if ( 0 == $current_user->ID ) {
-			return '<div class="callout small warning"><p>Please <a href="/wp-login.php">log in</a> to manage the scheduled rides.</p></div>';
+			return '<div class="callout small warning"><p>Please <a href="/wp-login.php">log in</a> to view the scheduled rides.</p></div>';
 		}
 
 		$is_captain = false;
@@ -942,7 +942,7 @@ class PwtcMapdb_Ride {
 		}
 
 		if ( 0 == $current_user->ID ) {
-			return '<div class="callout small warning"><p>Please <a href="/wp-login.php">log in</a> to manage the ride templates.</p></div>';
+			return '<div class="callout small warning"><p>Please <a href="/wp-login.php">log in</a> to view the ride templates.</p></div>';
 		}
 
 		$is_captain = false;
