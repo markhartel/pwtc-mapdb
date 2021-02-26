@@ -791,11 +791,11 @@ class PwtcMapdb_Ride {
 		$current_user = wp_get_current_user();
 
 		if ( 0 == $current_user->ID ) {
-			return '<div class="callout small warning"><p>Please <a href="/wp-login.php">log in</a> to manage the pending rides.</p></div>';
+			return '<div class="callout small warning"><p>Please <a href="/wp-login.php">log in</a> to review the pending rides.</p></div>';
 		}
 
 		if (!user_can($current_user,'edit_published_rides')) {
-			return '<div class="callout small warning"><p>You must be a road captain to manage the pending rides.</p></div>';
+			return '<div class="callout small warning"><p>You must be a road captain to review the pending rides.</p></div>';
 		}
 
 		$query_args = [
