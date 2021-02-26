@@ -775,7 +775,7 @@ class PwtcMapdb_Ride {
 			'post_type' => PwtcMapdb::POST_TYPE_RIDE,
 			'meta_key'  => PwtcMapdb::RIDE_DATE,
 			'meta_type' => 'DATETIME',
-			'orderby' => ['meta_value' => 'ASC'],
+			'orderby' => ['meta_value' => 'DESC'],
 		];
 		$query = new WP_Query($query_args);
 
@@ -804,7 +804,7 @@ class PwtcMapdb_Ride {
 			'post_type' => PwtcMapdb::POST_TYPE_RIDE,
 			'meta_key'  => PwtcMapdb::RIDE_DATE,
 			'meta_type' => 'DATETIME',
-			'orderby' => ['meta_value' => 'ASC'],
+			'orderby' => ['meta_value' => 'DESC'],
 		];
 		$query = new WP_Query($query_args);
 
