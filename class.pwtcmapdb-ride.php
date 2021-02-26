@@ -503,7 +503,7 @@ class PwtcMapdb_Ride {
 		else {
 			$description = '';
 			if (!empty($content)) {
-				$description = wp_kses($content, array());
+				$description = wp_kses($content, array()).'(insert ride description here...)';
 			}
 		}
 
