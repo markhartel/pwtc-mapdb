@@ -1,8 +1,11 @@
 <?php
 
 class PwtcMapdb_Ride {
+	
+	const EDIT_RIDE_URI = '/ride-edit-fields';
+	const DELETE_RIDE_URI = '/ride-delete-page';
 
-    private static $initiated = false;
+    	private static $initiated = false;
 
 	public static function init() {
 		if ( ! self::$initiated ) {
@@ -1130,6 +1133,50 @@ EOT;
 		}
 	 
 		return false;
+	}
+	
+	public static function submit_ride_link($return=false, $postid=0, $action=false) {
+		$uri = self::EDIT_RIDE_URI;
+		if ($postid > 0) {
+			$uri .= '?post=' . $postid;
+			if ($action) {
+				$uri .= '&action=' . $action;
+			}
+			if ($return) {
+				$uri .= '&return=' . urlencode($return);
+			}
+		}
+		else {
+			if ($return) {
+				$uri .= '?return=' . urlencode($return);
+			}
+		}
+		return esc_url($uri);
+	}
+
+	public static function delete_ride_link($postid, $return=false) {
+		$uri = self::DELETE_RIDE_URI;
+		$uri .= '?post=' . $postid;
+		if ($return) {
+			$uri .= '&return=' . urlencode($return);
+		}
+		return esc_url($uri);
+	}
+
+	public static function new_ride_link($return=false) {
+		return self::submit_ride_link($return);
+	}
+
+	public static function copy_ride_link($post_id, $return=false) {
+		return self::submit_ride_link($return, $post_id, 'copy');
+	}
+
+	public static function edit_ride_link($post_id, $return=false) {
+		return self::submit_ride_link($return, $post_id);
+	}
+
+	public static function template_ride_link($post_id, $return=false) {
+		return self::submit_ride_link($return, $post_id, 'template');
 	}
 
 }
