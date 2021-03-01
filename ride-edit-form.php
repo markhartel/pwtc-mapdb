@@ -714,15 +714,11 @@
         <?php } else if ($operation == 'update_pending') { ?>
         The pending ride was updated.
         <?php } else if ($operation == 'published') { 
-            $subject = 'Published Your Submitted Ride';
-            $body = 'Dear '.$author_name.','.urlencode("\r\n").'Your submitted ride'.urlencode("\r\n").urlencode($view_link).urlencode("\r\n").'has been published and is now on the ride calendar.'.urlencode("\r\n").urlencode("\r\n");
-            $notify_link = esc_url('mailto:'.$author_email.'?subject='.$subject.'&body='.$body);
+            $notify_link = self::ride_published_email($author_name, $author_email, $view_link);
         ?>
         The pending ride was published, click <a href="<?php echo $notify_link; ?>">here</a> to notify the author via email.
         <?php } else if ($operation == 'rejected') { 
-            $subject = 'Rejected Your Submitted Ride';
-            $body = 'Dear '.$author_name.','.urlencode("\r\n").'Your submitted ride'.urlencode("\r\n").urlencode($edit_link).urlencode("\r\n").'was rejected for the following reason:'.urlencode("\r\n").'(insert reason for rejection here...)'.urlencode("\r\n").urlencode("\r\n");
-            $notify_link = esc_url('mailto:'.$author_email.'?subject='.$subject.'&body='.$body);            
+            $notify_link = self::ride_rejected_email($author_name, $author_email, $edit_link);            
         ?>
         The pending ride was rejected, click <a href="<?php echo $notify_link; ?>">here</a> to notify the author via email.
         <?php } else if ($operation == 'update_published') { ?>
