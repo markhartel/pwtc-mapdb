@@ -636,8 +636,7 @@ class PwtcMapdb_Ride {
 		$view_link = '';
 		if ($postid != 0) {
 			$edit_link = add_query_arg(array(
-				'post' => $postid,
-				'return' => urlencode('/submit-ride')
+				'post' => $postid
 			), get_permalink());
 			$view_link = get_permalink($postid);
 		}
