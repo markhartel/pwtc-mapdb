@@ -84,7 +84,7 @@
         else {
             $leader = '';
         }
-        $copy_link = esc_url('/ride-edit-fields/?post='.$postid.'&action=template&return='.$return_uri);
+        $copy_link = self::template_ride_link($postid, $return_uri);
     ?>
         <tr>
             <td><span>Ride Title</span><?php echo $title; ?></td>
