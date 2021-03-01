@@ -477,9 +477,7 @@ class PwtcMapdb_Ride {
                			return $refresh_script . '<div class="callout small warning"><p>Ride "' . $ride_title . '" is published so you cannot edit it. ' . $return_to_ride . '</p></div>';
 			}
 			else if ($status == 'pending') {
-				$subject = 'Ride Submitted for Review';
-				$body = 'Dear Road Captain,'.urlencode("\r\n").'Please review the following ride:'.urlencode("\r\n").urlencode(get_permalink($postid)).urlencode("\r\n").urlencode("\r\n");
-				$notify_link = esc_url('mailto:'.PwtcMapdb::ROAD_CAPTAIN_EMAIL.'?subject='.$subject.'&body='.$body);
+				$notify_link = self::ride_submitted_email($postid);
 				ob_start();
 				include('ride-pending-form.php');
 				return ob_get_clean();
@@ -1177,6 +1175,30 @@ EOT;
 
 	public static function template_ride_link($post_id, $return=false) {
 		return self::submit_ride_link($return, $post_id, 'template');
+	}
+	
+	public static function ride_submitted_email($postid) {
+		$subject = 'Ride Submitted for Review';
+		$body = 'Dear Road Captain,'.urlencode("\r\n").'Please review the following ride:'.urlencode("\r\n").urlencode(get_permalink($postid)).urlencode("\r\n").urlencode("\r\n");
+		return esc_url('mailto:'.PwtcMapdb::ROAD_CAPTAIN_EMAIL.'?subject='.$subject.'&body='.$body);
+	}
+
+	public static function ride_published_email($author_name, $author_email, $ride_link) {
+		$subject = 'Published Your Submitted Ride';
+		$body = 'Dear '.$author_name.','.urlencode("\r\n").'Your submitted ride'.urlencode("\r\n").urlencode($ride_link).urlencode("\r\n").'has been published and is now on the ride calendar.'.urlencode("\r\n").urlencode("\r\n");
+		return esc_url('mailto:'.$author_email.'?subject='.$subject.'&body='.$body);
+	}
+
+	public static function ride_rejected_email($author_name, $author_email, $ride_link) {
+		$subject = 'Rejected Your Submitted Ride';
+		$body = 'Dear '.$author_name.','.urlencode("\r\n").'Your submitted ride'.urlencode("\r\n").urlencode($ride_link).urlencode("\r\n").'was rejected for the following reason:'.urlencode("\r\n").'(insert reason for rejection here...)'.urlencode("\r\n").urlencode("\r\n");
+		return esc_url('mailto:'.$author_email.'?subject='.$subject.'&body='.$body);
+	}
+
+	public static function ride_question_email($author_name, $author_email, $ride_title, $ride_date) {
+		$subject = 'Question About Your Submitted Ride';
+        	$body = 'Dear '.$author_name.','.urlencode("\r\n").'I have questions about your submitted ride'.urlencode("\r\n").$ride_title.' on '.$ride_date.urlencode("\r\n").'(insert questions here...)'.urlencode("\r\n").urlencode("\r\n");
+        	return esc_url('mailto:'.$author_email.'?subject='.$subject.'&body='.$body); 
 	}
 
 }
