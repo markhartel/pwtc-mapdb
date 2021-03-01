@@ -96,8 +96,8 @@
             $leader = '';
         }
         $view_link = esc_url(get_the_permalink());
-        $edit_link = esc_url('/ride-edit-fields/?post='.$postid.'&return='.$return_uri);
-        $copy_link = esc_url('/ride-edit-fields/?post='.$postid.'&action=copy&return='.$return_uri);
+        $edit_link = self::edit_ride_link($postid, $return_uri);
+        $copy_link = self::copy_ride_link($postid, $return_uri);
         $start = PwtcMapdb::get_ride_start_time($postid);
         $start_date = $start->format('m/d/Y g:ia');
     ?>
