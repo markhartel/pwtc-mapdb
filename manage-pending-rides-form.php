@@ -26,9 +26,7 @@
         $edit_link = self::edit_ride_link($postid, $return_uri);
         $start = PwtcMapdb::get_ride_start_time($postid);
         $start_date = $start->format('m/d/Y g:ia');
-	$subject = 'Question About Your Submitted Ride';
-        $body = 'Dear '.$author_name.','.urlencode("\r\n").'I have questions about your submitted ride'.urlencode("\r\n").get_the_title().' on '.$start_date.urlencode("\r\n").'(insert questions here...)'.urlencode("\r\n").urlencode("\r\n");
-        $notify_link = esc_url('mailto:'.$author_email.'?subject='.$subject.'&body='.$body);
+	$notify_link = self::ride_question_email($author_name, $author_email, get_the_title(), $start_date);
     ?>
         <tr>
             <td><span>Start Time</span><?php echo $start_date; ?></td>
