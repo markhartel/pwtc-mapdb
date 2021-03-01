@@ -14,8 +14,8 @@
         $title = esc_html(get_the_title());
         $status = get_post_status();
         $view_link = esc_url(get_the_permalink());
-        $edit_link = esc_url('/ride-edit-fields/?post='.$postid.'&return='.$return_uri);
-        $delete_link = esc_url('/ride-delete-page/?post='.$postid.'&return='.$return_uri);
+        $edit_link = self::edit_ride_link($postid, $return_uri);
+        $delete_link = self::delete_ride_link($postid, $return_uri);
         $start = PwtcMapdb::get_ride_start_time($postid);
         $start_date = '';
         if ($start) {
