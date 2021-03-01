@@ -782,7 +782,7 @@ class PwtcMapdb_Ride {
 		];
 		$query = new WP_Query($query_args);
 
-		$return_uri = urlencode($_SERVER['REQUEST_URI']);
+		$return_uri = $_SERVER['REQUEST_URI'];
 
 		ob_start();
 		include('manage-rides-form.php');
@@ -811,7 +811,7 @@ class PwtcMapdb_Ride {
 		];
 		$query = new WP_Query($query_args);
 
-		$return_uri = urlencode($_SERVER['REQUEST_URI']);
+		$return_uri = $_SERVER['REQUEST_URI'];
 
 		ob_start();
 		include('manage-pending-rides-form.php');
@@ -920,7 +920,7 @@ class PwtcMapdb_Ride {
 		}	 
 		$query = new WP_Query($query_args);
 
-		$return_uri = urlencode($_SERVER['REQUEST_URI']);
+		$return_uri = $_SERVER['REQUEST_URI'];
 
 		ob_start();
 		include('manage-published-rides-form.php');
@@ -1002,7 +1002,7 @@ class PwtcMapdb_Ride {
 		}	
 		$query = new WP_Query($query_args);
 
-		$return_uri = urlencode($_SERVER['REQUEST_URI']);
+		$return_uri = $_SERVER['REQUEST_URI'];
 
 		ob_start();
 		include('manage-ride-templates-form.php');
