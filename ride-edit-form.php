@@ -716,11 +716,11 @@
         <?php } else if ($operation == 'published') { 
             $notify_link = self::ride_published_email($author_name, $author_email, $view_link);
         ?>
-        The pending ride was published, click <a href="<?php echo $notify_link; ?>">here</a> to notify the author via email.
+        The pending ride was published, please <a href="<?php echo $notify_link; ?>">notify author via email.</a>
         <?php } else if ($operation == 'rejected') { 
-            $notify_link = self::ride_rejected_email($author_name, $author_email, $edit_link);            
+            $notify_link = self::ride_rejected_email($author_name, $author_email, $edit_link);
         ?>
-        The pending ride was rejected, click <a href="<?php echo $notify_link; ?>">here</a> to notify the author via email.
+        The pending ride was rejected, please <a href="<?php echo $notify_link; ?>">notify author via email.</a>
         <?php } else if ($operation == 'update_published') { ?>
         The published ride was updated.
         <?php } else if ($operation == 'unpublished') { ?>
@@ -730,13 +730,13 @@
         <?php } else if ($operation == 'revert_draft') { ?>
         The ride was reverted back to draft.
         <?php } ?>
-        <?php echo $return_to_ride; ?>
         </p>
     </div>
     <?php } ?>
     <div>
+        <p>
     <?php if ($postid != 0) { ?>
-        <p>This ride was authored by <?php echo $author_name; ?> and is 
+        This ride was authored by <?php echo $author_name; ?> and is 
         <?php if ($status == 'draft') { ?>
         a draft. It can be updated or submitted for review.
         <?php } else if ($status == 'pending') { ?>
@@ -744,16 +744,17 @@
         <?php } else if ($status == 'publish') { ?>
         published and on the ride calendar. It can be updated or unpublished.
         <?php } ?>
-        </p>
     <?php } else { ?>
         <?php if ($template) { ?>
-        <p>This is a new ride created from a template, set the <em>ride date</em> and <em>departure time</em> in the form below (and modify any other desired fields) and press the save button at the bottom of the form.</p>
+        This is a new ride created from a template, set the <em>ride date</em> and <em>departure time</em> in the form below (and modify any other desired fields) and press the save button at the bottom of the form.
         <?php } else if ($copy_ride) { ?>
-        <p>This is a new ride copied from an existing ride, set the <em>ride date</em> in the form below (and modify any other desired fields) and press the save button at the bottom of the form.</p>
+        This is a new ride copied from an existing ride, set the <em>ride date</em> in the form below (and modify any other desired fields) and press the save button at the bottom of the form.
         <?php } else { ?>
-        <p>This is a new ride, fill out the form below and press the save button at the bottom of the form.</p>
+        This is a new ride, fill out the form below and press the save button at the bottom of the form.
         <?php } ?>
     <?php } ?>
+    <?php echo $return_to_ride; ?>
+        </p>
     </div>
     <div class="callout">
         <form method="POST" novalidate>
@@ -988,9 +989,6 @@
                     <input class="dark button" name="publish" value="Update" type="submit"/>
                     <input class="dark button" name="draft" value="Unpublish" type="submit"/>
                 </div>
-            <?php } ?>
-            <?php if (!empty($ride_link)) { ?>
-                <a href="<?php echo $ride_link; ?>" class="dark button float-right"><i class="fa fa-chevron-left"></i> Return</a>
             <?php } ?>
             </div>
         </form>
