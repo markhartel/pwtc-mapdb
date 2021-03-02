@@ -18,8 +18,9 @@
 </script>
 <div id='pwtc-mapdb-edit-ride-div'>
     <div class="callout small warning">
-        <p>Published ride "<?php echo $ride_title; ?>" has already finished so you cannot edit it. Click <a class="revert-action">here</a> if you want to revert this ride back to draft. <?php echo $return_to_ride; ?></p>
+        <p>Published ride "<?php echo $ride_title; ?>" has already finished so you cannot edit it. If you wish to edit you must <a class="revert-action">revert ride back to draft.</a></p>
     </div>
+    <p><?php echo $return_to_ride; ?></p>
     <form method="POST">
         <input type="hidden" name="postid" value="<?php echo $postid; ?>"/>
         <input type="hidden" name="revert" value="draft"/>
