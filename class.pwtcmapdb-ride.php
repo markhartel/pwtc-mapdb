@@ -427,7 +427,7 @@ class PwtcMapdb_Ride {
 		}
 
 		$ride_link = '';
-		$return_to_ride = 'You can now close this page.';
+		$return_to_ride = '';
 		if (!empty($return)) {
 			$ride_link = esc_url($return);
 			$return_to_ride = self::create_return_link($ride_link);
@@ -657,7 +657,7 @@ class PwtcMapdb_Ride {
 		}
 
 		$ride_link = '';
-		$return_to_ride = 'You can now close this page.';
+		$return_to_ride = '';
 		if (!empty($return)) {
 			$ride_link = esc_url($return);
 			$return_to_ride = self::create_return_link($ride_link);
