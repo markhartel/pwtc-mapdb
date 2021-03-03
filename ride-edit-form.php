@@ -716,11 +716,11 @@
         <?php } else if ($operation == 'published') { 
             $notify_link = self::ride_published_email($author_name, $author_email, $view_link);
         ?>
-        The pending ride was published, please <a href="<?php echo $notify_link; ?>">notify author via email.</a>
+        The pending ride was published, please <a href="<?php echo $notify_link; ?>">notify author by email.</a>
         <?php } else if ($operation == 'rejected') { 
             $notify_link = self::ride_rejected_email($author_name, $author_email, $edit_link);
         ?>
-        The pending ride was rejected, please <a href="<?php echo $notify_link; ?>">notify author via email.</a>
+        The pending ride was rejected, please <a href="<?php echo $notify_link; ?>">notify author by email.</a>
         <?php } else if ($operation == 'update_published') { ?>
         The published ride was updated.
         <?php } else if ($operation == 'unpublished') { ?>
