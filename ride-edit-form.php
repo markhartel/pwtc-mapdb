@@ -768,15 +768,10 @@
                     <p class="help-text">You are not allowed to edit the ride title.</p>
                 <?php } ?>
             </div>
-            <div class="row column">
-                <label>Ride Description
-                    <textarea name="description" rows="10"><?php echo $description; ?></textarea>
-                </label>
-            </div>
             <div class="row">
                 <div class="small-12 medium-6 columns">
                     <label>Ride Date
-                        <input type="date" name="ride_date" value="<?php echo $ride_date; ?>" <?php echo empty($min_date) ? '': 'min="'.$min_date.'"'; ?> <?php echo $edit_date ? '': 'readonly'; ?>/>	
+                        <input type="date" name="ride_date" value="<?php echo $ride_date; ?>" <?php echo empty($min_date) ? '': 'min="'.$min_date.'"'; ?> <?php echo $edit_date ? '': 'readonly'; ?>/>
                     </label>
                     <?php if (!$edit_date) { ?>
                     <p class="help-text">You are not allowed to edit the ride date.</p>
@@ -790,6 +785,13 @@
                     <p class="help-text">You are not allowed to edit the departure time.</p>
                     <?php } ?>
                 </div>
+            </div>
+            <div class="row column">
+                <label>Ride Description
+                    <textarea name="description" rows="10"><?php echo $description; ?></textarea>
+                </label>
+            </div>
+            <div class="row">
                 <div class="small-12 medium-6 columns">
                     <label>Ride Type
                     <fieldset>
