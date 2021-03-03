@@ -18,7 +18,7 @@
 </script>
 <div id='pwtc-mapdb-edit-ride-div'>
     <div class="callout small success">
-        <p>The draft ride "<?php echo $ride_title; ?>" was submitted for review, please <a href="<?php echo $notify_link; ?>">notify road captain via email.</a> Or, if you've changed your mind, <a class="revert-action">revert ride back to draft.</a></p>
+        <p>The draft ride "<?php echo $ride_title; ?>" was submitted for review, please <a href="<?php echo $notify_link; ?>">notify road captain by email.</a> Or, if you've changed your mind, <a class="revert-action">revert ride back to draft.</a></p>
     </div>
     <p><?php echo $return_to_ride; ?></p>
     <form method="POST">
