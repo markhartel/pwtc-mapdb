@@ -37,14 +37,11 @@
 <div id="pwtc-mapdb-delete-ride-div">
     <form method="POST">
         <div class="row column">
-            <div class="delete-ride callout small">To delete draft ride "<?php echo $ride_title; ?>" on <?php echo $ride_date; ?>, press the delete button below.</div>
-            <div class="delete-ride-confirm callout small alert">Warning: this action will permanently delete draft ride "<?php echo $ride_title; ?>" on <?php echo $ride_date; ?>! Do you really want to do this?</div>
+            <div class="delete-ride callout small"><p>To delete draft ride "<?php echo $ride_title; ?>" on <?php echo $ride_date; ?>, press the delete button below. <?php echo $return_to_ride; ?></p></div>
+            <div class="delete-ride-confirm callout small alert"><p>Warning: this action will permanently delete draft ride "<?php echo $ride_title; ?>" on <?php echo $ride_date; ?>! Do you really want to do this?</p></div>
         </div>
         <div class="row column clearfix">
             <a class="action-delete delete-ride dark button float-left">Delete Ride</a>
-            <?php if (!empty($ride_link)) { ?>
-            <a href="<?php echo $ride_link; ?>" class="delete-ride dark button float-right"><i class="fa fa-chevron-left"></i> Return</a>
-            <?php } ?>
             <input class="delete-ride-confirm accent button float-left" type="submit" name="delete_ride" value="OK"/>
             <a class="action-cancel delete-ride-confirm dark button float-right">Cancel</a>
         </div>
