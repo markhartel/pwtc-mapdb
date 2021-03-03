@@ -2,8 +2,8 @@
 
 class PwtcMapdb_Ride {
 	
-	const EDIT_RIDE_URI = '/ride-edit-fields';
-	const DELETE_RIDE_URI = '/ride-delete-page';
+	const EDIT_RIDE_URI = '/submit-ride';
+	const DELETE_RIDE_URI = '/delete-ride';
 
     	private static $initiated = false;
 
