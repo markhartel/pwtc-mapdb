@@ -793,43 +793,39 @@
             </div>
             <div class="row">
                 <div class="small-12 medium-6 columns">
-                    <label>Ride Type
                     <fieldset>
+                        <legend>Ride Type</legend>
                         <input type="radio" name="ride_type" value="nongroup" id="type-nongroup" <?php echo $ride_type == 'nongroup' ? 'checked': ''; ?>><label for="type-nongroup">Non-group</label>
                         <input type="radio" name="ride_type" value="group" id="type-group" <?php echo $ride_type == 'group' ? 'checked': ''; ?>><label for="type-group">Group</label>
                         <input type="radio" name="ride_type" value="regroup" id="type-regroup" <?php echo $ride_type == 'regroup' ? 'checked': ''; ?>><label for="type-regroup">Re-group</label>
                     </fieldset>
-                    </label>  					
                 </div>
                 <div class="small-12 medium-6 columns">
-                    <label>Ride Pace
                     <fieldset>
+                        <legend>Ride Pace</legend>
                         <input type="radio" name="ride_pace" value="no" id="pace-na" <?php echo $ride_pace == 'no' ? 'checked': ''; ?>><label for="pace-na">N/A</label>
                         <input type="radio" name="ride_pace" value="slow" id="pace-slow" <?php echo $ride_pace == 'slow' ? 'checked': ''; ?>><label for="pace-slow">Slow</label>
                         <input type="radio" name="ride_pace" value="leisurely" id="pace-leisurely" <?php echo $ride_pace == 'leisurely' ? 'checked': ''; ?>><label for="pace-leisurely">Leisurely</label>
                         <input type="radio" name="ride_pace" value="moderate" id="pace-moderate" <?php echo $ride_pace == 'moderate' ? 'checked': ''; ?>><label for="pace-moderate">Moderate</label>
                         <input type="radio" name="ride_pace" value="fast" id="pace-fast" <?php echo $ride_pace == 'fast' ? 'checked': ''; ?>><label for="pace-fast">Fast</label>
                     </fieldset>
-                    </label>  					
                 </div>
                 <div class="small-12 medium-6 columns">
-                    <label>Attach Maps
                     <fieldset>
+                        <legend>Attach Maps</legend>
                         <input type="radio" name="attach_maps" value="0" id="attach-no" <?php echo $attach_maps == false ? 'checked': ''; ?>><label for="attach-no">No</label>
                         <input type="radio" name="attach_maps" value="1" id="attach-yes" <?php echo $attach_maps == true ? 'checked': ''; ?>><label for="attach-no">Yes</label>
                     </fieldset>
-                    </label>  					
                 </div>
                 <div class="small-12 medium-6 columns attach-map-no">
-                    <label>Ride Terrain
                     <fieldset class="terrain-fst">
+                        <legend>Ride Terrain</legend>
                         <input type="checkbox" name="ride_terrain[]" value="a" id="terrain-a" <?php echo in_array('a', $ride_terrain) ? 'checked': ''; ?>><label for="terrain-a">A</label>
                         <input type="checkbox" name="ride_terrain[]" value="b" id="terrain-b" <?php echo in_array('b', $ride_terrain) ? 'checked': ''; ?>><label for="terrain-b">B</label>
                         <input type="checkbox" name="ride_terrain[]" value="c" id="terrain-c" <?php echo in_array('c', $ride_terrain) ? 'checked': ''; ?>><label for="terrain-c">C</label>
                         <input type="checkbox" name="ride_terrain[]" value="d" id="terrain-d" <?php echo in_array('d', $ride_terrain) ? 'checked': ''; ?>><label for="terrain-d">D</label>
                         <input type="checkbox" name="ride_terrain[]" value="e" id="terrain-e" <?php echo in_array('e', $ride_terrain) ? 'checked': ''; ?>><label for="terrain-e">E</label>
                     </fieldset>
-                    </label>				
                 </div>
                 <div class="small-12 medium-6 columns attach-map-no">
                     <label>Ride Distance
