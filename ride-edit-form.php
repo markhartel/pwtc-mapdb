@@ -738,11 +738,11 @@
     <?php if ($postid != 0) { ?>
         This ride was authored by <?php echo $author_name; ?> and is 
         <?php if ($status == 'draft') { ?>
-        a draft. It can be updated or submitted for review.
+        a draft. It can be updated or submitted for review using the buttons at the bottom of the form.
         <?php } else if ($status == 'pending') { ?>
-        pending review by a road captain. It can be updated, published or rejected.
+        pending review by a road captain. It can be updated, published or rejected using the buttons at the bottom of the form.
         <?php } else if ($status == 'publish') { ?>
-        published and on the ride calendar. It can be updated or unpublished.
+        published and on the ride calendar. It can be updated or unpublished using the buttons at the bottom of the form.
         <?php } ?>
     <?php } else { ?>
         <?php if ($template) { ?>
