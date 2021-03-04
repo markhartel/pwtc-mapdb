@@ -135,7 +135,7 @@
     </form>
     <?php } ?>
     <?php } else { ?>
-    <div class="callout small"><p>No scheduled rides found for this month.</p></div>
+    <div class="callout small"><p>No scheduled rides found.</p></div>
     <?php } ?>
 </div>
 <?php 
