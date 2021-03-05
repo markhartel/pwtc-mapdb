@@ -775,6 +775,8 @@
                     </label>
                     <?php if (!$edit_date) { ?>
                     <p class="help-text">You are not allowed to edit the ride date.</p>
+                     <?php } else if (!empty($min_date_pretty)) { ?>
+                    <p class="help-text">The ride date cannot be earlier than <?php echo $min_date_pretty; ?>.</p>
                     <?php } ?>
                 </div>
                 <div class="small-12 medium-6 columns">
