@@ -709,8 +709,10 @@
         <p>
         <?php if ($operation == 'update_draft') { ?>
         The draft ride was updated.
-        <?php } else if ($operation == 'submit_review') { ?>
-        The draft ride was submitted for review.
+        <?php } else if ($operation == 'submit_review') { 
+            $notify_link = self::ride_submitted_email($postid);
+        ?>
+        The draft ride was submitted for review, please <a href="<?php echo $notify_link; ?>">notify road captain by email.</a>
         <?php } else if ($operation == 'update_pending') { ?>
         The pending ride was updated.
         <?php } else if ($operation == 'published') { 
