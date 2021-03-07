@@ -436,18 +436,18 @@ class PwtcMapdb_Ride {
 		$user_info = get_userdata($current_user->ID);
 
 		if (!$allow_leaders and !user_can($current_user,'edit_published_rides')) {
-			return '<div class="callout small warning"><p>You are not allowed to submit rides. ' . $return_to_ride . '</p></div>';
+			return '<div class="callout small warning"><p>You are not allowed to submit rides.</p></div><p>' . $return_to_ride . '</p>';
 		}
 		
 		if ($copy_ride and !user_can($current_user,'edit_published_rides')) {
             		if (!in_array(PwtcMapdb::ROLE_RIDE_LEADER, $user_info->roles)) {
-                		return '<div class="callout small warning"><p>You must be a ride leader to copy rides. ' . $return_to_ride . '</p></div>';
+                		return '<div class="callout small warning"><p>You must be a ride leader to copy rides.</p></div><p>' . $return_to_ride . '</p>';
             		}
 		}
 
 		if ($postid == 0 and !user_can($current_user,'edit_published_rides')) {
             		if (!in_array(PwtcMapdb::ROLE_RIDE_LEADER, $user_info->roles)) {
-                		return '<div class="callout small warning"><p>You must be a ride leader to create new rides. ' . $return_to_ride . '</p></div>';
+                		return '<div class="callout small warning"><p>You must be a ride leader to create new rides.</p></div><p>' . $return_to_ride . '</p>';
             		}
 		}
 
@@ -456,17 +456,17 @@ class PwtcMapdb_Ride {
 		    if ($lock_user) {
 				$info = get_userdata($lock_user);
 				$name = $info->first_name . ' ' . $info->last_name;	
-				return '<div class="callout small warning"><p>Ride "' . $ride_title . '" is currently being edited by ' . $name . '. ' . $return_to_ride . '</p></div>';
+				return '<div class="callout small warning"><p>Ride "' . $ride_title . '" is currently being edited by ' . $name . '. </p></div><p>' . $return_to_ride . '</p>';
 			}
 		}
 
 		if ($postid != 0 and !$copy_ride and !user_can($current_user,'edit_published_rides')) {
 			if (!in_array(PwtcMapdb::ROLE_RIDE_LEADER, $user_info->roles)) {
-                		return '<div class="callout small warning"><p>You must be a ride leader to edit rides. ' . $return_to_ride . '</p></div>';
+                		return '<div class="callout small warning"><p>You must be a ride leader to edit rides.</p></div><p>' . $return_to_ride . '</p>';
 			}
 			
 			if ($author != $current_user->ID) {
-                		return '<div class="callout small warning"><p>You must be the author of ride "' . $ride_title . '" to edit it. ' . $return_to_ride . '</p></div>';
+                		return '<div class="callout small warning"><p>You must be the author of ride "' . $ride_title . '" to edit it.</p></div><p>' . $return_to_ride . '</p>';
 			}
 			
 			$refresh_script = '';
@@ -474,7 +474,7 @@ class PwtcMapdb_Ride {
 				$refresh_script = self::get_refresh_script();
 			}
             		if ($status == 'publish') {
-               			return $refresh_script . '<div class="callout small warning"><p>Ride "' . $ride_title . '" is published so you cannot edit it. ' . $return_to_ride . '</p></div>';
+               			return $refresh_script . '<div class="callout small warning"><p>Ride "' . $ride_title . '" is published so you cannot edit it.</p></div><p>' . $return_to_ride . '</p>';
 			}
 			else if ($status == 'pending') {
 				$notify_link = self::ride_submitted_email($postid);
@@ -488,12 +488,17 @@ class PwtcMapdb_Ride {
 			$ride_datetime = PwtcMapdb::get_ride_start_time($postid);
 			if ($ride_datetime < $now_date) {
 				if (user_can($current_user,'edit_published_rides')) {
+					if (function_exists('pwtc_mileage_ridesheet_exists')) {
+						if (pwtc_mileage_ridesheet_exists($postid)) {
+							return '<div class="callout small warning"><p>Ride "' . $ride_title . '" has already finished and has associated mileage so you cannot edit it.</p></div><p>' . $return_to_ride . '</p>';
+						}
+					}
 					ob_start();
 					include('ride-published-form.php');
 					return ob_get_clean();
 				}
 				else {
-					return '<div class="callout small warning"><p>Ride "' . $ride_title . '" has already finished so you cannot edit it. ' . $return_to_ride . '</p></div>';
+					return '<div class="callout small warning"><p>Ride "' . $ride_title . '" has already finished so you cannot edit it.</p></div><p>' . $return_to_ride . '</p>';
 				}
 			}
 		}
@@ -671,7 +676,7 @@ class PwtcMapdb_Ride {
 				if (empty($return)) {
 					$refresh_script = self::get_refresh_script();
 				}
-				return $refresh_script . '<div class="callout small success"><p>This ride has been successfully deleted. ' . $return_to_ride . '</p></div>';
+				return $refresh_script . '<div class="callout small success"><p>This ride has been successfully deleted.</p></div><p>' . $return_to_ride . '</p>';
 			}
 			else {
 				return '<div class="callout small alert"><p>Failed to delete this ride.</p></div>';
@@ -713,25 +718,25 @@ class PwtcMapdb_Ride {
 		$status = $post->post_status;
 		
 		if (!$allow_leaders and !user_can($current_user,'edit_published_rides')) {
-			return '<div class="callout small warning"><p>You are not allowed to delete rides. ' . $return_to_ride . '</p></div>';
+			return '<div class="callout small warning"><p>You are not allowed to delete rides.</p></div><p>' . $return_to_ride . '</p>';
 		}
 
 		if ($status == 'publish') {
-			return '<div class="callout small warning"><p>Ride "' . $ride_title . '" is published so you cannot delete it. ' . $return_to_ride . '</p></div>';
+			return '<div class="callout small warning"><p>Ride "' . $ride_title . '" is published so you cannot delete it.</p></div><p>' . $return_to_ride . '</p>';
 		}
 		else if ($status == 'pending') {
-			return '<div class="callout small warning"><p>Ride "' . $ride_title . '" is pending review so you cannot delete it. ' . $return_to_ride . '</p></div>';
+			return '<div class="callout small warning"><p>Ride "' . $ride_title . '" is pending review so you cannot delete it.</p></div><p>' . $return_to_ride . '</p>';
 		}
 
 		if ($author != $current_user->ID and !user_can($current_user,'edit_published_rides')) {
-			return '<div class="callout small warning"><p>You must be the author of ride "' . $ride_title . '" to delete it. ' . $return_to_ride . '</p></div>';
+			return '<div class="callout small warning"><p>You must be the author of ride "' . $ride_title . '" to delete it.</p></div><p>' . $return_to_ride . '</p>';
 		}
 
 		$lock_user = self::check_post_lock($postid);
 		if ($lock_user) {
 			$info = get_userdata($lock_user);
 			$name = $info->first_name . ' ' . $info->last_name;	
-			return '<div class="callout small warning"><p>Ride "' . $ride_title . '" is currently being edited by ' . $name . '. ' . $return_to_ride . '</p></div>';
+			return '<div class="callout small warning"><p>Ride "' . $ride_title . '" is currently being edited by ' . $name . '.</p></div><p>' . $return_to_ride . '</p>';
 		}
 
 		self::set_post_lock($postid);
