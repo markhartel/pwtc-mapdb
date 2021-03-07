@@ -768,9 +768,13 @@ class PwtcMapdb_Ride {
 
 		$author_name = $user_info->first_name . ' ' . $user_info->last_name;
 
+		$status = array('draft');
+		if ($allow_leaders) {
+			$status[] = 'pending';
+		}
 		$query_args = [
 			'posts_per_page' => -1,
-			'post_status' => array('pending', 'draft'),
+			'post_status' => $status,
 			'author' => $current_user->ID,
 			'post_type' => PwtcMapdb::POST_TYPE_RIDE,
 			'meta_key'  => PwtcMapdb::RIDE_DATE,
