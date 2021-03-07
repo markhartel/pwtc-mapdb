@@ -718,7 +718,11 @@
         <?php } else if ($operation == 'published') { 
             $notify_link = self::ride_published_email($author_name, $author_email, $view_link);
         ?>
+        <?php if ($allow_leaders) { ?>
         The pending ride was published, please <a href="<?php echo $notify_link; ?>">notify author by email.</a>
+        <?php } else { ?>
+        The draft ride was published.
+        <?php } ?>
         <?php } else if ($operation == 'rejected') { 
             $notify_link = self::ride_rejected_email($author_name, $author_email, $edit_link);
         ?>
@@ -740,7 +744,7 @@
     <?php if ($postid != 0) { ?>
         This ride was authored by <?php echo $author_name; ?> and is 
         <?php if ($status == 'draft') { ?>
-        a draft. It can be updated or submitted for review using the buttons at the bottom of the form.
+        a draft. It can be updated or <?php if ($allow_leaders) { ?>submitted for review<?php } else { ?>published<?php } ?> using the buttons at the bottom of the form.
         <?php } else if ($status == 'pending') { ?>
         pending review by a road captain. It can be updated, published or rejected using the buttons at the bottom of the form.
         <?php } else if ($status == 'publish') { ?>
