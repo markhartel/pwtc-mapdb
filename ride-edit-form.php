@@ -978,7 +978,11 @@
             <?php } else if ($status == 'draft') { ?>
                 <div class="button-group float-left">
                     <input class="dark button" name="draft" value="Update" type="submit"/>
+                    <?php if ($allow_leaders) { ?>
                     <input class="dark button" name="pending" value="Submit for Review" type="submit"/>
+                    <?php } else { ?>
+                    <input class="dark button" name="publish" value="Publish" type="submit"/>
+                    <?php } ?>
                 </div>
             <?php } else if ($status == 'pending') { ?>
                 <div class="button-group float-left">
