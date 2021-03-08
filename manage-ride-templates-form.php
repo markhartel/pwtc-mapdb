@@ -34,16 +34,19 @@
                 <form class="search-frm" method="POST">
                     <input type="hidden" name="offset" value="0">
                     <div class="row">
-                        <div class="small-12 medium-10 columns">
+                        <div class="small-12 medium-9 columns">
                             <label>Ride Title 
                                 <input type="text" name="ride_title" value="<?php echo $ride_title; ?>">
                             </label>
                         </div>
-                        <div class="small-12 medium-2 columns">
+                        <div class="small-12 medium-3 columns">
                             <label>Ride Leader
                                 <select name="ride_leader">
                                     <option value="anyone" <?php echo $ride_leader == 'anyone' ? 'selected': ''; ?>>Anyone</option>
                                     <option value="me"  <?php echo $ride_leader == 'me' ? 'selected': ''; ?>>Me Only</option>
+                                    <?php foreach ( $leaders as $leader ) { ?>
+                                    <option value="<?php echo $leader->ID; ?>" <?php echo $ride_leader == $leader->ID ? 'selected': ''; ?>><?php echo $leader->first_name.' '.$leader->last_name; ?></option>
+                                    <?php } ?>
                                 </select>
                             </label>
                         </div>
