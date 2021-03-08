@@ -914,10 +914,16 @@ class PwtcMapdb_Ride {
 		if (!empty($ride_title)) {
 			$query_args['s'] = $ride_title;	
 		}	
-		if ($ride_leader == 'me') {
+		if ($ride_leader != 'anyone') {
+			if ($ride_leader == 'me') {
+				$userid = $current_user->ID;
+			}
+			else {
+				$userid = intval($ride_leader);
+			}
 			$query_args['meta_query'][] = [
 				'key' => PwtcMapdb::RIDE_LEADERS,
-				'value' => '"' . $current_user->ID . '"',
+				'value' => '"' . $userid . '"',
 				'compare' => 'LIKE'
 			];
 		}
@@ -925,6 +931,8 @@ class PwtcMapdb_Ride {
 			$query_args['offset'] = $offset;
 		}	 
 		$query = new WP_Query($query_args);
+		
+		$leaders = PwtcMapdb::fetch_ride_leaders();
 
 		$return_uri = $_SERVER['REQUEST_URI'];
 
