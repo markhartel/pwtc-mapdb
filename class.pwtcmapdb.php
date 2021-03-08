@@ -144,6 +144,18 @@ class PwtcMapdb {
 		$rider_id = get_field(self::USER_RIDER_ID, 'user_'.$userid);
 		return $rider_id;
 	}
+	
+	public static function fetch_ride_leaders() {
+		$query_args = [
+			'meta_key' => 'last_name',
+			'orderby' => 'meta_value',
+			'order' => 'ASC',
+			'role' => self::ROLE_RIDE_LEADER
+		];
+		$user_query = new WP_User_Query($query_args);
+		$leaders = $user_query->get_results();
+		return $leaders;
+	}
 
 	/******* AJAX request/response callback functions *******/
 
