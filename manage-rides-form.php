@@ -46,7 +46,7 @@
     </table>
     <p class="help-text">These rides were authored by <?php echo $author_name; ?>.</p>
     <?php } else { ?>
-    <div class="callout small"><p>No draft or pending rides authored by <?php echo $author_name; ?> found.</p></div>
+    <div class="callout small"><p>No draft<?php if ($allow_leaders) { ?> or pending<?php } ?> rides authored by <?php echo $author_name; ?> found.</p></div>
     <?php } ?>
 </div>
 <?php 
