@@ -37,7 +37,7 @@ class PwtcMapdb_Ride {
 
 	public static function load_javascripts() {
 		$link = get_the_permalink();
-		if ($link and (strpos($link, "ride-delete-page")!==false or strpos($link, "ride-edit-fields")!==false)) {
+		if ($link and (strpos($link, self::DELETE_RIDE_URI)!==false or strpos($link, self::EDIT_RIDE_URI)!==false)) {
 			wp_enqueue_script('heartbeat');
 		}
 	}
