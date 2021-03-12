@@ -81,9 +81,16 @@ class PwtcMapdb_Ride {
 	
 	// Generates the [pwtc_mapdb_ride_breadcrumb] shortcode.
 	public static function shortcode_ride_breadcrumb($atts) {
+		$a = shortcode_atts(array('leaders' => 'no'), $atts);
+		$allow_leaders = $a['leaders'] == 'yes';
+
 		$return = '';
 		if (isset($_GET['return'])) {
 			$return = $_GET['return'];
+		}
+
+		if (empty($return)) {
+			return '';
 		}
 
 		ob_start();
