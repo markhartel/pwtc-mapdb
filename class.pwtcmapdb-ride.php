@@ -93,7 +93,7 @@ class PwtcMapdb_Ride {
 
 	// Generates the [pwtc_mapdb_edit_ride] shortcode.
 	public static function shortcode_edit_ride($atts, $content) {
-		$a = shortcode_atts(array('leaders' => 'no'), $atts);
+		$a = shortcode_atts(array('leaders' => 'no', 'interval' => 'P14D'), $atts);
 		$allow_leaders = $a['leaders'] == 'yes';
 		
 		$current_user = wp_get_current_user();
@@ -568,7 +568,7 @@ class PwtcMapdb_Ride {
 				$interval = new DateInterval('P1D');
 			}
 			else {
-				$interval = new DateInterval('P14D');
+				$interval = new DateInterval($a['interval']);
 			}
 			$min_datetime = PwtcMapdb::get_current_date();
 			$min_datetime->add($interval);
