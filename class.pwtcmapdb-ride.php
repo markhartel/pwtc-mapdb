@@ -23,7 +23,8 @@ class PwtcMapdb_Ride {
 		add_filter('heartbeat_received', array('PwtcMapdb_Ride', 'refresh_post_lock'), 10, 3);
 
 		// Register shortcode callbacks
-        add_shortcode('pwtc_mapdb_edit_ride', array('PwtcMapdb_Ride', 'shortcode_edit_ride'));
+		add_shortcode('pwtc_mapdb_ride_breadcrumb', array('PwtcMapdb_Ride', 'shortcode_ride_breadcrumb'));
+        	add_shortcode('pwtc_mapdb_edit_ride', array('PwtcMapdb_Ride', 'shortcode_edit_ride'));
 		add_shortcode('pwtc_mapdb_manage_rides', array('PwtcMapdb_Ride', 'shortcode_manage_rides'));
 		add_shortcode('pwtc_mapdb_delete_ride', array( 'PwtcMapdb_Ride', 'shortcode_delete_ride'));
 		add_shortcode('pwtc_mapdb_manage_published_rides', array('PwtcMapdb_Ride', 'shortcode_manage_published_rides'));
@@ -77,6 +78,18 @@ class PwtcMapdb_Ride {
 	}
 
 	/******************* Shortcode Functions ******************/
+	
+	// Generates the [pwtc_mapdb_ride_breadcrumb] shortcode.
+	public static function shortcode_ride_breadcrumb($atts) {
+		$return = '';
+		if (isset($_GET['return'])) {
+			$return = $_GET['return'];
+		}
+
+		ob_start();
+		include('ride-nav-breadcrumb.php');
+		return ob_get_clean();
+	}
 
 	// Generates the [pwtc_mapdb_edit_ride] shortcode.
 	public static function shortcode_edit_ride($atts, $content) {
