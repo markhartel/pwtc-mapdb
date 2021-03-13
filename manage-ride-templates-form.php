@@ -87,12 +87,14 @@
         else {
             $leader = '';
         }
+        $view_link = esc_url(get_the_permalink());
         $copy_link = self::template_ride_link($postid, $return_uri);
     ?>
         <tr>
             <td><span>Ride Title</span><?php echo $title; ?></td>
             <td><span>1st Leader</span><?php echo $leader; ?></td>
             <td><span>Actions</span>
+                <a href="<?php echo $view_link; ?>">View</a>
                 <?php if ($is_captain or ($is_leader and $allow_leaders)) { ?>
                 <a href="<?php echo $copy_link; ?>">Copy</a>
                 <?php } ?>
