@@ -104,6 +104,12 @@ class PwtcMapdb_Ride {
 		$allow_leaders = $a['leaders'] == 'yes';
 		
 		$current_user = wp_get_current_user();
+		if ( 0 == $current_user->ID ) {
+			return '<div class="callout small alert"><p>You must be logged in to submit rides.</p></div>';
+		}
+		$user_info = get_userdata($current_user->ID);
+		$is_road_captain = user_can($current_user,'edit_published_rides');
+		$is_ride_leader = in_array(PwtcMapdb::ROLE_RIDE_LEADER, $user_info->roles);
 
 		$return = '';
 		if (isset($_GET['return'])) {
@@ -387,10 +393,6 @@ class PwtcMapdb_Ride {
 			}
 		}
 
-		if ( 0 == $current_user->ID ) {
-			return '<div class="callout small alert"><p>You must be logged in to submit rides.</p></div>';
-        }
-
 		$copy_ride = false;
 		$template = false;
 		if (isset($_GET['action'])) {
@@ -448,13 +450,13 @@ class PwtcMapdb_Ride {
 
 		$ride_link = '';
 		$return_to_ride = '';
+		/*
 		if (!empty($return)) {
 			$ride_link = esc_url($return);
 			$return_to_ride = self::create_return_link($ride_link);
 		}
+		*/
 		
-		$user_info = get_userdata($current_user->ID);
-
 		if (!$allow_leaders and !user_can($current_user,'edit_published_rides')) {
 			return '<div class="callout small warning"><p>You are not allowed to submit rides.</p></div><p>' . $return_to_ride . '</p>';
 		}
@@ -683,10 +685,12 @@ class PwtcMapdb_Ride {
 
 		$ride_link = '';
 		$return_to_ride = '';
+		/*
 		if (!empty($return)) {
 			$ride_link = esc_url($return);
 			$return_to_ride = self::create_return_link($ride_link);
 		}
+		*/
 
 		$current_user = wp_get_current_user();
 
