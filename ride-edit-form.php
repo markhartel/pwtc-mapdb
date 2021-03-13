@@ -742,7 +742,13 @@
     <div>
         <p>
     <?php if ($postid != 0) { ?>
-        This ride was authored by <?php echo $author_name; ?> and is 
+        This ride was authored by 
+        <?php if ($is_road_captain) { ?>
+        <a href="mailto:<?php echo $author_email; ?>"><?php echo $author_name; ?></a> 
+        <?php } else { ?>
+        <?php echo $author_name; ?> 
+        <?php } ?>
+        and is 
         <?php if ($status == 'draft') { ?>
         a draft. It can be updated or <?php if ($allow_leaders) { ?>submitted for review<?php } else { ?>published<?php } ?> using the buttons at the bottom of the form.
         <?php } else if ($status == 'pending') { ?>
