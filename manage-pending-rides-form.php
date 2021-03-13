@@ -26,7 +26,6 @@
         $edit_link = self::edit_ride_link($postid, $return_uri);
         $start = PwtcMapdb::get_ride_start_time($postid);
         $start_date = $start->format('m/d/Y g:ia');
-	$notify_link = self::ride_question_email($author_name, $author_email, get_the_title(), $start_date);
     ?>
         <tr>
             <td><span>Start Time</span><?php echo $start_date; ?></td>
@@ -35,7 +34,6 @@
             <td><span>Actions</span>
                 <a href="<?php echo $view_link; ?>">Preview</a>
                 <a href="<?php echo $edit_link; ?>">Edit</a>
-		<a href="<?php echo $notify_link; ?>">Notify</a>
             </td>	
         </tr>
     <?php
