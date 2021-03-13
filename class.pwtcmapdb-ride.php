@@ -462,13 +462,13 @@ class PwtcMapdb_Ride {
 		}
 		
 		if ($copy_ride and !$is_road_captain) {
-            		if (!in_array(PwtcMapdb::ROLE_RIDE_LEADER, $user_info->roles)) {
+            		if (!$is_ride_leader) {
                 		return '<div class="callout small warning"><p>You must be a ride leader to copy rides.</p></div><p>' . $return_to_ride . '</p>';
             		}
 		}
 
 		if ($postid == 0 and !$is_road_captain) {
-            		if (!in_array(PwtcMapdb::ROLE_RIDE_LEADER, $user_info->roles)) {
+            		if (!$is_ride_leader) {
                 		return '<div class="callout small warning"><p>You must be a ride leader to create new rides.</p></div><p>' . $return_to_ride . '</p>';
             		}
 		}
@@ -483,7 +483,7 @@ class PwtcMapdb_Ride {
 		}
 
 		if ($postid != 0 and !$copy_ride and !$is_road_captain) {
-			if (!in_array(PwtcMapdb::ROLE_RIDE_LEADER, $user_info->roles)) {
+			if (!$is_ride_leader) {
                 		return '<div class="callout small warning"><p>You must be a ride leader to edit rides.</p></div><p>' . $return_to_ride . '</p>';
 			}
 			
