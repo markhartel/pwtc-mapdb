@@ -457,17 +457,17 @@ class PwtcMapdb_Ride {
 		}
 		*/
 		
-		if (!$allow_leaders and !user_can($current_user,'edit_published_rides')) {
+		if (!$allow_leaders and !$is_road_captain) {
 			return '<div class="callout small warning"><p>You are not allowed to submit rides.</p></div><p>' . $return_to_ride . '</p>';
 		}
 		
-		if ($copy_ride and !user_can($current_user,'edit_published_rides')) {
+		if ($copy_ride and !$is_road_captain) {
             		if (!in_array(PwtcMapdb::ROLE_RIDE_LEADER, $user_info->roles)) {
                 		return '<div class="callout small warning"><p>You must be a ride leader to copy rides.</p></div><p>' . $return_to_ride . '</p>';
             		}
 		}
 
-		if ($postid == 0 and !user_can($current_user,'edit_published_rides')) {
+		if ($postid == 0 and !$is_road_captain) {
             		if (!in_array(PwtcMapdb::ROLE_RIDE_LEADER, $user_info->roles)) {
                 		return '<div class="callout small warning"><p>You must be a ride leader to create new rides.</p></div><p>' . $return_to_ride . '</p>';
             		}
@@ -482,7 +482,7 @@ class PwtcMapdb_Ride {
 			}
 		}
 
-		if ($postid != 0 and !$copy_ride and !user_can($current_user,'edit_published_rides')) {
+		if ($postid != 0 and !$copy_ride and !$is_road_captain) {
 			if (!in_array(PwtcMapdb::ROLE_RIDE_LEADER, $user_info->roles)) {
                 		return '<div class="callout small warning"><p>You must be a ride leader to edit rides.</p></div><p>' . $return_to_ride . '</p>';
 			}
@@ -509,7 +509,7 @@ class PwtcMapdb_Ride {
 		if ($postid != 0 and !$copy_ride and $status == 'publish') {
 			$ride_datetime = PwtcMapdb::get_ride_start_time($postid);
 			if ($ride_datetime < $now_date) {
-				if (user_can($current_user,'edit_published_rides')) {
+				if ($is_road_captain) {
 					if (function_exists('pwtc_mileage_ridesheet_exists')) {
 						if (pwtc_mileage_ridesheet_exists($postid)) {
 							return '<div class="callout small warning"><p>Ride "' . $ride_title . '" has already finished and has associated mileage so you cannot edit it.</p></div><p>' . $return_to_ride . '</p>';
@@ -572,8 +572,8 @@ class PwtcMapdb_Ride {
 			$ride_time = '';
 		}
 
-		if ($postid == 0 or $copy_ride or !user_can($current_user,'edit_published_rides')) {
-			if (user_can($current_user,'edit_published_rides')) {
+		if ($postid == 0 or $copy_ride or !$is_road_captain) {
+			if ($is_road_captain) {
 				$interval = new DateInterval('P1D');
 			}
 			else {
