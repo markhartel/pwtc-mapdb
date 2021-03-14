@@ -28,7 +28,7 @@ function pwtc_mapdb_get_signup() {
         $return_uri = $_SERVER['REQUEST_URI'];
         $result['edit_ride_url'] = false;
         if (user_can($current_user,'edit_published_rides')) {
-            $result['edit_ride_url'] = PwtcMapdb_Ride::edit_ride_link($postid, $return_uri);
+            $result['edit_ride_url'] = esc_url(PwtcMapdb_Ride::EDIT_RIDE_URI.'?post='.$postid.'&return='.urlencode($return_uri));
         }
         $result['copy_ride_url'] = false;
     }
