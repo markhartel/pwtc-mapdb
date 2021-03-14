@@ -437,6 +437,7 @@ class PwtcMapdb_Ride {
 		}
 
 		$author_name = '';
+		$author_email = '';
 		if ($author != 0) {
 			$info = get_userdata($author);
 			if ($info) {
@@ -557,22 +558,26 @@ class PwtcMapdb_Ride {
 		if ($postid != 0) {
 			if ($template) {
 				$ride_date = '';
-				$ride_time = '';	
+				$ride_time = '';
+				$ride_date_pretty = '';
 			}
 			else if ($copy_ride) {
 				$ride_datetime = PwtcMapdb::get_ride_start_time($postid);
 				$ride_time = $ride_datetime->format('H:i');
 				$ride_date = '';
+				$ride_date_pretty = '';
 			}
 			else {
 				$ride_datetime = PwtcMapdb::get_ride_start_time($postid);
 				$ride_date = $ride_datetime->format('Y-m-d');
-				$ride_time = $ride_datetime->format('H:i');	
+				$ride_time = $ride_datetime->format('H:i');
+				$ride_date_pretty = $ride_datetime->format('m/d/Y g:ia');
 			}
 		}
 		else {
 			$ride_date = '';
 			$ride_time = '';
+			$ride_date_pretty = '';
 		}
 
 		if ($postid == 0 or $copy_ride or !$is_road_captain) {
