@@ -996,6 +996,10 @@ class PwtcMapdb_Ride {
 		$limit = intval($a['limit']);
 
 		$current_user = wp_get_current_user();
+		
+		if ( 0 == $current_user->ID ) {
+			return '<div class="callout small warning"><p>Please <a href="/wp-login.php">log in</a> to view the ride templates.</p></div>';
+		}
 
 		if (isset($_POST['ride_title']) and isset($_POST['ride_leader']) and isset($_POST['offset'])) {
 			wp_redirect(add_query_arg(array(
@@ -1006,20 +1010,14 @@ class PwtcMapdb_Ride {
 			exit;
 		}
 
-		if ( 0 == $current_user->ID ) {
-			return '<div class="callout small warning"><p>Please <a href="/wp-login.php">log in</a> to view the ride templates.</p></div>';
-		}
-
-		$is_captain = false;
-		if (user_can($current_user,'edit_published_rides')) {
-			$is_captain = true;
-		}
-
-		$is_leader = false;
 		$user_info = get_userdata($current_user->ID);
-		if (in_array(PwtcMapdb::ROLE_RIDE_LEADER, $user_info->roles)) {
-			$is_leader = true;
+		if ($allow_leaders) {
+			$is_road_captain = in_array(PwtcMapdb::ROLE_ROAD_CAPTAIN, $user_info->roles);
 		}
+		else {
+			$is_road_captain = user_can($current_user,'edit_published_rides');
+		}
+		$is_ride_leader = in_array(PwtcMapdb::ROLE_RIDE_LEADER, $user_info->roles);
 
 		if (isset($_GET['title'])) {
 			$ride_title = $_GET['title'];
