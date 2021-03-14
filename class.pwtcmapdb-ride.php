@@ -503,7 +503,6 @@ class PwtcMapdb_Ride {
                			return $refresh_script . '<div class="callout small warning"><p>Ride "' . $ride_title . '" is published so you cannot edit it.</p></div><p>' . $return_to_ride . '</p>';
 			}
 			else if ($status == 'pending') {
-				$notify_link = self::ride_submitted_email($postid);
 				ob_start();
 				include('ride-pending-form.php');
 				return ob_get_clean();
