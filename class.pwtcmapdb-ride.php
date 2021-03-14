@@ -836,13 +836,24 @@ class PwtcMapdb_Ride {
 
 	// Generates the [pwtc_mapdb_manage_pending_rides] shortcode.
 	public static function shortcode_manage_pending_rides($atts) {
+		$a = shortcode_atts(array('leaders' => 'no'), $atts);
+		$allow_leaders = $a['leaders'] == 'yes';
+
 		$current_user = wp_get_current_user();
 
 		if ( 0 == $current_user->ID ) {
 			return '<div class="callout small warning"><p>Please <a href="/wp-login.php">log in</a> to review the pending rides.</p></div>';
 		}
+		
+		$user_info = get_userdata($current_user->ID);
+		if ($allow_leaders) {
+			$is_road_captain = in_array(PwtcMapdb::ROLE_ROAD_CAPTAIN, $user_info->roles);
+		}
+		else {
+			$is_road_captain = user_can($current_user,'edit_published_rides');
+		}
 
-		if (!user_can($current_user,'edit_published_rides')) {
+		if (!$is_road_captain) {
 			return '<div class="callout small warning"><p>You must be a road captain to review the pending rides.</p></div>';
 		}
 
