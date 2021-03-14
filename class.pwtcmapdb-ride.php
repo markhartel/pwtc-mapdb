@@ -793,12 +793,19 @@ class PwtcMapdb_Ride {
 		}
 
 		$user_info = get_userdata($current_user->ID);
+		if ($allow_leaders) {
+			$is_road_captain = in_array(PwtcMapdb::ROLE_ROAD_CAPTAIN, $user_info->roles);
+		}
+		else {
+			$is_road_captain = user_can($current_user,'edit_published_rides');
+		}
+		$is_ride_leader = in_array(PwtcMapdb::ROLE_RIDE_LEADER, $user_info->roles);
 
-		if (!user_can($current_user,'edit_published_rides')) {
+		if (!$is_road_captain) {
 			if (!$allow_leaders) {
 				return '<div class="callout small warning"><p>You are not allowed to view the rides that you have created.</p></div>';
 			}
-			if (!in_array(PwtcMapdb::ROLE_RIDE_LEADER, $user_info->roles)) {
+			if (!$is_ride_leader) {
 				return '<div class="callout small warning"><p>You must be a ride leader to view the rides that you have created.</p></div>';
 			}
 		}
