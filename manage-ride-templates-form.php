@@ -95,7 +95,7 @@
             <td><span>1st Leader</span><?php echo $leader; ?></td>
             <td><span>Actions</span>
                 <a href="<?php echo $view_link; ?>">View</a>
-                <?php if ($is_captain or ($is_leader and $allow_leaders)) { ?>
+                <?php if ($is_road_captain or ($is_ride_leader and $allow_leaders)) { ?>
                 <a href="<?php echo $copy_link; ?>">Copy</a>
                 <?php } ?>
             </td>	
