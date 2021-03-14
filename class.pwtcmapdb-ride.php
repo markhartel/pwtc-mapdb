@@ -100,15 +100,21 @@ class PwtcMapdb_Ride {
 
 	// Generates the [pwtc_mapdb_edit_ride] shortcode.
 	public static function shortcode_edit_ride($atts, $content) {
-		$a = shortcode_atts(array('leaders' => 'no', 'interval' => 'P14D'), $atts);
+		$a = shortcode_atts(array('leaders' => 'no', 'interval' => 'P14D', 'use_return' => 'no'), $atts);
 		$allow_leaders = $a['leaders'] == 'yes';
+		$use_return = $a['use_return'] == 'yes';
 		
 		$current_user = wp_get_current_user();
 		if ( 0 == $current_user->ID ) {
 			return '<div class="callout small alert"><p>You must be logged in to submit rides.</p></div>';
 		}
 		$user_info = get_userdata($current_user->ID);
-		$is_road_captain = user_can($current_user,'edit_published_rides');
+		if ($allow_leaders) {
+			$is_road_captain = in_array(PwtcMapdb::ROLE_ROAD_CAPTAIN, $user_info->roles);
+		}
+		else {
+			$is_road_captain = user_can($current_user,'edit_published_rides');
+		}
 		$is_ride_leader = in_array(PwtcMapdb::ROLE_RIDE_LEADER, $user_info->roles);
 
 		$return = '';
@@ -450,12 +456,10 @@ class PwtcMapdb_Ride {
 
 		$ride_link = '';
 		$return_to_ride = '';
-		/*
-		if (!empty($return)) {
+		if (!empty($return) and $use_return) {
 			$ride_link = esc_url($return);
 			$return_to_ride = self::create_return_link($ride_link);
 		}
-		*/
 		
 		if (!$allow_leaders and !$is_road_captain) {
 			return '<div class="callout small warning"><p>You are not allowed to submit rides.</p></div><p>' . $return_to_ride . '</p>';
