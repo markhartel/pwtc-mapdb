@@ -736,17 +736,13 @@
     <div>
         <p>
     <?php if ($postid != 0) { ?>
-        This ride was authored by 
-        <?php if ($is_road_captain) { ?>
-        <a href="mailto:<?php echo $author_email; ?>"><?php echo $author_name; ?></a> 
-        <?php } else { ?>
-        <?php echo $author_name; ?> 
-        <?php } ?>
-        and is 
+        This ride was authored by <?php echo $author_name; ?> and is
         <?php if ($status == 'draft') { ?>
         a draft. It can be updated or <?php if ($allow_leaders) { ?>submitted for review<?php } else { ?>published<?php } ?> using the buttons at the bottom of the form.
-        <?php } else if ($status == 'pending') { ?>
-        pending review by a road captain. It can be updated, published or rejected using the buttons at the bottom of the form.
+        <?php } else if ($status == 'pending') { 
+            $questions = self::ride_question_email($author_name, $author_email, $ride_title, $ride_date_pretty);
+        ?>
+        pending review by a road captain. It can be updated, published or rejected using the buttons at the bottom of the form. If you have questions, <a href="<?php echo $questions; ?>">email the author.</a>
         <?php } else if ($status == 'publish') { ?>
         published and on the ride calendar. It can be updated or unpublished using the buttons at the bottom of the form.
         <?php } ?>
