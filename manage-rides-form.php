@@ -30,7 +30,7 @@
                 <?php if (user_can($current_user,'edit_published_rides')) { ?>
                 <a href="<?php echo $view_link; ?>">Preview</a>
                 <?php } ?>
-                <?php if ($status == 'draft' or user_can($current_user,'edit_published_rides')) { ?>
+                <?php if ($status == 'draft' or $is_road_captain) { ?>
                 <a href="<?php echo $edit_link; ?>">Edit</a>
                 <?php } ?>
                 <?php if ($status == 'draft') { ?>
