@@ -2,9 +2,10 @@
 
 class PwtcMapdb_Ride {
 	
-	const EDIT_RIDE_URI = '/submit-ride';
+	const EDIT_RIDE_URI = '/edit-ride';
+	const SUBMIT_RIDE_URI = '/submit-ride';
 	const DELETE_RIDE_URI = '/delete-ride';
-
+	
     	private static $initiated = false;
 
 	public static function init() {
@@ -1204,7 +1205,7 @@ EOT;
 	}
 	
 	public static function submit_ride_link($return=false, $postid=0, $action=false) {
-		$uri = self::EDIT_RIDE_URI;
+		$uri = self::SUBMIT_RIDE_URI;
 		if ($postid > 0) {
 			$uri .= '?post=' . $postid;
 			if ($action) {
