@@ -1,17 +1,22 @@
 <script type="text/javascript">
     jQuery(document).ready(function($) { 
-        $('#pwtc-mapdb-delete-ride-div a.action-delete').on('click', function(evt) {
-            $('#pwtc-mapdb-delete-ride-div .delete-ride').hide();
-            $('#pwtc-mapdb-delete-ride-div .delete-ride-confirm').show();
+
+<?php if ($deleted) { ?>
+
+        $('#pwtc-mapdb-delete-ride-div .revert-action').on('click', function(evt) {
+            $('#pwtc-mapdb-delete-ride-div form').submit();
         });
 
-        $('#pwtc-mapdb-delete-ride-div a.action-cancel').on('click', function(evt) {
-            $('#pwtc-mapdb-delete-ride-div .delete-ride-confirm').hide();
-            $('#pwtc-mapdb-delete-ride-div .delete-ride').show();
-        });
+        $('#pwtc-mapdb-delete-ride-div form').on('submit', function(evt) {
+            $('#pwtc-mapdb-delete-ride-div .callout').html('<p><i class="fa fa-spinner fa-pulse"></i> please wait...</p>');
+        })
 
-        $('#pwtc-mapdb-delete-ride-div .delete-ride-confirm').hide();
-        $('#pwtc-mapdb-delete-ride-div .delete-ride').show();
+<?php } else { ?>
+
+        $('#pwtc-mapdb-delete-ride-div form').on('submit', function(evt) {
+            $('#pwtc-mapdb-delete-ride-div .errmsg').html('<p><i class="fa fa-spinner fa-pulse"></i> please wait...</p>');
+            $('#pwtc-mapdb-delete-ride-div input[type="submit"]').prop('disabled',true);
+        })
 
         $(document).on( 'heartbeat-send', function( e, data ) {
             var send = {};
@@ -32,19 +37,31 @@
 
         wp.heartbeat.interval( 15 );
 
+<?php } ?>
+
     });
 </script>
 <div id="pwtc-mapdb-delete-ride-div">
     <form method="POST">
-        <div class="row column">
-            <div class="delete-ride callout small"><p>To delete draft ride "<?php echo $ride_title; ?>" on <?php echo $ride_date; ?>, press the delete button below. <?php echo $return_to_ride; ?></p></div>
-            <div class="delete-ride-confirm callout small alert"><p>Warning: this action will permanently delete draft ride "<?php echo $ride_title; ?>" on <?php echo $ride_date; ?>! Do you really want to do this?</p></div>
+        <input type="hidden" name="postid" value="<?php echo $postid; ?>"/>
+<?php if ($deleted) { ?>
+        <input type="hidden" name="undo_delete" value="yes"/>
+        <div class="callout small success">
+            <p>This ride has been successfully deleted. <a class="revert-action">Undo</a></p>
         </div>
-        <div class="row column clearfix">
-            <a class="action-delete delete-ride dark button float-left">Delete Ride</a>
-            <input class="delete-ride-confirm accent button float-left" type="submit" name="delete_ride" value="OK"/>
-            <a class="action-cancel delete-ride-confirm dark button float-right">Cancel</a>
+        <p><?php echo $return_to_ride; ?></p>
+<?php } else { ?>
+        <input type="hidden" name="delete_ride" value="yes"/>
+        <div class="callout">
+            <div class="row column">
+                <p>To delete draft ride "<?php echo $ride_title; ?>" on <?php echo $ride_date; ?>, press the delete button below. <?php echo $return_to_ride; ?></p>
+            </div>
+            <div class="row column errmsg"></div>
+            <div class="row column clearfix">
+                <input class="dark button float-left" type="submit" value="Delete Ride"/>
+            </div>
         </div>
+<?php } ?>
     </form>
 </div>
 <?php 
