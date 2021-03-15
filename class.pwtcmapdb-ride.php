@@ -684,64 +684,87 @@ class PwtcMapdb_Ride {
 
 	// Generates the [pwtc_mapdb_delete_ride] shortcode.
 	public static function shortcode_delete_ride($atts) {
-		$a = shortcode_atts(array('leaders' => 'no'), $atts);
+		$a = shortcode_atts(array('leaders' => 'no', 'use_return' => 'no'), $atts);
 		$allow_leaders = $a['leaders'] == 'yes';
-		
+		$use_return = $a['use_return'] == 'yes';
+
+		$current_user = wp_get_current_user();
+		if ( 0 == $current_user->ID ) {
+			return '<div class="callout small alert"><p>You must be logged in to delete rides.</p></div>';
+		}
+		$user_info = get_userdata($current_user->ID);
+		if ($allow_leaders) {
+			$is_road_captain = in_array(PwtcMapdb::ROLE_ROAD_CAPTAIN, $user_info->roles);
+		}
+		else {
+			$is_road_captain = user_can($current_user,'edit_published_rides');
+		}
+		$is_ride_leader = in_array(PwtcMapdb::ROLE_RIDE_LEADER, $user_info->roles);
+
 		$return = '';
 		if (isset($_GET['return'])) {
 			$return = $_GET['return'];
 		}
 
-		$ride_link = '';
-		$return_to_ride = '';
-		/*
-		if (!empty($return)) {
-			$ride_link = esc_url($return);
-			$return_to_ride = self::create_return_link($ride_link);
-		}
-		*/
-
-		$current_user = wp_get_current_user();
-
-		if (isset($_GET['post']) and isset($_GET['deleted'])) {
-			if ($_GET['deleted'] == 'yes') {
-				$refresh_script = '';
-				if (empty($return)) {
-					$refresh_script = self::get_refresh_script();
+		if (isset($_POST['postid'])) {
+			$postid = intval($_POST['postid']);
+			if (isset($_POST['delete_ride'])) {
+				if (wp_trash_post($postid)) {
+					wp_redirect(add_query_arg(array(
+						'post' => $postid,
+						'return' => urlencode($return),
+						'deleted' => 'yes'
+					), get_permalink()), 303);
 				}
-				return $refresh_script . '<div class="callout small success"><p>This ride has been successfully deleted.</p></div><p>' . $return_to_ride . '</p>';
+				else {
+					wp_redirect(add_query_arg(array(
+						'post' => $postid,
+						'return' => urlencode($return),
+						'deleted' => 'no'
+					), get_permalink()), 303);
+				}
 			}
-			else {
-				return '<div class="callout small alert"><p>Failed to delete this ride.</p></div>';
+			else if (isset($_POST['undo_delete'])) {
+				if (wp_untrash_post($postid)) {
+					wp_redirect(add_query_arg(array(
+						'post' => $postid,
+						'return' => urlencode($return),
+						'undo' => 'yes'
+					), get_permalink()), 303);
+				}
+				else {
+					wp_redirect(add_query_arg(array(
+						'post' => $postid,
+						'return' => urlencode($return),
+						'undo' => 'no'
+					), get_permalink()), 303);
+				}
 			}
+			exit;
 		}
 
-		$error = self::check_post_id();
+		$error = self::check_post_id(false, true);
 		if (!empty($error)) {
 			return $error;
 		}
 		$postid = intval($_GET['post']);
 
-		if (isset($_POST['delete_ride']) and $current_user->ID != 0) {
-			if (wp_trash_post($postid)) {
-				wp_redirect(add_query_arg(array(
-					'post' => $postid,
-					'return' => urlencode($return),
-					'deleted' => 'yes'
-				), get_permalink()), 303);
+		if (isset($_GET['deleted'])) {
+			if ($_GET['deleted'] == 'no') {
+				return '<div class="callout small alert"><p>Failed to delete this ride.</p></div>';
 			}
-			else {
-				wp_redirect(add_query_arg(array(
-					'post' => $postid,
-					'return' => urlencode($return),
-					'deleted' => 'no'
-				), get_permalink()), 303);
+		}
+		else if (isset($_GET['undo'])) {
+			if ($_GET['undo'] == 'no') {
+				return '<div class="callout small alert"><p>Failed to undo the delete of this ride.</p></div>';
 			}
-			exit;
 		}
 
-		if ( 0 == $current_user->ID ) {
-			return '<div class="callout small alert"><p>You must be logged in to delete rides.</p></div>';
+		$ride_link = '';
+		$return_to_ride = '';
+		if (!empty($return) and $use_return) {
+			$ride_link = esc_url($return);
+			$return_to_ride = self::create_return_link($ride_link);
 		}
 
 		$ride_title = esc_html(get_the_title($postid));
@@ -749,8 +772,8 @@ class PwtcMapdb_Ride {
 		$post = get_post($postid);
 		$author = $post->post_author;
 		$status = $post->post_status;
-		
-		if (!$allow_leaders and !user_can($current_user,'edit_published_rides')) {
+
+		if (!$allow_leaders and !$is_road_captain) {
 			return '<div class="callout small warning"><p>You are not allowed to delete rides.</p></div><p>' . $return_to_ride . '</p>';
 		}
 
@@ -761,25 +784,30 @@ class PwtcMapdb_Ride {
 			return '<div class="callout small warning"><p>Ride "' . $ride_title . '" is pending review so you cannot delete it.</p></div><p>' . $return_to_ride . '</p>';
 		}
 
-		if ($author != $current_user->ID and !user_can($current_user,'edit_published_rides')) {
+		if ($author != $current_user->ID and !$is_road_captain) {
 			return '<div class="callout small warning"><p>You must be the author of ride "' . $ride_title . '" to delete it.</p></div><p>' . $return_to_ride . '</p>';
 		}
 
-		$lock_user = self::check_post_lock($postid);
-		if ($lock_user) {
-			$info = get_userdata($lock_user);
-			$name = $info->first_name . ' ' . $info->last_name;	
-			return '<div class="callout small warning"><p>Ride "' . $ride_title . '" is currently being edited by ' . $name . '.</p></div><p>' . $return_to_ride . '</p>';
+		$deleted = false;
+		if ($status != 'trash') {
+			$lock_user = self::check_post_lock($postid);
+			if ($lock_user) {
+				$info = get_userdata($lock_user);
+				$name = $info->first_name . ' ' . $info->last_name;	
+				return '<div class="callout small warning"><p>Ride "' . $ride_title . '" is currently being edited by ' . $name . '.</p></div><p>' . $return_to_ride . '</p>';
+			}
+			self::set_post_lock($postid);
 		}
-
-		self::set_post_lock($postid);
+		else {
+			$deleted = true;
+		}
 
 		$ride_datetime = PwtcMapdb::get_ride_start_time($postid);
 		$ride_date = $ride_datetime->format('m/d/Y g:ia');
 
-        ob_start();
-        include('ride-delete-form.php');
-        return ob_get_clean();
+        	ob_start();
+        	include('ride-delete-form.php');
+        	return ob_get_clean();
 	}
 
 	// Generates the [pwtc_mapdb_manage_rides] shortcode.
@@ -1090,7 +1118,7 @@ class PwtcMapdb_Ride {
 
 	/******************* Utility Functions ******************/
     
-    public static function check_post_id($template = false) {
+    	public static function check_post_id($template = false, $ignore_trash = false) {
 		if (!isset($_GET['post'])) {
 			return '<div class="callout small alert"><p>Ride post ID parameter is missing.</p></div>';
 		}
@@ -1120,7 +1148,9 @@ class PwtcMapdb_Ride {
 		if ($template) {
 			if ($post_status != 'publish') {
 				if ($post_status == 'trash') {
-					return '<div class="callout small alert"><p>Ride template post ' . $postid . ' has been deleted.</p></div>';
+					if (!$ignore_trash) {
+						return '<div class="callout small alert"><p>Ride template post ' . $postid . ' has been deleted.</p></div>';
+					}
 				}
 				else {
 					return '<div class="callout small alert"><p>Ride template post ' . $postid . ' is not published. Its current status is "' . $post_status . '"</p></div>';
@@ -1130,7 +1160,9 @@ class PwtcMapdb_Ride {
 		else {
 			if ($post_status != 'publish' and $post_status != 'draft' and $post_status != 'pending') {
 				if ($post_status == 'trash') {
-					return '<div class="callout small alert"><p>Ride post ' . $postid . ' has been deleted.</p></div>';
+					if (!$ignore_trash) {
+						return '<div class="callout small alert"><p>Ride post ' . $postid . ' has been deleted.</p></div>';
+					}
 				}
 				else {
 					return '<div class="callout small alert"><p>Ride post ' . $postid . ' is not draft, pending or published. Its current status is "' . $post_status . '"</p></div>';
