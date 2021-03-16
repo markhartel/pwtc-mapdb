@@ -380,11 +380,21 @@ class PwtcMapdb_Ride {
 				}
 			}
 
+			$email = 'no';
+			if ($operation == 'submit_review' and !$is_road_captain) {
+				$email = self::ride_submitted_email($postid) ? 'yes': 'failed';
+			}
+			else if ($operation == 'published') {
+			}
+			else if ($operation == 'rejected') {
+			}
+			
 			wp_redirect(add_query_arg(array(
 				'post' => $postid,
 				'return' => urlencode($return),
 				'op' => $operation,
-				'success' => $success
+				'success' => $success,
+				'email' => $email
 			), get_permalink()), 303);
 			exit;
 		}
@@ -1281,9 +1291,13 @@ EOT;
 	}
 	
 	public static function ride_submitted_email($postid) {
+		$ride_title = esc_html(get_the_title($postid));
+		$ride_url = get_permalink($postid);
+		$ride_link = '<a href="' . $ride_url . '">' . $ride_title . '</a>';
 		$subject = 'Ride Submitted for Review';
-		$body = 'Dear Road Captain,'.urlencode("\r\n").'Please review the following ride:'.urlencode("\r\n").urlencode(get_permalink($postid)).urlencode("\r\n").urlencode("\r\n");
-		return esc_url('mailto:'.PwtcMapdb::ROAD_CAPTAIN_EMAIL.'?subject='.$subject.'&body='.$body);
+		$message = "The following ride has been submitted for review:\r\n" . $ride_link . "\r\nDo not respond to this email.";
+		$headers = ['Content-type: text/html'];
+		return wp_mail(PwtcMapdb::ROAD_CAPTAIN_EMAIL, $subject , $message, $headers);
 	}
 
 	public static function ride_published_email($author_name, $author_email, $ride_link) {
