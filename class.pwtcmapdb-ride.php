@@ -101,9 +101,10 @@ class PwtcMapdb_Ride {
 
 	// Generates the [pwtc_mapdb_edit_ride] shortcode.
 	public static function shortcode_edit_ride($atts, $content) {
-		$a = shortcode_atts(array('leaders' => 'no', 'interval' => 'P14D', 'use_return' => 'no'), $atts);
+		$a = shortcode_atts(array('leaders' => 'no', 'interval' => 'P14D', 'use_return' => 'no', 'email' => 'no'), $atts);
 		$allow_leaders = $a['leaders'] == 'yes';
 		$use_return = $a['use_return'] == 'yes';
+		$allow_email = $a['email'] == 'yes';
 		
 		$current_user = wp_get_current_user();
 		if ( 0 == $current_user->ID ) {
@@ -381,12 +382,16 @@ class PwtcMapdb_Ride {
 			}
 
 			$email = 'no';
-			if ($operation == 'submit_review' and !$is_road_captain) {
-				$email = self::ride_submitted_email($postid) ? 'yes': 'failed';
-			}
-			else if ($operation == 'published') {
-			}
-			else if ($operation == 'rejected') {
+			if ($allow_email) {
+				if ($operation == 'submit_review' and !$is_road_captain) {
+					$email = self::ride_submitted_email($postid) ? 'yes': 'failed';
+				}
+				else if ($operation == 'published') {
+					$email = self::ride_published_email($postid) ? 'yes': 'failed';
+				}
+				else if ($operation == 'rejected') {
+					$email = self::ride_rejected_email($postid) ? 'yes': 'failed';
+				}
 			}
 			
 			wp_redirect(add_query_arg(array(
@@ -1295,26 +1300,38 @@ EOT;
 		$ride_url = get_permalink($postid);
 		$ride_link = '<a href="' . $ride_url . '">' . $ride_title . '</a>';
 		$subject = 'Ride Submitted for Review';
-		$message = "The following ride has been submitted for review:\r\n" . $ride_link . "\r\nDo not respond to this email.";
+		$message = "The following ride has been submitted for review: " . $ride_link . "\r\nDo not respond to this email.";
 		$headers = ['Content-type: text/html'];
 		return wp_mail(PwtcMapdb::ROAD_CAPTAIN_EMAIL, $subject , $message, $headers);
 	}
 
-	public static function ride_published_email($author_name, $author_email, $ride_link) {
+	public static function ride_published_email($postid) {
+		$post = get_post($postid);
+		$author_email = get_the_author_meta('user_email', $post->post_author);
+		$ride_title = esc_html(get_the_title($postid));
+		$ride_url = get_permalink($postid);
+		$ride_link = '<a href="' . $ride_url . '">' . $ride_title . '</a>';
 		$subject = 'Published Your Submitted Ride';
-		$body = 'Dear '.$author_name.','.urlencode("\r\n").'Your submitted ride'.urlencode("\r\n").urlencode($ride_link).urlencode("\r\n").'has been published and is now on the ride calendar.'.urlencode("\r\n").urlencode("\r\n");
-		return esc_url('mailto:'.$author_email.'?subject='.$subject.'&body='.$body);
+		$message = "Your submitted ride has been published and is now on the ride calendar: " . $ride_link . "\r\nDo not respond to this email.";
+		$headers = ['Content-type: text/html'];
+		return wp_mail($author_email, $subject , $message, $headers);
 	}
 
-	public static function ride_rejected_email($author_name, $author_email, $ride_link) {
+	public static function ride_rejected_email($postid) {
+		$post = get_post($postid);
+		$author_email = get_the_author_meta('user_email', $post->post_author);
+		$ride_title = esc_html(get_the_title($postid));
+		$ride_url = add_query_arg(array('post' => $postid), get_permalink());
+		$ride_link = '<a href="' . $ride_url . '">' . $ride_title . '</a>';
 		$subject = 'Rejected Your Submitted Ride';
-		$body = 'Dear '.$author_name.','.urlencode("\r\n").'Your submitted ride'.urlencode("\r\n").urlencode($ride_link).urlencode("\r\n").'was rejected for the following reason:'.urlencode("\r\n").'(insert reason for rejection here...)'.urlencode("\r\n").urlencode("\r\n");
-		return esc_url('mailto:'.$author_email.'?subject='.$subject.'&body='.$body);
+		$message = "Your submitted ride has been rejected and returned to you: " . $ride_link . "\r\nDo not respond to this email.";
+		$headers = ['Content-type: text/html'];
+		return wp_mail($author_email, $subject , $message, $headers);
 	}
 
 	public static function ride_question_email($author_name, $author_email, $ride_title, $ride_date) {
 		$subject = 'Question About Your Submitted Ride';
-        	$body = 'Dear '.$author_name.','.urlencode("\r\n").'I have questions about your submitted ride'.urlencode("\r\n").$ride_title.' on '.$ride_date.urlencode("\r\n").'(insert questions here...)'.urlencode("\r\n").urlencode("\r\n");
+        	$body = 'Hello '.$author_name.','.urlencode("\r\n").'I have questions about your submitted ride'.urlencode("\r\n").$ride_title.' on '.$ride_date.urlencode("\r\n").'(insert questions here...)'.urlencode("\r\n").urlencode("\r\n");
         	return esc_url('mailto:'.$author_email.'?subject='.$subject.'&body='.$body); 
 	}
 
