@@ -713,12 +713,10 @@
         The draft ride was submitted for review.
         <?php } else if ($operation == 'update_pending') { ?>
         The pending ride was updated.
-        <?php } else if ($operation == 'published') { ?>
-        <?php if ($allow_leaders) { ?>
-        The pending ride was published.
-        <?php } else { ?>
+        <?php } else if ($operation == 'published_draft') { ?>
         The draft ride was published.
-        <?php } ?>
+        <?php } else if ($operation == 'published') { ?>
+        The pending ride was published.
         <?php } else if ($operation == 'rejected') { ?>
         The pending ride was rejected.
         <?php } else if ($operation == 'update_published') { ?>
