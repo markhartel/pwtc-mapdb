@@ -181,7 +181,10 @@ class PwtcMapdb_Ride {
 				}
 				else if (isset($_POST['publish'])) {
 					$my_post['post_status'] = 'publish';
-					if ($post_status == 'pending' or $post_status == 'draft') {
+					if ($post_status == 'draft') {
+						$operation = 'published_draft';
+					}
+					else if ($post_status == 'pending') {
 						$operation = 'published';
 					}
 					else {
