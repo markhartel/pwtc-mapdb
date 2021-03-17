@@ -716,9 +716,15 @@
         <?php } else if ($operation == 'published_draft') { ?>
         The draft ride was published.
         <?php } else if ($operation == 'published') { ?>
-        The pending ride was published.
+        The pending ride was published
+        <?php if ($email_status == 'yes') { ?> and the author notified by email
+        <?php } else if ($email_status == 'failed') { ?> but failed to notify author by email<?php } ?>
+        .
         <?php } else if ($operation == 'rejected') { ?>
-        The pending ride was rejected.
+        The pending ride was rejected
+        <?php if ($email_status == 'yes') { ?> and the author notified by email
+        <?php } else if ($email_status == 'failed') { ?> but failed to notify author by email<?php } ?>
+        .
         <?php } else if ($operation == 'update_published') { ?>
         The published ride was updated.
         <?php } else if ($operation == 'unpublished') { ?>
