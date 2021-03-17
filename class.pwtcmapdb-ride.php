@@ -417,6 +417,11 @@ class PwtcMapdb_Ride {
 				}
 			}
 		}
+		
+		$email_status = 'no';
+		if (isset($_GET['email'])) {
+			$email_status = $_GET['email'];
+		}
 
 		$copy_ride = false;
 		$template = false;
