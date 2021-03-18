@@ -101,10 +101,11 @@ class PwtcMapdb_Ride {
 
 	// Generates the [pwtc_mapdb_edit_ride] shortcode.
 	public static function shortcode_edit_ride($atts, $content) {
-		$a = shortcode_atts(array('leaders' => 'no', 'interval' => 'P14D', 'use_return' => 'no', 'email' => 'no'), $atts);
+		$a = shortcode_atts(array('leaders' => 'no', 'interval' => 'P14D', 'use_return' => 'no', 'email' => 'no', 'captain' => PwtcMapdb::ROAD_CAPTAIN_EMAIL), $atts);
 		$allow_leaders = $a['leaders'] == 'yes';
 		$use_return = $a['use_return'] == 'yes';
 		$allow_email = $a['email'] == 'yes';
+		$captain_email = $a['captain'];
 		
 		$current_user = wp_get_current_user();
 		if ( 0 == $current_user->ID ) {
@@ -387,7 +388,7 @@ class PwtcMapdb_Ride {
 			$email = 'no';
 			if ($allow_email) {
 				if ($operation == 'submit_review' and !$is_road_captain) {
-					$email = self::ride_submitted_email($postid) ? 'yes': 'failed';
+					$email = self::ride_submitted_email($postid, $captain_email) ? 'yes': 'failed';
 				}
 				else if ($operation == 'published') {
 					$email = self::ride_published_email($postid) ? 'yes': 'failed';
@@ -1303,14 +1304,14 @@ EOT;
 		return self::submit_ride_link($return, $post_id, 'template');
 	}
 	
-	public static function ride_submitted_email($postid) {
+	public static function ride_submitted_email($postid, $captain_email) {
 		$ride_title = esc_html(get_the_title($postid));
 		$ride_url = get_permalink($postid);
 		$ride_link = '<a href="' . $ride_url . '">' . $ride_title . '</a>';
 		$subject = 'Ride Submitted for Review';
 		$message = "The following ride has been submitted for review: " . $ride_link . "\r\nDo not respond to this email.";
 		$headers = ['Content-type: text/html'];
-		return wp_mail(PwtcMapdb::ROAD_CAPTAIN_EMAIL, $subject , $message, $headers);
+		return wp_mail($captain_email, $subject , $message, $headers);
 	}
 
 	public static function ride_published_email($postid) {
