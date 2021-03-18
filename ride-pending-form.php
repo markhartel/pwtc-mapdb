@@ -7,13 +7,6 @@
         $('#pwtc-mapdb-edit-ride-div form').on('submit', function(evt) {
             $('#pwtc-mapdb-edit-ride-div .callout').html('<i class="fa fa-spinner fa-pulse"></i> please wait...');
         })
-
-        <?php if (empty($return)) { ?>
-        var opener_win = window.opener;
-        if (opener_win) {
-            opener_win.location.reload();
-        }
-        <?php } ?>
     });
 </script>
 <div id='pwtc-mapdb-edit-ride-div'>
