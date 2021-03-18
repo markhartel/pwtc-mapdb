@@ -736,6 +736,7 @@
     </div>
     <?php } ?>
     <div>
+        <p><?php echo $return_to_ride; ?></p>
         <p>
     <?php if ($postid != 0) { ?>
         This ride was authored by <?php echo $author_name; ?> and is
@@ -757,7 +758,6 @@
         This is a new ride, fill out the form below and press the save button at the bottom of the form.
         <?php } ?>
     <?php } ?>
-    <?php echo $return_to_ride; ?>
         </p>
     </div>
     <div class="callout">
