@@ -736,9 +736,9 @@
         <?php if ($status == 'draft') { ?>
         a draft. It can be updated or <?php if ($allow_leaders) { ?>submitted for review<?php } else { ?>published<?php } ?> using the buttons at the bottom of the form.
         <?php } else if ($status == 'pending') { 
-            $questions = self::ride_question_email($author_name, $author_email, $ride_title, $ride_date_pretty);
+            $questions = self::ride_question_email($postid);
         ?>
-        pending review by a road captain. It can be updated, published or rejected using the buttons at the bottom of the form. If you have questions, <a href="<?php echo $questions; ?>">email the author.</a>
+        pending review by a road captain. It can be updated, published or rejected using the buttons at the bottom of the form. <?php if (!empty($questions)) { ?>If you have questions, <a href="<?php echo $questions; ?>">email the author.</a><?php } ?>
         <?php } else if ($status == 'publish') { ?>
         published and on the ride calendar. It can be updated or unpublished using the buttons at the bottom of the form.
         <?php } ?>
