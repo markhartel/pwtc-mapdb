@@ -672,13 +672,6 @@
 
         var is_dirty = false;
 
-    <?php if ($success == 'yes' and empty($return)) { ?>
-        var opener_win = window.opener;
-        if (opener_win) {
-            opener_win.location.reload();
-        }
-    <?php } ?>
-
     <?php if ($postid != 0) { ?>
         $(document).on( 'heartbeat-send', function( e, data ) {
             var send = {};
