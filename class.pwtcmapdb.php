@@ -68,10 +68,9 @@ class PwtcMapdb {
 
 	const POST_TYPE_RIDE = 'scheduled_rides';
 	
-	//const ROAD_CAPTAIN_EMAIL = 'roadcaptain@portlandbicyclingclub.com';
-	const ROAD_CAPTAIN_EMAIL = 'mark_hartel@hotmail.com';
+	const ROAD_CAPTAIN_EMAIL = 'roadcaptain@portlandbicyclingclub.com';
 		
-    private static $initiated = false;
+    	private static $initiated = false;
 
 	public static function init() {
 		if ( ! self::$initiated ) {
