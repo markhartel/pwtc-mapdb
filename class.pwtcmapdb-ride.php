@@ -1298,10 +1298,11 @@ EOT;
 	
 	public static function ride_submitted_email($postid, $captain_email) {
 		$ride_title = esc_html(get_the_title($postid));
+		$ride_date = PwtcMapdb::get_ride_start_time($postid)->format('m/d/Y g:ia');
 		$ride_url = get_permalink($postid);
 		$ride_link = '<a href="' . $ride_url . '">' . $ride_title . '</a>';
 		$subject = 'Ride Submitted for Review';
-		$message = "The following ride has been submitted for review: " . $ride_link . "\r\nDo not respond to this email.";
+		$message = "The following ride has been submitted for review:\r\n" . $ride_link . " on " . $ride_date . "\r\nDo not respond to this email.";
 		$headers = ['Content-type: text/html'];
 		return wp_mail($captain_email, $subject , $message, $headers);
 	}
@@ -1310,30 +1311,40 @@ EOT;
 		$post = get_post($postid);
 		$author_email = get_the_author_meta('user_email', $post->post_author);
 		$ride_title = esc_html(get_the_title($postid));
+		$ride_date = PwtcMapdb::get_ride_start_time($postid)->format('m/d/Y g:ia');
 		$ride_url = get_permalink($postid);
 		$ride_link = '<a href="' . $ride_url . '">' . $ride_title . '</a>';
 		$subject = 'Published Your Submitted Ride';
-		$message = "Your submitted ride has been published and is now on the ride calendar: " . $ride_link . "\r\nDo not respond to this email.";
+		$message = "Your submitted ride has been published and is now on the ride calendar:\r\n" . $ride_link . " on " . $ride_date . "\r\nDo not respond to this email.";
 		$headers = ['Content-type: text/html'];
 		return wp_mail($author_email, $subject , $message, $headers);
 	}
 
 	public static function ride_rejected_email($postid) {
 		$post = get_post($postid);
-		$author_email = get_the_author_meta('user_email', $post->post_author);
+		$author_email = get_the_author_meta('user_email', $post->post_author);		
 		$ride_title = esc_html(get_the_title($postid));
+		$ride_date = PwtcMapdb::get_ride_start_time($postid)->format('m/d/Y g:ia');
 		$ride_url = add_query_arg(array('post' => $postid), get_permalink());
 		$ride_link = '<a href="' . $ride_url . '">' . $ride_title . '</a>';
 		$subject = 'Rejected Your Submitted Ride';
-		$message = "Your submitted ride has been rejected and returned to you: " . $ride_link . "\r\nDo not respond to this email.";
+		$message = "Your submitted ride has been rejected and returned to you:\r\n" . $ride_link . " on " . $ride_date . "\r\nDo not respond to this email.";
 		$headers = ['Content-type: text/html'];
 		return wp_mail($author_email, $subject , $message, $headers);
 	}
 
-	public static function ride_question_email($author_name, $author_email, $ride_title, $ride_date) {
-		$subject = 'Question About Your Submitted Ride';
-        	$body = 'Hello '.$author_name.','.urlencode("\r\n").'I have questions about your submitted ride'.urlencode("\r\n").$ride_title.' on '.$ride_date.urlencode("\r\n").'(insert questions here...)'.urlencode("\r\n").urlencode("\r\n");
-        	return esc_url('mailto:'.$author_email.'?subject='.$subject.'&body='.$body); 
+	public static function ride_question_email($postid) {
+		$post = get_post($postid);
+		$current_user = wp_get_current_user();
+		if ( $post->post_author != $current_user->ID ) {
+			$author_email = get_the_author_meta('user_email', $post->post_author);		
+			$ride_title = esc_html(get_the_title($postid));
+			$ride_date = PwtcMapdb::get_ride_start_time($postid)->format('m/d/Y g:ia');
+			$subject = 'Question About Your Submitted Ride';
+			$body = 'I have questions about your submitted ride'.urlencode("\r\n").$ride_title.' on '.$ride_date.urlencode("\r\n").'(insert questions here...)'.urlencode("\r\n").urlencode("\r\n");
+			return esc_url('mailto:'.$author_email.'?subject='.$subject.'&body='.$body); 
+		}
+		return '';
 	}
 
 }
