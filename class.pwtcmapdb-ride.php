@@ -521,12 +521,8 @@ class PwtcMapdb_Ride {
                 		return '<div class="callout small warning"><p>You must be the author of ride "' . $ride_title . '" to edit it.</p></div><p>' . $return_to_ride . '</p>';
 			}
 			
-			$refresh_script = '';
-			if (empty($return)) {
-				$refresh_script = self::get_refresh_script();
-			}
             		if ($status == 'publish') {
-               			return $refresh_script . '<div class="callout small warning"><p>Ride "' . $ride_title . '" is published so you cannot edit it.</p></div><p>' . $return_to_ride . '</p>';
+               			return '<div class="callout small warning"><p>Ride "' . $ride_title . '" is published so you cannot edit it.</p></div><p>' . $return_to_ride . '</p>';
 			}
 			else if ($status == 'pending') {
 				ob_start();
