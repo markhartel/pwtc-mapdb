@@ -42,6 +42,7 @@
     });
 </script>
 <div id="pwtc-mapdb-delete-ride-div">
+    <?php echo $return_to_ride; ?>
     <form method="POST">
         <input type="hidden" name="postid" value="<?php echo $postid; ?>"/>
 <?php if ($deleted) { ?>
@@ -49,7 +50,6 @@
         <div class="callout small success">
             <p>This ride has been successfully deleted. <a class="revert-action">Undo</a></p>
         </div>
-        <p><?php echo $return_to_ride; ?></p>
 <?php } else { ?>
         <input type="hidden" name="delete_ride" value="yes"/>
         <div class="callout">
