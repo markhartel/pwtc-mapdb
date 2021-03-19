@@ -697,6 +697,7 @@
     });
 </script>
 <div id='pwtc-mapdb-edit-ride-div'>
+    <?php echo $return_to_ride; ?>
     <?php if ($success == 'yes') { ?>
     <div class="callout small success">
         <p>
@@ -729,7 +730,6 @@
     </div>
     <?php } ?>
     <div>
-        <p><?php echo $return_to_ride; ?></p>
         <p>
     <?php if ($postid != 0) { ?>
         This ride was authored by <?php echo $author_name; ?> and is
