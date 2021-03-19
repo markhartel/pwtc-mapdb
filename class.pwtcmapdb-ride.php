@@ -391,10 +391,16 @@ class PwtcMapdb_Ride {
 					$email = self::ride_submitted_email($postid, $captain_email) ? 'yes': 'failed';
 				}
 				else if ($operation == 'published') {
-					$email = self::ride_published_email($postid) ? 'yes': 'failed';
+					$post = get_post($postid);
+					if ($post->post_author != $current_user->ID) {
+						$email = self::ride_published_email($postid) ? 'yes': 'failed';
+					}
 				}
 				else if ($operation == 'rejected') {
-					$email = self::ride_rejected_email($postid) ? 'yes': 'failed';
+					$post = get_post($postid);
+					if ($post->post_author != $current_user->ID) {
+						$email = self::ride_rejected_email($postid) ? 'yes': 'failed';
+					}
 				}
 			}
 			
