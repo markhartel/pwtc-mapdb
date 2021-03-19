@@ -494,18 +494,18 @@ class PwtcMapdb_Ride {
 		}
 		
 		if (!$allow_leaders and !$is_road_captain) {
-			return '<div class="callout small warning"><p>You are not allowed to submit rides.</p></div><p>' . $return_to_ride . '</p>';
+			return $return_to_ride . '<div class="callout small warning"><p>You are not allowed to submit rides.</p></div>';
 		}
 		
 		if ($copy_ride and !$is_road_captain) {
             		if (!$is_ride_leader) {
-                		return '<div class="callout small warning"><p>You must be a ride leader to copy rides.</p></div><p>' . $return_to_ride . '</p>';
+                		return $return_to_ride . '<div class="callout small warning"><p>You must be a ride leader to copy rides.</p></div>';
             		}
 		}
 
 		if ($postid == 0 and !$is_road_captain) {
             		if (!$is_ride_leader) {
-                		return '<div class="callout small warning"><p>You must be a ride leader to create new rides.</p></div><p>' . $return_to_ride . '</p>';
+                		return $return_to_ride . '<div class="callout small warning"><p>You must be a ride leader to create new rides.</p></div>';
             		}
 		}
 
@@ -514,21 +514,21 @@ class PwtcMapdb_Ride {
 		    if ($lock_user) {
 				$info = get_userdata($lock_user);
 				$name = $info->first_name . ' ' . $info->last_name;	
-				return '<div class="callout small warning"><p>Ride "' . $ride_title . '" is currently being edited by ' . $name . '. </p></div><p>' . $return_to_ride . '</p>';
+				return $return_to_ride . '<div class="callout small warning"><p>Ride "' . $ride_title . '" is currently being edited by ' . $name . '. </p></div>';
 			}
 		}
 
 		if ($postid != 0 and !$copy_ride and !$is_road_captain) {
 			if (!$is_ride_leader) {
-                		return '<div class="callout small warning"><p>You must be a ride leader to edit rides.</p></div><p>' . $return_to_ride . '</p>';
+                		return $return_to_ride . '<div class="callout small warning"><p>You must be a ride leader to edit rides.</p></div>';
 			}
 			
 			if ($author != $current_user->ID) {
-                		return '<div class="callout small warning"><p>You must be the author of ride "' . $ride_title . '" to edit it.</p></div><p>' . $return_to_ride . '</p>';
+                		return $return_to_ride . '<div class="callout small warning"><p>You must be the author of ride "' . $ride_title . '" to edit it.</p></div>';
 			}
 			
             		if ($status == 'publish') {
-               			return '<div class="callout small warning"><p>Ride "' . $ride_title . '" is published so you cannot edit it.</p></div><p>' . $return_to_ride . '</p>';
+               			return $return_to_ride . '<div class="callout small warning"><p>Ride "' . $ride_title . '" is published so you cannot edit it.</p></div>';
 			}
 			else if ($status == 'pending') {
 				ob_start();
@@ -543,7 +543,7 @@ class PwtcMapdb_Ride {
 				if ($is_road_captain) {
 					if (function_exists('pwtc_mileage_ridesheet_exists')) {
 						if (pwtc_mileage_ridesheet_exists($postid)) {
-							return '<div class="callout small warning"><p>Ride "' . $ride_title . '" has already finished and has associated mileage so you cannot edit it.</p></div><p>' . $return_to_ride . '</p>';
+							return $return_to_ride . '<div class="callout small warning"><p>Ride "' . $ride_title . '" has already finished and has associated mileage so you cannot edit it.</p></div>';
 						}
 					}
 					ob_start();
@@ -551,7 +551,7 @@ class PwtcMapdb_Ride {
 					return ob_get_clean();
 				}
 				else {
-					return '<div class="callout small warning"><p>Ride "' . $ride_title . '" has already finished so you cannot edit it.</p></div><p>' . $return_to_ride . '</p>';
+					return $return_to_ride . '<div class="callout small warning"><p>Ride "' . $ride_title . '" has already finished so you cannot edit it.</p></div>';
 				}
 			}
 		}
@@ -796,18 +796,18 @@ class PwtcMapdb_Ride {
 		$status = $post->post_status;
 
 		if (!$allow_leaders and !$is_road_captain) {
-			return '<div class="callout small warning"><p>You are not allowed to delete rides.</p></div><p>' . $return_to_ride . '</p>';
+			return $return_to_ride . '<div class="callout small warning"><p>You are not allowed to delete rides.</p></div>';
 		}
 
 		if ($status == 'publish') {
-			return '<div class="callout small warning"><p>Ride "' . $ride_title . '" is published so you cannot delete it.</p></div><p>' . $return_to_ride . '</p>';
+			return $return_to_ride . '<div class="callout small warning"><p>Ride "' . $ride_title . '" is published so you cannot delete it.</p></div>';
 		}
 		else if ($status == 'pending') {
-			return '<div class="callout small warning"><p>Ride "' . $ride_title . '" is pending review so you cannot delete it.</p></div><p>' . $return_to_ride . '</p>';
+			return $return_to_ride . '<div class="callout small warning"><p>Ride "' . $ride_title . '" is pending review so you cannot delete it.</p></div>';
 		}
 
 		if ($author != $current_user->ID and !$is_road_captain) {
-			return '<div class="callout small warning"><p>You must be the author of ride "' . $ride_title . '" to delete it.</p></div><p>' . $return_to_ride . '</p>';
+			return $return_to_ride . '<div class="callout small warning"><p>You must be the author of ride "' . $ride_title . '" to delete it.</p></div>';
 		}
 
 		$deleted = false;
@@ -816,7 +816,7 @@ class PwtcMapdb_Ride {
 			if ($lock_user) {
 				$info = get_userdata($lock_user);
 				$name = $info->first_name . ' ' . $info->last_name;	
-				return '<div class="callout small warning"><p>Ride "' . $ride_title . '" is currently being edited by ' . $name . '.</p></div><p>' . $return_to_ride . '</p>';
+				return $return_to_ride . '<div class="callout small warning"><p>Ride "' . $ride_title . '" is currently being edited by ' . $name . '.</p></div>';
 			}
 			self::set_post_lock($postid);
 		}
@@ -1209,7 +1209,7 @@ EOT;
 	}
 
 	public static function create_return_link($ride_url) {
-		return '<a href="' . $ride_url . '">Return to the previous page.</a>';
+		return '<ul class="breadcrumbs"><li><a href="' . $ride_url . '">Previous Page</a></li><li>' . esc_html(get_the_title()) . '</li></ul>';
 	}
 
 	public static function set_post_lock( $post_id ) {
