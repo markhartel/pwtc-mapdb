@@ -10,10 +10,10 @@
     });
 </script>
 <div id='pwtc-mapdb-edit-ride-div'>
+    <?php echo $return_to_ride; ?>
     <div class="callout small warning">
         <p>Published ride "<?php echo $ride_title; ?>" has already finished so you cannot edit it. If you wish to edit you must <a class="revert-action">revert ride back to draft.</a></p>
     </div>
-    <p><?php echo $return_to_ride; ?></p>
     <form method="POST">
         <input type="hidden" name="postid" value="<?php echo $postid; ?>"/>
         <input type="hidden" name="revert" value="draft"/>
