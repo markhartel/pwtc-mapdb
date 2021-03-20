@@ -1321,7 +1321,12 @@ EOT;
 		$ride_url = get_permalink($postid);
 		$ride_link = '<a href="' . $ride_url . '">' . $ride_title . '</a>';
 		$subject = 'Ride Submitted for Review';
-		$message = "The following ride has been submitted for review:\r\n" . $ride_link . " on " . $ride_date . "\r\nDo not respond to this email.";
+		$message = <<<EOT
+The following ride has been submitted for your review:
+$ride_link on $ride_date
+To review this ride, use a browser to log in to your club account (you must be a road captain) and open the ride by clicking its title link.
+Do not respond to this email.
+EOT;
 		$headers = ['Content-type: text/html'];
 		return wp_mail($captain_email, $subject , $message, $headers);
 	}
@@ -1348,7 +1353,12 @@ EOT;
 		$ride_url = get_permalink($postid);
 		$ride_link = '<a href="' . $ride_url . '">' . $ride_title . '</a>';
 		$subject = 'Published Your Submitted Ride';
-		$message = "Your submitted ride has been published and is now on the ride calendar:\r\n" . $ride_link . " on " . $ride_date . "\r\nDo not respond to this email.";
+		$message = <<<EOT
+Your submitted ride has been published and is now on the ride calendar:
+$ride_link on $ride_date
+To view this ride as it appears on the calendar, click its title link.
+Do not respond to this email.
+EOT;
 		$headers = ['Content-type: text/html'];
 		return wp_mail($author_email, $subject , $message, $headers);
 	}
@@ -1361,7 +1371,12 @@ EOT;
 		$ride_url = add_query_arg(array('post' => $postid), get_permalink());
 		$ride_link = '<a href="' . $ride_url . '">' . $ride_title . '</a>';
 		$subject = 'Rejected Your Submitted Ride';
-		$message = "Your submitted ride has been rejected and returned to you:\r\n" . $ride_link . " on " . $ride_date . "\r\nDo not respond to this email.";
+		$message = <<<EOT
+Your submitted ride has been rejected and returned to you:
+$ride_link on $ride_date
+To make changes to this ride and re-submit, use a browser to log in to your club account and open the ride by clicking its title link.
+Do not respond to this email.
+EOT;
 		$headers = ['Content-type: text/html'];
 		return wp_mail($author_email, $subject , $message, $headers);
 	}
