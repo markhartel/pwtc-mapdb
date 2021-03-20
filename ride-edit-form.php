@@ -724,7 +724,9 @@
         <?php } else if ($operation == 'insert') { ?>
         The first draft of your ride was saved.
         <?php } else if ($operation == 'revert_draft') { ?>
-        The ride was reverted back to draft.
+        The ride was reverted back to draft
+        <?php if ($email_status == 'yes') { ?> and the road captain notified by email
+        <?php } else if ($email_status == 'failed') { ?> but failed to notify road captain by email<?php } ?>.
         <?php } ?>
         </p>
     </div>
