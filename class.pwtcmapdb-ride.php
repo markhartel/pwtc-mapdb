@@ -127,18 +127,31 @@ class PwtcMapdb_Ride {
 
 		if (isset($_POST['postid']) and isset($_POST['revert'])) {
 			$postid = intval($_POST['postid']);
+			
+			$post_status = '';
+			if (isset($_POST['post_status'])) {
+				$post_status = $_POST['post_status'];
+			}
 
 			$my_post = array(
 				'ID' => $postid,
 				'post_status' => 'draft'
 			);
 			wp_update_post($my_post);
+			
+			$email = 'no';
+			if ($allow_email) {
+				if ($post_status == 'pending' and !$is_road_captain) {
+					$email = self::ride_unsubmitted_email($postid, $captain_email) ? 'yes': 'failed';
+				}
+			}
 
 			wp_redirect(add_query_arg(array(
 				'post' => $postid,
 				'return' => urlencode($return),
 				'op' => 'revert_draft',
-				'success' => 'yes'
+				'success' => 'yes',
+				'email' => $email
 			), get_permalink()), 303);
 			exit;
 		}
@@ -1309,6 +1322,20 @@ EOT;
 		$ride_link = '<a href="' . $ride_url . '">' . $ride_title . '</a>';
 		$subject = 'Ride Submitted for Review';
 		$message = "The following ride has been submitted for review:\r\n" . $ride_link . " on " . $ride_date . "\r\nDo not respond to this email.";
+		$headers = ['Content-type: text/html'];
+		return wp_mail($captain_email, $subject , $message, $headers);
+	}
+	
+	public static function ride_unsubmitted_email($postid, $captain_email) {
+		$ride_title = esc_html(get_the_title($postid));
+		$ride_date = PwtcMapdb::get_ride_start_time($postid)->format('m/d/Y g:ia');
+		$subject = 'Ride Unsubmitted';
+		$message = <<<EOT
+The author has reverted the following ride back to draft:
+$ride_title on $ride_date
+Ignore the previous email and do not review this ride.
+Do not respond to this email.
+EOT;
 		$headers = ['Content-type: text/html'];
 		return wp_mail($captain_email, $subject , $message, $headers);
 	}
