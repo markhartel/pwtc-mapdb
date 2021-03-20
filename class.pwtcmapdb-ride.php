@@ -1324,7 +1324,7 @@ EOT;
 		$message = <<<EOT
 The following ride has been submitted for your review:
 $ride_link on $ride_date
-To review this ride, use a browser to log in to your club account (you must be a road captain) and open the ride by clicking its title link.
+To review this ride, use a browser to log in to your club account (you must be a road captain) and open the ride by clicking its title link. Make any changes that you see fit and publish the ride or reject and return it to the author.
 Do not respond to this email.
 EOT;
 		$headers = ['Content-type: text/html'];
