@@ -1322,10 +1322,10 @@ EOT;
 		$ride_link = '<a href="' . $ride_url . '">' . $ride_title . '</a>';
 		$subject = 'Ride Submitted for Review';
 		$message = <<<EOT
-The following ride has been submitted for your review:
-$ride_link on $ride_date
-To review this ride, use a browser to log in to your club account (you must be a road captain) and open the ride by clicking its title link. Make any changes that you see fit and publish the ride or reject and return it to the author.
-Do not respond to this email.
+The following ride has been submitted for your review:<br>
+$ride_link on $ride_date.<br>
+To review this ride, use a browser to log in to your club account (you must be a road captain) and open the ride by clicking its title link. Make any changes that you see fit and publish the ride or reject and return it to the author.<br>
+Do not respond to this email.<br>
 EOT;
 		$headers = ['Content-type: text/html'];
 		return wp_mail($captain_email, $subject , $message, $headers);
@@ -1336,10 +1336,10 @@ EOT;
 		$ride_date = PwtcMapdb::get_ride_start_time($postid)->format('m/d/Y g:ia');
 		$subject = 'Ride Unsubmitted';
 		$message = <<<EOT
-The author has reverted the following ride back to draft:
-$ride_title on $ride_date
-Ignore the previous email and do not review this ride.
-Do not respond to this email.
+The author has reverted the following ride back to draft:<br>
+$ride_title on $ride_date.<br>
+Ignore the previous email and do not review this ride.<br>
+Do not respond to this email.<br>
 EOT;
 		$headers = ['Content-type: text/html'];
 		return wp_mail($captain_email, $subject , $message, $headers);
@@ -1354,10 +1354,10 @@ EOT;
 		$ride_link = '<a href="' . $ride_url . '">' . $ride_title . '</a>';
 		$subject = 'Published Your Submitted Ride';
 		$message = <<<EOT
-Your submitted ride has been published and is now on the ride calendar:
-$ride_link on $ride_date
-To view this ride as it appears on the calendar, click its title link.
-Do not respond to this email.
+Your submitted ride has been published and is now on the ride calendar:<br>
+$ride_link on $ride_date.<br>
+To view this ride as it appears on the calendar, click its title link.<br>
+Do not respond to this email.<br>
 EOT;
 		$headers = ['Content-type: text/html'];
 		return wp_mail($author_email, $subject , $message, $headers);
@@ -1372,10 +1372,10 @@ EOT;
 		$ride_link = '<a href="' . $ride_url . '">' . $ride_title . '</a>';
 		$subject = 'Rejected Your Submitted Ride';
 		$message = <<<EOT
-Your submitted ride has been rejected and returned to you:
-$ride_link on $ride_date
-To make changes to this ride and re-submit, use a browser to log in to your club account and open the ride by clicking its title link.
-Do not respond to this email.
+Your submitted ride has been rejected and returned to you:<br>
+$ride_link on $ride_date.<br>
+To make changes to this ride and re-submit, use a browser to log in to your club account and open the ride by clicking its title link.<br>
+Do not respond to this email.<br>
 EOT;
 		$headers = ['Content-type: text/html'];
 		return wp_mail($author_email, $subject , $message, $headers);
