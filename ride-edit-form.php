@@ -942,10 +942,11 @@
                         if ($info) {
                             $name = $info->first_name . ' ' . $info->last_name;
                     ?>
-                    <div userid="<?php echo $leader; ?>"><i class="fa fa-times"></i> <?php echo $name; ?></div>
+                    <div userid="<?php echo $leader; ?>"><?php if ($edit_leader) { ?><i class="fa fa-times"></i> <?php } ?><?php echo $name; ?></div>
                     <?php } } ?>
                 </div>
             </div>
+    <?php if ($edit_leader) { ?>
             <div class="row column">
                 <ul class="accordion" data-accordion data-allow-all-closed="true">
                     <li class="accordion-item" data-accordion-item>
@@ -968,6 +969,7 @@
                     </li>
                 </ul>					
             </div>
+     <?php } ?>
             <div class="row column errmsg"></div>
             <div class="row column clearfix">
             <?php if ($postid == 0) { ?>
