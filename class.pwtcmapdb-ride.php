@@ -579,19 +579,24 @@ class PwtcMapdb_Ride {
 			}
 		}
 
+		$edit_leader = false;
 		if ($postid != 0) {
-			$leaders = PwtcMapdb::get_leader_userids($postid);
-			/*
-			if ($copy_ride and !$template) {
-				$leaders = [$current_user->ID];
+			if ($is_road_captain) {
+				$leaders = PwtcMapdb::get_leader_userids($postid);
+				$edit_leader = true;
 			}
 			else {
-				$leaders = PwtcMapdb::get_leader_userids($postid);
+				$leaders = [$current_user->ID];
 			}
-			*/
 		}
 		else {
-			$leaders = [$current_user->ID];
+			if ($is_road_captain) {
+				$leaders = [];
+				$edit_leader = true;
+			}
+			else {
+				$leaders = [$current_user->ID];
+			}
 		}
 
 		$edit_date = true;
