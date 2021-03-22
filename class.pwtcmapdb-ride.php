@@ -585,8 +585,11 @@ class PwtcMapdb_Ride {
 				$leaders = PwtcMapdb::get_leader_userids($postid);
 				$edit_leader = true;
 			}
-			else {
+			else if ($copy_ride) {
 				$leaders = [$current_user->ID];
+			}
+			else {
+				$leaders = PwtcMapdb::get_leader_userids($postid);
 			}
 		}
 		else {
