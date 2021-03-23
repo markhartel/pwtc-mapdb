@@ -640,7 +640,15 @@ class PwtcMapdb_Ride {
 			$min_date = $min_date_pretty = '';
 		}
 
-		$edit_title = $edit_start_location = $edit_date;
+		$edit_title = $edit_date;
+		
+		$edit_start_location = false;
+		if ($is_road_captain) {
+			$edit_start_location = true;
+		}
+		else if ($postid == 0 or !$copy_ride) {
+			$edit_start_location = true;
+		}
 
 		if ($postid != 0) {
 			$start_location = get_field(PwtcMapdb::RIDE_START_LOCATION, $postid);
