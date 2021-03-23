@@ -969,7 +969,9 @@
                     </li>
                 </ul>					
             </div>
-     <?php } ?>
+    <?php } else { ?>
+            <div class="row column" style="min-height:20px;"></div>
+    <?php } ?>
             <div class="row column errmsg"></div>
             <div class="row column clearfix">
             <?php if ($postid == 0) { ?>
