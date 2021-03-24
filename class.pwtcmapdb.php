@@ -132,7 +132,7 @@ class PwtcMapdb {
 
 		$user_info = get_userdata($userid);
 		if (!in_array(self::ROLE_RIDE_LEADER, $user_info->roles)) {
-			return $return_to_ride . '<div class="callout small warning"><p>You must be a ride leader to edit your contact information.</p></div>';
+			return '<div class="callout small warning"><p>You must be a ride leader to edit your contact information.</p></div>';
 		}
 
 		$voice_phone = pwtc_members_format_phone_number(get_field(self::USER_CELL_PHONE, 'user_'.$userid));
