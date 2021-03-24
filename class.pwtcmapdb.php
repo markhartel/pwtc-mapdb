@@ -91,6 +91,7 @@ class PwtcMapdb {
 		
 		// Register shortcode callbacks
 		add_shortcode('pwtc_mapdb_leader_contact', array('PwtcMapdb', 'shortcode_leader_contact'));
+		add_shortcode('pwtc_mapdb_alert_contact', array('PwtcMapdb', 'shortcode_alert_contact'));
 	}
 
 	/******************* Action Functions ******************/
@@ -142,6 +143,35 @@ class PwtcMapdb {
 
 		ob_start();
 		include('leader-contact-form.php');
+		return ob_get_clean();
+	}
+	
+	// Generates the [pwtc_mapdb_alert_contact] shortcode.
+	public static function shortcode_alert_contact($atts) {
+		$error = self::check_plugin_dependency();
+		if (!empty($error)) {
+			return $error;
+		}
+
+		$current_user = wp_get_current_user();
+		if ( 0 == $current_user->ID ) {
+			return '<div class="callout small warning"><p>You must be logged in edit your emergency contact information.</p></div>';
+		}
+		$userid = $current_user->ID;
+
+		if (isset($_POST['contact_phone']) and isset($_POST['contact_name'])) {
+			update_field(self::USER_EMER_PHONE, pwtc_members_format_phone_number($_POST['contact_phone']), 'user_'.$userid);
+			update_field(self::USER_EMER_NAME, sanitize_text_field($_POST['contact_name']), 'user_'.$userid);
+
+			wp_redirect(get_permalink(), 303);
+			exit;
+		}
+
+		$contact_phone = pwtc_members_format_phone_number(get_field(self::USER_EMER_PHONE, 'user_'.$userid));
+		$contact_name = get_field(self::USER_EMER_NAME, 'user_'.$userid);
+
+		ob_start();
+		include('alert-contact-form.php');
 		return ob_get_clean();
 	}
 
