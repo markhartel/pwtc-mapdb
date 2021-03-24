@@ -58,7 +58,7 @@
         </div>
         <div class="row column errmsg"></div>
         <div class="row column clearfix">
-            <input class="button float-left" type="submit" value="Submit"/>
+            <input class="dark button float-left" type="submit" value="Submit"/>
         </div>
     </form>
 </div>
