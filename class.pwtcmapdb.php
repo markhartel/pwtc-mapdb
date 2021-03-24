@@ -88,7 +88,9 @@ class PwtcMapdb {
 		// Register ajax callbacks
 		add_action('wp_ajax_pwtc_mapdb_lookup_ride_leaders', array('PwtcMapdb', 'lookup_ride_leaders_callback'));
 		add_action('wp_ajax_pwtc_mapdb_lookup_riderid', array('PwtcMapdb', 'lookup_riderid_callback'));
-
+		
+		// Register shortcode callbacks
+		add_shortcode('pwtc_mapdb_leader_contact', array('PwtcMapdb', 'shortcode_leader_contact'));
 	}
 
 	/******************* Action Functions ******************/
@@ -96,6 +98,51 @@ class PwtcMapdb {
 	public static function load_report_scripts() {
 		wp_enqueue_style('pwtc_mapdb_report_css', 
 			PWTC_MAPDB__PLUGIN_URL . 'reports-style-v2.css', array());
+	}
+	
+	/******************* Shortcode Functions ******************/
+
+	// Generates the [pwtc_mapdb_leader_contact] shortcode.
+	public static function shortcode_leader_contact($atts) {
+		$error = self::check_plugin_dependency();
+		if (!empty($error)) {
+			return $error;
+		}
+
+		$current_user = wp_get_current_user();
+		if ( 0 == $current_user->ID ) {
+			return '<div class="callout small warning"><p>You must be logged in edit your ride leader contact information.</p></div>';
+		}
+		$userid = $current_user->ID;
+
+		if (isset($_POST['use_contact_email']) and isset($_POST['contact_email']) and isset($_POST['voice_phone']) and isset($_POST['text_phone'])) {
+			if ($_POST['use_contact_email'] == 'yes') {
+				update_field(self::USER_USE_EMAIL, true, 'user_'.$userid);
+			}
+			else {
+				update_field(self::USER_USE_EMAIL, false, 'user_'.$userid);
+			}
+			update_field(self::USER_CONTACT_EMAIL, sanitize_email($_POST['contact_email']), 'user_'.$userid);
+			update_field(self::USER_CELL_PHONE, pwtc_members_format_phone_number($_POST['voice_phone']), 'user_'.$userid);
+			update_field(self::USER_HOME_PHONE, pwtc_members_format_phone_number($_POST['text_phone']), 'user_'.$userid);
+
+			wp_redirect(get_permalink(), 303);
+			exit;
+		}
+
+		$user_info = get_userdata($userid);
+		if (in_array(self::ROLE_RIDE_LEADER, $user_info->roles)) {
+			return $return_to_ride . '<div class="callout small warning"><p>You must be a ride leader to edit your contact information.</p></div>';
+		}
+
+		$voice_phone = pwtc_members_format_phone_number(get_field(self::USER_CELL_PHONE, 'user_'.$userid));
+		$text_phone = pwtc_members_format_phone_number(get_field(self::USER_HOME_PHONE, 'user_'.$userid));
+		$contact_email = get_field(self::USER_CONTACT_EMAIL, 'user_'.$userid);
+		$use_contact_email = get_field(self::USER_USE_EMAIL, 'user_'.$userid);
+
+		ob_start();
+		include('leader-contact-form.php');
+		return ob_get_clean();
 	}
 
 	/******************* Utility Functions ******************/
