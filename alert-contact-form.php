@@ -27,6 +27,7 @@
 </script>
 <div id="pwtc-mapdb-alert-contact-div" class="callout">
     <form method="POST">
+        <?php wp_nonce_field('alert-contact-form', 'nonce_field'); ?>
         <div class="row">
             <div class="small-12 medium-6 columns">
                 <label><i class="fa fa-phone"></i> Emergency Contact Phone
