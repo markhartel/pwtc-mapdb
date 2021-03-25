@@ -31,6 +31,7 @@
 </script>
 <div id="pwtc-mapdb-leader-contact-div" class="callout">
     <form method="POST">
+        <?php wp_nonce_field('leader-contact-form', 'nonce_field'); ?>
         <div class="row">
             <div class="small-12 medium-6 columns">
                 <label>Use Contact Email?
