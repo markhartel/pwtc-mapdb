@@ -92,6 +92,7 @@ class PwtcMapdb {
 		// Register shortcode callbacks
 		add_shortcode('pwtc_mapdb_leader_contact', array('PwtcMapdb', 'shortcode_leader_contact'));
 		add_shortcode('pwtc_mapdb_alert_contact', array('PwtcMapdb', 'shortcode_alert_contact'));
+		add_shortcode('pwtc_mapdb_search_riders', array('PwtcMapdb', 'shortcode_search_riders'));
 	}
 
 	/******************* Action Functions ******************/
@@ -180,6 +181,49 @@ class PwtcMapdb {
 
 		ob_start();
 		include('alert-contact-form.php');
+		return ob_get_clean();
+	}
+	
+	// Generates the [pwtc_mapdb_search_riders] shortcode.
+	public static function shortcode_search_riders($atts) {
+		$a = shortcode_atts(array('limit' => '10'), $atts);
+		$limit = intval($a['limit']);
+		
+		$error = self::check_plugin_dependency();
+		if (!empty($error)) {
+			return $error;
+		}
+
+		$current_user = wp_get_current_user();
+		if ( 0 == $current_user->ID ) {
+			return '<div class="callout small warning"><p>You must be logged in to search rider contact information.</p></div>';
+		}
+		$userid = $current_user->ID;
+		$user_info = get_userdata($userid);
+		if (!in_array(self::ROLE_RIDE_LEADER, $user_info->roles)) {
+			return '<div class="callout small warning"><p>You must be a ride leader to search rider contact information.</p></div>';
+		}
+
+		if (isset($_GET['offset'])) {
+			$offset = intval($_GET['offset']);
+		}
+		else {
+			$offset = 0;
+		}
+
+		$query_args = [
+			'number' => $limit,
+			'offset' => $offset,
+			'meta_key' => 'last_name',
+			'orderby' => 'meta_value',
+			'order' => 'ASC',
+			'role__in' => [self::ROLE_CURRENT_MEMBER, self::ROLE_EXPIRED_MEMBER]
+		];
+		$user_query = new WP_User_Query($query_args);
+		$riders = $user_query->get_results();
+
+		ob_start();
+		include('search-riders-form.php');
 		return ob_get_clean();
 	}
 
