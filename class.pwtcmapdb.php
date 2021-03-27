@@ -119,8 +119,7 @@ class PwtcMapdb {
 
 		if (isset($_POST['use_contact_email']) and isset($_POST['contact_email']) and isset($_POST['voice_phone']) and isset($_POST['text_phone'])) {
 			if (!isset($_POST['nonce_field']) or !wp_verify_nonce($_POST['nonce_field'], 'leader-contact-form')) {
-				wp_die('An unauthorized modification of ride leader contact information was attempted!', 403);
-				exit;
+				wp_nonce_ays('');
 			}
 			if ($_POST['use_contact_email'] == 'yes') {
 				update_field(self::USER_USE_EMAIL, true, 'user_'.$userid);
@@ -166,8 +165,7 @@ class PwtcMapdb {
 
 		if (isset($_POST['contact_phone']) and isset($_POST['contact_name'])) {
 			if (!isset($_POST['nonce_field']) or !wp_verify_nonce($_POST['nonce_field'], 'alert-contact-form')) {
-				wp_die('An unauthorized modification of emergency contact information was attempted!', 403);
-				exit;
+				wp_nonce_ays('');
 			}
 			update_field(self::USER_EMER_PHONE, pwtc_members_format_phone_number($_POST['contact_phone']), 'user_'.$userid);
 			update_field(self::USER_EMER_NAME, sanitize_text_field($_POST['contact_name']), 'user_'.$userid);
