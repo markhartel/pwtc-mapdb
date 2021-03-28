@@ -5,10 +5,41 @@
             $('#pwtc-mapdb-search-riders-div .load-more-frm .errmsg').html('<div class="callout small"><i class="fa fa-spinner fa-pulse waiting"></i> please wait...</div>');
             $('#pwtc-mapdb-search-riders-div button[type="submit"]').prop('disabled',true);
         });
+        
+        $('#pwtc-mapdb-search-riders-div .search-frm').on('submit', function(evt) {
+            $('#pwtc-mapdb-search-riders-div .search-frm .errmsg').html('<div class="callout small"><i class="fa fa-spinner fa-pulse waiting"></i> please wait...</div>');
+            $('#pwtc-mapdb-search-riders-div button[type="submit"]').prop('disabled',true);
+        });
+
+        $('#pwtc-mapdb-search-riders-div .search-frm a').on('click', function(evt) {
+            $('#pwtc-mapdb-search-riders-div .search-frm input[name="rider_name"]').val('');
+        });
 
     });
 </script>			
 <div id="pwtc-mapdb-search-riders-div">
+    <ul class="accordion" data-accordion data-allow-all-closed="true">
+        <li class="accordion-item" data-accordion-item>
+            <a href="#" class="accordion-title">Search Riders...</a>
+            <div class="accordion-content" data-tab-content>
+                <form class="search-frm" method="POST" novalidate>
+                    <input type="hidden" name="offset" value="0">
+                    <div class="row">
+                        <div class="small-12 medium-6 columns">
+                            <label>Rider Name 
+                                <input type="text" name="rider_name" value="<?php echo $rider_name; ?>">
+                            </label>
+                        </div>
+                    </div>
+                    <div class="row column errmsg"></div>
+                    <div class="row column clearfix">
+                        <button class="accent button float-left" type="submit">Submit</button>
+                        <a class="dark button float-right">Reset</a>
+                    </div>
+                </form>
+            </div>
+        </li>
+    </ul>
 <?php if (count($riders) > 0) { ?>
     <table class="pwtc-mapdb-rwd-table">
         <thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>Emergency Contact</th></tr></thead>
@@ -51,6 +82,7 @@
     <?php if ($is_more) { ?>
     <form class="load-more-frm" method="POST">
         <input type="hidden" name="offset" value="<?php echo $offset + $limit; ?>">
+        <input type="hidden" name="rider_name" value="<?php echo $rider_name; ?>">
         <div class="row column errmsg"></div>
         <div class="row column clearfix">
             <button class="dark button float-left" type="submit">Load more riders...</button>
