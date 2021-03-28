@@ -196,6 +196,14 @@ class PwtcMapdb {
 		if ( 0 == $current_user->ID ) {
 			return '<div class="callout small warning"><p>You must be logged in to search rider contact information.</p></div>';
 		}
+		
+		if (isset($_POST['offset'])) {
+			wp_redirect(add_query_arg(array(
+				'offset' => intval($_POST['offset'])
+			), get_permalink()), 303);
+			exit;
+		}
+		
 		$userid = $current_user->ID;
 		$user_info = get_userdata($userid);
 		if (!in_array(self::ROLE_RIDE_LEADER, $user_info->roles)) {
