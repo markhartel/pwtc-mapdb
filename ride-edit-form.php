@@ -757,6 +757,7 @@
     </div>
     <div class="callout">
         <form method="POST" novalidate>
+            <?php wp_nonce_field('ride-edit-form', 'nonce_field'); ?>
             <div class="row column">
                 <label>Ride Title
                     <input type="text" name="title" value="<?php echo esc_attr($title); ?>" <?php echo $edit_title ? '': 'readonly'; ?>/>
