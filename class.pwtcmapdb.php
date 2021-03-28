@@ -197,9 +197,10 @@ class PwtcMapdb {
 			return '<div class="callout small warning"><p>You must be logged in to search rider contact information.</p></div>';
 		}
 		
-		if (isset($_POST['rider_name']) and isset($_POST['offset'])) {
+		if (isset($_POST['rider_name']) and isset($_POST['rider_id']) and isset($_POST['offset'])) {
 			wp_redirect(add_query_arg(array(
 				'rider' => urlencode(trim($_POST['rider_name'])),
+				'riderid' => urlencode(trim($_POST['rider_id'])),
 				'offset' => intval($_POST['offset'])
 			), get_permalink()), 303);
 			exit;
@@ -216,6 +217,13 @@ class PwtcMapdb {
 		}
 		else {
 			$rider_name = '';
+		}
+		
+		if (isset($_GET['riderid'])) {
+			$rider_id = $_GET['riderid'];
+		}
+		else {
+			$rider_id = '';
 		}
 
 		if (isset($_GET['offset'])) {
@@ -235,6 +243,14 @@ class PwtcMapdb {
 			'search' => '*'.$rider_name.'*',
 			'search_columns' => array('display_name')
 		];
+		if (!empty($rider_id)) {
+			$query_args['meta_query'] = [];
+    			$query_args['meta_query'][] = [
+        			'key'     => 'rider_id',
+        			'value'   => $rider_id,
+        			'compare' => '='
+    			];
+		}
 		$user_query = new WP_User_Query($query_args);
 		$riders = $user_query->get_results();
 
