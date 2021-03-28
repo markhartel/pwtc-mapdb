@@ -13,6 +13,7 @@
 
         $('#pwtc-mapdb-search-riders-div .search-frm a').on('click', function(evt) {
             $('#pwtc-mapdb-search-riders-div .search-frm input[name="rider_name"]').val('');
+            $('#pwtc-mapdb-search-riders-div .search-frm input[name="rider_id"]').val('');
         });
 
     });
@@ -28,6 +29,11 @@
                         <div class="small-12 medium-6 columns">
                             <label>Rider Name 
                                 <input type="text" name="rider_name" value="<?php echo $rider_name; ?>">
+                            </label>
+                        </div>
+                        <div class="small-12 medium-6 columns">
+                            <label>Rider ID 
+                                <input type="text" name="rider_id" value="<?php echo $rider_id; ?>">
                             </label>
                         </div>
                     </div>
@@ -83,6 +89,7 @@
     <form class="load-more-frm" method="POST">
         <input type="hidden" name="offset" value="<?php echo $offset + $limit; ?>">
         <input type="hidden" name="rider_name" value="<?php echo $rider_name; ?>">
+        <input type="hidden" name="rider_id" value="<?php echo $rider_id; ?>">
         <div class="row column errmsg"></div>
         <div class="row column clearfix">
             <button class="dark button float-left" type="submit">Load more riders...</button>
