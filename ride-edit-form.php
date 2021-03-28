@@ -698,7 +698,7 @@
 </script>
 <div id='pwtc-mapdb-edit-ride-div'>
     <?php echo $return_to_ride; ?>
-    <?php if ($success == 'yes') { ?>
+    <?php if (!empty($operation)) { ?>
     <div class="callout small success">
         <p>
         <?php if ($operation == 'update_draft') { ?>
