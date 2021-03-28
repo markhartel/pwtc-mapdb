@@ -44,6 +44,7 @@
 <div id="pwtc-mapdb-delete-ride-div">
     <?php echo $return_to_ride; ?>
     <form method="POST">
+        <?php wp_nonce_field('ride-delete-form', 'nonce_field'); ?>
         <input type="hidden" name="postid" value="<?php echo $postid; ?>"/>
 <?php if ($deleted) { ?>
         <input type="hidden" name="undo_delete" value="yes"/>
