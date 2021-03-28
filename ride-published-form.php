@@ -15,6 +15,7 @@
         <p>Published ride "<?php echo $ride_title; ?>" has already finished so you cannot edit it. If you wish to edit you must <a class="revert-action">revert ride back to draft.</a></p>
     </div>
     <form method="POST">
+        <?php wp_nonce_field('ride-edit-form', 'nonce_field'); ?>
         <input type="hidden" name="postid" value="<?php echo $postid; ?>"/>
         <input type="hidden" name="post_status" value="<?php echo $status; ?>"/>
         <input type="hidden" name="revert" value="draft"/>
