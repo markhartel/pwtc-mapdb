@@ -137,7 +137,10 @@ class PwtcMapdb_Ride {
 				'ID' => $postid,
 				'post_status' => 'draft'
 			);
-			wp_update_post($my_post);
+			$status = wp_update_post($my_post);
+			if ($status != $postid) {
+				wp_die('Failed to update this ride.', 403);
+			}
 			
 			$email = 'no';
 			if ($allow_email) {
@@ -150,14 +153,11 @@ class PwtcMapdb_Ride {
 				'post' => $postid,
 				'return' => urlencode($return),
 				'op' => 'revert_draft',
-				'success' => 'yes',
 				'email' => $email
 			), get_permalink()), 303);
 			exit;
 		}
 		else if (isset($_POST['postid']) and isset($_POST['title']) and $current_user->ID != 0) {
-
-			$success = '';
 			$operation = '';
 			$new_post = false;
 			$postid = intval($_POST['postid']);
@@ -208,17 +208,7 @@ class PwtcMapdb_Ride {
 				//error_log(print_r($my_post, true));
 				$status = wp_update_post( $my_post );	
 				if ($status != $postid) {
-					$success = 'no';
-					wp_redirect(add_query_arg(array(
-						'post' => $postid,
-						'return' => urlencode($return),
-						'op' => $operation,
-						'success' => $success
-					), get_permalink()), 303);
-					exit;
-				}
-				else {
-					$success = 'yes';
+					wp_die('Failed to update this ride.', 403);
 				}
 				update_post_meta($postid, '_edit_last', $current_user->ID);
 			}
@@ -226,35 +216,14 @@ class PwtcMapdb_Ride {
 				$my_post = array(
 					'post_title'    => esc_html($title),
 					'post_type'     => PwtcMapdb::POST_TYPE_RIDE,
-                    'post_status'   => 'draft',
-                    'post_author'   => $current_user->ID
+                    			'post_status'   => 'draft',
+                    			'post_author'   => $current_user->ID
 				);
 				$operation = 'insert';
 				$postid = wp_insert_post( $my_post );
 				if ($postid == 0) {
-					$success = 'no';
-					if (isset($_GET['post'])) {
-						wp_redirect(add_query_arg(array(
-							'post' => $_GET['post'],
-							'action' => $_GET['action'],
-							'return' => urlencode($return),
-							'op' => $operation,
-							'success' => $success
-						), get_permalink()), 303);
-					}
-					else {
-						wp_redirect(add_query_arg(array(
-							'return' => urlencode($return),
-							'op' => $operation,
-							'success' => $success
-						), get_permalink()), 303);
-					}
-					exit;
+					wp_die('Failed to create a new ride.', 403);
 				}
-				else {
-					$success = 'yes';
-				}
-				//$new_post = true;
 			}
 
 			if (isset($_POST['description'])) {
@@ -421,21 +390,9 @@ class PwtcMapdb_Ride {
 				'post' => $postid,
 				'return' => urlencode($return),
 				'op' => $operation,
-				'success' => $success,
 				'email' => $email
 			), get_permalink()), 303);
 			exit;
-		}
-
-		if (isset($_GET['op']) and isset($_GET['success'])) {
-			if ($_GET['success'] == 'no') {
-				if ($_GET['op'] == 'insert') {
-					return '<div class="callout small alert"><p>Failed to create a new ride.</p></div>';
-				}
-				else {
-					return '<div class="callout small alert"><p>Failed to update this ride.</p></div>';
-				}
-			}
 		}
 		
 		$email_status = 'no';
@@ -468,16 +425,16 @@ class PwtcMapdb_Ride {
 
 		$now_date = PwtcMapdb::get_current_time();
 
-        if ($postid != 0) {
+        	if ($postid != 0) {
 			$post = get_post($postid);
-            $title = $post->post_title;
-            $author = $post->post_author;
-            $status = $post->post_status;
+            		$title = $post->post_title;
+            		$author = $post->post_author;
+            		$status = $post->post_status;
 		}
 		else {
-            $title = '';
-            $author = $current_user->ID;
-            $status = 'draft';
+            		$title = '';
+            		$author = $current_user->ID;
+            		$status = 'draft';
 		}
 
 		$author_name = '';
@@ -705,10 +662,8 @@ class PwtcMapdb_Ride {
 		}
 
 		$operation = '';
-		$success = '';
-		if (isset($_GET['op']) and isset($_GET['success'])) {
+		if (isset($_GET['op'])) {
 			$operation = $_GET['op'];
-			$success = $_GET['success'];
 		}
 
 		if ($copy_ride) {
@@ -763,32 +718,22 @@ class PwtcMapdb_Ride {
 				if (wp_trash_post($postid)) {
 					wp_redirect(add_query_arg(array(
 						'post' => $postid,
-						'return' => urlencode($return),
-						'deleted' => 'yes'
+						'return' => urlencode($return)
 					), get_permalink()), 303);
 				}
 				else {
-					wp_redirect(add_query_arg(array(
-						'post' => $postid,
-						'return' => urlencode($return),
-						'deleted' => 'no'
-					), get_permalink()), 303);
+					wp_die('Failed to delete this ride.', 403);
 				}
 			}
 			else if (isset($_POST['undo_delete'])) {
 				if (wp_untrash_post($postid)) {
 					wp_redirect(add_query_arg(array(
 						'post' => $postid,
-						'return' => urlencode($return),
-						'undo' => 'yes'
+						'return' => urlencode($return)
 					), get_permalink()), 303);
 				}
 				else {
-					wp_redirect(add_query_arg(array(
-						'post' => $postid,
-						'return' => urlencode($return),
-						'undo' => 'no'
-					), get_permalink()), 303);
+					wp_die('Failed to undo the delete of this ride.', 403);
 				}
 			}
 			exit;
@@ -799,17 +744,6 @@ class PwtcMapdb_Ride {
 			return $error;
 		}
 		$postid = intval($_GET['post']);
-
-		if (isset($_GET['deleted'])) {
-			if ($_GET['deleted'] == 'no') {
-				return '<div class="callout small alert"><p>Failed to delete this ride.</p></div>';
-			}
-		}
-		else if (isset($_GET['undo'])) {
-			if ($_GET['undo'] == 'no') {
-				return '<div class="callout small alert"><p>Failed to undo the delete of this ride.</p></div>';
-			}
-		}
 
 		$ride_link = '';
 		$return_to_ride = '';
