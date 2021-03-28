@@ -199,7 +199,7 @@ class PwtcMapdb {
 		
 		if (isset($_POST['rider_name']) and isset($_POST['offset'])) {
 			wp_redirect(add_query_arg(array(
-				'name' => urlencode(trim($_POST['rider_name'])),
+				'rider' => urlencode(trim($_POST['rider_name'])),
 				'offset' => intval($_POST['offset'])
 			), get_permalink()), 303);
 			exit;
@@ -211,8 +211,8 @@ class PwtcMapdb {
 			return '<div class="callout small warning"><p>You must be a ride leader to search rider contact information.</p></div>';
 		}
 		
-		if (isset($_GET['name'])) {
-			$rider_name = $_GET['name'];
+		if (isset($_GET['rider'])) {
+			$rider_name = $_GET['rider'];
 		}
 		else {
 			$rider_name = '';
