@@ -197,8 +197,9 @@ class PwtcMapdb {
 			return '<div class="callout small warning"><p>You must be logged in to search rider contact information.</p></div>';
 		}
 		
-		if (isset($_POST['offset'])) {
+		if (isset($_POST['rider_name']) and isset($_POST['offset'])) {
 			wp_redirect(add_query_arg(array(
+				'name' => urlencode(trim($_POST['rider_name'])),
 				'offset' => intval($_POST['offset'])
 			), get_permalink()), 303);
 			exit;
@@ -208,6 +209,13 @@ class PwtcMapdb {
 		$user_info = get_userdata($userid);
 		if (!in_array(self::ROLE_RIDE_LEADER, $user_info->roles)) {
 			return '<div class="callout small warning"><p>You must be a ride leader to search rider contact information.</p></div>';
+		}
+		
+		if (isset($_GET['name'])) {
+			$rider_name = $_GET['name'];
+		}
+		else {
+			$rider_name = '';
 		}
 
 		if (isset($_GET['offset'])) {
@@ -223,7 +231,9 @@ class PwtcMapdb {
 			'meta_key' => 'last_name',
 			'orderby' => 'meta_value',
 			'order' => 'ASC',
-			'role__in' => [self::ROLE_CURRENT_MEMBER, self::ROLE_EXPIRED_MEMBER]
+			'role__in' => [self::ROLE_CURRENT_MEMBER, self::ROLE_EXPIRED_MEMBER],
+			'search' => '*'.$rider_name.'*',
+			'search_columns' => array('display_name')
 		];
 		$user_query = new WP_User_Query($query_args);
 		$riders = $user_query->get_results();
