@@ -126,6 +126,10 @@ class PwtcMapdb_Ride {
 		}
 
 		if (isset($_POST['postid']) and isset($_POST['revert'])) {
+			if (!isset($_POST['nonce_field']) or !wp_verify_nonce($_POST['nonce_field'], 'ride-edit-form')) {
+				wp_nonce_ays('');
+			}
+
 			$postid = intval($_POST['postid']);
 			
 			$post_status = '';
@@ -158,6 +162,10 @@ class PwtcMapdb_Ride {
 			exit;
 		}
 		else if (isset($_POST['postid']) and isset($_POST['title']) and $current_user->ID != 0) {
+			if (!isset($_POST['nonce_field']) or !wp_verify_nonce($_POST['nonce_field'], 'ride-edit-form')) {
+				wp_nonce_ays('');
+			}
+			
 			$operation = '';
 			$new_post = false;
 			$postid = intval($_POST['postid']);
@@ -713,6 +721,10 @@ class PwtcMapdb_Ride {
 		}
 
 		if (isset($_POST['postid'])) {
+			if (!isset($_POST['nonce_field']) or !wp_verify_nonce($_POST['nonce_field'], 'ride-delete-form')) {
+				wp_nonce_ays('');
+			}
+			
 			$postid = intval($_POST['postid']);
 			if (isset($_POST['delete_ride'])) {
 				if (wp_trash_post($postid)) {
