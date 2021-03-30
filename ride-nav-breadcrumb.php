@@ -1,5 +1,6 @@
 <ul class="breadcrumbs">
 <?php if ($allow_leaders) { ?>
+    <li><a href="/ride-leader-info">Ride Leader Info</a></li>
     <?php if (strpos($return, 'create-ride-from-template')!==false) { ?>
     <li><a href="/submit-rides-for-review">Submit Rides for Review</a></li>
     <li><a href="<?php echo $return; ?>">Create Ride from Template</a></li>
