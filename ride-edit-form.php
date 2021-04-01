@@ -15,7 +15,8 @@
         cursor: pointer;
     }
     #pwtc-mapdb-edit-ride-div .map-search-div table tr:hover {
-        font-weight: bold;
+        background-color: black !important;
+        color: white !important;
     }
     #pwtc-mapdb-edit-ride-div .map-search-div table td {
         padding: 3px;
@@ -45,7 +46,8 @@
         cursor: pointer;
     }
     #pwtc-mapdb-edit-ride-div .start-locations-div table tr:hover {
-        font-weight: bold;
+        background-color: black !important;
+        color: white !important;
     }
     #pwtc-mapdb-edit-ride-div .start-locations-div table td {
         padding: 3px;
