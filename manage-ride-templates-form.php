@@ -60,16 +60,20 @@
             </div>
         </li>
     </ul>
-    <?php if ($query->have_posts()) { ?>
+    <?php if ($query->have_posts()) { 
+    $total = $query->found_posts;
+    $warn = $total > $limit;
+    $is_more = ($limit > 0) && ($total > ($offset + $limit));
+    ?>
+    <?php if ($warn) { ?>
+    <div class="callout small warning">
+        <p>There were more templates found than can be shown on the page, use the <em>Search Ride Templates</em> section to narrow your search.</p>
+    </div>
+    <?php } ?>
     <table class="pwtc-mapdb-rwd-table">
         <thead><tr><th>Ride Title</th><th>1st Leader</th><th>Actions</th></tr></thead>
         <tbody>
     <?php
-    $is_more = ($limit > 0) && ($query->found_posts > ($offset + $limit));
-    //error_log('found_posts='.$query->found_posts);
-    //error_log('limit='.$limit);
-    //error_log('offset='.$offset);
-    //error_log('is_more='.$is_more);
     while ($query->have_posts()) {
         $query->the_post();
         $postid = get_the_ID();
@@ -113,8 +117,8 @@
         <input type="hidden" name="ride_leader" value="<?php echo $ride_leader; ?>">
         <div class="row column errmsg"></div>
         <div class="row column clearfix">
-            <button class="dark button float-left" type="submit">Load more templates...</button>
-            <label class="float-right">Remaining templates: <?php echo ($query->found_posts - ($offset + $limit)); ?></label>
+            <button class="dark button float-left" type="submit">Show Next <?php echo $limit; ?> Templates</button>
+            <label class="float-right">Remaining templates: <?php echo ($total - ($offset + $limit)); ?></label>
         </div>
     </form>
     <?php } ?>
