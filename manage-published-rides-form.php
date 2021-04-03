@@ -75,12 +75,20 @@
             </div>
         </li>
     </ul>
-    <?php if ($query->have_posts()) { ?>
+    <?php if ($query->have_posts()) { 
+    $total = $query->found_posts;
+    $warn = $total > $limit;
+    $is_more = ($limit > 0) && ($total > ($offset + $limit));
+    ?>
+    <?php if ($warn) { ?>
+    <div class="callout small warning">
+        <p>There were more rides found than can be shown on the page, use the <em>Search Scheduled Rides</em> section to narrow your search.</p>
+    </div>
+    <?php } ?>
     <table class="pwtc-mapdb-rwd-table">
         <thead><tr><th>Start Time</th><th>Ride Title</th><th>1st Leader</th><th>Actions</th></tr></thead>
         <tbody>
     <?php
-    $is_more = ($limit > 0) && ($query->found_posts > ($offset + $limit));
     while ($query->have_posts()) {
         $query->the_post();
         $postid = get_the_ID();
@@ -132,8 +140,8 @@
         <input type="hidden" name="ride_month" value="<?php echo $ride_month; ?>">
         <div class="row column errmsg"></div>
         <div class="row column clearfix">
-            <button class="dark button float-left" type="submit">Load more rides...</button>
-            <label class="float-right">Remaining rides: <?php echo ($query->found_posts - ($offset + $limit)); ?></label>
+            <button class="dark button float-left" type="submit">Show Next <?php echo $limit; ?> Rides</button>
+            <label class="float-right">Remaining rides: <?php echo ($total - ($offset + $limit)); ?></label>
         </div>
     </form>
     <?php } ?>
