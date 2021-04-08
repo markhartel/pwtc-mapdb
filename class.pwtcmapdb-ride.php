@@ -1285,8 +1285,8 @@ EOT;
 		$message = <<<EOT
 The following ride has been submitted for your review:<br>
 $ride_link on $ride_date.<br>
-To review this ride, use a browser to log in to your club account (you must be a road captain) and open the ride by clicking its title link. Make any changes that you see fit and publish the ride or reject and return it to the author.<br>
-Do not respond to this email.<br>
+To review this ride, use a browser to log in to your club account (you must be a road captain) and open the ride by clicking its link. Make any changes that you see fit and publish the ride or reject (return it to draft.)<br>
+Do not reply to this email!<br>
 EOT;
 		$headers = ['Content-type: text/html'];
 		return wp_mail($captain_email, $subject , $message, $headers);
@@ -1300,7 +1300,7 @@ EOT;
 The author has reverted the following ride back to draft:<br>
 $ride_title on $ride_date.<br>
 Ignore the previous email and do not review this ride.<br>
-Do not respond to this email.<br>
+Do not reply to this email!<br>
 EOT;
 		$headers = ['Content-type: text/html'];
 		return wp_mail($captain_email, $subject , $message, $headers);
@@ -1317,8 +1317,8 @@ EOT;
 		$message = <<<EOT
 Your submitted ride has been published and is now on the ride calendar:<br>
 $ride_link on $ride_date.<br>
-To view this ride as it appears on the calendar, click its title link.<br>
-Do not respond to this email.<br>
+To view this ride as it appears on the calendar, click its link.<br>
+Do not reply to this email!<br>
 EOT;
 		$headers = ['Content-type: text/html'];
 		return wp_mail($author_email, $subject , $message, $headers);
@@ -1335,8 +1335,8 @@ EOT;
 		$message = <<<EOT
 Your submitted ride has been rejected and returned to you:<br>
 $ride_link on $ride_date.<br>
-To make changes to this ride and re-submit, use a browser to log in to your club account and open the ride by clicking its title link.<br>
-Do not respond to this email.<br>
+To make changes to this ride and re-submit, use a browser to log in to your club account and open the ride by clicking its link.<br>
+Do not reply to this email!<br>
 EOT;
 		$headers = ['Content-type: text/html'];
 		return wp_mail($author_email, $subject , $message, $headers);
