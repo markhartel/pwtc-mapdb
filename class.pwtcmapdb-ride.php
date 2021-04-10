@@ -1329,7 +1329,7 @@ EOT;
 		$author_email = get_the_author_meta('user_email', $post->post_author);		
 		$ride_title = esc_html(get_the_title($postid));
 		$ride_date = PwtcMapdb::get_ride_start_time($postid)->format('m/d/Y g:ia');
-		$ride_url = add_query_arg(array('post' => $postid), get_permalink());
+		$ride_url = "https://".$_SERVER['HTTP_HOST'].self::edit_ride_link($postid);
 		$ride_link = '<a href="' . $ride_url . '">' . $ride_title . '</a>';
 		$subject = 'Rejected Your Submitted Ride';
 		$message = <<<EOT
