@@ -1283,7 +1283,7 @@ EOT;
 		$ride_link = '<a href="' . $ride_url . '">' . $ride_title . '</a>';
 		$subject = 'Ride Submitted for Review';
 		$message = <<<EOT
-The following ride has been submitted for your review:<br>
+The following ride has been submitted for road captain review:<br>
 $ride_link on $ride_date.<br>
 To review this ride, use a browser to log in to your club account (you must be a road captain) and open the ride by clicking its link. Make any changes that you see fit and publish the ride or reject (return it to draft.)<br>
 Do not reply to this email!<br>
@@ -1299,7 +1299,7 @@ EOT;
 		$message = <<<EOT
 The author has reverted the following ride back to draft:<br>
 $ride_title on $ride_date.<br>
-Ignore the previous email and do not review this ride.<br>
+Ignore the previous review request email and do not review this ride.<br>
 Do not reply to this email!<br>
 EOT;
 		$headers = ['Content-type: text/html'];
