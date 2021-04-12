@@ -2,7 +2,7 @@
 
 function pwtc_mapdb_get_signup() {
     $disable = false;
-    $disable_nonmembers = true;
+    $disable_nonmembers = false;
     $disable_edit = false;
     if ($disable) {
         $result['view_signup_url'] = false;
@@ -51,22 +51,22 @@ function pwtc_mapdb_get_signup() {
         }
         else if (!$members_only) {
             if ($disable_nonmembers) {
-                $result['ride_signup_msg'] = 'Online sign up is available for this ride. Members must first log in <a href="/wp-login.php">here</a> to sign up.';
+                $result['ride_signup_msg'] = 'Online sign up is available for this ride. Members must first <a href="/wp-login.php">log in</a> to sign up.';
                 $result['ride_signup_url'] = false;        
             }
             else {
                 $result['ride_signup_url'] = '/ride-nonmember-signup/?post='.$postid;
                 if ($signup_mode == 'paperless') {
-                    $result['ride_signup_msg'] = 'You <em>must</em> sign up online to attend this ride.';
+                    $result['ride_signup_msg'] = 'You <em>must</em> sign up online to attend this ride. ONLY non-members should sign up here. If you are a club member, first <a href="/wp-login.php">log in</a> before signing up for this ride.';
                 }
                 else {
-                    $result['ride_signup_msg'] = 'Online sign up is available for this ride.';
+                    $result['ride_signup_msg'] = 'Online sign up is available for this ride. ONLY non-members should sign up here. If you are a club member, first <a href="/wp-login.php">log in</a> before signing up for this ride.';
                 }
             }
         }
         else {
             $result['ride_signup_url'] = false;
-            $result['ride_signup_msg'] = 'Only club members may attend this ride. Members must first log in <a href="/wp-login.php">here</a> to sign up.';
+            $result['ride_signup_msg'] = 'Only club members may attend this ride. Members must first <a href="/wp-login.php">log in</a> to sign up.';
         }
     }
 
