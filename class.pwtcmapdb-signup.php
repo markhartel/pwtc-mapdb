@@ -537,12 +537,10 @@ class PwtcMapdb_Signup {
 		}
 		$postid = intval($_GET['post']);
 
-		/*
 		$current_user = wp_get_current_user();
 		if ( 0 != $current_user->ID ) {
-			return '<div class="callout small alert"><p>This page is only for non-member ride sign up and you must be logged out to use it.</p></div>';
+			return '<div class="callout small alert"><p>This page is ONLY for non-member ride sign up and you must be logged out to use it.</p></div>';
 		}
-		*/
 
 		$ride_title = esc_html(get_the_title($postid));
 		$ride_link = esc_url(get_the_permalink($postid));
