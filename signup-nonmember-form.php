@@ -209,7 +209,7 @@
 </script>
 
 <div id='pwtc-mapdb-nonmember-signup-div'>
-    <div class="callout small warning"><p>ONLY non-members should use this page to sign up for rides. If you are a club member, first log in <a href="/wp-login.php">here</a> before signing up for a ride.</p></div>
+    <div class="callout small warning"><p>ONLY non-members should use this page to sign up for rides. If you are a club member, first <a href="/wp-login.php">log in</a> before signing up for a ride.</p></div>
     <div class="errmsg"></div>
     <div class="accept_div callout" style="display: none">
         <p>To sign up for the ride "<?php echo $ride_title; ?>," please accept the Club's <a href="/terms-and-conditions" target="_blank">terms and conditions</a>, enter your name and emergency contact information and press the accept button.</p>
