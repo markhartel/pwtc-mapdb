@@ -165,7 +165,7 @@
                         a = '<a title="Display online ride route map." href="' + item.href + '" target="_blank"><i class="fa fa-link"></i></a>';
                     }
                     $('#pwtc-mapdb-edit-ride-div .map-search-div table').append(
-                        '<tr mapid="' + item.ID + '"><td>' + item.title + '</td><td>' + a + '</td><td>' + item.distance + '</td><td>' + item.terrain + '</td></tr>');    
+                        '<tr mapid="' + item.ID + '"><td>' + item.title + '</td><td>' + item.distance + '</td><td>' + item.terrain + '</td><td>' + a + '</td></tr>');  
                 });
                 if (res.offset !== undefined) {
                     $('#pwtc-mapdb-edit-ride-div .map-search-div').append('<a class="dark button fetch" offset="' + res.offset + '" count="' + res.count + '">Fetch next 10 maps</a>');
