@@ -80,6 +80,10 @@
         function show_waiting() {
             $('#pwtc-mapdb-edit-ride-div .errmsg').html('<div class="callout small"><i class="fa fa-spinner fa-pulse"></i> please wait...</div>');
         }
+        
+        function set_coord_string(lat, lng) {
+            $('#pwtc-mapdb-edit-ride-div .coord-span').html('(' + lat + ', ' + lng + ')');
+        }
 
         function has_user_id(id) {
             id = Number(id);
@@ -482,6 +486,7 @@
             if (!hardcode_zoom) {
                 zoom = item.data('zoom');
             }
+            set_coord_string(lat, lng);
             $('#pwtc-mapdb-edit-ride-div input[name="start_address"]').val(decodeHtml(title+', '+addr));
             $('#pwtc-mapdb-edit-ride-div input[name="start_location_comment"]').val(decodeHtml(comment));
             $('#pwtc-mapdb-edit-ride-div input[name="start_lat"]').val(lat);
@@ -623,6 +628,7 @@
                     if (!hardcode_zoom) {
                         zoom = google_map.getZoom();
                     }
+                    set_coord_string(lat, lng);
                     var addr = google_map.marker_address;
                     $('#pwtc-mapdb-edit-ride-div input[name="start_address"]').val(addr);
                     $('#pwtc-mapdb-edit-ride-div input[name="start_lat"]').val(lat);
@@ -877,7 +883,7 @@
                 </ul>					
             </div>
             <div class="row column">
-                <label>Start Location <a class="goolmap" title="Display start location in Google Maps."><i class="fa fa-map-marker"></i></a>
+                <label>Start Location <span class="coord-span"><?php echo $start_coords; ?></span>
                     <input type="text" name="start_address" value="<?php echo esc_attr($start_location['address']); ?>" readonly/>
                 </label>
     <?php if ($edit_start_location) { ?>
