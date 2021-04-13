@@ -470,7 +470,7 @@
                 var area = $(this).find('td').first().html();
                 var title = $(this).find('td').first().next().html();
                 $('#pwtc-mapdb-edit-ride-div .start-locations-div table').append(
-                    '<tr itemid="' + (index+1) + '"><td>' + title + '</td><td><a title="Display location in Google Maps."><i class="fa fa-map-marker"></i></a></td><td>' + area + '</td></tr>');
+                    '<tr itemid="' + (index+1) + '"><td>' + title + '</td><td>' + area + '</td><td><a title="Display location in Google Maps."><i class="fa fa-map-marker"></i></a></td></tr>');
             }
         });
 
