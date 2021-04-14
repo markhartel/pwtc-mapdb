@@ -285,6 +285,9 @@ class PwtcMapdb {
 	public static function get_ride_start_time($postid) {
 		$timezone = new DateTimeZone(pwtc_get_timezone_string());
 		$ride_date = DateTime::createFromFormat('Y-m-d H:i:s', get_field(self::RIDE_DATE, $postid), $timezone);
+		if ($ride_date === false) {
+			$ride_date = new DateTime(null, $timezone);
+		}
 		return $ride_date;
 	}
 
