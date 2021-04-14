@@ -83,6 +83,7 @@
         
         function set_coord_string(lat, lng) {
             $('#pwtc-mapdb-edit-ride-div .coord-span').html('(' + lat + ', ' + lng + ')');
+            $('#pwtc-mapdb-edit-ride-div .goolmap').show();
         }
 
         function has_user_id(id) {
@@ -883,7 +884,9 @@
                 </ul>					
             </div>
             <div class="row column">
-                <label>Start Location <span class="coord-span"><?php echo $start_coords; ?></span>
+                <label>Start Location
+                    <span class="coord-span"><?php echo $start_coords; ?></span>
+                    <a class="goolmap" <?php if (empty($start_coords)) { ?>style="display:none"<?php } ?> title="Display start location in Google Maps."><i class="fa fa-map-marker"></i></a>
                     <input type="text" name="start_address" value="<?php echo esc_attr($start_location['address']); ?>" readonly/>
                 </label>
     <?php if ($edit_start_location) { ?>
