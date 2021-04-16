@@ -320,6 +320,21 @@ class PwtcMapdb {
 		$leaders = $user_query->get_results();
 		return $leaders;
 	}
+	
+	public static function get_map_link($postid) {
+		$link = '';
+		$maps = get_field(self::RIDE_MAPS, $postid);
+		//error_log(print_r($maps, true));
+		if (count($maps) > 0) {
+			if ($maps[0][self::MAP_TYPE_FIELD] == 'link') {
+				$link = '<a title="Display online ride route map." href="' . $maps[0][self::MAP_LINK_FIELD] . '" target="_blank"><i class="fa fa-link"></i></a>';
+			}
+			else if ($maps[0][self::MAP_TYPE_FIELD] == 'file') {
+				$link = '<a title="Download ride route map file." href="' . $maps[0][self::MAP_FILE_FIELD]['url'] . '" target="_blank" download><i class="fa fa-download"></i></a>';
+			}
+		}
+		return $link;
+	}
 
 	/******* AJAX request/response callback functions *******/
 
