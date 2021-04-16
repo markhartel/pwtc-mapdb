@@ -178,8 +178,9 @@
                     var mapid = $(this).attr('mapid');
                     if (!has_map_id(mapid)) {
                         var title = $(this).find('td').first().html();
+                        var link = $(this).find('td').last().html();
                         is_dirty = true;
-                        $('#pwtc-mapdb-edit-ride-div .maps-div').append('<div mapid="' + mapid + '"><i class="fa fa-times"></i> ' + title + '</div>').find('i').on('click', function(evt) {
+                        $('#pwtc-mapdb-edit-ride-div .maps-div').append('<div mapid="' + mapid + '"><i class="fa fa-times"></i> ' + title + ' ' + link + '</div>').find('.fa-times').on('click', function(evt) {
                             $(this).parent().remove();
                         });
                     }
@@ -212,7 +213,7 @@
             $(this).parent().remove();
         });
 
-        $('#pwtc-mapdb-edit-ride-div .maps-div i').on('click', function(evt) {
+        $('#pwtc-mapdb-edit-ride-div .maps-div .fa-times').on('click', function(evt) {
             is_dirty = true;
             $(this).parent().remove();
         });
@@ -857,7 +858,7 @@
             <div class="row column attach-map-yes">
                 <div class= "maps-div" style="min-height:40px; border:1px solid; display:flex; flex-wrap:wrap;">
                     <?php foreach ($maps_obj as $map) { ?>
-                    <div mapid="<?php echo $map->ID; ?>"><i class="fa fa-times"></i> <?php echo esc_html($map->post_title); ?></div>
+                    <div mapid="<?php echo $map->ID; ?>"><i class="fa fa-times"></i> <?php echo esc_html($map->post_title); ?> <?php echo PwtcMapdb::get_map_link($map->ID); ?></div>
                     <?php } ?>
                 </div>
             </div>
