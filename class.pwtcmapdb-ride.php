@@ -1331,30 +1331,28 @@ EOT;
 	public static function ride_published_email($post) {
 		$author_email = get_the_author_meta('user_email', $post->post_author);
 		$ride_title = esc_html($post->post_title);
-		$ride_date = PwtcMapdb::get_ride_start_time($post->ID)->format('m/d/Y g:ia');
 		$ride_url = get_permalink($post);
 		$ride_link = '<a href="' . $ride_url . '">' . $ride_title . '</a>';
 		$subject = 'Published Your Submitted Ride';
 		$message = <<<EOT
 Your submitted ride has been published and is now on the ride calendar:<br>
-$ride_link on $ride_date.<br>
+$ride_link.<br>
 To view this ride as it appears on the calendar, click its link.<br>
 Do not reply to this email!<br>
 EOT;
 		$headers = ['Content-type: text/html'];
 		return wp_mail($author_email, $subject , $message, $headers);
 	}
-	
+
 	public static function ride_rejected_email($post) {
 		$author_email = get_the_author_meta('user_email', $post->post_author);		
 		$ride_title = esc_html($post->post_title);
-		$ride_date = PwtcMapdb::get_ride_start_time($post->ID)->format('m/d/Y g:ia');
 		$ride_url = "https://".$_SERVER['HTTP_HOST'].self::edit_ride_link($post->ID);
 		$ride_link = '<a href="' . $ride_url . '">' . $ride_title . '</a>';
 		$subject = 'Rejected Your Submitted Ride';
 		$message = <<<EOT
 Your submitted ride has been rejected and returned to you:<br>
-$ride_link on $ride_date.<br>
+$ride_link.<br>
 To make changes to this ride and re-submit, use a browser to log in to your club account and open the ride by clicking its link.<br>
 Do not reply to this email!<br>
 EOT;
