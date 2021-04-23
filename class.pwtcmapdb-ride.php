@@ -19,6 +19,7 @@ class PwtcMapdb_Ride {
 
 		// Register action callbacks
 		add_action('wp_enqueue_scripts', array('PwtcMapdb_Ride', 'load_javascripts'));
+		add_action('transition_post_status', array('PwtcMapdb_Ride', 'status_change_callback'));
 
 		// Register filter callbacks
 		add_filter('heartbeat_received', array('PwtcMapdb_Ride', 'refresh_post_lock'), 10, 3);
@@ -41,6 +42,17 @@ class PwtcMapdb_Ride {
 		$link = get_the_permalink();
 		if ($link and (strpos($link, self::DELETE_RIDE_URI)!==false or strpos($link, self::EDIT_RIDE_URI)!==false or strpos($link, self::SUBMIT_RIDE_URI)!==false)) {
 			wp_enqueue_script('heartbeat');
+		}
+	}
+	
+	public static function status_change_callback($new, $old, $post) {
+		if ($post->post_type == PwtcMapdb::POST_TYPE_RIDE) {
+			if (($new == 'publish') && ($old == 'pending')) {
+				self::ride_published_email($post);
+			}
+			else if (($new == 'draft') && ($old == 'pending')) {
+				self::ride_rejected_email($post);
+			}
 		}
 	}
 
@@ -380,18 +392,20 @@ class PwtcMapdb_Ride {
 				if ($operation == 'submit_review' and !$is_road_captain) {
 					$email = self::ride_submitted_email($postid, $captain_email) ? 'yes': 'failed';
 				}
+				/*
 				else if ($operation == 'published') {
 					$post = get_post($postid);
 					if ($post->post_author != $current_user->ID) {
-						$email = self::ride_published_email($postid) ? 'yes': 'failed';
+						$email = self::ride_published_email($post) ? 'yes': 'failed';
 					}
 				}
 				else if ($operation == 'rejected') {
 					$post = get_post($postid);
 					if ($post->post_author != $current_user->ID) {
-						$email = self::ride_rejected_email($postid) ? 'yes': 'failed';
+						$email = self::ride_rejected_email($post) ? 'yes': 'failed';
 					}
 				}
+				*/
 			}
 			
 			wp_redirect(add_query_arg(array(
@@ -1314,12 +1328,11 @@ EOT;
 		return wp_mail($captain_email, $subject , $message, $headers);
 	}
 
-	public static function ride_published_email($postid) {
-		$post = get_post($postid);
+	public static function ride_published_email($post) {
 		$author_email = get_the_author_meta('user_email', $post->post_author);
-		$ride_title = esc_html(get_the_title($postid));
-		$ride_date = PwtcMapdb::get_ride_start_time($postid)->format('m/d/Y g:ia');
-		$ride_url = get_permalink($postid);
+		$ride_title = esc_html($post->post_title);
+		$ride_date = PwtcMapdb::get_ride_start_time($post->ID)->format('m/d/Y g:ia');
+		$ride_url = get_permalink($post);
 		$ride_link = '<a href="' . $ride_url . '">' . $ride_title . '</a>';
 		$subject = 'Published Your Submitted Ride';
 		$message = <<<EOT
@@ -1331,13 +1344,12 @@ EOT;
 		$headers = ['Content-type: text/html'];
 		return wp_mail($author_email, $subject , $message, $headers);
 	}
-
-	public static function ride_rejected_email($postid) {
-		$post = get_post($postid);
+	
+	public static function ride_rejected_email($post) {
 		$author_email = get_the_author_meta('user_email', $post->post_author);		
-		$ride_title = esc_html(get_the_title($postid));
-		$ride_date = PwtcMapdb::get_ride_start_time($postid)->format('m/d/Y g:ia');
-		$ride_url = "https://".$_SERVER['HTTP_HOST'].self::edit_ride_link($postid);
+		$ride_title = esc_html($post->post_title);
+		$ride_date = PwtcMapdb::get_ride_start_time($post->ID)->format('m/d/Y g:ia');
+		$ride_url = "https://".$_SERVER['HTTP_HOST'].self::edit_ride_link($post->ID);
 		$ride_link = '<a href="' . $ride_url . '">' . $ride_title . '</a>';
 		$subject = 'Rejected Your Submitted Ride';
 		$message = <<<EOT
@@ -1349,7 +1361,7 @@ EOT;
 		$headers = ['Content-type: text/html'];
 		return wp_mail($author_email, $subject , $message, $headers);
 	}
-
+	
 	public static function ride_question_email($postid) {
 		$post = get_post($postid);
 		$current_user = wp_get_current_user();
