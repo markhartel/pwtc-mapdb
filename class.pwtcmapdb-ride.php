@@ -48,14 +48,18 @@ class PwtcMapdb_Ride {
 	public static function status_change_callback($new, $old, $post) {
 		if ($post->post_type == PwtcMapdb::POST_TYPE_RIDE) {
 			if (($new == 'publish') && ($old == 'pending')) {
-				self::ride_published_email($post);
+				if ($post->post_author != get_current_user_id()) {
+					self::ride_published_email($post);
+				}
 			}
 			else if (($new == 'draft') && ($old == 'pending')) {
-				self::ride_rejected_email($post);
+				if ($post->post_author != get_current_user_id()) {
+					self::ride_rejected_email($post);
+				}
 			}
 		}
 	}
-
+	
 	/******************* Filter Functions ******************/
 
 	public static function refresh_post_lock($response, $data, $screen_id) {
