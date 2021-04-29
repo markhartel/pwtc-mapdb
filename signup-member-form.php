@@ -120,7 +120,23 @@
         </div>
     <?php } else { ?>
         <div class="callout">
-            <p>Hello <?php echo $rider_name; ?>, you are currently signed up for the ride "<?php echo $ride_title; ?>." To cancel your sign up, please press the cancel button below.</p>
+            <p>Hello <?php echo $rider_name; ?>, you are currently signed up for the ride "<?php echo $ride_title; ?>."</p>
+        <?php if ($set_mileage) { ?>
+            <p>To update your mileage, enter the new value below and press the update button.</p>
+            <form method="POST">
+                <div class="row">
+                    <div class="input-group small-12 medium-3 columns">
+                        <span class="input-group-label">Mileage</span>
+                        <input type="hidden" name="accept_user_signup" value="update"/>
+                        <input class="input-group-field" type="number" name="mileage" value="<?php echo $mileage; ?>" maxlength="3" />
+                        <div class="input-group-button">
+                            <input type="submit" class="dark button" value="Update">
+                        </div>
+                    </div>
+                </div>
+            </form>
+        <?php } ?>
+            <p>To cancel your sign up, press the cancel button below.</p>
             <form method="POST">
                 <div class="row column errmsg"></div>
                 <div class="row column clearfix">
