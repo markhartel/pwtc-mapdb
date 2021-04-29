@@ -21,6 +21,7 @@
             <?php } else { ?>
             show_waiting();
             $('#pwtc-mapdb-rider-signup-div button[type="submit"]').prop('disabled',true);
+            $('#pwtc-mapdb-rider-signup-div input[type="submit"]').prop('disabled',true);
             <?php } ?>
             });
         
