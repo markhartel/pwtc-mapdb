@@ -322,6 +322,9 @@ class PwtcMapdb_Signup {
 		}
 
 		$signup_list = get_post_meta($postid, PwtcMapdb::RIDE_SIGNUP_USERID);
+		$nonmember_signup_list = get_post_meta($postid, PwtcMapdb::RIDE_SIGNUP_NONMEMBER);
+		$ride_signup_count = count($signup_list) + count($nonmember_signup_list);
+		
 		$accept_signup = true;
 		foreach($signup_list as $item) {
 			$arr = json_decode($item, true);
@@ -331,7 +334,7 @@ class PwtcMapdb_Signup {
 		}
 
 		if ($accept_signup and $ride_signup_limit > 0) {
-			if (count($signup_list)+count(get_post_meta($postid, PwtcMapdb::RIDE_SIGNUP_NONMEMBER)) >= $ride_signup_limit) {
+			if ($ride_signup_count >= $ride_signup_limit) {
 				return '<div class="callout small warning"><p>You cannot sign up for ride "' . $ride_title . '" because it is full. <em>A maximum of ' . $ride_signup_limit . ' riders are allowed on this ride.</em> ' . $return_to_ride . '</p></div>';
 			}
 		}
