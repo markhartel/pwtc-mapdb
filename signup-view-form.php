@@ -230,9 +230,18 @@
             };
             $.post(action, data, change_nonmember_signup_cb);
         }
+    
+        <?php if ($set_mileage or $take_attendance) { ?>
+        $('#pwtc-mapdb-view-signup-div table').on('click', function(evt) {
+            reset_mileage_cell();
+            clear_errmsg();
+            reset_attended_cell();
+        });
+        <?php } ?>
 
         <?php if ($set_mileage) { ?>
         $('#pwtc-mapdb-view-signup-div table tbody td[mileage]').on('click', function(evt) {
+            evt.stopPropagation();
             reset_mileage_cell();
             clear_errmsg();
             reset_attended_cell();
@@ -263,6 +272,7 @@
 
         <?php if ($take_attendance) { ?>
         $('#pwtc-mapdb-view-signup-div table tbody td[attended]').on('click', function(evt) {
+            evt.stopPropagation();
             reset_mileage_cell();
             clear_errmsg();
             reset_attended_cell();
