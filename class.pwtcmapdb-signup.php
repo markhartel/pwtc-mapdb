@@ -290,7 +290,7 @@ class PwtcMapdb_Signup {
 		}
 
 		if (isset($_POST['accept_user_signup'])) {
-			if ($_POST['accept_user_signup'] == 'yes') {
+			if ($_POST['accept_user_signup'] != 'no' ) {
 				self::delete_all_signups($postid, $current_user->ID);
 				$value = json_encode(array('userid' => $current_user->ID, 'mileage' => ''.$mileage, 'attended' => true));
 				add_post_meta($postid, PwtcMapdb::RIDE_SIGNUP_USERID, $value);
@@ -330,6 +330,7 @@ class PwtcMapdb_Signup {
 			$arr = json_decode($item, true);
 			if ($arr['userid'] == $current_user->ID) {
 				$accept_signup = false;
+				$mileage = $arr['mileage'];
 			}
 		}
 
