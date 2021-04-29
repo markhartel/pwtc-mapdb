@@ -35,6 +35,41 @@
     });
 </script>
 <div id='pwtc-mapdb-rider-signup-div'>
+        <ul class="accordion" data-accordion data-allow-all-closed="true">
+            <li class="accordion-item" data-accordion-item>
+                <a href="#" class="accordion-title">Show Signed-up Riders...</a>
+                <div class="accordion-content" data-tab-content>
+    <?php if ($ride_signup_count > 0) { ?>
+                    <p>The following persons are currently signed up for this ride:<br>
+        <?php foreach($signup_list as $item) { 
+            $arr = json_decode($item, true);
+            $userid = $arr['userid'];
+            $user_info = get_userdata($userid);
+            if ($user_info) {
+                $name = $user_info->first_name . ' ' . $user_info->last_name;
+            }
+            else {
+                $name = 'Unknown';
+            }
+        ?>
+                        <strong><?php echo $name; ?></strong>,  
+        <?php } ?>
+        <?php foreach($nonmember_signup_list as $item) { 
+            $arr = json_decode($item, true);
+            $name = $arr['name'];
+        ?>
+                        <strong><?php echo $name; ?></strong>,
+        <?php } ?>
+                    </p>
+    <?php } else { ?>
+                    <p>No one is currently signed up for this ride.</p>
+    <?php } ?>
+    <?php if ( $ride_signup_limit > 0) { ?>
+                    <p>This ride is limited to <?php echo $ride_signup_limit; ?> riders, there are <?php echo ($ride_signup_limit - $ride_signup_count); ?> spaces left.</p>
+    <?php } ?>
+                </div>
+            </li>
+        </ul>
     <?php if ($accept_signup) { ?>
         <div class="callout">
             <p>
