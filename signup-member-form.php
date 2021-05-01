@@ -38,7 +38,7 @@
 <div id='pwtc-mapdb-rider-signup-div'>
         <ul class="accordion" data-accordion data-allow-all-closed="true">
             <li class="accordion-item" data-accordion-item>
-                <a href="#" class="accordion-title">Show Signed-up Riders...</a>
+                <a href="#" class="accordion-title">Show Sign-up Riders...</a>
                 <div class="accordion-content" data-tab-content>
     <?php if ($ride_signup_count > 0) { ?>
                     <p>The following persons are currently signed up for this ride:<br>
