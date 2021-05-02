@@ -36,47 +36,15 @@
     });
 </script>
 <div id='pwtc-mapdb-rider-signup-div'>
-        <ul class="accordion" data-accordion data-allow-all-closed="true">
-            <li class="accordion-item" data-accordion-item>
-                <a href="#" class="accordion-title">Show Sign-up Riders...</a>
-                <div class="accordion-content" data-tab-content>
-    <?php if ($ride_signup_count > 0) { ?>
-                    <p>The following persons are currently signed up for this ride:<br>
-        <?php foreach($signup_list as $item) { 
-            $arr = json_decode($item, true);
-            $userid = $arr['userid'];
-            $user_info = get_userdata($userid);
-            if ($user_info) {
-                $name = $user_info->first_name . ' ' . $user_info->last_name;
-            }
-            else {
-                $name = 'Unknown';
-            }
-        ?>
-                        <strong><?php echo $name; ?></strong>,  
-        <?php } ?>
-        <?php foreach($nonmember_signup_list as $item) { 
-            $arr = json_decode($item, true);
-            $name = $arr['name'];
-        ?>
-                        <strong><?php echo $name; ?></strong>,
-        <?php } ?>
-                    </p>
-    <?php } else { ?>
-                    <p>No one is currently signed up for this ride.</p>
-    <?php } ?>
-    <?php if ( $ride_signup_limit > 0) { ?>
-                    <p>This ride is limited to <?php echo $ride_signup_limit; ?> riders, there are <?php echo ($ride_signup_limit - $ride_signup_count); ?> spaces left.</p>
-    <?php } ?>
-                </div>
-            </li>
-        </ul>
     <?php if ($accept_signup) { ?>
         <div class="callout">
             <p>
             Hello <?php echo $rider_name; ?>, to sign up for the ride "<?php echo $ride_title; ?>," please accept the Club's <a href="/terms-and-conditions" target="_blank">terms and conditions</a>, enter your emergency contact information<?php if ($set_mileage) { ?>, enter the mileage that you intend to ride<?php } ?> and press the accept button.
+        <?php if ( $ride_signup_limit > 0) { ?>
+            This ride is limited to <?php echo $ride_signup_limit; ?> riders, there are <?php echo ($ride_signup_limit - $ride_signup_count); ?> spaces left.
+        <?php } ?>                
         <?php if ($set_mileage) { ?> 
-            <em>You may ask the leader to change your mileage at ride start if desired. If you don't want your mileage logged, leave the mileage field blank.</em>
+            <em>If you don't want your mileage logged, leave the mileage field blank.</em>
         <?php } ?>
             </p>
             <form method="POST" novalidate>
@@ -121,7 +89,11 @@
         </div>
     <?php } else { ?>
         <div class="callout">
-            <p>Hello <?php echo $rider_name; ?>, you are currently signed up for the ride "<?php echo $ride_title; ?>."</p>
+            <p>Hello <?php echo $rider_name; ?>, you are currently signed up for the ride "<?php echo $ride_title; ?>."
+        <?php if ( $ride_signup_limit > 0) { ?>
+            This ride is limited to <?php echo $ride_signup_limit; ?> riders, there are <?php echo ($ride_signup_limit - $ride_signup_count); ?> spaces left.
+        <?php } ?>
+            </p>
         <?php if ($set_mileage) { ?>
             <p>To update your mileage, enter the new value below and press the update button.</p>
             <form method="POST">
@@ -147,6 +119,31 @@
                 </div>
             </form>
         </div>
+    <?php } ?>
+    <?php if ($ride_signup_count > 0) { ?>
+        <p>The following persons are currently signed up for this ride:<br>
+        <?php foreach($signup_list as $item) { 
+            $arr = json_decode($item, true);
+            $userid = $arr['userid'];
+            $user_info = get_userdata($userid);
+            if ($user_info) {
+                $name = $user_info->first_name . ' ' . $user_info->last_name;
+            }
+            else {
+                $name = 'Unknown';
+            }
+        ?>
+            <strong><?php echo $name; ?></strong>,  
+        <?php } ?>
+        <?php foreach($nonmember_signup_list as $item) { 
+            $arr = json_decode($item, true);
+            $name = $arr['name'];
+        ?>
+            <strong><?php echo $name; ?></strong>,
+        <?php } ?>
+        </p>
+    <?php } else { ?>
+        <p>No one is currently signed up for this ride.</p>
     <?php } ?>
 </div>
 <?php 
