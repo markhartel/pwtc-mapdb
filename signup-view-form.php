@@ -1,3 +1,8 @@
+<style>
+    #pwtc-mapdb-view-signup-div .pwtc-mapdb-rwd-table .absent td {
+        text-decoration: line-through;
+    }
+</style>
 <script type="text/javascript">
     jQuery(document).ready(function($) { 
 
@@ -73,8 +78,10 @@
                 var cell = $(this).parent();
                 $(this).remove();
                 cell.find('i').remove();
+                cell.parent().removeClass('absent');
                 if (cell.attr('attended') == '0') {
-                    cell.find('span').after('<i class="fa fa-times"></i>');
+                    //cell.find('span').after('<i class="fa fa-times"></i>');
+                    cell.parent().addClass('absent');
                 }
             });			
         }
@@ -106,8 +113,10 @@
                         return res.attended;
                     });
                     acell.find('i').remove();
+                    row.removeClass('absent');
                     if (res.attended == '0') {
-                        acell.find('span').after('<i class="fa fa-times"></i>');
+                        //acell.find('span').after('<i class="fa fa-times"></i>');
+                        row.addClass('absent');
                     }
                 }
                 else {
@@ -139,8 +148,10 @@
                         return res.attended;
                     });
                     acell.find('i').remove();
+                    row.removeClass('absent');
                     if (res.attended == '0') {
-                        acell.find('span').after('<i class="fa fa-times"></i>');
+                        //acell.find('span').after('<i class="fa fa-times"></i>');
+                        row.addClass('absent');
                     }
                 }
                 else {
@@ -546,8 +557,15 @@
     <?php } else { ?>
     <?php if (count($signup_list) > 0 or count($nonmember_signup_list) > 0) { ?>
         <p>The following riders are currently signed up for the ride "<?php echo $ride_title; ?>."
-        <?php if ($paperless and !$signup_locked) { ?>
-        <a class="show_more">more&gt;</a><span class="more_details" style="display: none"><strong>To mark a rider as NOT present for the ride:</strong> (1) press the rider&#39;s name, (2) press the <i class="fa fa-thumbs-down"></i> icon after it appears and (3) a <i class="fa fa-times"></i> icon will mark the rider as not present. <strong>To modify a rider&#39;s mileage for the ride:</strong> (1) press the rider&#39;s mileage, (2) type the new mileage into the entry field after it appears and (3) press the enter key to accept the change. <a class="show_less">&lt;less</a><span>
+        <?php if ($paperless and !$signup_locked and ($set_mileage or $take_attendance)) { ?>
+            <a class="show_more">more&gt;</a><span class="more_details" style="display: none">
+            <?php if ($take_attendance) { ?>
+            <strong>To mark a rider as absent:</strong> (1) press the rider&#39;s name, (2) press the <i class="fa fa-thumbs-down"></i> icon after it appears and (3) a strike through the name will mark the rider as absent. To reverse this, simply press the rider&#39;s name again and press the <i class="fa fa-thumbs-up"></i> icon after it appears.
+            <?php } ?>
+            <?php if ($set_mileage) { ?>
+            <strong>To modify a rider&#39;s mileage:</strong> (1) press the rider&#39;s mileage, (2) type the new mileage into the entry field after it appears and (3) press the enter key to accept the change. 
+            <?php } ?>
+            <a class="show_less">&lt;less</a><span>
         <?php } ?>
         </p> 
         <div class="errmsg"></div>
@@ -579,8 +597,8 @@
             $rider_id = PwtcMapdb::get_rider_id($userid);
             $contact = self::get_emergency_contact($userid, true);
         ?>
-            <tr userid="<?php echo $userid; ?>">
-            <td attended="<?php echo $attended ? '1':'0'; ?>"><span>Name</span><?php echo $attended ? '':'<i class="fa fa-times"></i>'; ?> <?php echo $name; ?> </td>
+            <tr userid="<?php echo $userid; ?>" <?php if (!$attended) { ?>class="absent"<?php } ?>>
+            <td attended="<?php echo $attended ? '1':'0'; ?>"><span>Name</span> <?php echo $name; ?> </td>
             <td><span>Rider ID</span><?php echo $rider_id; ?></td>
             <?php if ($paperless) { ?>
             <td mileage="<?php echo $mileage; ?>"><span>Mileage</span><?php echo $mileage_label; ?></td>
@@ -604,8 +622,8 @@
                 $attended = true;
             }
         ?>
-            <tr signup_id="<?php echo $signup_id; ?>">
-            <td attended="<?php echo $attended ? '1':'0'; ?>"><span>Name</span><?php echo $attended ? '':'<i class="fa fa-times"></i>'; ?> <?php echo $name; ?> </td>
+            <tr signup_id="<?php echo $signup_id; ?>" <?php if (!$attended) { ?>class="absent"<?php } ?>>
+            <td attended="<?php echo $attended ? '1':'0'; ?>"><span>Name</span> <?php echo $name; ?> </td>
             <td><span>Rider ID</span>n/a</td>
             <?php if ($paperless) { ?>
             <td mileage="<?php echo $mileage; ?>"><span>Mileage</span><?php echo $mileage_label; ?></td>
