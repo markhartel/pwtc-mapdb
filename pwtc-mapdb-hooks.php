@@ -33,8 +33,17 @@ function pwtc_mapdb_get_signup() {
         $result['copy_ride_url'] = false;
     }
 
-    if ($signup_mode == 'no' or $signup_locked) {
+    if ($signup_locked) {
         $result['ride_signup_msg'] = false;
+        $result['ride_signup_url'] = false;
+    }
+    else if ($signup_mode == 'no') {
+        if ($members_only) {
+            $result['ride_signup_msg'] = 'Only club members may attend this ride.';
+        }
+        else {
+            $result['ride_signup_msg'] = false;
+        }
         $result['ride_signup_url'] = false;
     }
     else {
