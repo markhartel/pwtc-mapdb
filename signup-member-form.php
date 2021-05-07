@@ -48,6 +48,7 @@
         <?php } ?>
             </p>
             <form method="POST" novalidate>
+                <?php wp_nonce_field('signup-member-form', 'nonce_field'); ?>
                 <div class="row">
                     <div class="small-12 medium-6 columns">
                         <label>Accept Terms and Conditions
@@ -97,6 +98,7 @@
         <?php if ($set_mileage) { ?>
             <p>To update your mileage, enter the new value below and press the update button.</p>
             <form method="POST">
+                <?php wp_nonce_field('signup-member-form', 'nonce_field'); ?>
                 <div class="row">
                     <div class="input-group small-12 medium-3 columns">
                         <span class="input-group-label">Mileage</span>
@@ -111,6 +113,7 @@
         <?php } ?>
             <p>To cancel your sign up, press the cancel button below.</p>
             <form method="POST">
+                <?php wp_nonce_field('signup-member-form', 'nonce_field'); ?>
                 <div class="row column errmsg"></div>
                 <div class="row column clearfix">
                     <input type="hidden" name="accept_user_signup" value="no"/>
