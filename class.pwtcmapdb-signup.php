@@ -615,6 +615,10 @@ class PwtcMapdb_Signup {
 		$postid = intval($_GET['post']);
 
 		if (isset($_POST['reset_ride_signups'])) {
+			if (!isset($_POST['nonce_field']) or !wp_verify_nonce($_POST['nonce_field'], 'signup-reset-form')) {
+				wp_nonce_ays('');
+			}
+			
 			delete_post_meta($postid, PwtcMapdb::RIDE_SIGNUP_LOCKED);
 			delete_post_meta($postid, PwtcMapdb::RIDE_SIGNUP_USERID);
 			delete_post_meta($postid, PwtcMapdb::RIDE_SIGNUP_NONMEMBER);
