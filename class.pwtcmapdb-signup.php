@@ -233,14 +233,64 @@ class PwtcMapdb_Signup {
 		}
 		$postid = intval($_GET['post']);
 
+		$current_user = wp_get_current_user();
+		if ( 0 == $current_user->ID ) {
+			return '<div class="callout small alert"><p>You must be logged in to sign up for rides.</p></div>';
+		}
+		
+		if (isset($_POST['accept_user_signup'])) {
+			if (!isset($_POST['nonce_field']) or !wp_verify_nonce($_POST['nonce_field'], 'signup-member-form')) {
+				wp_nonce_ays('');
+			}
+
+			$mileage = '';
+			if (isset($_POST['mileage'])) {
+				if (!empty(trim($_POST['mileage']))) {
+					$mileage = abs(intval($_POST['mileage']));
+				}
+			}
+	
+			if (isset($_POST['accept_user_signup'])) {
+				if ($_POST['accept_user_signup'] != 'no' ) {
+					self::delete_all_signups($postid, $current_user->ID);
+					$value = json_encode(array('userid' => $current_user->ID, 'mileage' => ''.$mileage, 'attended' => true));
+					add_post_meta($postid, PwtcMapdb::RIDE_SIGNUP_USERID, $value);
+				}
+				else {
+					self::delete_all_signups($postid, $current_user->ID);
+				}
+			}
+	
+			if (isset($_POST['contact_phone'])) {
+				if (function_exists('pwtc_members_format_phone_number')) {
+					$phone = pwtc_members_format_phone_number($_POST['contact_phone']);
+				}
+				else {
+					$phone = sanitize_text_field($_POST['contact_phone']);
+				}
+				update_field(PwtcMapdb::USER_EMER_PHONE, $phone, 'user_'.$current_user->ID);
+			}
+	
+			if (isset($_POST['contact_name'])) {
+				$name = sanitize_text_field($_POST['contact_name']);
+				update_field(PwtcMapdb::USER_EMER_NAME, $name, 'user_'.$current_user->ID);
+			}
+			
+			if (isset($_POST['accept_terms'])) {
+				if ($_POST['accept_terms'] == 'yes') {
+					update_field(PwtcMapdb::USER_RELEASE_ACCEPTED, true, 'user_'.$current_user->ID);
+				}
+			}
+
+			wp_redirect(add_query_arg(array(
+				'post' => $postid
+			), get_permalink()), 303);
+			exit;
+		}
+		
 		$ride_title = esc_html(get_the_title($postid));
 		$ride_link = esc_url(get_the_permalink($postid));
 		$return_to_ride = 'Click <a href="' . $ride_link . '">here</a> to return to the posted ride.';
-
-		$current_user = wp_get_current_user();
-		if ( 0 == $current_user->ID ) {
-			return '<div class="callout small warning"><p>You must log in <a href="/wp-login.php">here</a> to sign up for this ride. ' . $return_to_ride . '</p></div>';
-		}
 		
 		if (get_field(PwtcMapdb::RIDE_CANCELED, $postid)) {
 			return '<div class="callout small warning"><p>The ride "' . $ride_title . '" has been canceled, no sign up allowed. ' . $return_to_ride . '</p></div>';
@@ -281,51 +331,13 @@ class PwtcMapdb_Signup {
 		if ($signup_locked) {
 			return '<div class="callout small warning"><p>You cannot sign up for ride "' . $ride_title . '" because it is closed. ' . $return_to_ride . '</p></div>';	
 		}
-		
-		$mileage = '';
-		if (isset($_POST['mileage'])) {
-			if (!empty(trim($_POST['mileage']))) {
-				$mileage = abs(intval($_POST['mileage']));
-			}
-		}
-
-		if (isset($_POST['accept_user_signup'])) {
-			if ($_POST['accept_user_signup'] != 'no' ) {
-				self::delete_all_signups($postid, $current_user->ID);
-				$value = json_encode(array('userid' => $current_user->ID, 'mileage' => ''.$mileage, 'attended' => true));
-				add_post_meta($postid, PwtcMapdb::RIDE_SIGNUP_USERID, $value);
-			}
-			else {
-				self::delete_all_signups($postid, $current_user->ID);
-			}
-		}
-
-		if (isset($_POST['contact_phone'])) {
-			if (function_exists('pwtc_members_format_phone_number')) {
-				$phone = pwtc_members_format_phone_number($_POST['contact_phone']);
-			}
-			else {
-				$phone = sanitize_text_field($_POST['contact_phone']);
-			}
-			update_field(PwtcMapdb::USER_EMER_PHONE, $phone, 'user_'.$current_user->ID);
-		}
-
-		if (isset($_POST['contact_name'])) {
-			$name = sanitize_text_field($_POST['contact_name']);
-			update_field(PwtcMapdb::USER_EMER_NAME, $name, 'user_'.$current_user->ID);
-		}
-		
-		if (isset($_POST['accept_terms'])) {
-			if ($_POST['accept_terms'] == 'yes') {
-				update_field(PwtcMapdb::USER_RELEASE_ACCEPTED, true, 'user_'.$current_user->ID);
-			}
-		}
 
 		$signup_list = get_post_meta($postid, PwtcMapdb::RIDE_SIGNUP_USERID);
 		$nonmember_signup_list = get_post_meta($postid, PwtcMapdb::RIDE_SIGNUP_NONMEMBER);
 		$ride_signup_count = count($signup_list) + count($nonmember_signup_list);
 		
 		$accept_signup = true;
+		$mileage = '';
 		foreach($signup_list as $item) {
 			$arr = json_decode($item, true);
 			if ($arr['userid'] == $current_user->ID) {
@@ -345,13 +357,6 @@ class PwtcMapdb_Signup {
 		$contact_phone = get_field(PwtcMapdb::USER_EMER_PHONE, 'user_'.$current_user->ID);
 		$contact_name = get_field(PwtcMapdb::USER_EMER_NAME, 'user_'.$current_user->ID);
 		$release_accepted = get_field(PwtcMapdb::USER_RELEASE_ACCEPTED, 'user_'.$current_user->ID);
-
-		if (isset($_POST['accept_user_signup'])) {
-			wp_redirect(add_query_arg(array(
-				'post' => $postid
-			), get_permalink()), 303);
-			exit;
-		}
 
 		ob_start();
 		include('signup-member-form.php');
