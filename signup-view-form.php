@@ -483,6 +483,7 @@
                     <a href="#" class="accordion-title">Set Sign-up Options...</a>
                     <div class="accordion-content" data-tab-content>
                 <form class="signup-options-frm" method="POST" novalidate>
+                    <?php wp_nonce_field('signup-view-form', 'nonce_field'); ?>
                     <div class="row">
                         <div class="small-12 medium-4 columns">
                             <label>Online Ride Sign-up
@@ -524,6 +525,7 @@
                     <a href="#" class="accordion-title">Sign-up a Rider...</a>
                     <div class="accordion-content" data-tab-content>
                 <form class="rider-signup-frm" method="POST" novalidate>
+                    <?php wp_nonce_field('signup-view-form', 'nonce_field'); ?>
                     <input type="hidden" name="signup_userid" value="0"/>
                     <div class="help-text"><p>A rider should use their club member account to sign up for rides. However, if they don't have access to a computer, the ride leader can do it for them here. Enter their rider ID and press lookup. After a rider matching that ID is found, you can enter their mileage and press submit.</p></div>
                     <div class="row">
@@ -651,6 +653,7 @@
     <div class="errmsg2"></div>
     <div class="row column clearfix action-btns">
         <form method="POST">
+            <?php wp_nonce_field('signup-view-form', 'nonce_field'); ?>
     <?php if ($signup_locked) { ?>
             <div class="button-group float-left">
         <?php if ($paperless) { ?>
