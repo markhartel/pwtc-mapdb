@@ -381,7 +381,77 @@ class PwtcMapdb_Signup {
 		
 		$current_user = wp_get_current_user();
 		if ( 0 == $current_user->ID ) {
-			return '<div class="callout small warning"><p>Please <a href="/wp-login.php">log in</a> to view the ride sign up list.</p></div>';
+			return '<div class="callout small alert"><p>You must be logged in to view sign up list for rides.</p></div>';
+		}
+		
+		if (isset($_POST['lock_signup']) or isset($_POST['ride_signup_mode']) or isset($_POST['signup_userid'])) {
+			if (!isset($_POST['nonce_field']) or !wp_verify_nonce($_POST['nonce_field'], 'signup-view-form')) {
+				wp_nonce_ays('');
+			}
+
+			if (isset($_POST['ride_signup_mode'])) {
+				delete_post_meta($postid, PwtcMapdb::RIDE_SIGNUP_MODE);
+				add_post_meta($postid, PwtcMapdb::RIDE_SIGNUP_MODE, $_POST['ride_signup_mode'], true);
+			}
+	
+			if (isset($_POST['ride_signup_cutoff'])) {
+				delete_post_meta($postid, PwtcMapdb::RIDE_SIGNUP_CUTOFF);
+				add_post_meta($postid, PwtcMapdb::RIDE_SIGNUP_CUTOFF, abs(intval($_POST['ride_signup_cutoff'])), true);
+			}
+			
+			if (isset($_POST['ride_signup_limit'])) {
+				delete_post_meta($postid, PwtcMapdb::RIDE_SIGNUP_LIMIT);
+				add_post_meta($postid, PwtcMapdb::RIDE_SIGNUP_LIMIT, abs(intval($_POST['ride_signup_limit'])), true);
+			}
+			
+			if (isset($_POST['signup_members_only'])) {
+				delete_post_meta($postid, PwtcMapdb::RIDE_SIGNUP_MEMBERS_ONLY);
+				add_post_meta($postid, PwtcMapdb::RIDE_SIGNUP_MEMBERS_ONLY, $_POST['signup_members_only'] == 'yes', true);
+			}
+			
+			if (isset($_POST['signup_userid'])) {
+				$userid = intval($_POST['signup_userid']);
+				if ($userid != 0) {
+					$mileage = false;
+					if (isset($_POST['signup_rider_mileage'])) {
+						if (!empty(trim($_POST['signup_rider_mileage']))) {
+							$mileage = $_POST['signup_rider_mileage'];
+						}
+					}
+					$signup = self::fetch_user_signup($postid, $userid);
+					if ($signup) {
+						if ($mileage) {
+							$signup['mileage'] = ''.abs(intval($mileage));
+						}
+						self::delete_all_signups($postid, $userid);
+						$value = json_encode($signup);
+						add_post_meta($postid, PwtcMapdb::RIDE_SIGNUP_USERID, $value);
+					}
+					else {
+						if ($mileage) {
+							$value = json_encode(array('userid' => $userid, 'mileage' => ''.abs(intval($mileage)), 'attended' => true));
+						}
+						else {
+							$value = json_encode(array('userid' => $userid, 'mileage' => '', 'attended' => true));
+						}
+						add_post_meta($postid, PwtcMapdb::RIDE_SIGNUP_USERID, $value);	
+					}
+				}
+			}
+
+			if (isset($_POST['lock_signup'])) {
+				if ($_POST['lock_signup'] == 'yes') {
+					add_post_meta($postid, PwtcMapdb::RIDE_SIGNUP_LOCKED, true, true);
+				}
+				else {
+					delete_post_meta( $postid, PwtcMapdb::RIDE_SIGNUP_LOCKED);
+				}
+			}
+
+			wp_redirect(add_query_arg(array(
+				'post' => $postid
+			), get_permalink()), 303);
+			exit;
 		}
 		
 		$ride_title = esc_html(get_the_title($postid));
@@ -403,56 +473,6 @@ class PwtcMapdb_Signup {
 			}
 			if ($denied) {
 				return '<div class="callout small warning"><p>You must be a leader for ride "' . $ride_title . '" to view sign ups. ' . $return_to_ride . '</p></div>';
-			}
-		}
-		
-		if (isset($_POST['ride_signup_mode'])) {
-			delete_post_meta($postid, PwtcMapdb::RIDE_SIGNUP_MODE);
-			add_post_meta($postid, PwtcMapdb::RIDE_SIGNUP_MODE, $_POST['ride_signup_mode'], true);
-		}
-
-		if (isset($_POST['ride_signup_cutoff'])) {
-			delete_post_meta($postid, PwtcMapdb::RIDE_SIGNUP_CUTOFF);
-			add_post_meta($postid, PwtcMapdb::RIDE_SIGNUP_CUTOFF, abs(intval($_POST['ride_signup_cutoff'])), true);
-		}
-		
-		if (isset($_POST['ride_signup_limit'])) {
-			delete_post_meta($postid, PwtcMapdb::RIDE_SIGNUP_LIMIT);
-			add_post_meta($postid, PwtcMapdb::RIDE_SIGNUP_LIMIT, abs(intval($_POST['ride_signup_limit'])), true);
-		}
-		
-		if (isset($_POST['signup_members_only'])) {
-			delete_post_meta($postid, PwtcMapdb::RIDE_SIGNUP_MEMBERS_ONLY);
-			add_post_meta($postid, PwtcMapdb::RIDE_SIGNUP_MEMBERS_ONLY, $_POST['signup_members_only'] == 'yes', true);
-		}
-		
-		if (isset($_POST['signup_userid'])) {
-			$userid = intval($_POST['signup_userid']);
-			if ($userid != 0) {
-				$mileage = false;
-				if (isset($_POST['signup_rider_mileage'])) {
-					if (!empty(trim($_POST['signup_rider_mileage']))) {
-						$mileage = $_POST['signup_rider_mileage'];
-					}
-				}
-				$signup = self::fetch_user_signup($postid, $userid);
-				if ($signup) {
-					if ($mileage) {
-						$signup['mileage'] = ''.abs(intval($mileage));
-					}
-					self::delete_all_signups($postid, $userid);
-					$value = json_encode($signup);
-					add_post_meta($postid, PwtcMapdb::RIDE_SIGNUP_USERID, $value);
-				}
-				else {
-					if ($mileage) {
-						$value = json_encode(array('userid' => $userid, 'mileage' => ''.abs(intval($mileage)), 'attended' => true));
-					}
-					else {
-						$value = json_encode(array('userid' => $userid, 'mileage' => '', 'attended' => true));
-					}
-					add_post_meta($postid, PwtcMapdb::RIDE_SIGNUP_USERID, $value);	
-				}
 			}
 		}
 				
@@ -481,14 +501,6 @@ class PwtcMapdb_Signup {
 			$signup_list = get_post_meta($postid, PwtcMapdb::RIDE_SIGNUP_USERID);
 			$nonmember_signup_list = get_post_meta($postid, PwtcMapdb::RIDE_SIGNUP_NONMEMBER);
 
-			if (isset($_POST['lock_signup'])) {
-				if ($_POST['lock_signup'] == 'yes') {
-					add_post_meta($postid, PwtcMapdb::RIDE_SIGNUP_LOCKED, true, true);
-				}
-				else {
-					delete_post_meta( $postid, PwtcMapdb::RIDE_SIGNUP_LOCKED);
-				}
-			}
 			$signup_locked = self::get_signup_locked($postid);
 			if ($signup_locked) {
 				$set_mileage = $take_attendance = false;
@@ -496,13 +508,6 @@ class PwtcMapdb_Signup {
 		}
 		else {
 			$cutoff_units = '(hours)';
-		}
-		
-		if (isset($_POST['lock_signup']) or isset($_POST['ride_signup_mode']) or isset($_POST['signup_userid'])) {
-			wp_redirect(add_query_arg(array(
-				'post' => $postid
-			), get_permalink()), 303);
-			exit;
 		}
 
 		ob_start();
