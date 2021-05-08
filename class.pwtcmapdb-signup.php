@@ -234,10 +234,7 @@ class PwtcMapdb_Signup {
 		$postid = intval($_GET['post']);
 
 		$current_user = wp_get_current_user();
-		if ( 0 == $current_user->ID ) {
-			return '<div class="callout small alert"><p>You must be logged in to sign up for rides.</p></div>';
-		}
-		
+
 		if (isset($_POST['accept_user_signup'])) {
 			if (!isset($_POST['nonce_field']) or !wp_verify_nonce($_POST['nonce_field'], 'signup-member-form')) {
 				wp_nonce_ays('');
@@ -286,6 +283,10 @@ class PwtcMapdb_Signup {
 				'post' => $postid
 			), get_permalink()), 303);
 			exit;
+		}
+		
+		if ( 0 == $current_user->ID ) {
+			return '<div class="callout small alert"><p>You must be logged in to sign up for rides.</p></div>';
 		}
 		
 		$ride_title = esc_html(get_the_title($postid));
@@ -380,10 +381,7 @@ class PwtcMapdb_Signup {
 		$postid = intval($_GET['post']);
 		
 		$current_user = wp_get_current_user();
-		if ( 0 == $current_user->ID ) {
-			return '<div class="callout small alert"><p>You must be logged in to view sign up list for rides.</p></div>';
-		}
-		
+
 		if (isset($_POST['lock_signup']) or isset($_POST['ride_signup_mode']) or isset($_POST['signup_userid'])) {
 			if (!isset($_POST['nonce_field']) or !wp_verify_nonce($_POST['nonce_field'], 'signup-view-form')) {
 				wp_nonce_ays('');
@@ -452,6 +450,10 @@ class PwtcMapdb_Signup {
 				'post' => $postid
 			), get_permalink()), 303);
 			exit;
+		}
+		
+		if ( 0 == $current_user->ID ) {
+			return '<div class="callout small alert"><p>You must be logged in to view sign up list for rides.</p></div>';
 		}
 		
 		$ride_title = esc_html(get_the_title($postid));
