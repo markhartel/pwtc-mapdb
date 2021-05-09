@@ -454,6 +454,13 @@
                     label = '(hours before ride start)';
                 }
                 $('#pwtc-mapdb-view-signup-div .cutoff_units').html(label);
+                if (mode == 'no') {
+                    $('#pwtc-mapdb-view-signup-div input[name="ride_signup_cutoff"]').prop('disabled',true);
+                    $('#pwtc-mapdb-view-signup-div input[name="ride_signup_limit"]').prop('disabled',true);
+                } else {
+                    $('#pwtc-mapdb-view-signup-div input[name="ride_signup_cutoff"]').prop('disabled',false);
+                    $('#pwtc-mapdb-view-signup-div input[name="ride_signup_limit"]').prop('disabled',false);
+                }
             });
         });
     
@@ -496,12 +503,12 @@
                         </div>
                         <div class="small-12 medium-4 columns">
                             <label>Sign-up Cutoff <span class="cutoff_units"><?php echo $cutoff_units; ?></span>
-                                <input type="number" name="ride_signup_cutoff" value="<?php echo $ride_signup_cutoff; ?>"/>
+                                <input type="number" name="ride_signup_cutoff" value="<?php echo $ride_signup_cutoff; ?>" <?php echo $ride_signup_mode == 'no' ? 'disabled': ''; ?>/>
                             </label>
                         </div>
                         <div class="small-12 medium-4 columns">
                             <label>Sign-up Count Limit (0 means unlimited)
-                                <input type="number" name="ride_signup_limit" value="<?php echo $ride_signup_limit; ?>"/>
+                                <input type="number" name="ride_signup_limit" value="<?php echo $ride_signup_limit; ?>" <?php echo $ride_signup_mode == 'no' ? 'disabled': ''; ?>/>
                             </label>
                         </div>
                         <div class="small-12 medium-4 columns">
