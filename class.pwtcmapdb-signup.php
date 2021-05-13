@@ -234,6 +234,14 @@ class PwtcMapdb_Signup {
 		$postid = intval($_GET['post']);
 
 		$current_user = wp_get_current_user();
+		
+		$ride_signup_mode = self::get_signup_mode($postid);
+		$ride_signup_cutoff = self::get_signup_cutoff($postid);
+		$ride_signup_limit = self::get_signup_limit($postid);
+		$signup_locked = self::get_signup_locked($postid);
+		$signup_list = get_post_meta($postid, PwtcMapdb::RIDE_SIGNUP_USERID);
+		$nonmember_signup_list = get_post_meta($postid, PwtcMapdb::RIDE_SIGNUP_NONMEMBER);
+		$ride_signup_count = count($signup_list) + count($nonmember_signup_list);
 
 		if (isset($_POST['accept_user_signup'])) {
 			if (!isset($_POST['nonce_field']) or !wp_verify_nonce($_POST['nonce_field'], 'signup-member-form')) {
@@ -248,6 +256,9 @@ class PwtcMapdb_Signup {
 			}
 	
 			if (isset($_POST['accept_user_signup'])) {
+				if ($_POST['accept_user_signup'] == 'yes' and $ride_signup_limit > 0 and $ride_signup_count >= $ride_signup_limit) {
+					wp_die('Sign up failed because ride is full.', 403);
+				}
 				if ($_POST['accept_user_signup'] != 'no' ) {
 					self::delete_all_signups($postid, $current_user->ID);
 					$value = json_encode(array('userid' => $current_user->ID, 'mileage' => ''.$mileage, 'attended' => true));
@@ -306,12 +317,6 @@ class PwtcMapdb_Signup {
 		if (in_array(PwtcMapdb::ROLE_EXPIRED_MEMBER, (array) $current_user->roles)) {
 			$expired = true;
 		}
-				
-		$ride_signup_mode = self::get_signup_mode($postid);
-
-		$ride_signup_cutoff = self::get_signup_cutoff($postid);
-		
-		$ride_signup_limit = self::get_signup_limit($postid);
 
 		if ($ride_signup_mode == 'paperless') {
 			$set_mileage = true;
@@ -332,10 +337,6 @@ class PwtcMapdb_Signup {
 		if ($signup_locked) {
 			return '<div class="callout small warning"><p>You cannot sign up for ride "' . $ride_title . '" because it is closed. ' . $return_to_ride . '</p></div>';	
 		}
-
-		$signup_list = get_post_meta($postid, PwtcMapdb::RIDE_SIGNUP_USERID);
-		$nonmember_signup_list = get_post_meta($postid, PwtcMapdb::RIDE_SIGNUP_NONMEMBER);
-		$ride_signup_count = count($signup_list) + count($nonmember_signup_list);
 		
 		$accept_signup = true;
 		$mileage = '';
