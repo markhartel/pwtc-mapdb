@@ -257,7 +257,10 @@ class PwtcMapdb_Signup {
 	
 			if (isset($_POST['accept_user_signup'])) {
 				if ($_POST['accept_user_signup'] == 'yes' and $ride_signup_limit > 0 and $ride_signup_count >= $ride_signup_limit) {
-					wp_die('Sign up failed because ride is full.', 403);
+					wp_redirect(add_query_arg(array(
+						'post' => $postid
+					), get_permalink()), 303);
+					exit;
 				}
 				if ($_POST['accept_user_signup'] != 'no' ) {
 					self::delete_all_signups($postid, $current_user->ID);
