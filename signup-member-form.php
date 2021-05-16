@@ -124,7 +124,7 @@
         </div>
     <?php } ?>
     <?php if ($ride_signup_count > 0) { ?>
-        <p>The following persons are currently signed up for this ride:<br>
+        <p>The following persons are signed up to attend this ride:<br>
         <?php foreach($signup_list as $item) { 
             $arr = json_decode($item, true);
             $userid = $arr['userid'];
@@ -135,15 +135,23 @@
             else {
                 $name = 'Unknown';
             }
+            $attended = $arr['attended'];
+            if ($attended) {
         ?>
             <strong><?php echo $name; ?></strong>,  
-        <?php } ?>
+        <?php } else { ?>
+            <s><?php echo $name; ?></s>,
+        <?php } } ?>
         <?php foreach($nonmember_signup_list as $item) { 
             $arr = json_decode($item, true);
             $name = $arr['name'];
+            $attended = $arr['attended'];
+            if ($attended) {
         ?>
             <strong><?php echo $name; ?></strong>,
-        <?php } ?>
+        <?php } else { ?>
+            <s><?php echo $name; ?></s>,
+        <?php } } ?>
         </p>
     <?php } else { ?>
         <p>No one is currently signed up for this ride.</p>
