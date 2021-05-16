@@ -224,7 +224,7 @@
                     </label>
                 </div>
                 <div class="small-12 medium-6 columns">
-                    <label>Your Name
+                    <label>Your First and Last Name
                         <input type="text" name="your_name" value=""/>
                     </label>
                 </div>
