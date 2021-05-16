@@ -495,9 +495,9 @@
                         <div class="small-12 medium-4 columns">
                             <label>Online Ride Sign-up
                                 <select name="ride_signup_mode">
-                                    <option value="no" <?php echo $ride_signup_mode == 'no' ? 'selected': ''; ?>>No</option>
-                                    <option value="hardcopy"  <?php echo $ride_signup_mode == 'hardcopy' ? 'selected': ''; ?>>Hardcopy (requires computer/printer)</option>
-                                    <option value="paperless"  <?php echo $ride_signup_mode == 'paperless' ? 'selected': ''; ?>>Paperless (requires smartphone)</option>
+                                    <option value="no" <?php echo $ride_signup_mode == 'no' ? 'selected': ''; ?>>No Sign-up Allowed</option>
+                                    <option value="hardcopy"  <?php echo $ride_signup_mode == 'hardcopy' ? 'selected': ''; ?>>Printed Hardcopy Sign-up</option>
+                                    <option value="paperless"  <?php echo $ride_signup_mode == 'paperless' ? 'selected': ''; ?>>Paperless Sign-up</option>
                                 </select>
                             </label>
                         </div>
