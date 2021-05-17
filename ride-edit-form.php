@@ -746,7 +746,7 @@
     <?php if ($postid != 0) { ?>
         This ride was authored by <?php echo $author_name; ?> and is
         <?php if ($status == 'draft') { ?>
-        a draft. It can be updated or <?php if ($allow_leaders) { ?>submitted for review<?php } else { ?>published<?php } ?> using the buttons at the bottom of the form.
+        a draft. It can be updated or <?php if ($allow_leaders and !$is_road_captain) { ?>submitted for review<?php } else { ?>published<?php } ?> using the buttons at the bottom of the form.
         <?php } else if ($status == 'pending') { 
             $questions = self::ride_question_email($postid);
         ?>
