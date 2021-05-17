@@ -15,6 +15,7 @@ class PwtcMapdb_Map {
 
         // Register shortcode callbacks
         add_shortcode('pwtc_search_mapdb', array('PwtcMapdb_Map', 'shortcode_search_mapdb'));
+	add_shortcode('pwtc_mapdb_edit_map', array('PwtcMapdb_Map', 'shortcode_edit_map'));
 
         // Register ajax callbacks
         add_action('wp_ajax_pwtc_mapdb_lookup_maps', array('PwtcMapdb_Map', 'lookup_maps_callback') );
@@ -36,6 +37,14 @@ class PwtcMapdb_Map {
             return ob_get_clean();
 		}
     }
+	
+	// Generates the [pwtc_mapdb_edit_map] shortcode.
+	public static function shortcode_edit_map($atts) {
+
+		ob_start();
+        	include('map-edit-form.php');
+        	return ob_get_clean();
+	}
     
     /******* AJAX request/response callback functions *******/
 
