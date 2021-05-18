@@ -902,7 +902,7 @@ class PwtcMapdb_Signup {
 					'postid' => $postid,
 					'signup_id' => ''.$signup_id,
 					'override' => 'yes',
-					'warning' => 'Your last name was found in our membership records, are you a club member? If so, first <a href="/wp-login.php">log in</a> before signing up for a ride. Otherwise, press the accept sign-up button again.'
+					'warning' => 'Your last name was found in our membership records, are you a club member? If yes, first <a href="/wp-login.php">log in</a> before signing up for a ride. Otherwise, to continue as a non-member, press the accept sign-up button again.'
 				);
 			}
 			else {
