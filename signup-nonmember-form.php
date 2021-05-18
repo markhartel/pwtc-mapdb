@@ -92,6 +92,7 @@
                     if (res.warning) {
                         show_warnmsg(res.warning);
                         $('#pwtc-mapdb-nonmember-signup-div .accept_div').show();
+                        $('#pwtc-mapdb-nonmember-signup-div input[name="override"]').val(res.override);
                     }
                     else {
                         window.localStorage.setItem('<?php echo self::LOCAL_SIGNUP_NAME; ?>', res.signup_name);
@@ -150,6 +151,7 @@
                 var signup_id = window.localStorage.getItem('<?php echo self::LOCAL_SIGNUP_ID; ?>');
                 var contact_phone = $(this).find('input[name="contact_phone"]').val().trim();
                 var contact_name = $(this).find('input[name="contact_name"]').val().trim();
+                var override = $(this).find('input[name="override"]').val().trim();
                 var action = "<?php echo admin_url('admin-ajax.php'); ?>";
                 var data = {
                     'action': 'pwtc_mapdb_accept_nonmember_signup',
@@ -159,7 +161,7 @@
                     'signup_name': your_name,
                     'signup_contact_phone': contact_phone,
                     'signup_contact_name': contact_name,
-                    'signup_limit': <?php echo $ride_signup_limit; ?>
+                    'override': override
                 };
                 $.post(action, data, accept_signup_cb);
                 $('#pwtc-mapdb-nonmember-signup-div .accept_div').hide();
@@ -183,6 +185,18 @@
             $.post(action, data, cancel_signup_cb);
             $('#pwtc-mapdb-nonmember-signup-div .cancel_div').hide();
             show_waiting();
+        });
+    
+        $('#pwtc-mapdb-nonmember-signup-div form').on('keypress', function(evt) {
+            var keyPressed = evt.keyCode || evt.which; 
+            if (keyPressed === 13) { 
+                evt.preventDefault(); 
+                return false; 
+            } 
+        });
+
+        $('#pwtc-mapdb-nonmember-signup-div input[name="your_name"]').on('input', function() {
+            $('#pwtc-mapdb-nonmember-signup-div input[name="override"]').val('no');
         });
 
         if (window.localStorage) {
@@ -214,6 +228,7 @@
     <div class="accept_div callout" style="display: none">
         <p>To sign up for the ride "<?php echo $ride_title; ?>," please accept the Club's <a href="/terms-and-conditions" target="_blank">terms and conditions</a>, enter your name and emergency contact information and press the accept button.</p>
         <form method="POST">
+            <input type="hidden" name="override" value="no"/>
             <div class="row">
                 <div class="small-12 medium-6 columns">
                     <label>Accept Terms and Conditions
