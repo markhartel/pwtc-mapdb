@@ -866,17 +866,43 @@ class PwtcMapdb_Signup {
 	}	
 
 	public static function accept_nonmember_signup_callback() {
-		if (isset($_POST['signup_id']) and isset($_POST['postid']) and isset($_POST['nonce']) and isset($_POST['signup_name']) and isset($_POST['signup_contact_phone']) and isset($_POST['signup_contact_name']) and isset($_POST['signup_limit'])) {
+		if (isset($_POST['signup_id']) and isset($_POST['postid']) and isset($_POST['nonce']) and isset($_POST['signup_name']) and isset($_POST['signup_contact_phone']) and isset($_POST['signup_contact_name']) and isset($_POST['override'])) {
 			$signup_id = intval($_POST['signup_id']);
 			$postid = intval($_POST['postid']);
-			$signup_limit = intval($_POST['signup_limit']);
+			$signup_limit = self::get_signup_limit($postid);
 			$nonce = $_POST['nonce'];
 			$signup_name = $_POST['signup_name'];
 			$contact_phone = $_POST['signup_contact_phone'];
 			$contact_name = $_POST['signup_contact_name'];
+			$override = $_POST['override'];
+			$names = explode(" ", $signup_name);
 			if (!wp_verify_nonce($nonce, 'pwtc_mapdb_accept_nonmember_signup')) {
 				$response = array(
 					'error' => 'Server security check failed for nonmember sign up accept.'
+				);
+			}
+			else if (count($names) < 2) {
+				$response = array(
+					'postid' => $postid,
+					'signup_id' => ''.$signup_id,
+					'override' => 'no',
+					'warning' => 'You must enter both a first and last name.'
+				);
+			}
+			else if (count($names) > 2) {
+				$response = array(
+					'postid' => $postid,
+					'signup_id' => ''.$signup_id,
+					'override' => 'no',
+					'warning' => 'You must enter ONLY a first and last name.'
+				);
+			}
+			else if (self::found_last_name($names[1]) and $override == 'no') {
+				$response = array(
+					'postid' => $postid,
+					'signup_id' => ''.$signup_id,
+					'override' => 'yes',
+					'warning' => 'Your last name was found in our membership records, are you a club member? If so, first <a href="/wp-login.php">log in</a> before signing up for a ride. Otherwise, press the accept sign-up button again.'
 				);
 			}
 			else {
@@ -886,6 +912,7 @@ class PwtcMapdb_Signup {
 					$response = array(
 						'postid' => $postid,
 						'signup_id' => ''.$signup_id,
+						'override' => 'yes',
 						'warning' => 'You cannot sign up for this ride because it is full; a maximum of ' . $signup_limit . ' riders are allowed.'
 					);				
 				}
@@ -1214,6 +1241,19 @@ class PwtcMapdb_Signup {
 		}
 
 		return '';
+	}
+	
+	public static function found_last_name($last_name) {
+		$query_args = [
+			'role__in' => [PwtcMapdb::ROLE_CURRENT_MEMBER, PwtcMapdb::ROLE_EXPIRED_MEMBER],
+			'fields' => ['ID'],
+			'meta_key' => 'last_name',
+			'meta_value' => $last_name,
+			'meta_compare' => '='
+		];
+		$user_query = new WP_User_Query($query_args);
+		$users = $user_query->get_results();
+		return (count($users) > 0);
 	}
 
 }
