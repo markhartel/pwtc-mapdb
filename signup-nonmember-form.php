@@ -23,6 +23,7 @@
 
         function set_accept_form() {
             var form = $('#pwtc-mapdb-nonmember-signup-div .accept_div form');
+            form.find('input[name="override"]').val('no');
             var your_name = window.localStorage.getItem('<?php echo self::LOCAL_SIGNUP_NAME; ?>');
             if (!your_name) {
                 your_name = '';
