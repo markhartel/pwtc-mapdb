@@ -40,6 +40,35 @@ class PwtcMapdb_Map {
 	
 	// Generates the [pwtc_mapdb_edit_map] shortcode.
 	public static function shortcode_edit_map($atts) {
+		if (isset($_POST['upload_file'])) {
+			if (!isset($_FILES['map_file'])) {
+				error_log('ERROR: missing input parameter');
+			}
+			else if ($_FILES['map_file']['size'] == 0) {
+				error_log('ERROR: uploaded file is empty or not selected');
+			}
+			else if ($_FILES['map_file']['error'] != UPLOAD_ERR_OK) {
+				error_log('ERROR: file upload error code ' . $_FILES['map_file']['error']);
+			}
+			else {
+				$filename = $_FILES['map_file']['name'];
+				error_log('Uploaded file name: ' . $filename);
+				$tmpname = $_FILES['map_file']['tmp_name'];
+				error_log('Uploaded tmp file location: ' . $tmpname);
+
+				$upload_dir = wp_upload_dir();
+				$movefile = $upload_dir['path'] . '/' . $filename;
+				error_log('Uploaded file move location: ' . $movefile);
+
+				$status = move_uploaded_file($tmpname, $movefile);
+				if ($status === false) {
+					error_log('ERROR: file move failed');
+				}
+			}
+
+			wp_redirect(get_permalink(), 303);
+			exit;
+		}
 
 		ob_start();
         	include('map-edit-form.php');
