@@ -259,6 +259,10 @@
             var cell = $(this);
             if (cell.attr('mileage') != 'XXX') {
                 var row = cell.parent();
+                var attended = row.find('td[attended]').attr('attended');
+                if (attended == '0') {
+                    return;
+                }
                 cell.html('<span>Mileage</span><input type="number" value="' + cell.attr('mileage') + '" style="width:50%" maxlength="3" />');
                 var input = cell.find('input');
                 input.on('click', function(e) {
