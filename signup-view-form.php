@@ -382,6 +382,10 @@
         function show_errmsg4_success(msg) {
             $('#pwtc-mapdb-view-signup-div .errmsg4').html('<div class="callout small success">' + msg + '</div>');
         }
+    
+        function show_errmsg5_wait() {
+            $('#pwtc-mapdb-view-signup-div .errmsg5').html('<div class="callout small"><i class="fa fa-spinner fa-pulse waiting"></i> please wait...</div>');
+        }
 
         function riderid_lookup_cb(response) {
             var res;
@@ -442,7 +446,12 @@
         $('#pwtc-mapdb-view-signup-div .rider-signup-frm').on('submit', function(evt) {
             show_errmsg4_wait();
             $('#pwtc-mapdb-view-signup-div button[type="submit"]').prop('disabled',true);
-            });
+        });
+    
+        $('#pwtc-mapdb-view-signup-div .rider-cancel-frm').on('submit', function(evt) {
+            show_errmsg5_wait();
+            $('#pwtc-mapdb-view-signup-div button[type="submit"]').prop('disabled',true);
+        });
     
         <?php } ?>
     
@@ -533,12 +542,12 @@
         </li>
     <?php if ($paperless and !$signup_locked) { ?>
         <li class="accordion-item" data-accordion-item>
-                    <a href="#" class="accordion-title">Sign-up a Rider...</a>
-                    <div class="accordion-content" data-tab-content>
+            <a href="#" class="accordion-title">Sign-up a Rider...</a>
+            <div class="accordion-content" data-tab-content>
                 <form class="rider-signup-frm" method="POST" novalidate>
                     <?php wp_nonce_field('signup-view-form', 'nonce_field'); ?>
                     <input type="hidden" name="signup_userid" value="0"/>
-                    <div class="help-text"><p>A rider should use their club member account to sign up for rides. However, if they don't have access to a computer, the ride leader can do it for them here. Enter their rider ID and press lookup. After a rider matching that ID is found, you can enter their mileage and press submit.</p></div>
+                    <div class="help-text"><p>A rider should use their club member account to sign up for rides. However, if they don't have access to a computer, the ride leader can do it for them here. Enter their rider ID and press lookup. After a rider matching that ID is found, you can enter their mileage and press the accept sign-up button.</p></div>
                     <div class="row">
                         <div class="small-12 medium-4 columns">
                             <label>Rider ID
@@ -558,7 +567,47 @@
                     </div>
                     <div class="row column errmsg4"></div>
                     <div class="row column clearfix">
-                        <button class="accent button float-left" type="submit" disabled>Submit</button>
+                        <button class="accent button float-left" type="submit" disabled><i class="fa fa-user-plus"></i> Accept Sign-up</button>
+                    </div>
+                </form>
+            </div>
+        </li>
+        <li class="accordion-item" data-accordion-item>
+            <a href="#" class="accordion-title">Cancel a Sign-up...</a>
+            <div class="accordion-content" data-tab-content>
+                <form class="rider-cancel-frm" method="POST" novalidate>
+                    <?php wp_nonce_field('signup-view-form', 'nonce_field'); ?>
+                    <div class="help-text"><p>A rider should use their club member account to cancel their own ride sign up. However, if they don't have access to a computer, the ride leader can do it for them here. Select the rider for which to cancel sign up and press the cancel sign-up button.</p></div>
+                    <div class="row">
+                        <div class="small-12 medium-4 columns">
+                            <select name="cancel_userid">
+                                <option value="0" selected>-- Select a Rider --</option>
+                            <?php foreach ($signup_list as $item) { 
+                                $arr = json_decode($item, true);
+                                $userid = $arr['userid'];
+                                $user_info = get_userdata($userid);
+                                if ($user_info) {
+                                    $name = $user_info->first_name.' '.$user_info->last_name;
+                                }
+                                else {
+                                    $name = 'Unknown';
+                                }
+                            ?>
+                                <option value="userid:<?php echo $userid; ?>"><?php echo $name; ?></option>
+                            <?php } ?>
+                            <?php foreach ($nonmember_signup_list as $item) { 
+                                $arr = json_decode($item, true);
+                                $signup_id = $arr['signup_id'];
+                                $name = $arr['name'];
+                            ?>
+                                <option value="signupid:<?php echo $signup_id; ?>"><?php echo $name; ?></option>
+                            <?php } ?>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row column errmsg5"></div>
+                    <div class="row column clearfix">
+                        <button class="accent button float-left" type="submit" disabled><i class="fa fa-user-times"></i> Cancel Sign-up</button>
                     </div>
                 </form>
             </div>
