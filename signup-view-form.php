@@ -403,7 +403,7 @@
             }
             else {
                 $('#pwtc-mapdb-view-signup-div .rider-signup-frm input[name="signup_userid"]').val(res.userid);
-                show_errmsg4_success(res.name + ' found, press submit to sign up.');
+                show_errmsg4_success(res.name + ' found, press accept to sign up.');
                 $('#pwtc-mapdb-view-signup-div .rider-signup-frm button[type="submit"]').prop('disabled',false);
             }
         }
