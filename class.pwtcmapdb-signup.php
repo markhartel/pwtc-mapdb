@@ -386,7 +386,7 @@ class PwtcMapdb_Signup {
 		
 		$current_user = wp_get_current_user();
 
-		if (isset($_POST['lock_signup']) or isset($_POST['ride_signup_mode']) or isset($_POST['signup_userid'])) {
+		if (isset($_POST['lock_signup']) or isset($_POST['ride_signup_mode']) or isset($_POST['signup_userid']) or isset($_POST['cancel_userid'])) {
 			if (!isset($_POST['nonce_field']) or !wp_verify_nonce($_POST['nonce_field'], 'signup-view-form')) {
 				wp_nonce_ays('');
 			}
@@ -437,6 +437,20 @@ class PwtcMapdb_Signup {
 							$value = json_encode(array('userid' => $userid, 'mileage' => '', 'attended' => true));
 						}
 						add_post_meta($postid, PwtcMapdb::RIDE_SIGNUP_USERID, $value);	
+					}
+				}
+			}
+			
+			if (isset($_POST['cancel_userid'])) {
+				if ($_POST['cancel_userid'] != '0') {
+					$items = explode(':', $_POST['cancel_userid']);
+					if ($items[0] == 'userid') {
+						$userid = intval($items[1]);
+						self::delete_all_signups($postid, $userid);
+					}
+					else if ($items[0] == 'signupid') {
+						$signupid = intval($items[1]);
+						self::delete_all_nonmember_signups($postid, $signupid);
 					}
 				}
 			}
