@@ -453,6 +453,18 @@
             $('#pwtc-mapdb-view-signup-div button[type="submit"]').prop('disabled',true);
         });
     
+        $("#pwtc-mapdb-view-signup-div .rider-cancel-frm select[name='cancel_userid']").change(function() {
+            $(this).find('option:selected').each(function() {
+                var userid = $(this).val();
+                if (userid == '0') {
+                    $('#pwtc-mapdb-view-signup-div .rider-cancel-frm button[type="submit"]').prop('disabled',true);
+                }
+                else {
+                    $('#pwtc-mapdb-view-signup-div .rider-cancel-frm button[type="submit"]').prop('disabled',false);
+                }
+            });
+        });
+    
         <?php } ?>
     
     <?php } ?>
