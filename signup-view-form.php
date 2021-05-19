@@ -612,7 +612,7 @@
                                 $signup_id = $arr['signup_id'];
                                 $name = $arr['name'];
                             ?>
-                                <option value="signupid:<?php echo $signup_id; ?>"><?php echo $name; ?></option>
+                                <option value="signupid:<?php echo $signup_id; ?>"><?php echo $name; ?> (nonmember)</option>
                             <?php } ?>
                             </select>
                         </div>
