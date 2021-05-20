@@ -507,7 +507,7 @@ class PwtcMapdb_Signup {
 		if ($ride_signup_mode != 'no') {
 			if ($ride_signup_mode == 'paperless') {
 				$paperless = $set_mileage = true;
-				$take_attendance = true;
+				$take_attendance = false;
 				$cutoff_units = '(hours after ride start)';
 			}
 			else {
