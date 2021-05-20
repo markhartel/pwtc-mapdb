@@ -554,7 +554,7 @@
         </li>
     <?php if ($paperless and !$signup_locked) { ?>
         <li class="accordion-item" data-accordion-item>
-            <a href="#" class="accordion-title">Sign-up a Rider...</a>
+            <a href="#" class="accordion-title">Sign-up Rider...</a>
             <div class="accordion-content" data-tab-content>
                 <form class="rider-signup-frm" method="POST" novalidate>
                     <?php wp_nonce_field('signup-view-form', 'nonce_field'); ?>
@@ -585,7 +585,7 @@
             </div>
         </li>
         <li class="accordion-item" data-accordion-item>
-            <a href="#" class="accordion-title">Cancel a Sign-up...</a>
+            <a href="#" class="accordion-title">Cancel Sign-up...</a>
             <div class="accordion-content" data-tab-content>
                 <form class="rider-cancel-frm" method="POST" novalidate>
                     <?php wp_nonce_field('signup-view-form', 'nonce_field'); ?>
