@@ -1086,7 +1086,12 @@ class PwtcMapdb_Ride {
 			$ride_leader = $_GET['leader'];
 		}
 		else {
-			$ride_leader = 'anyone';
+			if ($is_road_captain or !$is_ride_leader) {
+				$ride_leader = 'anyone';
+			}
+			else {
+				$ride_leader = 'me';
+			}
 		}
 
 		if (isset($_GET['offset'])) {
