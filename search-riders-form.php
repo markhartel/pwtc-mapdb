@@ -106,7 +106,7 @@
     </form>
     <?php } ?>
 <?php } else { ?>
-<div class="callout small"><p>No riders found.</p></div>
+<div class="callout small"><p>No riders found, use the <em>Search Riders</em> section to broaden your search.</p></div>
 <?php } ?>
 </div>
 <?php 
