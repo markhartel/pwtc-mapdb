@@ -146,7 +146,7 @@
     </form>
     <?php } ?>
     <?php } else { ?>
-    <div class="callout small"><p>No scheduled rides found.</p></div>
+    <div class="callout small"><p>No scheduled rides found, use the <em>Search Scheduled Rides</em> section to broaden your search.</p></div>
     <?php } ?>
 </div>
 <?php 
