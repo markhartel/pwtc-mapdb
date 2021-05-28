@@ -53,7 +53,6 @@
                             <label>Ride Leader
                                 <select name="ride_leader">
                                     <option value="anyone" <?php echo $ride_leader == 'anyone' ? 'selected': ''; ?>>Anyone</option>
-                                    <option value="me"  <?php echo $ride_leader == 'me' ? 'selected': ''; ?>>Me Only</option>
                                     <?php foreach ( $leaders as $leader ) { ?>
                                     <option value="<?php echo $leader->ID; ?>" <?php echo $ride_leader == $leader->ID ? 'selected': ''; ?>><?php echo $leader->first_name.' '.$leader->last_name; ?></option>
                                     <?php } ?>
