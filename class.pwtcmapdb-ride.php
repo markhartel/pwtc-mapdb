@@ -971,7 +971,7 @@ class PwtcMapdb_Ride {
 				$ride_leader = 'anyone';
 			}
 			else {
-				$ride_leader = 'me';
+				$ride_leader = $current_user->ID;
 			}
 		}
 
@@ -1090,7 +1090,7 @@ class PwtcMapdb_Ride {
 				$ride_leader = 'anyone';
 			}
 			else {
-				$ride_leader = 'me';
+				$ride_leader = $current_user->ID;
 			}
 		}
 
