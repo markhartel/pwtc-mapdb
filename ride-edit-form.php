@@ -933,7 +933,7 @@
                         <a href="#" class="accordion-title">Choose Popular Start Location...</a>
                         <div class="accordion-content" data-tab-content>
                             <div class="row column">
-                                <p class="help-text">Below is a list of popular club ride start locations. Scroll through the list and select your desired start location.</p>
+                                <p class="help-text">Below is a list of <a href="/ride-start-locations" target="_blank" rel="noopener noreferrer">popular club ride start locations.</a> Scroll through the list and select your desired start location.</p>
                                 <div class="start-locations-div" style="border:1px solid; overflow: auto; height: 200px;">
                                     <table></table>
                                 </div>
