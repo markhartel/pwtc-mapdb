@@ -169,7 +169,7 @@
                         '<tr mapid="' + item.ID + '"><td>' + item.title + '</td><td>' + item.distance + '</td><td>' + item.terrain + '</td><td>' + a + '</td></tr>');  
                 });
                 if (res.offset !== undefined) {
-                    $('#pwtc-mapdb-edit-ride-div .map-search-div').append('<a class="dark button fetch" offset="' + res.offset + '" count="' + res.count + '">Fetch next 10 maps</a>');
+                    $('#pwtc-mapdb-edit-ride-div .map-search-div').append('<a class="dark button fetch" offset="' + res.offset + '" count="' + res.count + '">Show Next 10 Maps</a>');
                 }
                 $('#pwtc-mapdb-edit-ride-div .map-search-div tr a').on('click', function(evt) {
                     evt.stopPropagation();
@@ -868,7 +868,7 @@
                         <a href="#" class="accordion-title">Add Ride Map...</a>
                         <div class="accordion-content" data-tab-content>
                             <div class="row column">
-                               <p class="help-text">Find ride route maps by entering a title and pressing search, then choose the desired map from the resulting list. When choosing a map, make certain that the start location on the route map matches the start location of the ride.</p>
+                               <p class="help-text">Find ride route maps by entering a title and pressing search, then choose the desired map from the resulting list. When choosing a map, make certain that the start location on the route map matches the start location of the ride. To inspect the map, press the download or link icon.</p>
                                 <div class="input-group">
                                     <input class="input-group-field" type="text" name="map-pattern" placeholder="Enter map title">
                                     <div class="input-group-button">
@@ -933,7 +933,7 @@
                         <a href="#" class="accordion-title">Choose Popular Start Location...</a>
                         <div class="accordion-content" data-tab-content>
                             <div class="row column">
-                                <p class="help-text">Below is a list of <a href="/ride-start-locations" target="_blank" rel="noopener noreferrer">popular club ride start locations.</a> Scroll through the list and select your desired start location.</p>
+                                <p class="help-text">Below is a list of <a href="/ride-start-locations" target="_blank" rel="noopener noreferrer">popular club ride start locations.</a> Scroll through the list and choose your desired start location. To see the location on a Google Map, press the map marker icon.</p>
                                 <div class="start-locations-div" style="border:1px solid; overflow: auto; height: 200px;">
                                     <table></table>
                                 </div>
