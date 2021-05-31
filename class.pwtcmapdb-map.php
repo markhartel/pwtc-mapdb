@@ -40,34 +40,159 @@ class PwtcMapdb_Map {
 	
 	// Generates the [pwtc_mapdb_edit_map] shortcode.
 	public static function shortcode_edit_map($atts) {
-		if (isset($_POST['upload_file'])) {
-			if (!isset($_FILES['map_file'])) {
-				error_log('ERROR: missing input parameter');
+		$a = shortcode_atts(array('leaders' => 'no', 'use_return' => 'no', 'email' => 'no', 'captain' => PwtcMapdb::ROAD_CAPTAIN_EMAIL), $atts);
+		$allow_leaders = $a['leaders'] == 'yes';
+		$use_return = $a['use_return'] == 'yes';
+		$allow_email = $a['email'] == 'yes';
+		$captain_email = $a['captain'];
+
+		$current_user = wp_get_current_user();
+		if ( 0 == $current_user->ID ) {
+			return '<div class="callout small alert"><p>You must be logged in to submit route maps.</p></div>';
+		}
+		$user_info = get_userdata($current_user->ID);
+		if ($allow_leaders) {
+			$is_road_captain = in_array(PwtcMapdb::ROLE_ROAD_CAPTAIN, $user_info->roles);
+		}
+		else {
+			$is_road_captain = user_can($current_user,'edit_published_rides');
+		}
+		$is_ride_leader = in_array(PwtcMapdb::ROLE_RIDE_LEADER, $user_info->roles);
+
+		$return = '';
+		if (isset($_GET['return'])) {
+			$return = $_GET['return'];
+		}
+
+		//TODO: handle post data here!
+
+		$email_status = 'no';
+		if (isset($_GET['email'])) {
+			$email_status = $_GET['email'];
+		}
+
+		$copy_map = false;
+		if (isset($_GET['action'])) {
+			if ($_GET['action'] == 'copy') {
+				$copy_map = true;
 			}
-			else if ($_FILES['map_file']['size'] == 0) {
-				error_log('ERROR: uploaded file is empty or not selected');
+		}
+
+		if (isset($_GET['post'])) {
+			$error = self::check_post_id();
+			if (!empty($error)) {
+				return $error;
 			}
-			else if ($_FILES['map_file']['error'] != UPLOAD_ERR_OK) {
-				error_log('ERROR: file upload error code ' . $_FILES['map_file']['error']);
+			$postid = intval($_GET['post']);
+		}
+		else {
+			$postid = 0;
+		}
+
+        if ($postid != 0) {
+			$post = get_post($postid);
+            $title = $post->post_title;
+            $author = $post->post_author;
+            $status = $post->post_status;
+		}
+		else {
+            $title = '';
+            $author = $current_user->ID;
+            $status = 'draft';
+		}
+
+		$author_name = '';
+		$author_email = '';
+		if ($author != 0) {
+			$info = get_userdata($author);
+			if ($info) {
+				$author_name = $info->first_name . ' ' . $info->last_name;
+				$author_email = $info->user_email;
 			}
 			else {
-				$filename = $_FILES['map_file']['name'];
-				error_log('Uploaded file name: ' . $filename);
-				$tmpname = $_FILES['map_file']['tmp_name'];
-				error_log('Uploaded tmp file location: ' . $tmpname);
-
-				$upload_dir = wp_upload_dir();
-				$movefile = $upload_dir['path'] . '/' . $filename;
-				error_log('Uploaded file move location: ' . $movefile);
-
-				$status = move_uploaded_file($tmpname, $movefile);
-				if ($status === false) {
-					error_log('ERROR: file move failed');
-				}
+				$author_name = 'Unknown';
+				$author_email = '';
 			}
+		}
 
-			wp_redirect(get_permalink(), 303);
-			exit;
+		$map_title = '';
+		if ($postid != 0) {
+			$map_title = esc_html(get_the_title($postid));
+		}
+
+		$map_link = '';
+		$return_to_map = '';
+		if (!empty($return) and $use_return) {
+			$map_link = esc_url($return);
+			$return_to_map = self::create_return_link($map_link);
+		}
+
+		if (!$allow_leaders and !$is_road_captain) {
+			return $return_to_map . '<div class="callout small warning"><p>You are not allowed to submit route maps.</p></div>';
+		}
+
+		if ($copy_map and !$is_road_captain) {
+            if (!$is_ride_leader) {
+                return $return_to_map . '<div class="callout small warning"><p>You must be a ride leader to copy route maps.</p></div>';
+            }
+		}
+
+		if ($postid == 0 and !$is_road_captain) {
+            if (!$is_ride_leader) {
+                return $return_to_map . '<div class="callout small warning"><p>You must be a ride leader to create new route maps.</p></div>';
+            }
+		}
+
+		if ($postid != 0 and !$copy_map) {
+			$lock_user = self::check_post_lock($postid);
+		    if ($lock_user) {
+				$info = get_userdata($lock_user);
+				$name = $info->first_name . ' ' . $info->last_name;	
+				return $return_to_map . '<div class="callout small warning"><p>Route map "' . $map_title . '" is currently being edited by ' . $name . '. </p></div>';
+			}
+		}
+
+		if ($postid != 0 and !$copy_map and !$is_road_captain) {
+			if (!$is_ride_leader) {
+                return $return_to_map . '<div class="callout small warning"><p>You must be a ride leader to edit route maps.</p></div>';
+			}
+			
+			if ($author != $current_user->ID) {
+                return $return_to_map . '<div class="callout small warning"><p>You must be the author of route map "' . $map_title . '" to edit it.</p></div>';
+			}
+			
+            if ($status == 'publish') {
+                return $return_to_map . '<div class="callout small warning"><p>Route map "' . $map_title . '" is published so you cannot edit it.</p></div>';
+			}
+			else if ($status == 'pending') {
+				ob_start();
+				include('map-pending-form.php');
+				return ob_get_clean();
+            }
+		}
+
+		//TODO: fetch route map field values!
+
+		$operation = '';
+		if (isset($_GET['op'])) {
+			$operation = $_GET['op'];
+		}
+
+		if ($copy_ride) {
+			$postid = 0;
+		}
+
+		if ($postid != 0) {
+			self::set_post_lock($postid);
+		}
+
+		$edit_link = '';
+		$view_link = '';
+		if ($postid != 0) {
+			$edit_link = add_query_arg(array(
+				'post' => $postid
+			), get_permalink());
+			$view_link = get_permalink($postid);
 		}
 
 		ob_start();
@@ -309,5 +434,91 @@ class PwtcMapdb_Map {
 		}
 		wp_reset_postdata();
 		return $results;
+	}
+	
+	public static function check_post_id($ignore_trash = false) {
+		if (!isset($_GET['post'])) {
+			return '<div class="callout small alert"><p>Route map post ID parameter is missing.</p></div>';
+		}
+
+		$postid = intval($_GET['post']);
+		if ($postid == 0) {
+			return '<div class="callout small alert"><p>Route map post ID parameter is invalid, it must be an integer number.</p></div>';
+		}
+
+		$post = get_post($postid);
+		if (!$post) {
+			return '<div class="callout small alert"><p>Route map post ' . $postid . ' does not exist, it may have been deleted.</p></div>';
+		}
+
+
+		if (get_post_type($post) != PwtcMapdb::MAP_POST_TYPE) {
+			return '<div class="callout small alert"><p>Route map post ' . $postid . ' is not a route map.</p></div>';
+		}
+
+		$post_status = get_post_status($post);
+
+		if ($post_status != 'publish' and $post_status != 'draft' and $post_status != 'pending') {
+			if ($post_status == 'trash') {
+				if (!$ignore_trash) {
+					return '<div class="callout small alert"><p>Route map post ' . $postid . ' has been deleted.</p></div>';
+				}
+			}
+			else {
+				return '<div class="callout small alert"><p>Route map post ' . $postid . ' is not draft, pending or published. Its current status is "' . $post_status . '"</p></div>';
+			}
+		}
+	
+		return '';
+	}
+
+	public static function create_return_link($map_url) {
+		return '<ul class="breadcrumbs"><li><a href="' . $map_url . '">Previous Page</a></li><li>' . esc_html(get_the_title()) . '</li></ul>';
+	}
+
+	public static function set_post_lock( $post_id ) {
+		$post = get_post( $post_id );
+		if ( ! $post ) {
+			return false;
+		}
+	 
+		$user_id = get_current_user_id();
+		if ( 0 == $user_id ) {
+			return false;
+		}
+	 
+		$now  = time();
+		$lock = "$now:$user_id";
+	 
+		update_post_meta( $post->ID, '_edit_lock', $lock );
+	 
+		return array( $now, $user_id );
+	}
+
+	public static function check_post_lock( $post_id ) {
+		$post = get_post( $post_id );
+		if ( ! $post ) {
+			return false;
+		}
+	 
+		$lock = get_post_meta( $post->ID, '_edit_lock', true );
+		if ( ! $lock ) {
+			return false;
+		}
+	 
+		$lock = explode( ':', $lock );
+		$time = $lock[0];
+		$user = isset( $lock[1] ) ? $lock[1] : get_post_meta( $post->ID, '_edit_last', true );
+	 
+		if ( ! get_userdata( $user ) ) {
+			return false;
+		}
+	 
+		$time_window = 150;
+		if ( $time && $time > time() - $time_window && get_current_user_id() != $user ) {
+			return $user;
+		}
+	 
+		return false;
 	}
 }
