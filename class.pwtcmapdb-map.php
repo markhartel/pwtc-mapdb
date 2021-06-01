@@ -117,8 +117,131 @@ class PwtcMapdb_Map {
 			$return = $_GET['return'];
 		}
 
-		//TODO: handle post data here!
+		if (isset($_POST['postid']) and isset($_POST['revert'])) {
+			if (!isset($_POST['nonce_field']) or !wp_verify_nonce($_POST['nonce_field'], 'map-edit-form')) {
+				wp_nonce_ays('');
+			}
 
+			$postid = intval($_POST['postid']);
+
+			$post_status = '';
+			if (isset($_POST['post_status'])) {
+				$post_status = $_POST['post_status'];
+			}
+
+			$my_post = array(
+				'ID' => $postid,
+				'post_status' => 'draft'
+			);
+			$status = wp_update_post($my_post);
+			if ($status != $postid) {
+				wp_die('Failed to update this route map.', 403);
+			}
+
+			$email = 'no';
+			if ($allow_email) {
+				if ($post_status == 'pending' and !$is_road_captain) {
+					$email = self::ride_unsubmitted_email($postid, $captain_email) ? 'yes': 'failed';
+				}
+			}
+
+			wp_redirect(add_query_arg(array(
+				'post' => $postid,
+				'return' => urlencode($return),
+				'op' => 'revert_draft',
+				'email' => $email
+			), get_permalink()), 303);
+			exit;
+		}
+		else if (isset($_POST['postid']) and isset($_POST['title']) and $current_user->ID != 0) {
+			if (!isset($_POST['nonce_field']) or !wp_verify_nonce($_POST['nonce_field'], 'map-edit-form')) {
+				wp_nonce_ays('');
+			}
+
+			$operation = '';
+			$new_post = false;
+			$postid = intval($_POST['postid']);
+			$title = trim($_POST['title']);
+			$post_status = '';
+			if (isset($_POST['post_status'])) {
+				$post_status = $_POST['post_status'];
+			}
+
+			if ($postid != 0) {
+				$my_post = array(
+					'ID' => $postid,
+					'post_title' => esc_html($title)
+				);
+				if (isset($_POST['draft'])) {
+					$my_post['post_status'] = 'draft';
+					if ($post_status == 'pending') {
+						$operation = 'rejected';
+					}
+					else if ($post_status == 'publish') {
+						$operation = 'unpublished';
+					}
+					else {
+						$operation = 'update_draft';
+					}
+				}
+				else if (isset($_POST['pending'])) {
+					$my_post['post_status'] = 'pending';
+					if ($post_status == 'draft') {
+						$operation = 'submit_review';
+					}
+					else {
+						$operation = 'update_pending';
+					}
+				}
+				else if (isset($_POST['publish'])) {
+					$my_post['post_status'] = 'publish';
+					if ($post_status == 'draft') {
+						$operation = 'published_draft';
+					}
+					else if ($post_status == 'pending') {
+						$operation = 'published';
+					}
+					else {
+						$operation = 'update_published';
+					}
+				}
+				//error_log(print_r($my_post, true));
+				$status = wp_update_post( $my_post );	
+				if ($status != $postid) {
+					wp_die('Failed to update this route map.', 403);
+				}
+				update_post_meta($postid, '_edit_last', $current_user->ID);
+			}
+			else {
+				$my_post = array(
+					'post_title'    => esc_html($title),
+					'post_type'     => PwtcMapdb::MAP_POST_TYPE,
+                    'post_status'   => 'draft',
+                    'post_author'   => $current_user->ID
+				);
+				$operation = 'insert';
+				$postid = wp_insert_post( $my_post );
+				if ($postid == 0) {
+					wp_die('Failed to create a new route map.', 403);
+				}
+			}
+
+			$email = 'no';
+			if ($allow_email) {
+				if ($operation == 'submit_review' and !$is_road_captain) {
+					$email = self::map_submitted_email($postid, $captain_email) ? 'yes': 'failed';
+				}
+			}
+			
+			wp_redirect(add_query_arg(array(
+				'post' => $postid,
+				'return' => urlencode($return),
+				'op' => $operation,
+				'email' => $email
+			), get_permalink()), 303);
+			exit;			
+		}
+		
 		$email_status = 'no';
 		if (isset($_GET['email'])) {
 			$email_status = $_GET['email'];
@@ -573,5 +696,20 @@ class PwtcMapdb_Map {
 		}
 	 
 		return false;
+	}
+	
+	public static function map_submitted_email($postid, $captain_email) {
+		$map_title = esc_html(get_the_title($postid));
+		$map_url = get_permalink($postid);
+		$map_link = '<a href="' . $map_url . '">' . $map_title . '</a>';
+		$subject = 'Route Map Submitted for Review';
+		$message = <<<EOT
+The following route map has been submitted for road captain review:<br>
+$map_link.<br>
+To review this route map, use a browser to log in to your club account (you must be a road captain) and open the route map by clicking its link. Make any changes that you see fit and publish the route map or reject (return it to draft.)<br>
+Do not reply to this email!<br>
+EOT;
+		$headers = ['Content-type: text/html'];
+		return wp_mail($captain_email, $subject , $message, $headers);
 	}
 }
