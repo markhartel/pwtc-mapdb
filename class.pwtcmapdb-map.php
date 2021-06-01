@@ -2,7 +2,11 @@
 
 class PwtcMapdb_Map {
 
-    private static $initiated = false;
+	const EDIT_MAP_URI = '/edit-map';
+	const SUBMIT_MAP_URI = '/submit-map';
+	const DELETE_MAP_URI = '/delete-map';
+	
+    	private static $initiated = false;
 
 	public static function init() {
 		if ( ! self::$initiated ) {
@@ -12,6 +16,12 @@ class PwtcMapdb_Map {
 
 	private static function init_hooks() {
         self::$initiated = true;
+		
+	// Register action callbacks
+	add_action('wp_enqueue_scripts', array('PwtcMapdb_Map', 'load_javascripts'));
+
+	// Register filter callbacks
+	add_filter('heartbeat_received', array('PwtcMapdb_Map', 'refresh_post_lock'), 10, 3);
 
         // Register shortcode callbacks
         add_shortcode('pwtc_search_mapdb', array('PwtcMapdb_Map', 'shortcode_search_mapdb'));
@@ -21,6 +31,49 @@ class PwtcMapdb_Map {
         add_action('wp_ajax_pwtc_mapdb_lookup_maps', array('PwtcMapdb_Map', 'lookup_maps_callback') );
 
     }
+	
+	/******************* Action Functions ******************/
+
+	public static function load_javascripts() {
+		$link = get_the_permalink();
+		if ($link and (strpos($link, self::DELETE_MAP_URI)!==false or strpos($link, self::EDIT_MAP_URI)!==false or strpos($link, self::SUBMIT_MAP_URI)!==false)) {
+			wp_enqueue_script('heartbeat');
+		}
+	}
+
+	/******************* Filter Functions ******************/
+
+	public static function refresh_post_lock($response, $data, $screen_id) {
+		if ( array_key_exists( 'pwtc-refresh-post-lock', $data ) ) {
+			$received = $data['pwtc-refresh-post-lock'];
+			$send     = array();
+	
+			$post_id = absint( $received['post_id'] );
+			if ( ! $post_id ) {
+				return $response;
+			}
+		
+			$user_id = self::check_post_lock( $post_id );
+			$user    = get_userdata( $user_id );
+			if ( $user ) {
+				$name = $user->first_name . ' ' . $user->last_name;
+				$error = array(
+					'text' => sprintf('%s has taken over and is currently editing.', $name ),
+				);
+				$send['lock_error'] = $error;
+			} 
+			else {
+				$new_lock = self::set_post_lock( $post_id );
+				if ( $new_lock ) {
+					$send['new_lock'] = implode( ':', $new_lock );
+				}
+			}
+	
+			$response['pwtc-refresh-post-lock'] = $send;
+		}	
+
+		return $response;
+	}
 
     /******************* Shortcode Functions ******************/
 
