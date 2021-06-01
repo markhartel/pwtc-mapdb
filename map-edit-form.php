@@ -6,6 +6,76 @@
 </style>
 <script type="text/javascript">
     jQuery(document).ready(function($) { 
+        
+        function show_warning(msg) {
+            $('#pwtc-mapdb-edit-map-div .errmsg').html('<div class="callout small warning"><p>' + msg + '</p></div>');
+        }
+
+        function show_waiting() {
+            $('#pwtc-mapdb-edit-map-div .errmsg').html('<div class="callout small"><i class="fa fa-spinner fa-pulse"></i> please wait...</div>');
+        }
+
+        $('#pwtc-mapdb-edit-map-div form').on('keypress', function(evt) {
+            var keyPressed = evt.keyCode || evt.which; 
+            if (keyPressed === 13) { 
+                evt.preventDefault(); 
+                return false; 
+            } 
+        });	
+
+        $('#pwtc-mapdb-edit-map-div input[name="title"]').on('input', function() {
+            is_dirty = true;
+        });
+
+        $('#pwtc-mapdb-edit-map-div form').on('submit', function(evt) {
+            $('#pwtc-mapdb-edit-map-div input').removeClass('indicate-error');
+
+            if ($('#pwtc-mapdb-edit-map-div input[name="title"]').val().trim().length == 0) {
+                show_warning('The <strong>route map title</strong> cannot be blank.');
+                $('#pwtc-mapdb-edit-map-div input[name="title"]').addClass('indicate-error');
+                evt.preventDefault();
+                return;
+            }
+
+            is_dirty = false;
+            show_waiting();
+            $('#pwtc-mapdb-edit-map-div button[type="submit"]').prop('disabled',true);
+        });
+
+        window.addEventListener('beforeunload', function(e) {
+            if (is_dirty) {
+                e.preventDefault();
+                e.returnValue = 'If you leave this page, any data you have entered will not be saved.';
+            }
+            else {
+                delete e['returnValue'];
+            }
+        });
+
+        var is_dirty = false;
+
+    <?php if ($postid != 0) { ?>
+        $(document).on( 'heartbeat-send', function( e, data ) {
+            var send = {};
+            send.post_id = '<?php echo $postid; ?>';
+            data['pwtc-refresh-post-lock'] = send;
+        });
+
+        $(document).on( 'heartbeat-tick', function( e, data ) {
+            if ( data['pwtc-refresh-post-lock'] ) {
+                var received = data['pwtc-refresh-post-lock'];
+                if ( received.lock_error ) {
+                    show_warning('You can no longer edit this route map. ' + received.lock_error.text);
+                    $('#pwtc-mapdb-edit-map-div button[type="submit"]').prop('disabled',true);
+                } 
+                else if ( received.new_lock ) {
+                }
+            }
+        });
+
+        wp.heartbeat.interval( 15 );
+    <?php } ?>		
+
     });
 </script>
 <div id='pwtc-mapdb-edit-map-div'>
