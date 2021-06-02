@@ -225,6 +225,24 @@ class PwtcMapdb_Map {
 					wp_die('Failed to create a new route map.', 403);
 				}
 			}
+			
+			if (isset($_POST['distance'])) {
+				update_field(PwtcMapdb::LENGTH_FIELD, intval($_POST['distance']), $postid);
+			}
+	
+			if (isset($_POST['max_distance'])) {
+				$d = trim($_POST['max_distance']);
+				if (empty($d)) {
+					update_field(PwtcMapdb::MAX_LENGTH_FIELD, null, $postid);
+				}
+				else {
+					update_field(PwtcMapdb::MAX_LENGTH_FIELD, intval($d), $postid);
+				}
+			}
+	
+			if (isset($_POST['terrain'])) {
+				update_field(PwtcMapdb::TERRAIN_FIELD, $_POST['terrain'], $postid);
+			}
 
 			$email = 'no';
 			if ($allow_email) {
@@ -348,11 +366,21 @@ class PwtcMapdb_Map {
 		}
 
 		//TODO: fetch route map field values!
-		$distance = '';
-		$max_distance = '';
-		$terrain = array();
+
 		$map_type = 'link';
-		$description = '';
+		
+		if ($postid != 0) {
+			$distance = get_field(PwtcMapdb::LENGTH_FIELD, $postid);
+			$max_distance = get_field(PwtcMapdb::MAX_LENGTH_FIELD, $postid);
+			$terrain = get_field(PwtcMapdb::TERRAIN_FIELD, $postid);
+			$description = '';
+		}
+		else {
+			$distance = 0;
+			$max_distance = '';
+			$terrain = [];
+			$description = '';
+		}
 
 		$operation = '';
 		if (isset($_GET['op'])) {
