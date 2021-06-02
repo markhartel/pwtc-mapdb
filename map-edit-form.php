@@ -148,6 +148,35 @@
                     <input type="hidden" name="post_status" value="<?php echo $status; ?>"/>
                 </label>
             </div>
+            <div class="row">
+                <div class="small-12 medium-6 columns">
+                    <label>Distance
+                        <input type="number" name="distance" value="<?php echo $distance; ?>"/>	
+                    </label>
+                </div>
+                <div class="small-12 medium-6 columns">
+                    <label>Max Distance
+                        <input type="number" name="max_distance" value="<?php echo $max_distance; ?>"/>	
+                    </label>
+                </div>
+                <div class="small-12 medium-6 columns">
+                    <fieldset class="terrain-fst">
+                        <legend>Terrain</legend>
+                        <input type="checkbox" name="terrain[]" value="a" id="terrain-a" <?php echo in_array('a', $terrain) ? 'checked': ''; ?>><label for="terrain-a">A</label>
+                        <input type="checkbox" name="terrain[]" value="b" id="terrain-b" <?php echo in_array('b', $terrain) ? 'checked': ''; ?>><label for="terrain-b">B</label>
+                        <input type="checkbox" name="terrain[]" value="c" id="terrain-c" <?php echo in_array('c', $terrain) ? 'checked': ''; ?>><label for="terrain-c">C</label>
+                        <input type="checkbox" name="terrain[]" value="d" id="terrain-d" <?php echo in_array('d', $terrain) ? 'checked': ''; ?>><label for="terrain-d">D</label>
+                        <input type="checkbox" name="terrain[]" value="e" id="terrain-e" <?php echo in_array('e', $terrain) ? 'checked': ''; ?>><label for="terrain-e">E</label>
+                    </fieldset>
+                </div>
+                <div class="small-12 medium-6 columns">
+                    <fieldset>
+                        <legend>Route Map Type</legend>
+                        <input type="radio" name="map_type" value="file" id="type-file" <?php echo $map_type == 'file' ? 'checked': ''; ?>><label for="type-file">Download File</label>
+                        <input type="radio" name="map_type" value="link" id="type-link" <?php echo $map_type == 'link' ? 'checked': ''; ?>><label for="type-link">URL Link</label>
+                    </fieldset>
+                </div>
+            </div>
             <div class="row column errmsg"></div>
             <div class="row column clearfix">
             <?php if ($postid == 0) { ?>
