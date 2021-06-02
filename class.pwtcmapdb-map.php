@@ -352,6 +352,7 @@ class PwtcMapdb_Map {
 		$max_distance = '';
 		$terrain = array();
 		$map_type = 'link';
+		$description = '';
 
 		$operation = '';
 		if (isset($_GET['op'])) {
