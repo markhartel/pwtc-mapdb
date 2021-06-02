@@ -22,19 +22,79 @@
                 return false; 
             } 
         });	
+        
+        $('#pwtc-mapdb-edit-map-div form textarea').on('keypress', function(evt) {
+            is_dirty = true;
+            var keyPressed = evt.keyCode || evt.which; 
+            if (keyPressed === 13) { 
+                evt.stopPropagation(); 
+            } 
+        });		
 
         $('#pwtc-mapdb-edit-map-div input[name="title"]').on('input', function() {
+            is_dirty = true;
+        });
+        
+        $('#pwtc-mapdb-edit-map-div input[name="distance"]').on('input', function() {
+            is_dirty = true;
+        });
+
+        $('#pwtc-mapdb-edit-map-div input[name="max_distance"]').on('input', function() {
+            is_dirty = true;
+        });
+
+        $('#pwtc-mapdb-edit-map-div input[type="checkbox"]').change(function() {
             is_dirty = true;
         });
 
         $('#pwtc-mapdb-edit-map-div form').on('submit', function(evt) {
             $('#pwtc-mapdb-edit-map-div input').removeClass('indicate-error');
+            $('#pwtc-mapdb-edit-map-div textarea').removeClass('indicate-error');
+            $('#pwtc-mapdb-edit-map-div .terrain-fst').removeClass('indicate-error');
 
             if ($('#pwtc-mapdb-edit-map-div input[name="title"]').val().trim().length == 0) {
                 show_warning('The <strong>route map title</strong> cannot be blank.');
                 $('#pwtc-mapdb-edit-map-div input[name="title"]').addClass('indicate-error');
                 evt.preventDefault();
                 return;
+            }
+            
+            var terrain_empty = $('#pwtc-mapdb-edit-map-div input[name="terrain[]"]:checked').length == 0;
+            if (terrain_empty) {
+                show_warning('You must choose at least one <strong>route map terrain</strong>.');
+                $('#pwtc-mapdb-edit-map-div .terrain-fst').addClass('indicate-error');
+                evt.preventDefault();
+                return;						
+            }
+            var dist = $('#pwtc-mapdb-edit-map-div input[name="distance"]').val().trim();
+            if (dist.length == 0) {
+                show_warning('You must enter a <strong>route map distance</strong>.');
+                $('#pwtc-mapdb-edit-map-div input[name="distance"]').addClass('indicate-error');
+                evt.preventDefault();
+                return;							
+            }
+            dist = parseInt(dist, 10);
+            if (dist == NaN || dist < 0) {
+                show_warning('You must enter a <strong>route map distance</strong> that is a non-negative number.');
+                $('#pwtc-mapdb-edit-map-div input[name="distance"]').addClass('indicate-error');
+                evt.preventDefault();
+                return;							
+            }
+            var maxdist = $('#pwtc-mapdb-edit-map-div input[name="max_distance"]').val().trim();
+            if (maxdist.length > 0) {
+                maxdist = parseInt(maxdist, 10);
+                if (maxdist == NaN || maxdist < 0) {
+                    show_warning('You must enter a <strong>route map max distance</strong> that is a non-negative number.');
+                    $('#pwtc-mapdb-edit-map-div input[name="max_distance"]').addClass('indicate-error');
+                    evt.preventDefault();
+                    return;							
+                }
+                if (maxdist <= dist) {
+                    show_warning('The <strong>route map max distance</strong> must be greater than the <strong>ride distance</strong>.');
+                    $('#pwtc-mapdb-edit-map-div input[name="max_distance"]').addClass('indicate-error');
+                    evt.preventDefault();
+                    return;									
+                }					
             }
 
             is_dirty = false;
@@ -150,18 +210,18 @@
             </div>
             <div class="row">
                 <div class="small-12 medium-6 columns">
-                    <label>Distance
+                    <label>Route Map Distance
                         <input type="number" name="distance" value="<?php echo $distance; ?>"/>	
                     </label>
                 </div>
                 <div class="small-12 medium-6 columns">
-                    <label>Max Distance
+                    <label>Route Map Max Distance
                         <input type="number" name="max_distance" value="<?php echo $max_distance; ?>"/>	
                     </label>
                 </div>
                 <div class="small-12 medium-6 columns">
                     <fieldset class="terrain-fst">
-                        <legend>Terrain</legend>
+                        <legend>Route Map Terrain</legend>
                         <input type="checkbox" name="terrain[]" value="a" id="terrain-a" <?php echo in_array('a', $terrain) ? 'checked': ''; ?>><label for="terrain-a">A</label>
                         <input type="checkbox" name="terrain[]" value="b" id="terrain-b" <?php echo in_array('b', $terrain) ? 'checked': ''; ?>><label for="terrain-b">B</label>
                         <input type="checkbox" name="terrain[]" value="c" id="terrain-c" <?php echo in_array('c', $terrain) ? 'checked': ''; ?>><label for="terrain-c">C</label>
@@ -176,6 +236,11 @@
                         <input type="radio" name="map_type" value="link" id="type-link" <?php echo $map_type == 'link' ? 'checked': ''; ?>><label for="type-link">URL Link</label>
                     </fieldset>
                 </div>
+            </div>
+            <div class="row column">
+                <label>Comments
+                    <textarea name="description" rows="5"><?php echo $description; ?></textarea>
+                </label>
             </div>
             <div class="row column errmsg"></div>
             <div class="row column clearfix">
