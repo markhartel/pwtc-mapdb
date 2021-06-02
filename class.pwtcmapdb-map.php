@@ -348,6 +348,10 @@ class PwtcMapdb_Map {
 		}
 
 		//TODO: fetch route map field values!
+		$distance = '';
+		$max_distance = '';
+		$terrain = array();
+		$map_type = 'link';
 
 		$operation = '';
 		if (isset($_GET['op'])) {
