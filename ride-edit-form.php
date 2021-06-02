@@ -829,7 +829,7 @@
                     <fieldset>
                         <legend>Attach Maps</legend>
                         <input type="radio" name="attach_maps" value="0" id="attach-no" <?php echo $attach_maps == false ? 'checked': ''; ?>><label for="attach-no">No</label>
-                        <input type="radio" name="attach_maps" value="1" id="attach-yes" <?php echo $attach_maps == true ? 'checked': ''; ?>><label for="attach-no">Yes</label>
+                        <input type="radio" name="attach_maps" value="1" id="attach-yes" <?php echo $attach_maps == true ? 'checked': ''; ?>><label for="attach-yes">Yes</label>
                     </fieldset>
                 </div>
                 <div class="small-12 medium-6 columns attach-map-no">
