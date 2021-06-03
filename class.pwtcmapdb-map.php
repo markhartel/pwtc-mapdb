@@ -387,7 +387,7 @@ class PwtcMapdb_Map {
 			$distance = 0;
 			$max_distance = '';
 			$terrain = [];
-			$map_type = 'link';
+			$map_type = 'file';
 			$map_link = '';
 			$description = '';
 		}
