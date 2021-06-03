@@ -46,6 +46,18 @@
         $('#pwtc-mapdb-edit-map-div input[type="checkbox"]').change(function() {
             is_dirty = true;
         });
+        
+        $('#pwtc-mapdb-edit-map-div input[name="map_type"]').change(function() {
+            if (this.value == 'file') {
+                $('#pwtc-mapdb-edit-map-div form .map-type-link').hide();
+                $('#pwtc-mapdb-edit-map-div form .map-type-file').show();
+            }
+            else if (this.value == 'link') {
+                $('#pwtc-mapdb-edit-map-div form .map-type-file').hide();
+                $('#pwtc-mapdb-edit-map-div form .map-type-link').show();
+            }
+            is_dirty = true;
+        });
 
         $('#pwtc-mapdb-edit-map-div form').on('submit', function(evt) {
             $('#pwtc-mapdb-edit-map-div input').removeClass('indicate-error');
@@ -101,6 +113,14 @@
             show_waiting();
             $('#pwtc-mapdb-edit-map-div button[type="submit"]').prop('disabled',true);
         });
+        
+        <?php if ($map_type == 'file') { ?>
+            $('#pwtc-mapdb-edit-map-div form .map-type-link').hide();
+            $('#pwtc-mapdb-edit-map-div form .map-type-file').show();
+        <?php } else { ?>
+            $('#pwtc-mapdb-edit-map-div form .map-type-file').hide();
+            $('#pwtc-mapdb-edit-map-div form .map-type-link').show();
+        <?php } ?>
 
         window.addEventListener('beforeunload', function(e) {
             if (is_dirty) {
@@ -236,6 +256,11 @@
                         <input type="radio" name="map_type" value="link" id="type-link" <?php echo $map_type == 'link' ? 'checked': ''; ?>><label for="type-link">URL Link</label>
                     </fieldset>
                 </div>
+            </div>
+            <div class="row column map-type-link">
+                <label>Route Map Link
+                    <input type="url" name="map_link" value="<?php echo $map_link; ?>"/>
+                </label>
             </div>
             <div class="row column">
                 <label>Comments
