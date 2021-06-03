@@ -58,6 +58,19 @@
             }
             is_dirty = true;
         });
+        
+        $('#pwtc-mapdb-edit-map-div input[name="map_file"]').on('change', function(e) {
+            var fileName = '';
+            if (e.target.value) {
+				fileName = e.target.value.split('\\').pop();
+            }
+			if (fileName) {
+				$('#pwtc-mapdb-edit-map-div .map-type-file span').html(fileName);
+            }
+			else {
+				$('#pwtc-mapdb-edit-map-div .map-type-file span').html('No file chosen');
+            }
+        });
 
         $('#pwtc-mapdb-edit-map-div form').on('submit', function(evt) {
             $('#pwtc-mapdb-edit-map-div input').removeClass('indicate-error');
@@ -256,6 +269,11 @@
                         <input type="radio" name="map_type" value="link" id="type-link" <?php echo $map_type == 'link' ? 'checked': ''; ?>><label for="type-link">URL Link</label>
                     </fieldset>
                 </div>
+            </div>
+            <div class="row column map-type-file">
+                <label for="map-file-upload" class="dark button">Choose File for Upload</label>
+                <span>No file chosen</span>
+                <input type="file" id="map-file-upload" class="show-for-sr" multiple="false" name="map_file">
             </div>
             <div class="row column map-type-link">
                 <label>Route Map Link
