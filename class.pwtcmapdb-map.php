@@ -369,8 +369,18 @@ class PwtcMapdb_Map {
 			$distance = get_field(PwtcMapdb::LENGTH_FIELD, $postid);
 			$max_distance = get_field(PwtcMapdb::MAX_LENGTH_FIELD, $postid);
 			$terrain = get_field(PwtcMapdb::TERRAIN_FIELD, $postid);
-			$map_type = 'link';
+			$map_type = '';
 			$map_link = '';
+			while (have_rows(PwtcMapdb::MAP_FIELD, $postid) ): the_row();
+				$map_type = get_sub_field(PwtcMapdb::MAP_TYPE_FIELD);
+				if ($map_type == 'file') {
+					$map_file = get_sub_field(PwtcMapdb::MAP_FILE_FIELD);
+					error_log(print_r($map_file, true));
+				}
+				else if ($map_type == 'link') {
+					$map_link = get_sub_field(PwtcMapdb::MAP_LINK_FIELD);
+				}
+			endwhile;
 			$description = '';
 		}
 		else {
