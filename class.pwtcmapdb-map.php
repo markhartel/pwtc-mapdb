@@ -364,21 +364,21 @@ class PwtcMapdb_Map {
 				return ob_get_clean();
             }
 		}
-
-		//TODO: fetch route map field values!
-
-		$map_type = 'link';
 		
 		if ($postid != 0) {
 			$distance = get_field(PwtcMapdb::LENGTH_FIELD, $postid);
 			$max_distance = get_field(PwtcMapdb::MAX_LENGTH_FIELD, $postid);
 			$terrain = get_field(PwtcMapdb::TERRAIN_FIELD, $postid);
+			$map_type = 'link';
+			$map_link = '';
 			$description = '';
 		}
 		else {
 			$distance = 0;
 			$max_distance = '';
 			$terrain = [];
+			$map_type = 'link';
+			$map_link = '';
 			$description = '';
 		}
 
