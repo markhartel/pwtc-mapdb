@@ -6,6 +6,7 @@ class PwtcMapdb {
 	const START_LOCATION_FIELD = 'start_location';
 	const TERRAIN_FIELD = 'terrain';
 	const LENGTH_FIELD = 'length';
+	const DESCRIPTION_FIELD = 'description';
 	const MAX_LENGTH_FIELD = 'max_length';
 	const MAP_FIELD = 'maps';
 	const MAP_TYPE_FIELD = 'type';
