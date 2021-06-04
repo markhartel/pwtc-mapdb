@@ -371,17 +371,22 @@ class PwtcMapdb_Map {
 			$terrain = get_field(PwtcMapdb::TERRAIN_FIELD, $postid);
 			$map_type = '';
 			$map_link = '';
+			$map_file_id = 0;
+			$map_file_url = '';
+			$map_file_name = '';
 			while (have_rows(PwtcMapdb::MAP_FIELD, $postid) ): the_row();
 				$map_type = get_sub_field(PwtcMapdb::MAP_TYPE_FIELD);
 				if ($map_type == 'file') {
 					$map_file = get_sub_field(PwtcMapdb::MAP_FILE_FIELD);
-					error_log(print_r($map_file, true));
+					//error_log(print_r($map_file, true));
+					$map_file_id = $map_file['id'];
+					$map_file_url = $map_file['url'];
+					$map_file_name = $map_file['filename'];
 				}
 				else if ($map_type == 'link') {
 					$map_link = get_sub_field(PwtcMapdb::MAP_LINK_FIELD);
 				}
 			endwhile;
-			$description = '';
 		}
 		else {
 			$distance = 0;
@@ -389,7 +394,9 @@ class PwtcMapdb_Map {
 			$terrain = [];
 			$map_type = 'file';
 			$map_link = '';
-			$description = '';
+			$map_file_id = 0;
+			$map_file_url = '';
+			$map_file_name = '';
 		}
 
 		$operation = '';
