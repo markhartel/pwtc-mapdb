@@ -59,16 +59,16 @@
             is_dirty = true;
         });
         
-        $('#pwtc-mapdb-edit-map-div input[name="map_file"]').on('change', function(e) {
+        $('#pwtc-mapdb-edit-map-div input[name="map_file_upload"]').on('change', function(e) {
             var fileName = '';
             if (e.target.value) {
-				fileName = e.target.value.split('\\').pop();
+		fileName = e.target.value.split('\\').pop();
             }
-			if (fileName) {
-				$('#pwtc-mapdb-edit-map-div .map-type-file span').html(fileName);
+	    if (fileName) {
+		$('#pwtc-mapdb-edit-map-div .map-type-file span').html(fileName);
             }
-			else {
-				$('#pwtc-mapdb-edit-map-div .map-type-file span').html('No file chosen');
+	    else {
+		$('#pwtc-mapdb-edit-map-div .map-type-file span').html('No file chosen');
             }
         });
 
@@ -270,19 +270,22 @@
                     </fieldset>
                 </div>
             </div>
+	    <div class="row column map-type-file">
+                <label>Route Map File
+                    <input type="hidden" name="map_file_id" value="<?php echo $map_file_id; ?>"/>  	
+                </label>
+            </div>
+            <div class="row column map-type-file">
+                <div style="min-height:40px; border:1px solid;"><?php echo $map_file_name; ?></div>
+            </div>
             <div class="row column map-type-file">
                 <label for="map-file-upload" class="dark button">Choose File for Upload</label>
                 <span>No file chosen</span>
-                <input type="file" id="map-file-upload" class="show-for-sr" multiple="false" name="map_file">
+                <input type="file" id="map-file-upload" class="show-for-sr" multiple="false" name="map_file_upload">
             </div>
             <div class="row column map-type-link">
                 <label>Route Map Link
                     <input type="url" name="map_link" value="<?php echo $map_link; ?>"/>
-                </label>
-            </div>
-            <div class="row column">
-                <label>Comments
-                    <textarea name="description" rows="5"><?php echo $description; ?></textarea>
                 </label>
             </div>
             <div class="row column errmsg"></div>
