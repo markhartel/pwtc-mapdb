@@ -50,10 +50,14 @@
         $('#pwtc-mapdb-edit-map-div input[name="map_type"]').change(function() {
             if (this.value == 'file') {
                 $('#pwtc-mapdb-edit-map-div form .map-type-link').hide();
+		$('#pwtc-mapdb-edit-map-div form .map-type-link input').prop('disabled',true);
+                $('#pwtc-mapdb-edit-map-div form .map-type-file input').prop('disabled',false);
                 $('#pwtc-mapdb-edit-map-div form .map-type-file').show();
             }
             else if (this.value == 'link') {
                 $('#pwtc-mapdb-edit-map-div form .map-type-file').hide();
+                $('#pwtc-mapdb-edit-map-div form .map-type-file input').prop('disabled',true);
+                $('#pwtc-mapdb-edit-map-div form .map-type-link input').prop('disabled',false);
                 $('#pwtc-mapdb-edit-map-div form .map-type-link').show();
             }
             is_dirty = true;
@@ -129,9 +133,13 @@
         
         <?php if ($map_type == 'file') { ?>
             $('#pwtc-mapdb-edit-map-div form .map-type-link').hide();
+            $('#pwtc-mapdb-edit-map-div form .map-type-link input').prop('disabled',true);
+            $('#pwtc-mapdb-edit-map-div form .map-type-file input').prop('disabled',false);
             $('#pwtc-mapdb-edit-map-div form .map-type-file').show();
         <?php } else { ?>
             $('#pwtc-mapdb-edit-map-div form .map-type-file').hide();
+            $('#pwtc-mapdb-edit-map-div form .map-type-file input').prop('disabled',true);
+            $('#pwtc-mapdb-edit-map-div form .map-type-link input').prop('disabled',false);
             $('#pwtc-mapdb-edit-map-div form .map-type-link').show();
         <?php } ?>
 
