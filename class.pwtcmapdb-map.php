@@ -243,6 +243,44 @@ class PwtcMapdb_Map {
 			if (isset($_POST['terrain'])) {
 				update_field(PwtcMapdb::TERRAIN_FIELD, $_POST['terrain'], $postid);
 			}
+			
+			if (isset($_POST['map_type'])) {
+				$map_type = $_POST['map_type'];
+
+				if (isset($_POST['map_file_id']) and isset($_FILES['map_file_upload']) and $_FILES['map_file_upload']['size'] > 0) {
+					if ($_FILES['map_file_upload']['error'] != UPLOAD_ERR_OK) {
+						wp_die('Route map file upload failed.', 403);
+					}
+					$filetype = wp_check_filetype($_FILES['map_file_upload']['name'], null);
+					$filename = preg_replace('TBD', '', $title) . '.' . $filetype['ext'];
+					$tmpname = $_FILES['map_file_upload']['tmp_name'];
+					$upload_dir = wp_upload_dir();
+					$movefile = $upload_dir['path'] . '/' . $filename;
+					//TODO: remove file if it already exist!
+					$status = move_uploaded_file($tmpname, $movefile);
+					if ($status === false) {
+						wp_die('Could not move uploaded route map file.', 403);
+					}			 
+					$map_file_id = intval($_POST['map_file_id']);
+					if ($map_file_id == 0) {
+						$attachment = array(
+							'guid'           => $upload_dir['url'] . '/' . basename($filename), 
+							'post_mime_type' => $filetype['type'],
+							'post_title'     => esc_html($title),
+							'post_content'   => '',
+							'post_status'    => 'inherit'
+						);
+						$map_file_id = wp_insert_attachment($attachment, $movefile, $postid);
+					}
+					else {
+						//TODO: modify existing attachment post!
+					}
+				}
+
+				if (isset($_POST['map_link'])) {
+					$map_link = $_POST['map_link'];
+				}
+			}
 
 			$email = 'no';
 			if ($allow_email) {
