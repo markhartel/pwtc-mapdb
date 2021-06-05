@@ -240,7 +240,7 @@
         </p>
     </div>
     <div class="callout">
-        <form method="POST" novalidate>
+        <form method="POST" enctype="multipart/form-data" novalidate>
             <?php wp_nonce_field('map-edit-form', 'nonce_field'); ?>
             <div class="row column">
                 <label>Route Map Title
