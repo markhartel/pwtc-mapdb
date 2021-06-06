@@ -74,6 +74,7 @@
 	    else {
 		$('#pwtc-mapdb-edit-map-div .map-type-file span').html('No file chosen');
             }
+	    is_dirty = true;
         });
 
         $('#pwtc-mapdb-edit-map-div form').on('submit', function(evt) {
@@ -124,6 +125,45 @@
                     evt.preventDefault();
                     return;									
                 }					
+            }
+	    if ($('#pwtc-mapdb-edit-map-div input[name="map_type"]:checked').val() == 'link') {
+                var url = $('#pwtc-mapdb-edit-map-div input[name="map_link"]').val().trim();
+                if (url.length == 0) {
+                    show_warning('The <strong>route map link</strong> must be set.');
+                    $('#pwtc-mapdb-edit-map-div input[name="map_link"]').addClass('indicate-error');
+                    evt.preventDefault();
+                    return;
+                }
+                var elem = $('#pwtc-mapdb-edit-map-div input[name="map_link"]')[0];
+                if (elem.validity) {
+                    if (!elem.validity.valid) {
+                        show_warning('The <strong>route map link</strong> has an invalid format.');
+                        $('#pwtc-mapdb-edit-map-div input[name="map_link"]').addClass('indicate-error');
+                        evt.preventDefault();
+                        return;                     
+                    }
+                }
+            }
+            else {
+                var attach_id = $('#pwtc-mapdb-edit-map-div input[name="map_file_id"]').val().trim();
+                var file = $('#pwtc-mapdb-edit-map-div input[name="map_file_upload"]').val().trim();
+                if (file.length == 0 && attach_id == '0') {
+                    show_warning('The <strong>route map file</strong> must be set.');
+                    //$('#pwtc-mapdb-edit-map-div input[name="map_link"]').addClass('indicate-error');
+                    evt.preventDefault();
+                    return;
+                }
+                if (file.length > 0) {
+                    var elem = $('#pwtc-mapdb-edit-map-div input[name="map_file_upload"]')[0];
+                    if (elem.validity) {
+                        if (!elem.validity.valid) {
+                            show_warning('The <strong>route map file</strong> has an invalid format.');
+                            //$('#pwtc-mapdb-edit-map-div input[name="map_link"]').addClass('indicate-error');
+                            evt.preventDefault();
+                            return;                     
+                        }
+                    }
+                }
             }
 
             is_dirty = false;
