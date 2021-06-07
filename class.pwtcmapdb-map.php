@@ -252,11 +252,10 @@ class PwtcMapdb_Map {
 						wp_die('Route map file upload failed.', 403);
 					}
 					$filetype = wp_check_filetype($_FILES['map_file_upload']['name'], null);
-					$filename = preg_replace('TBD', '', $title) . '.' . $filetype['ext'];
+					$filename = sanitize_title_with_dashes($title) . '.' . $filetype['ext'];
 					$tmpname = $_FILES['map_file_upload']['tmp_name'];
 					$upload_dir = wp_upload_dir();
 					$movefile = $upload_dir['path'] . '/' . $filename;
-					//TODO: remove file if it already exist!
 					$status = move_uploaded_file($tmpname, $movefile);
 					if ($status === false) {
 						wp_die('Could not move uploaded route map file.', 403);
@@ -264,21 +263,43 @@ class PwtcMapdb_Map {
 					$map_file_id = intval($_POST['map_file_id']);
 					if ($map_file_id == 0) {
 						$attachment = array(
-							'guid'           => $upload_dir['url'] . '/' . basename($filename), 
+							'guid'           => $upload_dir['url'] . '/' . $filename, 
 							'post_mime_type' => $filetype['type'],
 							'post_title'     => esc_html($title),
 							'post_content'   => '',
 							'post_status'    => 'inherit'
 						);
 						$map_file_id = wp_insert_attachment($attachment, $movefile, $postid);
+						if ($map_file_id == 0) {
+							wp_die('Could not create new attachment for uploaded route map file.', 403);
+						}
 					}
 					else {
-						//TODO: modify existing attachment post!
+						$attachment = array(
+							'ID'			 => $map_file_id,
+							'guid'           => $upload_dir['url'] . '/' . $filename, 
+							'post_mime_type' => $filetype['type'],
+							'post_title'     => esc_html($title)
+						);
+						$map_file_id = wp_insert_attachment($attachment, $movefile, $postid);
+						if ($map_file_id == 0) {
+							wp_die('Could not update attachment for uploaded route map file.', 403);
+						}
 					}
+					$row = array(
+						PwtcMapdb::MAP_TYPE_FIELD => $map_type,
+						PwtcMapdb::MAP_FILE_FIELD => $map_file_id
+					);
+					update_row(PwtcMapdb::MAP_FIELD, 1, $row, $postid);
 				}
 
 				if (isset($_POST['map_link'])) {
-					$map_link = $_POST['map_link'];
+					$map_link = trim($_POST['map_link']);
+					$row = array(
+						PwtcMapdb::MAP_TYPE_FIELD => $map_type,
+						PwtcMapdb::MAP_LINK_FIELD => $map_link
+					);
+					update_row(PwtcMapdb::MAP_FIELD, 1, $row, $postid);
 				}
 			}
 
