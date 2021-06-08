@@ -216,10 +216,11 @@ class PwtcMapdb_Map {
 				$my_post = array(
 					'post_title'    => esc_html($title),
 					'post_type'     => PwtcMapdb::MAP_POST_TYPE,
-                    'post_status'   => 'draft',
-                    'post_author'   => $current_user->ID
+                    			'post_status'   => 'draft',
+                    			'post_author'   => $current_user->ID
 				);
 				$operation = 'insert';
+				$new_post = true;
 				$postid = wp_insert_post( $my_post );
 				if ($postid == 0) {
 					wp_die('Failed to create a new route map.', 403);
@@ -227,21 +228,41 @@ class PwtcMapdb_Map {
 			}
 			
 			if (isset($_POST['distance'])) {
-				update_field(PwtcMapdb::LENGTH_FIELD, intval($_POST['distance']), $postid);
+				if ($new_post) {
+					update_field(PwtcMapdb::LENGTH_FIELD_KEY, intval($_POST['distance']), $postid);
+				}
+				else {
+					update_field(PwtcMapdb::LENGTH_FIELD, intval($_POST['distance']), $postid);
+				}
 			}
 	
 			if (isset($_POST['max_distance'])) {
 				$d = trim($_POST['max_distance']);
 				if (empty($d)) {
-					update_field(PwtcMapdb::MAX_LENGTH_FIELD, null, $postid);
+					if ($new_post) {
+						update_field(PwtcMapdb::MAX_LENGTH_FIELD_KEY, null, $postid);
+					}
+					else {
+						update_field(PwtcMapdb::MAX_LENGTH_FIELD, null, $postid);
+					}
 				}
 				else {
-					update_field(PwtcMapdb::MAX_LENGTH_FIELD, intval($d), $postid);
+					if ($new_post) {
+						update_field(PwtcMapdb::MAX_LENGTH_FIELD_KEY, intval($d), $postid);
+					}
+					else {
+						update_field(PwtcMapdb::MAX_LENGTH_FIELD, intval($d), $postid);
+					}
 				}
 			}
 	
 			if (isset($_POST['terrain'])) {
-				update_field(PwtcMapdb::TERRAIN_FIELD, $_POST['terrain'], $postid);
+				if ($new_post) {
+					update_field(PwtcMapdb::TERRAIN_FIELD_KEY, $_POST['terrain'], $postid);
+				}
+				else {
+					update_field(PwtcMapdb::TERRAIN_FIELD, $_POST['terrain'], $postid);
+				}
 			}
 			
 			if (isset($_POST['map_type'])) {
@@ -286,20 +307,38 @@ class PwtcMapdb_Map {
 							wp_die('Could not update attachment for uploaded route map file.', 403);
 						}
 					}
-					$row = array(
-						PwtcMapdb::MAP_TYPE_FIELD => $map_type,
-						PwtcMapdb::MAP_FILE_FIELD => $map_file_id
-					);
-					update_row(PwtcMapdb::MAP_FIELD, 1, $row, $postid);
+					if ($new_post) {
+						$row = array(
+							PwtcMapdb::MAP_TYPE_FIELD_KEY => $map_type,
+							PwtcMapdb::MAP_FILE_FIELD_KEY => $map_file_id
+						);
+						add_row(PwtcMapdb::MAP_FIELD_KEY, $row, $postid);						
+					}
+					else {
+						$row = array(
+							PwtcMapdb::MAP_TYPE_FIELD => $map_type,
+							PwtcMapdb::MAP_FILE_FIELD => $map_file_id
+						);
+						update_row(PwtcMapdb::MAP_FIELD, 1, $row, $postid);
+					}
 				}
 
 				if (isset($_POST['map_link'])) {
 					$map_link = trim($_POST['map_link']);
-					$row = array(
-						PwtcMapdb::MAP_TYPE_FIELD => $map_type,
-						PwtcMapdb::MAP_LINK_FIELD => $map_link
-					);
-					update_row(PwtcMapdb::MAP_FIELD, 1, $row, $postid);
+					if ($new_post) {
+						$row = array(
+							PwtcMapdb::MAP_TYPE_FIELD_KEY => $map_type,
+							PwtcMapdb::MAP_LINK_FIELD_KEY => $map_link
+						);
+						add_row(PwtcMapdb::MAP_FIELD_KEY, $row, $postid);						
+					}
+					else {
+						$row = array(
+							PwtcMapdb::MAP_TYPE_FIELD => $map_type,
+							PwtcMapdb::MAP_LINK_FIELD => $map_link
+						);
+						update_row(PwtcMapdb::MAP_FIELD, 1, $row, $postid);
+					}
 				}
 			}
 
