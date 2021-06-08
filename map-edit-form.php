@@ -329,7 +329,7 @@
             <div class="row column map-type-file">
                 <label for="map-file-upload" class="dark button">Choose File for Upload</label>
                 <span>No file chosen</span>
-                <input type="file" id="map-file-upload" class="show-for-sr" name="map_file_upload">
+                <input type="file" id="map-file-upload" class="show-for-sr" accept="image/*,.pdf" name="map_file_upload">
             </div>
             <div class="row column map-type-link">
                 <label>Route Map Link
