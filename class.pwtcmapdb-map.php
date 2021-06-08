@@ -159,7 +159,7 @@ class PwtcMapdb_Map {
 			}
 
 			$operation = '';
-			$new_post = false;
+			$new_post = true;
 			$postid = intval($_POST['postid']);
 			$title = trim($_POST['title']);
 			$post_status = '';
@@ -220,7 +220,6 @@ class PwtcMapdb_Map {
                     			'post_author'   => $current_user->ID
 				);
 				$operation = 'insert';
-				$new_post = true;
 				$postid = wp_insert_post( $my_post );
 				if ($postid == 0) {
 					wp_die('Failed to create a new route map.', 403);
@@ -312,14 +311,23 @@ class PwtcMapdb_Map {
 							PwtcMapdb::MAP_TYPE_FIELD_KEY => $map_type,
 							PwtcMapdb::MAP_FILE_FIELD_KEY => $map_file_id
 						);
-						add_row(PwtcMapdb::MAP_FIELD_KEY, $row, $postid);						
-					}
+						if (have_rows(PwtcMapdb::MAP_FIELD_KEY, $postid)) {
+							update_row(PwtcMapdb::MAP_FIELD_KEY, 1, $row, $postid);
+						}
+						else {
+							add_row(PwtcMapdb::MAP_FIELD_KEY, $row, $postid);
+						}						}
 					else {
 						$row = array(
 							PwtcMapdb::MAP_TYPE_FIELD => $map_type,
 							PwtcMapdb::MAP_FILE_FIELD => $map_file_id
 						);
-						update_row(PwtcMapdb::MAP_FIELD, 1, $row, $postid);
+						if (have_rows(PwtcMapdb::MAP_FIELD, $postid)) {
+							update_row(PwtcMapdb::MAP_FIELD, 1, $row, $postid);
+						}
+						else {
+							add_row(PwtcMapdb::MAP_FIELD, $row, $postid);
+						}
 					}
 				}
 
@@ -330,14 +338,24 @@ class PwtcMapdb_Map {
 							PwtcMapdb::MAP_TYPE_FIELD_KEY => $map_type,
 							PwtcMapdb::MAP_LINK_FIELD_KEY => $map_link
 						);
-						add_row(PwtcMapdb::MAP_FIELD_KEY, $row, $postid);						
+						if (have_rows(PwtcMapdb::MAP_FIELD_KEY, $postid)) {
+							update_row(PwtcMapdb::MAP_FIELD_KEY, 1, $row, $postid);
+						}
+						else {
+							add_row(PwtcMapdb::MAP_FIELD_KEY, $row, $postid);
+						}						
 					}
 					else {
 						$row = array(
 							PwtcMapdb::MAP_TYPE_FIELD => $map_type,
 							PwtcMapdb::MAP_LINK_FIELD => $map_link
 						);
-						update_row(PwtcMapdb::MAP_FIELD, 1, $row, $postid);
+						if (have_rows(PwtcMapdb::MAP_FIELD, $postid)) {
+							update_row(PwtcMapdb::MAP_FIELD, 1, $row, $postid);
+						}
+						else {
+							add_row(PwtcMapdb::MAP_FIELD, $row, $postid);
+						}
 					}
 				}
 			}
