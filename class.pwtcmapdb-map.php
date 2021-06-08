@@ -467,7 +467,7 @@ class PwtcMapdb_Map {
 			$distance = get_field(PwtcMapdb::LENGTH_FIELD, $postid);
 			$max_distance = get_field(PwtcMapdb::MAX_LENGTH_FIELD, $postid);
 			$terrain = get_field(PwtcMapdb::TERRAIN_FIELD, $postid);
-			$map_type = '';
+			$map_type = 'file';
 			$map_link = '';
 			$map_file_id = 0;
 			$map_file_url = '';
