@@ -4,13 +4,21 @@ class PwtcMapdb {
 
 	const MAP_POST_TYPE = 'ride_maps';
 	const START_LOCATION_FIELD = 'start_location';
+	const TERRAIN_FIELD_KEY = 'field_57bb6243726b8';
 	const TERRAIN_FIELD = 'terrain';
+	const LENGTH_FIELD_KEY = 'field_57bb613bff50c';
 	const LENGTH_FIELD = 'length';
+	const DESCRIPTION_FIELD_KEY = 'field_58050980e4d2e';
 	const DESCRIPTION_FIELD = 'description';
+	const MAX_LENGTH_FIELD_KEY = 'field_57bb61c9ff50d';
 	const MAX_LENGTH_FIELD = 'max_length';
+	const MAP_FIELD_KEY = 'field_57bb66366797b';
 	const MAP_FIELD = 'maps';
+	const MAP_TYPE_FIELD_KEY = 'field_57bb665f6797c';
 	const MAP_TYPE_FIELD = 'type';
+	const MAP_LINK_FIELD_KEY = 'field_57bb667e6797d';
 	const MAP_LINK_FIELD = 'link';
+	const MAP_FILE_FIELD_KEY = 'field_57bb668c6797e';
 	const MAP_FILE_FIELD = 'file';
 	const MAP_TYPE_QUERY = 'maps_0_type';
 	const COPY_ANCHOR_LABEL = '<i class="fa fa-clipboard"></i>';
