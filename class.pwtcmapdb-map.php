@@ -272,7 +272,7 @@ class PwtcMapdb_Map {
 					if ($_FILES['map_file_upload']['error'] != UPLOAD_ERR_OK) {
 						wp_die('Route map file upload failed.', 403);
 					}
-					$filetype = wp_check_filetype($_FILES['map_file_upload']['name'], null);
+					$filetype = wp_check_filetype($_FILES['map_file_upload']['name']);
 					$filename = sanitize_title_with_dashes($title) . '.' . $filetype['ext'];
 					$tmpname = $_FILES['map_file_upload']['tmp_name'];
 					$upload_dir = wp_upload_dir();
