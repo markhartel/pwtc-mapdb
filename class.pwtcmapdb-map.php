@@ -272,39 +272,31 @@ class PwtcMapdb_Map {
 						wp_die('Route map file upload failed.', 403);
 					}
 					$filetype = wp_check_filetype($_FILES['map_file_upload']['name']);
-					$filename = sanitize_title_with_dashes($title) . '.' . $filetype['ext'];
 					$tmpname = $_FILES['map_file_upload']['tmp_name'];
+					$map_file_id = intval($_POST['map_file_id']);
+					if ($map_file_id > 0) {
+						$status = wp_delete_attachment($map_file_id, true);
+						if ($status === false) {
+							wp_die('Could not delete old route map file attachment.', 403);
+						}	
+					}
+					$filename = sanitize_file_name($_FILES['map_file_upload']['name']);
 					$upload_dir = wp_upload_dir();
 					$movefile = $upload_dir['path'] . '/' . $filename;
 					$status = move_uploaded_file($tmpname, $movefile);
 					if ($status === false) {
 						wp_die('Could not move uploaded route map file.', 403);
-					}			 
-					$map_file_id = intval($_POST['map_file_id']);
+					}	
+					$attachment = array(
+						'guid'           => $upload_dir['url'] . '/' . $filename, 
+						'post_mime_type' => $filetype['type'],
+						'post_title'     => esc_html($title),
+						'post_content'   => '',
+						'post_status'    => 'inherit'
+					);
+					$map_file_id = wp_insert_attachment($attachment, $movefile, $postid);
 					if ($map_file_id == 0) {
-						$attachment = array(
-							'guid'           => $upload_dir['url'] . '/' . $filename, 
-							'post_mime_type' => $filetype['type'],
-							'post_title'     => esc_html($title),
-							'post_content'   => '',
-							'post_status'    => 'inherit'
-						);
-						$map_file_id = wp_insert_attachment($attachment, $movefile, $postid);
-						if ($map_file_id == 0) {
-							wp_die('Could not create new attachment for uploaded route map file.', 403);
-						}
-					}
-					else {
-						$attachment = array(
-							'ID'			 => $map_file_id,
-							'guid'           => $upload_dir['url'] . '/' . $filename, 
-							'post_mime_type' => $filetype['type'],
-							'post_title'     => esc_html($title)
-						);
-						$map_file_id = wp_insert_attachment($attachment, $movefile, $postid);
-						if ($map_file_id == 0) {
-							wp_die('Could not update attachment for uploaded route map file.', 403);
-						}
+						wp_die('Could not create new attachment for uploaded route map file.', 403);
 					}
 					if ($new_post) {
 						$row = array(
