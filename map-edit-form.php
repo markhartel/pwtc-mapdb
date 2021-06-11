@@ -324,8 +324,12 @@
                 </label>
             </div>
             <div class="row column map-type-file">
-                <div style="min-height:40px; border:1px solid;"><?php echo $map_file_name; ?></div>
-            </div>
+                <div style="min-height:40px; border:1px solid;">
+            <?php if (!empty($map_file_url)) { ?>
+                    <a href="<?php echo $map_file_url; ?>" target="_blank" download><?php echo $map_file_name; ?></a>
+            <?php } ?>
+                </div>
+	    </div>
             <div class="row column map-type-file">
                 <label for="map-file-upload" class="dark button">Choose File for Upload</label>
                 <span>No file chosen</span>
