@@ -26,6 +26,7 @@ class PwtcMapdb_Map {
         // Register shortcode callbacks
         add_shortcode('pwtc_search_mapdb', array('PwtcMapdb_Map', 'shortcode_search_mapdb'));
 	add_shortcode('pwtc_mapdb_edit_map', array('PwtcMapdb_Map', 'shortcode_edit_map'));
+	add_shortcode('pwtc_mapdb_delete_map', array( 'PwtcMapdb_Map', 'shortcode_delete_map'));
 
         // Register ajax callbacks
         add_action('wp_ajax_pwtc_mapdb_lookup_maps', array('PwtcMapdb_Map', 'lookup_maps_callback') );
@@ -529,6 +530,114 @@ class PwtcMapdb_Map {
 		ob_start();
         	include('map-edit-form.php');
         	return ob_get_clean();
+	}
+	
+	// Generates the [pwtc_mapdb_delete_map] shortcode.
+	public static function shortcode_delete_map($atts) {
+		$a = shortcode_atts(array('leaders' => 'no', 'use_return' => 'no'), $atts);
+		$allow_leaders = $a['leaders'] == 'yes';
+		$use_return = $a['use_return'] == 'yes';
+
+		$current_user = wp_get_current_user();
+		if ( 0 == $current_user->ID ) {
+			return '<div class="callout small alert"><p>You must be logged in to delete route maps.</p></div>';
+		}
+		$user_info = get_userdata($current_user->ID);
+		if ($allow_leaders) {
+			$is_road_captain = in_array(PwtcMapdb::ROLE_ROAD_CAPTAIN, $user_info->roles);
+		}
+		else {
+			$is_road_captain = user_can($current_user,'edit_published_rides');
+		}
+		$is_ride_leader = in_array(PwtcMapdb::ROLE_RIDE_LEADER, $user_info->roles);
+
+		$return = '';
+		if (isset($_GET['return'])) {
+			$return = $_GET['return'];
+		}
+
+		if (isset($_POST['postid'])) {
+			if (!isset($_POST['nonce_field']) or !wp_verify_nonce($_POST['nonce_field'], 'map-delete-form')) {
+				wp_nonce_ays('');
+			}
+
+			$postid = intval($_POST['postid']);
+			if (isset($_POST['delete_map'])) {
+				if (wp_trash_post($postid)) {
+					wp_redirect(add_query_arg(array(
+						'post' => $postid,
+						'return' => urlencode($return)
+					), get_permalink()), 303);
+				}
+				else {
+					wp_die('Failed to delete this route map.', 403);
+				}
+			}
+			else if (isset($_POST['undo_delete'])) {
+				if (wp_untrash_post($postid)) {
+					wp_redirect(add_query_arg(array(
+						'post' => $postid,
+						'return' => urlencode($return)
+					), get_permalink()), 303);
+				}
+				else {
+					wp_die('Failed to undo the delete of this route map.', 403);
+				}
+			}
+			exit;
+		}
+
+		$error = self::check_post_id(true);
+		if (!empty($error)) {
+			return $error;
+		}
+		$postid = intval($_GET['post']);
+
+		$map_link = '';
+		$return_to_map = '';
+		if (!empty($return) and $use_return) {
+			$map_link = esc_url($return);
+			$return_to_map = self::create_return_link($map_link);
+		}
+
+		$map_title = esc_html(get_the_title($postid));
+
+		$post = get_post($postid);
+		$author = $post->post_author;
+		$status = $post->post_status;
+
+		if (!$allow_leaders and !$is_road_captain) {
+			return $return_to_map . '<div class="callout small warning"><p>You are not allowed to delete route maps.</p></div>';
+		}
+
+		if ($status == 'publish') {
+			return $return_to_map . '<div class="callout small warning"><p>Route map "' . $map_title . '" is published so you cannot delete it.</p></div>';
+		}
+		else if ($status == 'pending') {
+			return $return_to_map . '<div class="callout small warning"><p>Route map "' . $map_title . '" is pending review so you cannot delete it.</p></div>';
+		}
+
+		if ($author != $current_user->ID and !$is_road_captain) {
+			return $return_to_map . '<div class="callout small warning"><p>You must be the author of route map "' . $map_title . '" to delete it.</p></div>';
+		}
+
+		$deleted = false;
+		if ($status != 'trash') {
+			$lock_user = self::check_post_lock($postid);
+			if ($lock_user) {
+				$info = get_userdata($lock_user);
+				$name = $info->first_name . ' ' . $info->last_name;	
+				return $return_to_map . '<div class="callout small warning"><p>Route map "' . $map_title . '" is currently being edited by ' . $name . '.</p></div>';
+			}
+			self::set_post_lock($postid);
+		}
+		else {
+			$deleted = true;
+		}
+
+		ob_start();
+		include('map-delete-form.php');
+		return ob_get_clean();
 	}
     
     /******* AJAX request/response callback functions *******/
