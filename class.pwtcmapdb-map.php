@@ -25,6 +25,7 @@ class PwtcMapdb_Map {
 
         // Register shortcode callbacks
         add_shortcode('pwtc_search_mapdb', array('PwtcMapdb_Map', 'shortcode_search_mapdb'));
+	add_shortcode('pwtc_mapdb_map_breadcrumb', array('PwtcMapdb_Map', 'shortcode_map_breadcrumb'));
 	add_shortcode('pwtc_mapdb_edit_map', array('PwtcMapdb_Map', 'shortcode_edit_map'));
 	add_shortcode('pwtc_mapdb_delete_map', array( 'PwtcMapdb_Map', 'shortcode_delete_map'));
 	add_shortcode('pwtc_mapdb_manage_maps', array('PwtcMapdb_Map', 'shortcode_manage_maps'));
@@ -92,6 +93,26 @@ class PwtcMapdb_Map {
             return ob_get_clean();
 		}
     }
+	
+	// Generates the [pwtc_mapdb_map_breadcrumb] shortcode.
+	public static function shortcode_map_breadcrumb($atts) {
+		$a = shortcode_atts(array('leaders' => 'no'), $atts);
+		$allow_leaders = $a['leaders'] == 'yes';
+
+		$return = '';
+		if (isset($_GET['return'])) {
+			$return = $_GET['return'];
+		}
+
+		if (empty($return)) {
+			return '';
+		}
+
+		ob_start();
+		include('map-nav-breadcrumb.php');
+		return ob_get_clean();
+	}
+
 	
 	// Generates the [pwtc_mapdb_edit_map] shortcode.
 	public static function shortcode_edit_map($atts) {
