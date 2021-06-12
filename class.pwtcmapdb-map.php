@@ -27,6 +27,7 @@ class PwtcMapdb_Map {
         add_shortcode('pwtc_search_mapdb', array('PwtcMapdb_Map', 'shortcode_search_mapdb'));
 	add_shortcode('pwtc_mapdb_edit_map', array('PwtcMapdb_Map', 'shortcode_edit_map'));
 	add_shortcode('pwtc_mapdb_delete_map', array( 'PwtcMapdb_Map', 'shortcode_delete_map'));
+	add_shortcode('pwtc_mapdb_manage_maps', array('PwtcMapdb_Map', 'shortcode_manage_maps'));
 
         // Register ajax callbacks
         add_action('wp_ajax_pwtc_mapdb_lookup_maps', array('PwtcMapdb_Map', 'lookup_maps_callback') );
@@ -639,6 +640,58 @@ class PwtcMapdb_Map {
 		include('map-delete-form.php');
 		return ob_get_clean();
 	}
+	
+	// Generates the [pwtc_mapdb_manage_maps] shortcode.
+	public static function shortcode_manage_maps($atts) {
+		$a = shortcode_atts(array('leaders' => 'no'), $atts);
+		$allow_leaders = $a['leaders'] == 'yes';
+
+		$current_user = wp_get_current_user();
+
+		if ( 0 == $current_user->ID ) {
+			return '<div class="callout small warning"><p>Please <a href="/wp-login.php">log in</a> to view the route maps that you have created.</p></div>';
+		}
+
+		$user_info = get_userdata($current_user->ID);
+		if ($allow_leaders) {
+			$is_road_captain = in_array(PwtcMapdb::ROLE_ROAD_CAPTAIN, $user_info->roles);
+		}
+		else {
+			$is_road_captain = user_can($current_user,'edit_published_rides');
+		}
+		$is_ride_leader = in_array(PwtcMapdb::ROLE_RIDE_LEADER, $user_info->roles);
+
+		if (!$is_road_captain) {
+			if (!$allow_leaders) {
+				return '<div class="callout small warning"><p>You are not allowed to view the route maps that you have created.</p></div>';
+			}
+			if (!$is_ride_leader) {
+				return '<div class="callout small warning"><p>You must be a ride leader to view the route maps that you have created.</p></div>';
+			}
+		}
+
+		$author_name = $user_info->first_name . ' ' . $user_info->last_name;
+
+		$status = array('draft');
+		if ($allow_leaders) {
+			$status[] = 'pending';
+		}
+		$query_args = [
+			'posts_per_page' => -1,
+			'post_status' => $status,
+			'author' => $current_user->ID,
+			'post_type' => PwtcMapdb::MAP_POST_TYPE,
+			'orderby' => 'date',
+			'order' => 'DESC',
+		];
+		$query = new WP_Query($query_args);
+
+		$return_uri = $_SERVER['REQUEST_URI'];
+
+		ob_start();
+		include('manage-maps-form.php');
+		return ob_get_clean();
+	}	
     
     /******* AJAX request/response callback functions *******/
 
@@ -976,4 +1029,41 @@ EOT;
 		$headers = ['Content-type: text/html'];
 		return wp_mail($captain_email, $subject , $message, $headers);
 	}
+	
+	public static function submit_map_link($return=false, $postid=0, $action=false) {
+		$uri = self::SUBMIT_MAP_URI;
+		if ($postid > 0) {
+			$uri .= '?post=' . $postid;
+			if ($action) {
+				$uri .= '&action=' . $action;
+			}
+			if ($return) {
+				$uri .= '&return=' . urlencode($return);
+			}
+		}
+		else {
+			if ($return) {
+				$uri .= '?return=' . urlencode($return);
+			}
+		}
+		return esc_url($uri);
+	}
+
+	public static function delete_map_link($postid, $return=false) {
+		$uri = self::DELETE_MAP_URI;
+		$uri .= '?post=' . $postid;
+		if ($return) {
+			$uri .= '&return=' . urlencode($return);
+		}
+		return esc_url($uri);
+	}
+
+	public static function new_map_link($return=false) {
+		return self::submit_map_link($return);
+	}
+
+	public static function edit_map_link($post_id, $return=false) {
+		return self::submit_map_link($return, $post_id);
+	}
+	
 }
