@@ -29,6 +29,8 @@ class PwtcMapdb_Map {
 	add_shortcode('pwtc_mapdb_edit_map', array('PwtcMapdb_Map', 'shortcode_edit_map'));
 	add_shortcode('pwtc_mapdb_delete_map', array( 'PwtcMapdb_Map', 'shortcode_delete_map'));
 	add_shortcode('pwtc_mapdb_manage_maps', array('PwtcMapdb_Map', 'shortcode_manage_maps'));
+	add_shortcode('pwtc_mapdb_manage_pending_maps', array('PwtcMapdb_Map', 'shortcode_manage_pending_maps'));
+	add_shortcode('pwtc_mapdb_new_map_link', array('PwtcMapdb_Map', 'shortcode_new_map_link'));
 
         // Register ajax callbacks
         add_action('wp_ajax_pwtc_mapdb_lookup_maps', array('PwtcMapdb_Map', 'lookup_maps_callback') );
@@ -713,6 +715,55 @@ class PwtcMapdb_Map {
 		include('manage-maps-form.php');
 		return ob_get_clean();
 	}	
+	
+	// Generates the [pwtc_mapdb_manage_pending_maps] shortcode.
+	public static function shortcode_manage_pending_maps($atts) {
+		$a = shortcode_atts(array('leaders' => 'no'), $atts);
+		$allow_leaders = $a['leaders'] == 'yes';
+
+		$current_user = wp_get_current_user();
+
+		if ( 0 == $current_user->ID ) {
+			return '<div class="callout small warning"><p>Please <a href="/wp-login.php">log in</a> to review the pending route maps.</p></div>';
+		}
+
+		$user_info = get_userdata($current_user->ID);
+		if ($allow_leaders) {
+			$is_road_captain = in_array(PwtcMapdb::ROLE_ROAD_CAPTAIN, $user_info->roles);
+		}
+		else {
+			$is_road_captain = user_can($current_user,'edit_published_rides');
+		}
+
+		if (!$is_road_captain) {
+			return '<div class="callout small warning"><p>You must be a road captain to review the pending route maps.</p></div>';
+		}
+
+		$query_args = [
+			'posts_per_page' => -1,
+			'post_status' => 'pending',
+			'post_type' => PwtcMapdb::MAP_POST_TYPE,
+			'orderby' => 'date',
+			'order' => 'DESC',
+		];
+		$query = new WP_Query($query_args);
+
+		$return_uri = $_SERVER['REQUEST_URI'];
+
+		ob_start();
+		include('manage-pending-maps-form.php');
+		return ob_get_clean();
+	}	
+
+	// Generates the [pwtc_mapdb_new_map_link] shortcode.
+	public static function shortcode_new_map_link($atts, $content) {
+		$return_uri = $_SERVER['REQUEST_URI'];
+		if (empty($content)) {
+			$content = 'new route map';
+		}
+		$new_link = self::new_map_link($return_uri);
+		return '<a href="' . $new_link . '">' . $content . '</a>';
+	}
     
     /******* AJAX request/response callback functions *******/
 
