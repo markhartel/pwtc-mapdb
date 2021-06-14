@@ -46,6 +46,19 @@
         $('#pwtc-mapdb-edit-map-div input[type="checkbox"]').change(function() {
             is_dirty = true;
         });
+	    
+	$('#pwtc-mapdb-edit-map-div input[name="map_link"]').on('input', function(e) {
+            is_dirty = true;
+            var span = $('#pwtc-mapdb-edit-map-div form .map-type-link label span');
+            span.html('');
+            if (e.target.value) {
+                if (e.target.validity) {
+                    if (e.target.validity.valid) {
+                        span.html('<a href="' + e.target.value + '" title="Display online route map." target="_blank"><i class="fa fa-link"></i></a>');
+                    }
+                }
+            }
+        });
         
         $('#pwtc-mapdb-edit-map-div input[name="map_type"]').change(function() {
             if (this.value == 'file') {
@@ -335,6 +348,11 @@
             </div>
             <div class="row column map-type-link">
                 <label>Route Map Link
+		    <span>
+            <?php if (!empty($map_link)) { ?>
+                    <a href="<?php echo $map_link; ?>" title="Display online route map." target="_blank"><i class="fa fa-link"></i></a>
+            <?php } ?>
+                    </span>
                     <input type="url" name="map_link" value="<?php echo $map_link; ?>"/>
                 </label>
             </div>
