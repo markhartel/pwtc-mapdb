@@ -292,42 +292,51 @@ class PwtcMapdb_Map {
 			if (isset($_POST['map_type'])) {
 				$map_type = $_POST['map_type'];
 
-				if (isset($_POST['map_file_id']) and isset($_FILES['map_file_upload']) and $_FILES['map_file_upload']['size'] > 0) {
-					if ($_FILES['map_file_upload']['error'] != UPLOAD_ERR_OK) {
-						wp_die('Route map file upload failed.', 403);
-					}
-					$filetype = wp_check_filetype($_FILES['map_file_upload']['name']);
-					$tmpname = $_FILES['map_file_upload']['tmp_name'];
+				if (isset($_POST['map_file_id'])) {
 					$map_file_id = intval($_POST['map_file_id']);
-					if ($map_file_id > 0) {
-						$status = wp_delete_attachment($map_file_id, true);
+					if (isset($_FILES['map_file_upload']) and $_FILES['map_file_upload']['size'] > 0) {
+						if ($_FILES['map_file_upload']['error'] != UPLOAD_ERR_OK) {
+							wp_die('Route map file upload failed.', 403);
+						}
+						$filetype = wp_check_filetype($_FILES['map_file_upload']['name']);
+						$tmpname = $_FILES['map_file_upload']['tmp_name'];
+						if ($map_file_id > 0) {
+							$status = wp_delete_attachment($map_file_id, true);
+							if ($status === false) {
+								wp_die('Could not delete old route map file attachment.', 403);
+							}	
+						}
+						$filename = sanitize_file_name($_FILES['map_file_upload']['name']);
+						$upload_dir = wp_upload_dir();
+						$movefile = $upload_dir['path'] . '/' . $filename;
+						$status = move_uploaded_file($tmpname, $movefile);
 						if ($status === false) {
-							wp_die('Could not delete old route map file attachment.', 403);
+							wp_die('Could not move uploaded route map file.', 403);
 						}	
-					}
-					$filename = sanitize_file_name($_FILES['map_file_upload']['name']);
-					$upload_dir = wp_upload_dir();
-					$movefile = $upload_dir['path'] . '/' . $filename;
-					$status = move_uploaded_file($tmpname, $movefile);
-					if ($status === false) {
-						wp_die('Could not move uploaded route map file.', 403);
-					}	
-					$attachment = array(
-						'guid'           => $upload_dir['url'] . '/' . $filename, 
-						'post_mime_type' => $filetype['type'],
-						'post_title'     => esc_html($title),
-						'post_content'   => '',
-						'post_status'    => 'inherit'
-					);
-					$map_file_id = wp_insert_attachment($attachment, $movefile, $postid);
-					if ($map_file_id == 0) {
-						wp_die('Could not create new attachment for uploaded route map file.', 403);
+						$attachment = array(
+							'guid'           => $upload_dir['url'] . '/' . $filename, 
+							'post_mime_type' => $filetype['type'],
+							'post_title'     => esc_html($title),
+							'post_content'   => '',
+							'post_status'    => 'inherit'
+						);
+						$map_file_id = wp_insert_attachment($attachment, $movefile, $postid);
+						if ($map_file_id == 0) {
+							wp_die('Could not create new attachment for uploaded route map file.', 403);
+						}
 					}
 					if ($new_post) {
-						$row = array(
-							PwtcMapdb::MAP_TYPE_FIELD_KEY => $map_type,
-							PwtcMapdb::MAP_FILE_FIELD_KEY => $map_file_id
-						);
+						if ($map_file_id > 0) {
+							$row = array(
+								PwtcMapdb::MAP_TYPE_FIELD_KEY => $map_type,
+								PwtcMapdb::MAP_FILE_FIELD_KEY => $map_file_id
+							);
+						}
+						else {
+							$row = array(
+								PwtcMapdb::MAP_TYPE_FIELD_KEY => $map_type
+							);
+						}
 						if (have_rows(PwtcMapdb::MAP_FIELD_KEY, $postid)) {
 							update_row(PwtcMapdb::MAP_FIELD_KEY, 1, $row, $postid);
 						}
@@ -335,10 +344,17 @@ class PwtcMapdb_Map {
 							add_row(PwtcMapdb::MAP_FIELD_KEY, $row, $postid);
 						}						}
 					else {
-						$row = array(
-							PwtcMapdb::MAP_TYPE_FIELD => $map_type,
-							PwtcMapdb::MAP_FILE_FIELD => $map_file_id
-						);
+						if ($map_file_id > 0) {
+							$row = array(
+								PwtcMapdb::MAP_TYPE_FIELD => $map_type,
+								PwtcMapdb::MAP_FILE_FIELD => $map_file_id
+							);
+						}
+						else {
+							$row = array(
+								PwtcMapdb::MAP_TYPE_FIELD => $map_type,
+							);
+						}
 						if (have_rows(PwtcMapdb::MAP_FIELD, $postid)) {
 							update_row(PwtcMapdb::MAP_FIELD, 1, $row, $postid);
 						}
