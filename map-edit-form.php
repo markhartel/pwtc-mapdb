@@ -81,6 +81,7 @@
             $('#pwtc-mapdb-edit-map-div input').removeClass('indicate-error');
             $('#pwtc-mapdb-edit-map-div textarea').removeClass('indicate-error');
             $('#pwtc-mapdb-edit-map-div .terrain-fst').removeClass('indicate-error');
+	    $('#pwtc-mapdb-edit-map-div .file-upload-lbl').removeClass('indicate-error');
 
             if ($('#pwtc-mapdb-edit-map-div input[name="title"]').val().trim().length == 0) {
                 show_warning('The <strong>route map title</strong> cannot be blank.');
@@ -158,6 +159,7 @@
                     if (elem.validity) {
                         if (!elem.validity.valid) {
                             show_warning('The <strong>upload file</strong> has an invalid format.');
+			    $('#pwtc-mapdb-edit-map-div .file-upload-lbl').addClass('indicate-error');
                             evt.preventDefault();
                             return;                     
                         }
