@@ -102,44 +102,7 @@
                 evt.preventDefault();
                 return;
             }
-            
-            var terrain_empty = $('#pwtc-mapdb-edit-map-div input[name="terrain[]"]:checked').length == 0;
-            if (terrain_empty) {
-                show_warning('You must choose at least one <strong>route map terrain</strong>.');
-                $('#pwtc-mapdb-edit-map-div .terrain-fst').addClass('indicate-error');
-                evt.preventDefault();
-                return;						
-            }
-            var dist = $('#pwtc-mapdb-edit-map-div input[name="distance"]').val().trim();
-            if (dist.length == 0) {
-                show_warning('You must enter a <strong>route map distance</strong>.');
-                $('#pwtc-mapdb-edit-map-div input[name="distance"]').addClass('indicate-error');
-                evt.preventDefault();
-                return;							
-            }
-            dist = parseInt(dist, 10);
-            if (dist == NaN || dist < 0) {
-                show_warning('You must enter a <strong>route map distance</strong> that is a non-negative number.');
-                $('#pwtc-mapdb-edit-map-div input[name="distance"]').addClass('indicate-error');
-                evt.preventDefault();
-                return;							
-            }
-            var maxdist = $('#pwtc-mapdb-edit-map-div input[name="max_distance"]').val().trim();
-            if (maxdist.length > 0) {
-                maxdist = parseInt(maxdist, 10);
-                if (maxdist == NaN || maxdist < 0) {
-                    show_warning('You must enter a <strong>route map max distance</strong> that is a non-negative number.');
-                    $('#pwtc-mapdb-edit-map-div input[name="max_distance"]').addClass('indicate-error');
-                    evt.preventDefault();
-                    return;							
-                }
-                if (maxdist <= dist) {
-                    show_warning('The <strong>route map max distance</strong> must be greater than the <strong>ride distance</strong>.');
-                    $('#pwtc-mapdb-edit-map-div input[name="max_distance"]').addClass('indicate-error');
-                    evt.preventDefault();
-                    return;									
-                }					
-            }
+
 	    if ($('#pwtc-mapdb-edit-map-div input[name="map_type"]:checked').val() == 'link') {
                 var url = $('#pwtc-mapdb-edit-map-div input[name="map_link"]').val().trim();
                 if (url.length == 0) {
@@ -178,6 +141,44 @@
                         }
                     }
                 }
+            }
+		
+	    var terrain_empty = $('#pwtc-mapdb-edit-map-div input[name="terrain[]"]:checked').length == 0;
+            if (terrain_empty) {
+                show_warning('You must choose at least one <strong>route map terrain</strong>.');
+                $('#pwtc-mapdb-edit-map-div .terrain-fst').addClass('indicate-error');
+                evt.preventDefault();
+                return;						
+            }
+            var dist = $('#pwtc-mapdb-edit-map-div input[name="distance"]').val().trim();
+            if (dist.length == 0) {
+                show_warning('You must enter a <strong>route map distance</strong>.');
+                $('#pwtc-mapdb-edit-map-div input[name="distance"]').addClass('indicate-error');
+                evt.preventDefault();
+                return;							
+            }
+            dist = parseInt(dist, 10);
+            if (dist == NaN || dist < 0) {
+                show_warning('You must enter a <strong>route map distance</strong> that is a non-negative number.');
+                $('#pwtc-mapdb-edit-map-div input[name="distance"]').addClass('indicate-error');
+                evt.preventDefault();
+                return;							
+            }
+            var maxdist = $('#pwtc-mapdb-edit-map-div input[name="max_distance"]').val().trim();
+            if (maxdist.length > 0) {
+                maxdist = parseInt(maxdist, 10);
+                if (maxdist == NaN || maxdist < 0) {
+                    show_warning('You must enter a <strong>route map max distance</strong> that is a non-negative number.');
+                    $('#pwtc-mapdb-edit-map-div input[name="max_distance"]').addClass('indicate-error');
+                    evt.preventDefault();
+                    return;							
+                }
+                if (maxdist <= dist) {
+                    show_warning('The <strong>route map max distance</strong> must be greater than the <strong>ride distance</strong>.');
+                    $('#pwtc-mapdb-edit-map-div input[name="max_distance"]').addClass('indicate-error');
+                    evt.preventDefault();
+                    return;									
+                }					
             }
 
             is_dirty = false;
@@ -305,26 +306,6 @@
             </div>
             <div class="row">
                 <div class="small-12 medium-6 columns">
-                    <label>Route Map Distance
-                        <input type="number" name="distance" value="<?php echo $distance; ?>"/>	
-                    </label>
-                </div>
-                <div class="small-12 medium-6 columns">
-                    <label>Route Map Max Distance
-                        <input type="number" name="max_distance" value="<?php echo $max_distance; ?>"/>	
-                    </label>
-                </div>
-                <div class="small-12 medium-6 columns">
-                    <fieldset class="terrain-fst">
-                        <legend>Route Map Terrain</legend>
-                        <input type="checkbox" name="terrain[]" value="a" id="terrain-a" <?php echo in_array('a', $terrain) ? 'checked': ''; ?>><label for="terrain-a">A</label>
-                        <input type="checkbox" name="terrain[]" value="b" id="terrain-b" <?php echo in_array('b', $terrain) ? 'checked': ''; ?>><label for="terrain-b">B</label>
-                        <input type="checkbox" name="terrain[]" value="c" id="terrain-c" <?php echo in_array('c', $terrain) ? 'checked': ''; ?>><label for="terrain-c">C</label>
-                        <input type="checkbox" name="terrain[]" value="d" id="terrain-d" <?php echo in_array('d', $terrain) ? 'checked': ''; ?>><label for="terrain-d">D</label>
-                        <input type="checkbox" name="terrain[]" value="e" id="terrain-e" <?php echo in_array('e', $terrain) ? 'checked': ''; ?>><label for="terrain-e">E</label>
-                    </fieldset>
-                </div>
-                <div class="small-12 medium-6 columns">
                     <fieldset>
                         <legend>Route Map Type</legend>
                         <input type="radio" name="map_type" value="file" id="type-file" <?php echo $map_type == 'file' ? 'checked': ''; ?>><label for="type-file">Download File</label>
@@ -355,6 +336,28 @@
                     </span>
                     <input type="url" name="map_link" value="<?php echo $map_link; ?>"/>
                 </label>
+            </div>
+	    <div class="row">
+                <div class="small-12 medium-4 columns">
+                    <fieldset class="terrain-fst">
+                        <legend>Route Map Terrain</legend>
+                        <input type="checkbox" name="terrain[]" value="a" id="terrain-a" <?php echo in_array('a', $terrain) ? 'checked': ''; ?>><label for="terrain-a">A</label>
+                        <input type="checkbox" name="terrain[]" value="b" id="terrain-b" <?php echo in_array('b', $terrain) ? 'checked': ''; ?>><label for="terrain-b">B</label>
+                        <input type="checkbox" name="terrain[]" value="c" id="terrain-c" <?php echo in_array('c', $terrain) ? 'checked': ''; ?>><label for="terrain-c">C</label>
+                        <input type="checkbox" name="terrain[]" value="d" id="terrain-d" <?php echo in_array('d', $terrain) ? 'checked': ''; ?>><label for="terrain-d">D</label>
+                        <input type="checkbox" name="terrain[]" value="e" id="terrain-e" <?php echo in_array('e', $terrain) ? 'checked': ''; ?>><label for="terrain-e">E</label>
+                    </fieldset>
+                </div>
+                <div class="small-12 medium-4 columns">
+                    <label>Route Map Distance
+                        <input type="number" name="distance" value="<?php echo $distance; ?>"/>	
+                    </label>
+                </div>
+                <div class="small-12 medium-4 columns">
+                    <label>Route Map Max Distance
+                        <input type="number" name="max_distance" value="<?php echo $max_distance; ?>"/>	
+                    </label>
+                </div>
             </div>
             <div class="row column errmsg"></div>
             <div class="row column clearfix">
