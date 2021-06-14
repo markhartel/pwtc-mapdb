@@ -69,10 +69,10 @@
 		fileName = e.target.value.split('\\').pop();
             }
 	    if (fileName) {
-		$('#pwtc-mapdb-edit-map-div .map-type-file span').html(fileName);
+		$('#pwtc-mapdb-edit-map-div .file-upload-lbl').html('Upload File: ' + fileName);
             }
 	    else {
-		$('#pwtc-mapdb-edit-map-div .map-type-file span').html('No file chosen');
+		$('#pwtc-mapdb-edit-map-div .file-upload-lbl').html('Upload File');
             }
 	    is_dirty = true;
         });
@@ -149,7 +149,7 @@
                 var file = $('#pwtc-mapdb-edit-map-div input[name="map_file_upload"]').val().trim();
                 if (file.length == 0 && attach_id == '0') {
                     show_warning('The <strong>route map file</strong> must be set.');
-                    //$('#pwtc-mapdb-edit-map-div input[name="map_link"]').addClass('indicate-error');
+                    $('#pwtc-mapdb-edit-map-div input[name="map_file_name"]').addClass('indicate-error');
                     evt.preventDefault();
                     return;
                 }
@@ -157,8 +157,7 @@
                     var elem = $('#pwtc-mapdb-edit-map-div input[name="map_file_upload"]')[0];
                     if (elem.validity) {
                         if (!elem.validity.valid) {
-                            show_warning('The <strong>route map file</strong> has an invalid format.');
-                            //$('#pwtc-mapdb-edit-map-div input[name="map_link"]').addClass('indicate-error');
+                            show_warning('The <strong>upload file</strong> has an invalid format.');
                             evt.preventDefault();
                             return;                     
                         }
@@ -318,22 +317,19 @@
                     </fieldset>
                 </div>
             </div>
-	    <div class="row column map-type-file">
+            <div class="row column map-type-file">
+                <input type="hidden" name="map_file_id" value="<?php echo $map_file_id; ?>"/> 
                 <label>Route Map File
-                    <input type="hidden" name="map_file_id" value="<?php echo $map_file_id; ?>"/>  	
+            <?php if (!empty($map_file_url)) { ?>
+                    <a href="<?php echo $map_file_url; ?>" title="Download route map file." target="_blank" download><i class="fa fa-download"></i></a>
+            <?php } ?>
+                    <input type="text" name="map_file_name" value="<?php echo esc_attr($map_file_name); ?>" readonly/>
                 </label>
+                <p class="help-text">You cannot edit the route map file directly, instead press the upload file button below to choose a new file to upload when this route map is saved.</p>
             </div>
             <div class="row column map-type-file">
-                <div style="min-height:40px; border:1px solid;">
-            <?php if (!empty($map_file_url)) { ?>
-                    <a href="<?php echo $map_file_url; ?>" target="_blank" download><?php echo $map_file_name; ?></a>
-            <?php } ?>
-                </div>
-	    </div>
-            <div class="row column map-type-file">
-                <label for="map-file-upload" class="dark button">Choose File for Upload</label>
-                <span>No file chosen</span>
-                <input type="file" id="map-file-upload" class="show-for-sr" accept="image/*,.pdf" name="map_file_upload">
+                <label for="map-file-upload" class="dark button file-upload-lbl">Upload File</label>
+                <input type="file" id="map-file-upload" class="show-for-sr" accept="image/*,.pdf" name="map_file_upload"/>
             </div>
             <div class="row column map-type-link">
                 <label>Route Map Link
