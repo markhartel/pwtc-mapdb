@@ -504,6 +504,7 @@ class PwtcMapdb_Signup {
 		
 		$signup_members_only = self::get_signup_members_only($postid);
 
+		$mileage_logged = false;
 		if ($ride_signup_mode != 'no') {
 			if ($ride_signup_mode == 'paperless') {
 				$paperless = $set_mileage = true;
@@ -525,6 +526,20 @@ class PwtcMapdb_Signup {
 			$signup_locked = self::get_signup_locked($postid);
 			if ($signup_locked) {
 				$set_mileage = $take_attendance = false;
+				if ($paperless) {
+					$log_cutoff_date = PwtcMapdb::get_ride_start_time($postid);
+					$interval = new DateInterval('P6M');	
+					$log_cutoff_date->add($interval);
+					if ($log_cutoff_date < $now_date) {
+						$mileage_logged = true;
+					}
+					else {
+						$results = PwtcMileage_DB::fetch_ride_by_post_id($postid);
+						if (count($results) > 0) {
+							$mileage_logged = true;
+						}
+					}
+				}
 			}
 		}
 		else {
