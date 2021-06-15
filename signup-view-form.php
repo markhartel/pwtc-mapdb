@@ -710,7 +710,9 @@
         <div class="callout small"><p>There are currently no riders signed up for the ride "<?php echo $ride_title; ?>."</p></div>
     <?php } ?>
     <?php if ($signup_locked) { ?>
-        <?php if ($paperless) { ?>
+        <?php if ($mileage_logged) { ?>
+            <div class="callout small success"><p>The rider mileage has been logged to the mileage database, contact the club statistician to make any changes.</p></div>
+        <?php } else if ($paperless) { ?>
             <div class="callout small success"><p>Online sign up is closed, you may now log the rider mileage to the mileage database.</p></div>
         <?php } else { ?>
             <div class="callout small success"><p>Online sign up is closed, you may now download the ride sign-in sheet and print it.</p></div>
