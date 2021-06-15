@@ -528,7 +528,7 @@ class PwtcMapdb_Signup {
 				$set_mileage = $take_attendance = false;
 				if ($paperless) {
 					$log_cutoff_date = PwtcMapdb::get_ride_start_time($postid);
-					$interval = new DateInterval('P6M');	
+					$interval = new DateInterval('P1Y');	
 					$log_cutoff_date->add($interval);
 					if ($log_cutoff_date < $now_date) {
 						$mileage_logged = true;
@@ -1010,7 +1010,7 @@ class PwtcMapdb_Signup {
 			}
 			else {
 				$ride_date = PwtcMapdb::get_ride_start_time($postid);
-				$interval = new DateInterval('P6M');	
+				$interval = new DateInterval('P1Y');	
 				$ride_date->add($interval);
 				$now = PwtcMapdb::get_current_time();
 				if ($ride_date < $now) {
