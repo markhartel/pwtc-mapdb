@@ -207,6 +207,8 @@
                     else {
                         show_errmsg2_success(msg);
                     }
+                    $('#pwtc-mapdb-view-signup-div .signup-buttons-frm .log_mileage').hide();
+                    $('#pwtc-mapdb-view-signup-div .signup-buttons-frm button[type="submit"]').prop('disabled',true);
                 }
                 else {
                     show_errmsg2('Ride post ID does not match post ID returned by server.');
@@ -713,7 +715,7 @@
         <?php if ($mileage_logged) { ?>
             <div class="callout small success"><p>The rider mileage has been logged to the mileage database, contact the club statistician to make any changes.</p></div>
         <?php } else if ($paperless) { ?>
-            <div class="callout small success"><p>Online sign up is closed, you may now log the rider mileage to the mileage database.</p></div>
+            <div class="callout small success"><p>Online sign up is closed, you may now log the rider mileage to the mileage database. <em>Warning: once this is done, you will no longer be able to modify the mileages.</em></p></div>
         <?php } else { ?>
             <div class="callout small success"><p>Online sign up is closed, you may now download the ride sign-in sheet and print it.</p></div>
         <?php } ?>
@@ -728,17 +730,18 @@
     <?php } ?>
     <div class="errmsg2"></div>
     <div class="row column clearfix action-btns">
-        <form method="POST">
+        <form class="signup-buttons-frm" method="POST">
             <?php wp_nonce_field('signup-view-form', 'nonce_field'); ?>
     <?php if ($signup_locked) { ?>
             <div class="button-group float-left">
-        <?php if ($paperless) { ?>
+        <?php if ($mileage_logged) { ?>
+        <?php } else if ($paperless) { ?>
             <a class="log_mileage dark button"><i class="fa fa-bicycle"></i> Log Mileage</a>
         <?php } else { ?>
             <a class="download_sheet dark button"><i class="fa fa-download"></i> Sign-in Sheet</a>
         <?php } ?>
             <input type="hidden" name="lock_signup" value="no"/>
-            <button class="dark button" type="submit"><i class="fa fa-unlock"></i> Reopen Sign-up</button>
+            <button class="dark button" type="submit" <?php echo $mileage_logged ? 'disabled': ''; ?>><i class="fa fa-unlock"></i> Reopen Sign-up</button>
             </div>
     <?php } else { ?>
             <input type="hidden" name="lock_signup" value="yes"/>
