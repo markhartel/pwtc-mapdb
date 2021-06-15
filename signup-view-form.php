@@ -718,8 +718,10 @@
     <?php } else { ?>
         <?php if ($now_date < $cutoff_date) { ?>
             <div class="callout small warning"><p>Online sign up is allowed until <?php echo $cutoff_date_str; ?>, you cannot close it until then.</p></div>
+        <?php } else if ($paperless) { ?>
+            <div class="callout small success"><p>The period for online sign up has expired, but you may continue to modify the mileages. Close the sign up after the rider mileages are finalized.</p></div>
         <?php } else { ?>
-            <div class="callout small success"><p>The period for online sign up is past, you may now close it.</p></div>
+            <div class="callout small success"><p>The period for online sign up has expired, you may now close it.</p></div>
         <?php } ?>
     <?php } ?>
     <div class="errmsg2"></div>
