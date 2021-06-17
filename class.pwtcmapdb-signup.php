@@ -1010,12 +1010,10 @@ class PwtcMapdb_Signup {
 			}
 			else {
 				$ride_date = PwtcMapdb::get_ride_start_time($postid);
-				$interval = new DateInterval('P1Y');	
-				$ride_date->add($interval);
-				$now = PwtcMapdb::get_current_time();
-				if ($ride_date < $now) {
+				$limit_date = self::get_log_mileage_lookback_limit();
+				if ($ride_date < $limit_date) {
 					$response = array(
-						'error' => 'This ride must be less than 6 months old to log its mileage.'
+						'error' => 'This ride must start later than ' . $limit_date->format('m/d/Y') . ' to log its mileage.'
 					);	
 				}
 				else {
