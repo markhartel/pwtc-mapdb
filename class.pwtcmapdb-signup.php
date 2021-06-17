@@ -1155,6 +1155,22 @@ class PwtcMapdb_Signup {
 		}
 		return $ride_date;
 	}
+	
+	public static function get_log_mileage_lookback_limit() {
+		$timezone = new DateTimeZone(pwtc_get_timezone_string());
+		$plugin_options = PwtcMileage::get_plugin_options();
+		$thisyear = date('Y', current_time('timestamp'));
+		$lastyear = intval($thisyear) - 1;
+		$limit = '' . $lastyear . '-01-01';
+		$limit_date = DateTime::createFromFormat('Y-m-d', $limit, $timezone);
+		if ($plugin_options['ride_lookback_date'] != '') {
+			$option_date = DateTime::createFromFormat('Y-m-d', $plugin_options['ride_lookback_date'], $timezone);
+			if ($option_date > $limit_date) {
+				$limit_date = $option_date;
+			}
+		}
+		return $limit_date;
+	}
 
 	public static function check_ride_start($postid, $mode, $pad, $return_to_ride) {
 		$ride_title = esc_html(get_the_title($postid));
