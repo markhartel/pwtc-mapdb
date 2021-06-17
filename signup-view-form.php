@@ -208,8 +208,7 @@
                         show_errmsg2_success(msg);
                     }
                     $('#pwtc-mapdb-view-signup-div .signup-buttons-frm .log_mileage').hide();
-                    $('#pwtc-mapdb-view-signup-div .signup-buttons-frm button[type="submit"]').prop('disabled',true);
-                }
+                 }
                 else {
                     show_errmsg2('Ride post ID does not match post ID returned by server.');
                 }
@@ -713,9 +712,9 @@
     <?php } ?>
     <?php if ($signup_locked) { ?>
         <?php if ($mileage_logged) { ?>
-            <div class="callout small success"><p>The rider mileage has been logged to the mileage database, contact the club statistician to make any changes.</p></div>
+            <div class="callout small success"><p>The rider mileages have already been logged to the mileage database, contact the club statistician to make any changes.</p></div>
         <?php } else if ($paperless) { ?>
-            <div class="callout small success"><p>Online sign up is closed, you may now log the rider mileage to the mileage database. <em>Warning: once this is done, you will no longer be able to modify the mileages.</em></p></div>
+            <div class="callout small success"><p>Online sign up is closed, you may now log the rider mileages to the mileage database. <em>Warning: this can only be done once, so be certain that you have entered all of the final mileages.</em></p></div>
         <?php } else { ?>
             <div class="callout small success"><p>Online sign up is closed, you may now download the ride sign-in sheet and print it.</p></div>
         <?php } ?>
@@ -723,7 +722,7 @@
         <?php if ($now_date < $cutoff_date) { ?>
             <div class="callout small warning"><p>Online sign up is allowed until <?php echo $cutoff_date_str; ?>, you cannot close it until then.</p></div>
         <?php } else if ($paperless) { ?>
-            <div class="callout small success"><p>The period for online sign up has expired, but you may continue to modify the mileages. Close the sign up after the rider mileages are finalized.</p></div>
+            <div class="callout small success"><p>The period for online sign up has expired, but you may continue to modify the mileages. Close the sign up only after you have entered all of the final mileages.</p></div>
         <?php } else { ?>
             <div class="callout small success"><p>The period for online sign up has expired, you may now close it.</p></div>
         <?php } ?>
@@ -741,7 +740,7 @@
             <a class="download_sheet dark button"><i class="fa fa-download"></i> Sign-in Sheet</a>
         <?php } ?>
             <input type="hidden" name="lock_signup" value="no"/>
-            <button class="dark button" type="submit" <?php echo $mileage_logged ? 'disabled': ''; ?>><i class="fa fa-unlock"></i> Reopen Sign-up</button>
+            <button class="dark button" type="submit"><i class="fa fa-unlock"></i> Reopen Sign-up</button>
             </div>
     <?php } else { ?>
             <input type="hidden" name="lock_signup" value="yes"/>
