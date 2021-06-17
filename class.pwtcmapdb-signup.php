@@ -1013,7 +1013,7 @@ class PwtcMapdb_Signup {
 				$limit_date = self::get_log_mileage_lookback_limit();
 				if ($ride_date < $limit_date) {
 					$response = array(
-						'error' => 'You cannot log the mileage of a ride older than ' . $limit_date->format('m/d/Y') . '.'
+						'error' => 'You cannot log the mileage of a ride that start before ' . $limit_date->format('m/d/Y') . '.'
 					);	
 				}
 				else {
