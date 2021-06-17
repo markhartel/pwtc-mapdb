@@ -1156,13 +1156,14 @@ class PwtcMapdb_Signup {
 	
 	public static function get_log_mileage_lookback_limit() {
 		$timezone = new DateTimeZone(pwtc_get_timezone_string());
+		$now_date = new DateTime(null, $timezone);
+		$thisyear = intval($now_date->format('Y'));
+		$lastyear = $thisyear - 1;
+		$limit = '' . $lastyear . '-01-01 00:00:00';
+		$limit_date = DateTime::createFromFormat('Y-m-d H:i:s', $limit, $timezone);
 		$plugin_options = PwtcMileage::get_plugin_options();
-		$thisyear = date('Y', current_time('timestamp'));
-		$lastyear = intval($thisyear) - 1;
-		$limit = '' . $lastyear . '-01-01';
-		$limit_date = DateTime::createFromFormat('Y-m-d', $limit, $timezone);
 		if ($plugin_options['ride_lookback_date'] != '') {
-			$option_date = DateTime::createFromFormat('Y-m-d', $plugin_options['ride_lookback_date'], $timezone);
+			$option_date = DateTime::createFromFormat('Y-m-d H:i:s', $plugin_options['ride_lookback_date'] . ' 00:00:00', $timezone);
 			if ($option_date > $limit_date) {
 				$limit_date = $option_date;
 			}
