@@ -530,7 +530,7 @@ class PwtcMapdb_Signup {
 				if ($paperless) {
 					$ride_start = PwtcMapdb::get_ride_start_time($postid);
 					$limit_date = self::get_log_mileage_lookback_limit();
-					if ($ride_date < $limit_date) {
+					if ($ride_start < $limit_date) {
 						$logging_limited = true;
 					}
 					else {
