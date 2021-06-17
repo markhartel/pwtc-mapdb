@@ -711,7 +711,9 @@
         <div class="callout small"><p>There are currently no riders signed up for the ride "<?php echo $ride_title; ?>."</p></div>
     <?php } ?>
     <?php if ($signup_locked) { ?>
-        <?php if ($mileage_logged) { ?>
+        <?php if ($logging_limited) { ?>
+            <div class="callout small success"><p>Rider mileages cannot be logged to the mileage database because the ride starts before <?php echo $limit_date->format('m/d/Y'); ?>.</p></div>
+        <?php } else if ($mileage_logged) { ?>
             <div class="callout small success"><p>The rider mileages have already been logged to the mileage database, contact the club statistician to make any changes.</p></div>
         <?php } else if ($paperless) { ?>
             <div class="callout small success"><p>Online sign up is closed, you may now log the rider mileages to the mileage database. <em>Warning: this can only be done once, so be certain that you have entered all of the final mileages.</em></p></div>
@@ -733,7 +735,7 @@
             <?php wp_nonce_field('signup-view-form', 'nonce_field'); ?>
     <?php if ($signup_locked) { ?>
             <div class="button-group float-left">
-        <?php if ($mileage_logged) { ?>
+        <?php if ($mileage_logged or $logging_limited) { ?>
         <?php } else if ($paperless) { ?>
             <a class="log_mileage dark button"><i class="fa fa-bicycle"></i> Log Mileage</a>
         <?php } else { ?>
