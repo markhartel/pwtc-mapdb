@@ -505,6 +505,7 @@ class PwtcMapdb_Signup {
 		$signup_members_only = self::get_signup_members_only($postid);
 
 		$mileage_logged = false;
+		$logging_limited = false;
 		if ($ride_signup_mode != 'no') {
 			if ($ride_signup_mode == 'paperless') {
 				$paperless = $set_mileage = true;
@@ -527,11 +528,10 @@ class PwtcMapdb_Signup {
 			if ($signup_locked) {
 				$set_mileage = $take_attendance = false;
 				if ($paperless) {
-					$log_cutoff_date = PwtcMapdb::get_ride_start_time($postid);
-					$interval = new DateInterval('P1Y');	
-					$log_cutoff_date->add($interval);
-					if ($log_cutoff_date < $now_date) {
-						$mileage_logged = true;
+					$ride_start = PwtcMapdb::get_ride_start_time($postid);
+					$limit_date = self::get_log_mileage_lookback_limit();
+					if ($ride_date < $limit_date) {
+						$logging_limited = true;
 					}
 					else {
 						$results = PwtcMileage_DB::fetch_ride_by_post_id($postid);
@@ -1013,7 +1013,7 @@ class PwtcMapdb_Signup {
 				$limit_date = self::get_log_mileage_lookback_limit();
 				if ($ride_date < $limit_date) {
 					$response = array(
-						'error' => 'This ride must start later than ' . $limit_date->format('m/d/Y') . ' to log its mileage.'
+						'error' => 'You cannot log the mileage of a ride older than ' . $limit_date->format('m/d/Y') . '.'
 					);	
 				}
 				else {
