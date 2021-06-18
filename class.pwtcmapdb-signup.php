@@ -386,7 +386,7 @@ class PwtcMapdb_Signup {
 		
 		$current_user = wp_get_current_user();
 
-		if (isset($_POST['lock_signup']) or isset($_POST['ride_signup_mode']) or isset($_POST['signup_userid']) or isset($_POST['cancel_userid'])) {
+		if (isset($_POST['lock_signup']) or isset($_POST['ride_signup_mode']) or isset($_POST['signup_userid']) or isset($_POST['nonmember_signup']) or isset($_POST['cancel_userid'])) {
 			if (!isset($_POST['nonce_field']) or !wp_verify_nonce($_POST['nonce_field'], 'signup-view-form')) {
 				wp_nonce_ays('');
 			}
@@ -439,6 +439,25 @@ class PwtcMapdb_Signup {
 						add_post_meta($postid, PwtcMapdb::RIDE_SIGNUP_USERID, $value);	
 					}
 				}
+			}
+			
+			if (isset($_POST['nonmember_signup'])) {
+				$signup_id = time() - self::TIMESTAMP_OFFSET;
+				$signup_name = $_POST['nonmember_signup'];
+				$contact_phone = '';
+				if (isset($_POST['nonmember_contact_phone'])) {
+					$contact_phone = $_POST['nonmember_contact_phone'];
+					if (function_exists('pwtc_members_format_phone_number')) {
+						$contact_phone = pwtc_members_format_phone_number($contact_phone);
+					}
+				}
+				$contact_name = '';
+				if (isset($_POST['nonmember_contact_name'])) {
+					$contact_name = $_POST['nonmember_contact_name'];
+				}
+				self::delete_all_nonmember_signups($postid, $signup_id);
+				$value = json_encode(array('signup_id' => $signup_id, 'name' => $signup_name, 'contact_phone' => $contact_phone, 'contact_name' => $contact_name, 'attended' => true));
+				add_post_meta($postid, PwtcMapdb::RIDE_SIGNUP_NONMEMBER, $value);
 			}
 			
 			if (isset($_POST['cancel_userid'])) {
