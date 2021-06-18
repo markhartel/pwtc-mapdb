@@ -408,6 +408,17 @@
                 $('#pwtc-mapdb-view-signup-div .rider-signup-frm button[type="submit"]').prop('disabled',false);
             }
         }
+    
+        $('#pwtc-mapdb-view-signup-div input[name="rider_type"]').change(function() {
+            if (this.value == 'member') {
+                $('#pwtc-mapdb-view-signup-div .nonmember-signup-frm').hide();
+                $('#pwtc-mapdb-view-signup-div .rider-signup-frm').show();
+            }
+            else if (this.value == 'nonmember') {
+                $('#pwtc-mapdb-view-signup-div .rider-signup-frm').hide();
+                $('#pwtc-mapdb-view-signup-div .nonmember-signup-frm').show();
+            }
+        });
 
         $('#pwtc-mapdb-view-signup-div .rider-signup-frm input[type="button"]').on('click', function(evt) {
             var riderid = $('#pwtc-mapdb-view-signup-div .rider-signup-frm input[name="signup_riderid"]').val().trim();
@@ -436,6 +447,14 @@
                 return false; 
             } 
         });	
+    
+        $('#pwtc-mapdb-view-signup-div .nonmember-signup-frm').on('keypress', function(evt) {
+            var keyPressed = evt.keyCode || evt.which; 
+            if (keyPressed === 13) { 
+                evt.preventDefault(); 
+                return false; 
+            } 
+        });
 
         $('#pwtc-mapdb-view-signup-div .rider-signup-frm input[name="signup_riderid"]').on('keypress', function(evt) {
             var keyPressed = evt.keyCode || evt.which; 
@@ -446,6 +465,11 @@
 
         $('#pwtc-mapdb-view-signup-div .rider-signup-frm').on('submit', function(evt) {
             show_errmsg4_wait();
+            $('#pwtc-mapdb-view-signup-div button[type="submit"]').prop('disabled',true);
+        });
+    
+        $('#pwtc-mapdb-view-signup-div .nonmember-signup-frm').on('submit', function(evt) {
+            //show_errmsg4_wait();
             $('#pwtc-mapdb-view-signup-div button[type="submit"]').prop('disabled',true);
         });
     
@@ -557,10 +581,16 @@
         <li class="accordion-item" data-accordion-item>
             <a href="#" class="accordion-title">Sign-up Rider...</a>
             <div class="accordion-content" data-tab-content>
+                <div class="row column">
+                    <fieldset>
+                        <input type="radio" name="rider_type" value="member" id="rider-type-member" checked><label for="rider-type-member">Member</label>
+                        <input type="radio" name="rider_type" value="nonmember" id="rider-type-nonmember"><label for="rider-type-nonmember">Non-member</label>
+                    </fieldset>
+                </div>
                 <form class="rider-signup-frm" method="POST" novalidate>
                     <?php wp_nonce_field('signup-view-form', 'nonce_field'); ?>
                     <input type="hidden" name="signup_userid" value="0"/>
-                    <div class="help-text"><p>A rider should use their club member account to sign up for rides. However, if they don't have access to a computer, the ride leader can do it for them here. Enter their rider ID and press lookup. After a rider matching that ID is found, you can enter their mileage and press the accept sign-up button.</p></div>
+                    <div class="help-text"><p>Enter the member's rider ID and press lookup. After a rider matching that ID is found, you can enter their mileage and press the accept sign-up button.</p></div>
                     <div class="row">
                         <div class="small-12 medium-4 columns">
                             <label>Rider ID
@@ -581,6 +611,31 @@
                     <div class="row column errmsg4"></div>
                     <div class="row column clearfix">
                         <button class="accent button float-left" type="submit" disabled><i class="fa fa-user-plus"></i> Accept Sign-up</button>
+                    </div>
+                </form>
+                <form class="nonmember-signup-frm" method="POST" style="display: none" novalidate>
+                    <?php wp_nonce_field('signup-view-form', 'nonce_field'); ?>
+                    <div class="help-text"><p>Enter the non-member's first and last name, their emergency contact information and press the accept sign-up button.</p></div>
+                    <div class="row">
+                        <div class="small-12 medium-4 columns">
+                            <label>First and Last Name
+                                <input type="text" name="nonmember_signup" value=""/>
+                            </label>
+                        </div>
+                        <div class="small-12 medium-4 columns">
+                            <label><i class="fa fa-phone"></i> Emergency Contact Phone
+                                <input type="text" name="nonmember_contact_phone" value=""/>
+                            </label>
+                        </div>
+                        <div class="small-12 medium-4 columns">
+                            <label>Emergency Contact Name
+                                <input type="text" name="nonmember_contact_name" value=""/>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="row column errmsg6"></div>
+                    <div class="row column clearfix">
+                        <button class="accent button float-left" type="submit"><i class="fa fa-user-plus"></i> Accept Sign-up</button>
                     </div>
                 </form>
             </div>
