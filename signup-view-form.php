@@ -387,6 +387,14 @@
         function show_errmsg5_wait() {
             $('#pwtc-mapdb-view-signup-div .errmsg5').html('<div class="callout small"><i class="fa fa-spinner fa-pulse waiting"></i> please wait...</div>');
         }
+    
+        function show_errmsg6_wait() {
+            $('#pwtc-mapdb-view-signup-div .errmsg6').html('<div class="callout small"><i class="fa fa-spinner fa-pulse waiting"></i> please wait...</div>');
+        }
+
+        function show_errmsg6_warning(msg) {
+            $('#pwtc-mapdb-view-signup-div .errmsg6').html('<div class="callout small warning">' + msg + '</div>');
+        }
 
         function riderid_lookup_cb(response) {
             var res;
@@ -463,13 +471,29 @@
             } 
         });
 
+        $('#pwtc-mapdb-view-signup-div .nonmember-signup-frm input[name="nonmember_signup"]').on('input', function(e) {
+            if (e.target.value) {
+                $('#pwtc-mapdb-view-signup-div .nonmember-signup-frm button[type="submit"]').prop('disabled',false);
+            }
+            else {
+                $('#pwtc-mapdb-view-signup-div .nonmember-signup-frm button[type="submit"]').prop('disabled',true);
+            }
+        });
+    
         $('#pwtc-mapdb-view-signup-div .rider-signup-frm').on('submit', function(evt) {
             show_errmsg4_wait();
             $('#pwtc-mapdb-view-signup-div button[type="submit"]').prop('disabled',true);
         });
     
         $('#pwtc-mapdb-view-signup-div .nonmember-signup-frm').on('submit', function(evt) {
-            //show_errmsg4_wait();
+            var name = $('#pwtc-mapdb-view-signup-div .nonmember-signup-frm input[name="nonmember_signup"]').val().trim();
+            if (name.length == 0) {
+                show_errmsg6_warning('You must enter a first and last name.');
+                evt.preventDefault();
+                return;
+            }
+
+            show_errmsg6_wait();
             $('#pwtc-mapdb-view-signup-div button[type="submit"]').prop('disabled',true);
         });
     
@@ -635,7 +659,7 @@
                     </div>
                     <div class="row column errmsg6"></div>
                     <div class="row column clearfix">
-                        <button class="accent button float-left" type="submit"><i class="fa fa-user-plus"></i> Accept Sign-up</button>
+                        <button class="accent button float-left" type="submit" disabled><i class="fa fa-user-plus"></i> Accept Sign-up</button>
                     </div>
                 </form>
             </div>
