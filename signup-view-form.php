@@ -669,7 +669,7 @@
             <div class="accordion-content" data-tab-content>
                 <form class="rider-cancel-frm" method="POST" novalidate>
                     <?php wp_nonce_field('signup-view-form', 'nonce_field'); ?>
-                    <div class="help-text"><p>A rider should use their club member account to cancel their own ride sign up. However, if they don't have access to a computer, the ride leader can do it for them here. Select the rider for which to cancel sign up and press the cancel sign-up button.</p></div>
+                    <div class="help-text"><p>Select the rider for which to cancel sign up and press the cancel sign-up button.</p></div>
                     <div class="row">
                         <div class="small-12 medium-4 columns">
                             <select name="cancel_userid">
@@ -730,9 +730,11 @@
             $user_info = get_userdata($userid);
             if ($user_info) {
                 $name = $user_info->first_name . ' ' . $user_info->last_name;
+                $is_expired = in_array(PwtcMapdb::ROLE_EXPIRED_MEMBER, $user_info->roles);
             }
             else {
                 $name = 'Unknown';
+                $is_expired = false;
             }
             if ($paperless) {
                 $mileage = $arr['mileage'];
@@ -753,7 +755,7 @@
         ?>
             <tr userid="<?php echo $userid; ?>" <?php if (!$attended) { ?>class="absent"<?php } ?>>
             <td attended="<?php echo $attended ? '1':'0'; ?>"><span>Name</span> <?php echo $name; ?> </td>
-            <td><span>Rider ID</span><?php echo $rider_id; ?></td>
+            <td><span>Rider ID</span><?php echo $rider_id; ?><?php if ($is_expired) { ?> <i class="fa fa-exclamation-triangle" title="This rider's membership has expired, their mileage will not be logged."></i><?php } ?></td>
             <?php if ($paperless) { ?>
             <td mileage="<?php echo $mileage; ?>"><span>Mileage</span><?php echo $mileage_label; ?></td>
             <?php } ?>
