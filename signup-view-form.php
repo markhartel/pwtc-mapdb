@@ -492,6 +492,12 @@
                 evt.preventDefault();
                 return;
             }
+            var names = name.split(' ');
+            if (names.length < 2) {
+                show_errmsg6_warning('You must enter BOTH a first and last name.');
+                evt.preventDefault();
+                return;
+            }
 
             show_errmsg6_wait();
             $('#pwtc-mapdb-view-signup-div button[type="submit"]').prop('disabled',true);
