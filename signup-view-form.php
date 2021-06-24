@@ -715,8 +715,8 @@
     <?php if ($ride_signup_mode == 'no') { ?>
         <div class="callout small"><p>Online sign up is not enabled for ride "<?php echo $ride_title; ?>." <?php echo $return_to_ride; ?></p></div>
     <?php } else { ?>
-    <?php if (count($signup_list) > 0 or count($nonmember_signup_list) > 0) { ?>
-        <p>The following riders are currently signed up for the ride "<?php echo $ride_title; ?>."
+    <?php if ($total_signups > 0) { ?>
+        <p>The following <?php echo $total_signups; ?> riders are currently signed up for the ride "<?php echo $ride_title; ?>."
         <?php if ($paperless and !$signup_locked and ($set_mileage or $take_attendance)) { ?>
             <a class="show_more">more&gt;</a><span class="more_details" style="display: none">
             <?php if ($take_attendance) { ?>
