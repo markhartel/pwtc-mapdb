@@ -801,7 +801,7 @@
         <?php if ($logging_limited) { ?>
             <div class="callout small success"><p>Rider mileages cannot be logged to the mileage database because the ride starts before <?php echo $limit_date->format('m/d/Y'); ?>.</p></div>
         <?php } else if ($mileage_logged) { ?>
-            <div class="callout small success"><p>The rider mileages have already been logged to the mileage database, contact the club statistician to make any changes.</p></div>
+            <div class="callout small success"><p>The rider mileages have already been logged to the mileage database, you must contact the club statistician to make any changes.</p></div>
         <?php } else if ($paperless) { ?>
             <div class="callout small success"><p>Online sign up is closed, you may now log the rider mileages to the mileage database. <em>Warning: this can only be done once, so be certain that you have entered all of the final mileages.</em></p></div>
         <?php } else { ?>
