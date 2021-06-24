@@ -14,7 +14,7 @@
     $is_more = ($limit > 0) && ($total > ($offset + $limit));
     ?>
     <table class="pwtc-mapdb-rwd-table">
-        <thead><tr><th>Start Time</th><th>Ride Title</th><th>1st Leader</th><th>Sign-up Mode</th><th>Status</th><th>Actions</th></tr></thead>
+        <thead><tr><th>Start Time</th><th>Ride Title</th><th>1st Leader</th><th>Sign-up Mode</th><th>Status</th></tr></thead>
         <tbody>
     <?php
     while ($query->have_posts()) {
@@ -52,13 +52,10 @@
     ?>
         <tr>
             <td><span>Start Time</span><?php echo $start_date; ?></td>
-            <td><span>Ride Title</span><?php echo $title; ?></td>
+            <td><span>Ride Title</span><a href="<?php echo $view_link; ?>"><?php echo $title; ?></a></td>
             <td><span>1st Leader</span><?php echo $leader; ?></td>
             <td><span>Sign-up Mode</span><?php echo $mode; ?></td>
             <td><span>Status</span><?php echo $status; ?></td>
-            <td><span>Actions</span>
-                <a href="<?php echo $view_link; ?>">View</a>
-            </td>	
         </tr>
     <?php
     }
