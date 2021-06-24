@@ -542,6 +542,7 @@ class PwtcMapdb_Signup {
 
 			$signup_list = get_post_meta($postid, PwtcMapdb::RIDE_SIGNUP_USERID);
 			$nonmember_signup_list = get_post_meta($postid, PwtcMapdb::RIDE_SIGNUP_NONMEMBER);
+			$total_signups = count($signup_list) + count($nonmember_signup_list);
 
 			$signup_locked = self::get_signup_locked($postid);
 			if ($signup_locked) {
