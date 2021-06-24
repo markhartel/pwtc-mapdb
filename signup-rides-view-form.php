@@ -35,7 +35,17 @@
             $leader = '';
         }
         $mode = self::get_signup_mode($postid);
-        $status = self::get_signup_locked($postid) ? 'closed' : 'open';
+        $cutoff = self::get_signup_cutoff($postid);
+        $cutoff_date = self::get_signup_cutoff_time($postid, $mode, $cutoff);
+        if (self::get_signup_locked($postid)) {
+            $status = 'closed';
+        }
+        else if ($now > $cutoff_date) {
+            $status = 'ready to close';
+        }
+        else {
+            $status = 'open';
+        }
         $view_link = esc_url(get_the_permalink());
         $start = PwtcMapdb::get_ride_start_time($postid);
         $start_date = $start->format('m/d/Y g:ia');
@@ -56,6 +66,7 @@
     ?>
         </tbody>
     </table>
+    <p class="help-text">These scheduled rides have online sign-up enabled.</p>
     <?php if ($is_more) { ?>
     <form class="load-more-frm" method="POST">
         <input type="hidden" name="offset" value="<?php echo $offset + $limit; ?>">
