@@ -30,6 +30,7 @@ class PwtcMapdb_Signup {
 		add_shortcode('pwtc_mapdb_show_userid_signups', array('PwtcMapdb_Signup', 'shortcode_show_userid_signups'));
 		add_shortcode('pwtc_mapdb_download_signup', array('PwtcMapdb_Signup', 'shortcode_download_signup'));
 		add_shortcode('pwtc_mapdb_reset_signups', array('PwtcMapdb_Signup', 'shortcode_reset_signups'));
+		add_shortcode('pwtc_mapdb_view_signup_rides', array('PwtcMapdb_Signup', 'shortcode_view_signup_rides'));
 
 		// Register ajax callbacks
 		add_action('wp_ajax_pwtc_mapdb_edit_signup', array('PwtcMapdb_Signup', 'edit_signup_callback'));
@@ -732,6 +733,62 @@ class PwtcMapdb_Signup {
 
 		ob_start();
 		include('signup-your-form.php');
+		return ob_get_clean();
+	}
+	
+	// Generates the [pwtc_mapdb_view_signup_rides] shortcode.
+	public static function shortcode_view_signup_rides($atts) {
+		$a = shortcode_atts(array('limit' => '10'), $atts);
+		$limit = intval($a['limit']);
+
+		$current_user = wp_get_current_user();
+
+		if ( 0 == $current_user->ID ) {
+			return '<div class="callout small warning"><p>Please <a href="/wp-login.php">log in</a> to view the scheduled rides with online sign-up enabled.</p></div>';
+		}
+
+		if (isset($_POST['offset'])) {
+			wp_redirect(add_query_arg(array(
+				'offset' => intval($_POST['offset'])
+			), get_permalink()), 303);
+			exit;
+		}
+
+		if (isset($_GET['offset'])) {
+			$offset = intval($_GET['offset']);
+		}
+		else {
+			$offset = 0;
+		}
+
+		$now = PwtcMapdb::get_current_time();
+		$query_args = [
+			'posts_per_page' => $limit > 0 ? $limit : -1,
+			'post_status' => 'publish',
+			'post_type' => PwtcMapdb::POST_TYPE_RIDE,
+			'meta_key'  => PwtcMapdb::RIDE_DATE,
+			'meta_type' => 'DATETIME',
+			'orderby' => ['meta_value' => 'DESC'],
+			'meta_query' => [
+				'relation' => 'OR',
+				[
+					'key'     => PwtcMapdb::RIDE_SIGNUP_MODE,
+					'value'   => 'hardcopy',
+				],
+				[
+					'key'     => PwtcMapdb::RIDE_SIGNUP_MODE,
+					'value'   => 'paperless',
+				],
+			],
+		];
+
+		if ($limit > 0)	{
+			$query_args['offset'] = $offset;
+		}	 
+		$query = new WP_Query($query_args);
+
+		ob_start();
+		include('signup-rides-view-form.php');
 		return ob_get_clean();
 	}
 
