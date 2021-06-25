@@ -729,17 +729,19 @@
         <?php } ?>
         </p> 
         <div class="errmsg"></div>
-        <table class="pwtc-mapdb-rwd-table"><thead><tr><th>Name</th><th>Rider ID</th><?php if ($paperless) { ?><th>Mileage</th><?php } ?><th>Emergency Contact</th></tr></thead><tbody>
+        <table class="pwtc-mapdb-rwd-table"><thead><tr><th>Name</th><th>Rider ID</th><?php if ($paperless) { ?><th>Mileage</th><?php } ?><th>Phone</th><th>Emergency Contact</th></tr></thead><tbody>
         <?php foreach($signup_list as $item) { 
             $arr = json_decode($item, true);
             $userid = $arr['userid'];
             $user_info = get_userdata($userid);
             if ($user_info) {
                 $name = $user_info->first_name . ' ' . $user_info->last_name;
+                $phone = '<a href="tel:' . pwtc_members_strip_phone_number($user_info->billing_phone) . '">' . pwtc_members_format_phone_number($user_info->billing_phone) . '</a>';
                 $is_expired = in_array(PwtcMapdb::ROLE_EXPIRED_MEMBER, $user_info->roles);
             }
             else {
                 $name = 'Unknown';
+                $phone = '';
                 $is_expired = false;
             }
             if ($paperless) {
@@ -765,6 +767,7 @@
             <?php if ($paperless) { ?>
             <td mileage="<?php echo $mileage; ?>"><span>Mileage</span><?php echo $mileage_label; ?></td>
             <?php } ?>
+            <td><span>Phone</span><?php echo $phone; ?></td>
             <td><span>Emergency Contact</span><?php echo $contact; ?></td>
             </tr>
         <?php } ?>
@@ -774,6 +777,7 @@
             $name = $arr['name'];
             $contact_phone = $arr['contact_phone'];
             $contact_name = $arr['contact_name'];
+            $phone = '';
             $contact = self::get_nonmember_emergency_contact($contact_phone, $contact_name, true);
             if ($paperless) {
                 $mileage = 'XXX';
@@ -790,6 +794,7 @@
             <?php if ($paperless) { ?>
             <td mileage="<?php echo $mileage; ?>"><span>Mileage</span><?php echo $mileage_label; ?></td>
             <?php } ?>
+            <td><span>Phone</span><?php echo $phone; ?></td>
             <td><span>Emergency Contact</span><?php echo $contact; ?></td>
             </tr>
         <?php } ?>
