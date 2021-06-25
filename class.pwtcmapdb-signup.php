@@ -445,6 +445,13 @@ class PwtcMapdb_Signup {
 			if (isset($_POST['nonmember_signup'])) {
 				$signup_id = time() - self::TIMESTAMP_OFFSET;
 				$signup_name = $_POST['nonmember_signup'];
+				$phone = '';
+				if (isset($_POST['nonmember_phone'])) {
+					$phone = $_POST['nonmember_phone'];
+					if (function_exists('pwtc_members_format_phone_number')) {
+						$phone = pwtc_members_format_phone_number($contact_phone);
+					}
+				}
 				$contact_phone = '';
 				if (isset($_POST['nonmember_contact_phone'])) {
 					$contact_phone = $_POST['nonmember_contact_phone'];
@@ -457,7 +464,7 @@ class PwtcMapdb_Signup {
 					$contact_name = $_POST['nonmember_contact_name'];
 				}
 				self::delete_all_nonmember_signups($postid, $signup_id);
-				$value = json_encode(array('signup_id' => $signup_id, 'name' => $signup_name, 'contact_phone' => $contact_phone, 'contact_name' => $contact_name, 'attended' => true));
+				$value = json_encode(array('signup_id' => $signup_id, 'name' => $signup_name, 'phone' => $phone, 'contact_phone' => $contact_phone, 'contact_name' => $contact_name, 'attended' => true));
 				add_post_meta($postid, PwtcMapdb::RIDE_SIGNUP_NONMEMBER, $value);
 			}
 			
