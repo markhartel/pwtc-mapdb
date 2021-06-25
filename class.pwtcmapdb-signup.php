@@ -738,9 +738,10 @@ class PwtcMapdb_Signup {
 	
 	// Generates the [pwtc_mapdb_view_signup_rides] shortcode.
 	public static function shortcode_view_signup_rides($atts) {
-		$a = shortcode_atts(array('limit' => '10'), $atts);
+		$a = shortcode_atts(array('limit' => '10', 'show_all' => 'no'), $atts);
 		$limit = intval($a['limit']);
-
+		$show_all = $a['show_all'] == 'yes';
+		
 		$current_user = wp_get_current_user();
 
 		if ( 0 == $current_user->ID ) {
@@ -752,6 +753,14 @@ class PwtcMapdb_Signup {
 				'offset' => intval($_POST['offset'])
 			), get_permalink()), 303);
 			exit;
+		}
+		
+		if (!$show_all) {
+			$user_info = get_userdata($current_user->ID);
+			$addendum = '(Led by ' . $user_info->first_name . ' ' . $user_info->last_name . ')';
+		}
+		else {
+			$addendum = '';
 		}
 
 		if (isset($_GET['offset'])) {
@@ -769,7 +778,10 @@ class PwtcMapdb_Signup {
 			'meta_key'  => PwtcMapdb::RIDE_DATE,
 			'meta_type' => 'DATETIME',
 			'orderby' => ['meta_value' => 'DESC'],
-			'meta_query' => [
+		];
+		
+		if ($show_all) {
+			$query_args['meta_query'] = [
 				'relation' => 'OR',
 				[
 					'key'     => PwtcMapdb::RIDE_SIGNUP_MODE,
@@ -779,8 +791,29 @@ class PwtcMapdb_Signup {
 					'key'     => PwtcMapdb::RIDE_SIGNUP_MODE,
 					'value'   => 'paperless',
 				],
-			],
-		];
+			];
+		}
+		else {
+			$query_args['meta_query'] = [
+				'relation' => 'AND',
+				[
+					'key' => PwtcMapdb::RIDE_LEADERS,
+					'value' => '"' . $current_user->ID . '"',
+					'compare' => 'LIKE'
+				],
+				[
+					'relation' => 'OR',
+					[
+						'key'     => PwtcMapdb::RIDE_SIGNUP_MODE,
+						'value'   => 'hardcopy',
+					],
+					[
+						'key'     => PwtcMapdb::RIDE_SIGNUP_MODE,
+						'value'   => 'paperless',
+					],
+				],
+			];
+		}
 
 		if ($limit > 0)	{
 			$query_args['offset'] = $offset;
