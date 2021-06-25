@@ -647,22 +647,22 @@
                     <?php wp_nonce_field('signup-view-form', 'nonce_field'); ?>
                     <div class="help-text"><p>Enter the non-member's first and last name, their emergency contact information and press the accept sign-up button.</p></div>
                     <div class="row">
-                        <div class="small-12 medium-6 columns">
+                        <div class="small-12 medium-3 columns">
                             <label>First and Last Name
                                 <input type="text" name="nonmember_signup" value=""/>
                             </label>
                         </div>
-                        <div class="small-12 medium-6 columns">
+                        <div class="small-12 medium-3 columns">
                             <label><i class="fa fa-phone"></i> Contact Phone
                                 <input type="text" name="nonmember_phone" value=""/>
                             </label>
                         </div>
-                        <div class="small-12 medium-6 columns">
+                        <div class="small-12 medium-3 columns">
                             <label><i class="fa fa-phone"></i> Emergency Contact Phone
                                 <input type="text" name="nonmember_contact_phone" value=""/>
                             </label>
                         </div>
-                        <div class="small-12 medium-6 columns">
+                        <div class="small-12 medium-3 columns">
                             <label>Emergency Contact Name
                                 <input type="text" name="nonmember_contact_name" value=""/>
                             </label>
