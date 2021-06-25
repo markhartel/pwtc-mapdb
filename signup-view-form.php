@@ -647,17 +647,22 @@
                     <?php wp_nonce_field('signup-view-form', 'nonce_field'); ?>
                     <div class="help-text"><p>Enter the non-member's first and last name, their emergency contact information and press the accept sign-up button.</p></div>
                     <div class="row">
-                        <div class="small-12 medium-4 columns">
+                        <div class="small-12 medium-6 columns">
                             <label>First and Last Name
                                 <input type="text" name="nonmember_signup" value=""/>
                             </label>
                         </div>
-                        <div class="small-12 medium-4 columns">
+                        <div class="small-12 medium-6 columns">
+                            <label><i class="fa fa-phone"></i> Contact Phone
+                                <input type="text" name="nonmember_phone" value=""/>
+                            </label>
+                        </div>
+                        <div class="small-12 medium-6 columns">
                             <label><i class="fa fa-phone"></i> Emergency Contact Phone
                                 <input type="text" name="nonmember_contact_phone" value=""/>
                             </label>
                         </div>
-                        <div class="small-12 medium-4 columns">
+                        <div class="small-12 medium-6 columns">
                             <label>Emergency Contact Name
                                 <input type="text" name="nonmember_contact_name" value=""/>
                             </label>
@@ -778,6 +783,12 @@
             $contact_phone = $arr['contact_phone'];
             $contact_name = $arr['contact_name'];
             $phone = '';
+            if (isset($arr['phone'])) {
+                $pnum = $arr['phone'];
+                if (!empty($pnum)) {
+                    $phone = '<a href="tel:' . pwtc_members_strip_phone_number($pnum) . '">' . pwtc_members_format_phone_number($pnum) . '</a>';
+                }
+            }
             $contact = self::get_nonmember_emergency_contact($contact_phone, $contact_name, true);
             if ($paperless) {
                 $mileage = 'XXX';
