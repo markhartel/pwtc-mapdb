@@ -63,7 +63,7 @@
     ?>
         </tbody>
     </table>
-    <p class="help-text">These scheduled rides have online sign-up enabled.</p>
+    <p class="help-text">These scheduled rides <?php echo $addendum; ?> have online sign-up enabled.</p>
     <?php if ($is_more) { ?>
     <form class="load-more-frm" method="POST">
         <input type="hidden" name="offset" value="<?php echo $offset + $limit; ?>">
@@ -75,7 +75,7 @@
     </form>
     <?php } ?>
     <?php } else { ?>
-    <div class="callout small"><p>No scheduled rides with online sign-up enabled found.</p></div>
+    <div class="callout small"><p>No scheduled rides <?php echo $addendum; ?> with online sign-up enabled were found.</p></div>
     <?php } ?>
 </div>
 <?php 
