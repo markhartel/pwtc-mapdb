@@ -757,7 +757,7 @@ class PwtcMapdb_Signup {
 		
 		if (!$show_all) {
 			$user_info = get_userdata($current_user->ID);
-			$addendum = '(Led by ' . $user_info->first_name . ' ' . $user_info->last_name . ')';
+			$addendum = '(led by ' . $user_info->first_name . ' ' . $user_info->last_name . ')';
 		}
 		else {
 			$addendum = '';
