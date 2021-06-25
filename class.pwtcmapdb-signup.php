@@ -449,7 +449,7 @@ class PwtcMapdb_Signup {
 				if (isset($_POST['nonmember_phone'])) {
 					$phone = $_POST['nonmember_phone'];
 					if (function_exists('pwtc_members_format_phone_number')) {
-						$phone = pwtc_members_format_phone_number($contact_phone);
+						$phone = pwtc_members_format_phone_number($phone);
 					}
 				}
 				$contact_phone = '';
