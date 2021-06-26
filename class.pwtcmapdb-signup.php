@@ -927,7 +927,11 @@ class PwtcMapdb_Signup {
 					}
 					if (!empty($oldvalue)) {
 						$arr = json_decode($oldvalue, true);
-						$value = json_encode(array('signup_id' => $arr['signup_id'], 'name' => $arr['name'], 'contact_phone' => $arr['contact_phone'], 'contact_name' => $arr['contact_name'], 'attended' => boolval($attended)));
+						$phone = '';
+						if (isset($arr['phone'])) {
+							$phone = $arr['phone'];
+						}
+						$value = json_encode(array('signup_id' => $arr['signup_id'], 'name' => $arr['name'], 'phone' => $phone, 'contact_phone' => $arr['contact_phone'], 'contact_name' => $arr['contact_name'], 'attended' => boolval($attended)));
 						if (update_post_meta($postid, PwtcMapdb::RIDE_SIGNUP_NONMEMBER, $value, $oldvalue)) {
 							$response = array(
 								'postid' => $postid,
@@ -986,11 +990,16 @@ class PwtcMapdb_Signup {
 					}
 				}
 				if ($found) {
+					$phone = '';
+					if (isset($arr['phone'])) {
+						$phone = $arr['phone'];
+					}
 					$response = array(
 						'postid' => $postid,
 						'signup_id' => ''.$signup_id,
 						'found' => $found,
 						'signup_name' => $arr['name'],
+						'signup_phone' => $phone,
 						'signup_contact_phone' => $arr['contact_phone'],
 						'signup_contact_name' => $arr['contact_name']
 					);
