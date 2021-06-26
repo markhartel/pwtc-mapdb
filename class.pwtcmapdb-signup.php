@@ -1014,12 +1014,13 @@ class PwtcMapdb_Signup {
 	}	
 
 	public static function accept_nonmember_signup_callback() {
-		if (isset($_POST['signup_id']) and isset($_POST['postid']) and isset($_POST['nonce']) and isset($_POST['signup_name']) and isset($_POST['signup_contact_phone']) and isset($_POST['signup_contact_name']) and isset($_POST['override'])) {
+		if (isset($_POST['signup_id']) and isset($_POST['postid']) and isset($_POST['nonce']) and isset($_POST['signup_name']) and isset($_POST['signup_phone']) and isset($_POST['signup_contact_phone']) and isset($_POST['signup_contact_name']) and isset($_POST['override'])) {
 			$signup_id = intval($_POST['signup_id']);
 			$postid = intval($_POST['postid']);
 			$signup_limit = self::get_signup_limit($postid);
 			$nonce = $_POST['nonce'];
 			$signup_name = $_POST['signup_name'];
+			$signup_phone = $_POST['signup_phone'];
 			$contact_phone = $_POST['signup_contact_phone'];
 			$contact_name = $_POST['signup_contact_name'];
 			$override = $_POST['override'];
@@ -1066,15 +1067,18 @@ class PwtcMapdb_Signup {
 				}
 				else {
 					if (function_exists('pwtc_members_format_phone_number')) {
+						$signup_phone = pwtc_members_format_phone_number($signup_phone);
+					}
+					if (function_exists('pwtc_members_format_phone_number')) {
 						$contact_phone = pwtc_members_format_phone_number($contact_phone);
 					}
 					self::delete_all_nonmember_signups($postid, $signup_id);
-					$value = json_encode(array('signup_id' => $signup_id, 'name' => $signup_name, 'contact_phone' => $contact_phone, 'contact_name' => $contact_name, 'attended' => true));
-					add_post_meta($postid, PwtcMapdb::RIDE_SIGNUP_NONMEMBER, $value);
+					$value = json_encode(array('signup_id' => $signup_id, 'name' => $signup_name, 'phone' => $signup_phone, 'contact_phone' => $contact_phone, 'contact_name' => $contact_name, 'attended' => true));					add_post_meta($postid, PwtcMapdb::RIDE_SIGNUP_NONMEMBER, $value);
 					$response = array(
 						'postid' => $postid,
 						'signup_id' => ''.$signup_id,
 						'signup_name' => $signup_name,
+						'signup_phone' => $signup_phone,
 						'signup_contact_phone' => $contact_phone,
 						'signup_contact_name' => $contact_name
 					);
