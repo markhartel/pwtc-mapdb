@@ -4,6 +4,7 @@ class PwtcMapdb_Signup {
 
 	const LOCAL_SIGNUP_ID = 'ride_signup_id';
 	const LOCAL_SIGNUP_NAME = 'ride_signup_name';
+	const LOCAL_SIGNUP_PHONE = 'ride_signup_phone';
 	const LOCAL_EMER_NAME = 'ride_signup_contact_name';
 	const LOCAL_EMER_PHONE = 'ride_signup_contact_phone';
 
