@@ -102,6 +102,7 @@
                     }
                     else {
                         window.localStorage.setItem('<?php echo self::LOCAL_SIGNUP_NAME; ?>', res.signup_name);
+                        window.localStorage.setItem('<?php echo self::LOCAL_SIGNUP_PHONE; ?>', res.signup_phone);
                         window.localStorage.setItem('<?php echo self::LOCAL_EMER_NAME; ?>', res.signup_contact_name);
                         window.localStorage.setItem('<?php echo self::LOCAL_EMER_PHONE; ?>', res.signup_contact_phone);
                         $('#pwtc-mapdb-nonmember-signup-div .accept_div').hide();
