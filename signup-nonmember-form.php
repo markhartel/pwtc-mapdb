@@ -29,6 +29,11 @@
                 your_name = '';
             }
             form.find('input[name="your_name"]').val(your_name);
+            var your_phone = window.localStorage.getItem('<?php echo self::LOCAL_SIGNUP_PHONE; ?>');
+            if (!your_phone) {
+                your_phone = '';
+            }
+            form.find('input[name="your_phone"]').val(your_phone);
             var contact_phone = window.localStorage.getItem('<?php echo self::LOCAL_EMER_PHONE; ?>');
             if (!contact_phone) {
                 contact_phone = '';
@@ -150,6 +155,7 @@
             else if (your_name) {
                 clear_warnmsg();
                 var signup_id = window.localStorage.getItem('<?php echo self::LOCAL_SIGNUP_ID; ?>');
+                var your_phone = $(this).find('input[name="your_phone"]').val().trim();
                 var contact_phone = $(this).find('input[name="contact_phone"]').val().trim();
                 var contact_name = $(this).find('input[name="contact_name"]').val().trim();
                 var override = $(this).find('input[name="override"]').val().trim();
@@ -160,6 +166,7 @@
                     'postid': '<?php echo $postid ?>',
                     'signup_id': signup_id,
                     'signup_name': your_name,
+                    'signup_phone': your_phone,
                     'signup_contact_phone': contact_phone,
                     'signup_contact_name': contact_name,
                     'override': override
@@ -242,6 +249,11 @@
                 <div class="small-12 medium-6 columns">
                     <label>Your First and Last Name
                         <input type="text" name="your_name" value=""/>
+                    </label>
+                </div>
+                <div class="small-12 medium-6 columns">
+                    <label><i class="fa fa-phone"></i> Contact Phone
+                        <input type="text" name="your_phone" value=""/>
                     </label>
                 </div>
                 <div class="small-12 medium-6 columns">
