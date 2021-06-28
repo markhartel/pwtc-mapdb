@@ -168,8 +168,8 @@ class PwtcMapdb_Signup {
 				$pdf->Cell(10, $cell_h, 'No.', 1, 0,'C');
 				$pdf->Cell(30, $cell_h, 'Member #', 1, 0,'C');
 				$pdf->Cell(20, $cell_h, 'Miles', 1, 0,'C');
-				$pdf->Cell(70, $cell_h, 'Rider Name', 1, 0,'C');
-				$pdf->Cell(50, $cell_h, 'Signature', 1, 0,'C');
+				$pdf->Cell(80, $cell_h, 'Rider Name & Phone', 1, 0,'C');
+				$pdf->Cell(40, $cell_h, 'Signature', 1, 0,'C');
 				$pdf->Cell(80, $cell_h, 'Emergency Phone', 1, 0,'C');
 
 				$y_offset = $table_y;
@@ -186,6 +186,7 @@ class PwtcMapdb_Signup {
 							$user_info = get_userdata($userid);
 							if ($user_info) {
 								$rider_name = $user_info->first_name . ' ' . $user_info->last_name;
+								$rider_name .= ' ' . pwtc_members_format_phone_number($user_info->billing_phone);
 							}
 							else {
 								$rider_name = 'Unknown';
@@ -196,6 +197,9 @@ class PwtcMapdb_Signup {
 						else {
 							$signup_id = $arr['signup_id'];
 							$rider_name = $arr['name'];
+							if (isset($arr['phone'])) {
+								$rider_name .= ' ' . $arr['phone'];
+							}
 							$contact_phone = $arr['contact_phone'];
 							$contact_name = $arr['contact_name'];
 							$contact = self::get_nonmember_emergency_contact($contact_phone, $contact_name, false);	
@@ -210,8 +214,8 @@ class PwtcMapdb_Signup {
 					$pdf->Cell(10, $cell_h, $rider_count, 1, 0,'C');
 					$pdf->Cell(30, $cell_h, $rider_id, 1, 0,'C');
 					$pdf->Cell(20, $cell_h, $mileage, 1, 0,'C');
-					$pdf->Cell(70, $cell_h, $rider_name, 1, 0,'L');
-					$pdf->Cell(50, $cell_h, '', 1, 0,'L');
+					$pdf->Cell(80, $cell_h, $rider_name, 1, 0,'L');
+					$pdf->Cell(40, $cell_h, '', 1, 0,'L');
 					$pdf->Cell(80, $cell_h, $contact, 1, 0,'L');
 				}
 			}
