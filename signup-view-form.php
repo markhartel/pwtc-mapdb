@@ -741,7 +741,10 @@
             $user_info = get_userdata($userid);
             if ($user_info) {
                 $name = $user_info->first_name . ' ' . $user_info->last_name;
-                $phone = '<a href="tel:' . pwtc_members_strip_phone_number($user_info->billing_phone) . '">' . pwtc_members_format_phone_number($user_info->billing_phone) . '</a>';
+                $phone = '';
+                if (!empty($user_info->billing_phone)) {
+                    $phone = '<a href="tel:' . pwtc_members_strip_phone_number($user_info->billing_phone) . '">' . pwtc_members_format_phone_number($user_info->billing_phone) . '</a>';
+                }
                 $is_expired = in_array(PwtcMapdb::ROLE_EXPIRED_MEMBER, $user_info->roles);
             }
             else {
