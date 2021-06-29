@@ -602,8 +602,28 @@ class PwtcMapdb_Map {
 			}
 
 			$postid = intval($_POST['postid']);
-			if (isset($_POST['delete_map'])) {
+			if (isset($_POST['trash_map'])) {
 				if (wp_trash_post($postid)) {
+					wp_redirect(add_query_arg(array(
+						'post' => $postid,
+						'return' => urlencode($return)
+					), get_permalink()), 303);
+				}
+				else {
+					wp_die('Failed to trash this route map.', 403);
+				}
+			}
+			else if (isset($_POST['delete_map'])) {
+				if (isset($_POST['map_file_id'])) {
+					$map_file_id = intval($_POST['map_file_id']);
+					if ($map_file_id > 0) {
+						$status = wp_delete_attachment($map_file_id, true);
+						if ($status === false) {
+							wp_die('Could not delete route map file attachment.', 403);
+						}	
+					}
+				}
+				if (wp_delete_post($postid, true)) {
 					wp_redirect(add_query_arg(array(
 						'post' => $postid,
 						'return' => urlencode($return)
@@ -674,6 +694,17 @@ class PwtcMapdb_Map {
 		else {
 			$deleted = true;
 		}
+		
+		$attached_file = false;
+		while (have_rows(PwtcMapdb::MAP_FIELD, $postid) ): the_row();
+			$map_file = get_sub_field(PwtcMapdb::MAP_FILE_FIELD);
+			if (!empty($map_file)) {
+				$map_file_id = $map_file['id'];
+				if ($map_file_id > 0) {
+					$attached_file = true;
+				}
+			}
+		endwhile;
 
 		ob_start();
 		include('map-delete-form.php');
