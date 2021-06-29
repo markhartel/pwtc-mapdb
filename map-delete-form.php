@@ -13,7 +13,7 @@
 
 <?php } else { ?>
         
-        $('#confirm-delete-modal button').on('click', function(evt) {
+        $('#confirm-delete-modal .confirm-delete-btn').on('click', function(evt) {
             $('#confirm-delete-modal').foundation('close');
             $('#pwtc-mapdb-delete-map-div form').submit();
         });
@@ -70,10 +70,11 @@
         </div>
         <div class="reveal" id="confirm-delete-modal" data-reveal>
             <div class="row column">
-                <p>Do you really want to delete this map?</p>
+                <p>Do you really want to delete this route map?</p>
             </div>
             <div class="row column clearfix">
-                <button class="dark button float-left" type="button">Yes, Delete Map</button>
+                <button class="confirm-delete-btn dark button float-left" type="button">Yes, Delete Map</button>
+                <button class="dark button float-right" type="button" data-close>Cancel</button>
             </div>
         </div>
 <?php } else { ?>
