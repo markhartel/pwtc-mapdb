@@ -619,7 +619,7 @@ class PwtcMapdb_Map {
 					if ($map_file_id > 0) {
 						$status = wp_delete_attachment($map_file_id, true);
 						if ($status === false) {
-							wp_die('Could not delete route map file attachment.', 403);
+							wp_die('Failed to delete the file attached to this route map', 403);
 						}	
 					}
 				}
@@ -647,18 +647,18 @@ class PwtcMapdb_Map {
 			exit;
 		}
 
-		$error = self::check_post_id(true);
-		if (!empty($error)) {
-			return $error;
-		}
-		$postid = intval($_GET['post']);
-
 		$map_link = '';
 		$return_to_map = '';
 		if (!empty($return) and $use_return) {
 			$map_link = esc_url($return);
 			$return_to_map = self::create_return_link($map_link);
 		}
+		
+		$error = self::check_post_id(true);
+		if (!empty($error)) {
+			return $error;
+		}
+		$postid = intval($_GET['post']);
 
 		$map_title = esc_html(get_the_title($postid));
 
