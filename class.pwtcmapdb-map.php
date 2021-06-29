@@ -420,11 +420,18 @@ class PwtcMapdb_Map {
 				$copy_map = true;
 			}
 		}
+		
+		$map_link = '';
+		$return_to_map = '';
+		if (!empty($return) and $use_return) {
+			$map_link = esc_url($return);
+			$return_to_map = self::create_return_link($map_link);
+		}
 
 		if (isset($_GET['post'])) {
 			$error = self::check_post_id();
 			if (!empty($error)) {
-				return $error;
+				return $return_to_map . $error;
 			}
 			$postid = intval($_GET['post']);
 		}
@@ -432,16 +439,16 @@ class PwtcMapdb_Map {
 			$postid = 0;
 		}
 
-        if ($postid != 0) {
+        	if ($postid != 0) {
 			$post = get_post($postid);
-            $title = $post->post_title;
-            $author = $post->post_author;
-            $status = $post->post_status;
+            		$title = $post->post_title;
+           		 $author = $post->post_author;
+            		$status = $post->post_status;
 		}
 		else {
-            $title = '';
-            $author = $current_user->ID;
-            $status = 'draft';
+           		$title = '';
+            		$author = $current_user->ID;
+            		$status = 'draft';
 		}
 
 		$author_name = '';
@@ -463,32 +470,25 @@ class PwtcMapdb_Map {
 			$map_title = esc_html(get_the_title($postid));
 		}
 
-		$map_link = '';
-		$return_to_map = '';
-		if (!empty($return) and $use_return) {
-			$map_link = esc_url($return);
-			$return_to_map = self::create_return_link($map_link);
-		}
-
 		if (!$allow_leaders and !$is_road_captain) {
 			return $return_to_map . '<div class="callout small warning"><p>You are not allowed to submit route maps.</p></div>';
 		}
 
 		if ($copy_map and !$is_road_captain) {
-            if (!$is_ride_leader) {
-                return $return_to_map . '<div class="callout small warning"><p>You must be a ride leader to copy route maps.</p></div>';
-            }
+            		if (!$is_ride_leader) {
+                		return $return_to_map . '<div class="callout small warning"><p>You must be a ride leader to copy route maps.</p></div>';
+            		}
 		}
 
 		if ($postid == 0 and !$is_road_captain) {
-            if (!$is_ride_leader) {
-                return $return_to_map . '<div class="callout small warning"><p>You must be a ride leader to create new route maps.</p></div>';
-            }
+            		if (!$is_ride_leader) {
+                		return $return_to_map . '<div class="callout small warning"><p>You must be a ride leader to create new route maps.</p></div>';
+            		}
 		}
 
 		if ($postid != 0 and !$copy_map) {
 			$lock_user = self::check_post_lock($postid);
-		    if ($lock_user) {
+		    	if ($lock_user) {
 				$info = get_userdata($lock_user);
 				$name = $info->first_name . ' ' . $info->last_name;	
 				return $return_to_map . '<div class="callout small warning"><p>Route map "' . $map_title . '" is currently being edited by ' . $name . '. </p></div>';
@@ -656,7 +656,7 @@ class PwtcMapdb_Map {
 		
 		$error = self::check_post_id(true);
 		if (!empty($error)) {
-			return $error;
+			return $return_to_map . $error;
 		}
 		$postid = intval($_GET['post']);
 
