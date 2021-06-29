@@ -12,6 +12,11 @@
         })
 
 <?php } else { ?>
+        
+        $('#confirm-delete-modal button').on('click', function(evt) {
+            $('#confirm-delete-modal').foundation('close');
+            $('#pwtc-mapdb-delete-map-div form').submit();
+        });
 
         $('#pwtc-mapdb-delete-map-div form').on('submit', function(evt) {
             $('#pwtc-mapdb-delete-map-div .errmsg').html('<p><i class="fa fa-spinner fa-pulse"></i> please wait...</p>');
@@ -51,8 +56,28 @@
         <div class="callout small success">
             <p>This route map has been successfully deleted. <a class="revert-action">Undo</a></p>
         </div>
-<?php } else { ?>
+<?php } else if ($attached_file) { ?>
         <input type="hidden" name="delete_map" value="yes"/>
+        <input type="hidden" name="map_file_id" value="<?php echo $map_file_id; ?>"/>
+        <div class="callout">
+            <div class="row column">
+                <p>To delete draft route map "<?php echo $map_title; ?>", press the delete button below.</p>
+            </div>
+            <div class="row column errmsg"></div>
+            <div class="row column clearfix">
+                <button class="dark button float-left" type="button" data-open="confirm-delete-modal">Delete Map</button>
+            </div>
+        </div>
+        <div class="reveal" id="confirm-delete-modal" data-reveal>
+            <div class="row column">
+                <p>Do you really want to delete this map?</p>
+            </div>
+            <div class="row column clearfix">
+                <button class="dark button float-left" type="button">Yes, Delete Map</button>
+            </div>
+        </div>
+<?php } else { ?>
+        <input type="hidden" name="trash_map" value="yes"/>
         <div class="callout">
             <div class="row column">
                 <p>To delete draft route map "<?php echo $map_title; ?>", press the delete button below.</p>
