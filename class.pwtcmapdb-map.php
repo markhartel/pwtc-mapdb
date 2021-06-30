@@ -166,7 +166,7 @@ class PwtcMapdb_Map {
 			$email = 'no';
 			if ($allow_email) {
 				if ($post_status == 'pending' and !$is_road_captain) {
-					$email = self::ride_unsubmitted_email($postid, $captain_email) ? 'yes': 'failed';
+					$email = self::map_unsubmitted_email($postid, $captain_email) ? 'yes': 'failed';
 				}
 			}
 
@@ -1143,6 +1143,19 @@ class PwtcMapdb_Map {
 The following route map has been submitted for road captain review:<br>
 $map_link.<br>
 To review this route map, use a browser to log in to your club account (you must be a road captain) and open the route map by clicking its link. Make any changes that you see fit and publish the route map or reject (return it to draft.)<br>
+Do not reply to this email!<br>
+EOT;
+		$headers = ['Content-type: text/html'];
+		return wp_mail($captain_email, $subject , $message, $headers);
+	}
+	
+	public static function map_unsubmitted_email($postid, $captain_email) {
+		$map_title = esc_html(get_the_title($postid));
+		$subject = 'Route Map Unsubmitted';
+		$message = <<<EOT
+The author has reverted the following route map back to draft:<br>
+$map_title.<br>
+Ignore the previous review request email and do not review this route map.<br>
 Do not reply to this email!<br>
 EOT;
 		$headers = ['Content-type: text/html'];
