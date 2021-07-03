@@ -750,9 +750,10 @@ class PwtcMapdb_Signup {
 	
 	// Generates the [pwtc_mapdb_view_signup_rides] shortcode.
 	public static function shortcode_view_signup_rides($atts) {
-		$a = shortcode_atts(array('limit' => '10', 'show_all' => 'no'), $atts);
+		$a = shortcode_atts(array('limit' => '10', 'show_all' => 'no', 'show_closed' => 'no'), $atts);
 		$limit = intval($a['limit']);
 		$show_all = $a['show_all'] == 'yes';
+		$show_closed = $a['show_closed'] == 'yes';
 		
 		$current_user = wp_get_current_user();
 
@@ -792,38 +793,53 @@ class PwtcMapdb_Signup {
 			'orderby' => ['meta_value' => 'DESC'],
 		];
 		
-		if ($show_all) {
-			$query_args['meta_query'] = [
+		$query_args['meta_query'] = [
+			'relation' => 'AND',
+			[
 				'relation' => 'OR',
 				[
-					'key'     => PwtcMapdb::RIDE_SIGNUP_MODE,
-					'value'   => 'hardcopy',
+					'key' => PwtcMapdb::RIDE_CANCELED,
+					'compare' => 'NOT EXISTS',
 				],
 				[
-					'key'     => PwtcMapdb::RIDE_SIGNUP_MODE,
-					'value'   => 'paperless',
+					'key' => PwtcMapdb::RIDE_CANCELED,
+					'value' => '1',
+					'compare' => '!=',
+					'type' => 'NUMERIC',
+				],
+			],
+			[
+					'key' => PwtcMapdb::RIDE_SIGNUP_MODE,
+					'compare' => 'EXISTS',
+			],
+			[
+					'key' => PwtcMapdb::RIDE_SIGNUP_MODE,
+					'value' => 'no',
+					'compare' => '!=',
+			],
+		];
+
+		if (!$show_closed) {
+			$query_args['meta_query'][] = [
+				'relation' => 'OR',
+				[
+					'key' => PwtcMapdb::RIDE_SIGNUP_LOCKED,
+					'compare' => 'NOT EXISTS',
+				],
+				[
+					'key' => PwtcMapdb::RIDE_SIGNUP_LOCKED,
+					'value' => '1',
+					'compare' => '!=',
+					'type' => 'NUMERIC',
 				],
 			];
 		}
-		else {
-			$query_args['meta_query'] = [
-				'relation' => 'AND',
-				[
-					'key' => PwtcMapdb::RIDE_LEADERS,
-					'value' => '"' . $current_user->ID . '"',
-					'compare' => 'LIKE'
-				],
-				[
-					'relation' => 'OR',
-					[
-						'key'     => PwtcMapdb::RIDE_SIGNUP_MODE,
-						'value'   => 'hardcopy',
-					],
-					[
-						'key'     => PwtcMapdb::RIDE_SIGNUP_MODE,
-						'value'   => 'paperless',
-					],
-				],
+
+		if (!$show_all) {
+			$query_args['meta_query'][] = [
+				'key' => PwtcMapdb::RIDE_LEADERS,
+				'value' => '"' . $current_user->ID . '"',
+				'compare' => 'LIKE',
 			];
 		}
 
