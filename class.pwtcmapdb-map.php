@@ -324,6 +324,7 @@ class PwtcMapdb_Map {
 						if ($map_file_id == 0) {
 							wp_die('Could not create new attachment for uploaded route map file.', 403);
 						}
+						add_post_meta($map_file_id, '_rml_folder', 3, true);
 					}
 					if ($new_post) {
 						if ($map_file_id > 0) {
