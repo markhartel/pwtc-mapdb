@@ -183,7 +183,7 @@ class PwtcMapdb_Ride {
 			}
 			
 			$operation = '';
-			$new_post = false;
+			$new_post = true;
 			$postid = intval($_POST['postid']);
 			$title = trim($_POST['title']);
 			$post_status = '';
@@ -437,11 +437,18 @@ class PwtcMapdb_Ride {
 				$template = true;
 			}
 		}
+		
+		$ride_link = '';
+		$return_to_ride = '';
+		if (!empty($return) and $use_return) {
+			$ride_link = esc_url($return);
+			$return_to_ride = self::create_return_link($ride_link);
+		}
 
 		if (isset($_GET['post'])) {
 			$error = self::check_post_id($template);
 			if (!empty($error)) {
-				return $error;
+				return $return_to_ride . $error;
 			}
 			$postid = intval($_GET['post']);
 		}
@@ -480,13 +487,6 @@ class PwtcMapdb_Ride {
 		$ride_title = '';
 		if ($postid != 0) {
 			$ride_title = esc_html(get_the_title($postid));
-		}
-
-		$ride_link = '';
-		$return_to_ride = '';
-		if (!empty($return) and $use_return) {
-			$ride_link = esc_url($return);
-			$return_to_ride = self::create_return_link($ride_link);
 		}
 		
 		if (!$allow_leaders and !$is_road_captain) {
@@ -776,18 +776,18 @@ class PwtcMapdb_Ride {
 			exit;
 		}
 
-		$error = self::check_post_id(false, true);
-		if (!empty($error)) {
-			return $error;
-		}
-		$postid = intval($_GET['post']);
-
 		$ride_link = '';
 		$return_to_ride = '';
 		if (!empty($return) and $use_return) {
 			$ride_link = esc_url($return);
 			$return_to_ride = self::create_return_link($ride_link);
 		}
+		
+		$error = self::check_post_id(false, true);
+		if (!empty($error)) {
+			return $return_to_ride . $error;
+		}
+		$postid = intval($_GET['post']);
 
 		$ride_title = esc_html(get_the_title($postid));
 
