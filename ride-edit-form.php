@@ -25,6 +25,20 @@
     #pwtc-mapdb-edit-ride-div .map-search-div table tr:nth-child(odd) {
         background-color: #f2f2f2;
     }
+    #pwtc-mapdb-edit-ride-div .pending-maps-div table tr {
+        cursor: pointer;
+    }
+    #pwtc-mapdb-edit-ride-div .pending-maps-div table tr:hover {
+        background-color: black !important;
+        color: white !important;
+    }
+    #pwtc-mapdb-edit-ride-div .pending-maps-div table td {
+        padding: 3px;
+        vertical-align: top;
+    }
+    #pwtc-mapdb-edit-ride-div .pending-maps-div table tr:nth-child(odd) {
+        background-color: #f2f2f2;
+    }
     #pwtc-mapdb-edit-ride-div .leaders-div div {
         margin: 10px; 
         padding: 10px; 
@@ -207,6 +221,22 @@
                 });
             }
         }
+        
+        $('#pwtc-mapdb-edit-ride-div .pending-maps-div tr a').on('click', function(evt) {
+            evt.stopPropagation();
+        });
+        
+        $('#pwtc-mapdb-edit-ride-div .pending-maps-div tr').on('click', function(evt) {
+            var mapid = $(this).attr('mapid');
+            if (!has_map_id(mapid)) {
+                var title = $(this).find('td').first().html();
+                var link = $(this).find('td').last().html();
+                is_dirty = true;
+                $('#pwtc-mapdb-edit-ride-div .maps-div').append('<div mapid="' + mapid + '"><i class="fa fa-times"></i> ' + title + ' ' + link + '</div>').find('.fa-times').on('click', function(evt) {
+                    $(this).parent().remove();
+                });
+            }
+        });        
 
         $('#pwtc-mapdb-edit-ride-div .leaders-div i').on('click', function(evt) {
             is_dirty = true;
@@ -868,10 +898,10 @@
             <div class="row column attach-map-yes">
                 <ul class="accordion" data-accordion data-allow-all-closed="true">
                     <li class="accordion-item" data-accordion-item>
-                        <a href="#" class="accordion-title">Add Ride Map...</a>
+                        <a href="#" class="accordion-title">Add Map from Library...</a>
                         <div class="accordion-content" data-tab-content>
                             <div class="row column">
-                               <p class="help-text">Find ride route maps by entering a title and pressing search, then choose the desired map from the resulting list. When choosing a map, make certain that the start location on the route map matches the start location of the ride. To inspect the map, press the download or link icon.</p>
+                                <p class="help-text">Find route maps in the library by entering a title and pressing search, then choose the desired map from the resulting list. When choosing a map, make certain that the start location on the route map matches the start location of the ride. To inspect the map, press the download or link icon.</p>
                                 <div class="input-group">
                                     <input class="input-group-field" type="text" name="map-pattern" placeholder="Enter map title">
                                     <div class="input-group-button">
@@ -885,6 +915,50 @@
                             </div>
                         </div>
                     </li>
+    <?php if ($author == $current_user->ID and ($postid == 0 or $status == 'draft')) { ?>
+                    <li class="accordion-item" data-accordion-item>
+                        <a href="#" class="accordion-title">Add Submitted Map...</a>
+                        <div class="accordion-content" data-tab-content>
+                            <div class="row column">
+                                <p class="help-text">Below is a list of your submitted route maps. Scroll through the list and choose the desired map. When choosing a map, make certain that the start location on the route map matches the start location of the ride. To inspect the map, press the download or link icon.</p>
+                            </div>
+                            <div class="row column">
+                                <div class="pending-maps-div" style="border:1px solid; overflow: auto; height: 100px;">
+                                <?php
+                                $query_args = [
+                                    'posts_per_page' => -1,
+                                    'post_status' => 'pending',
+                                    'post_type' => PwtcMapdb::MAP_POST_TYPE,
+                                    'author' => $current_user->ID,
+                                    'orderby' => 'date',
+                                    'order' => 'DESC',
+                                ];
+                                $query = new WP_Query($query_args);
+                                if ($query->have_posts()) {
+                                ?>
+                                <table>
+                                    <?php
+                                    while ($query->have_posts()) {
+                                        $query->the_post();
+                                        $pid = get_the_ID();
+                                        $d = get_field(PwtcMapdb::LENGTH_FIELD, $pid);
+                                        $max_d = get_field(PwtcMapdb::MAX_LENGTH_FIELD, $pid);
+                                        $t = get_field(PwtcMapdb::TERRAIN_FIELD, $pid);
+                                    ?>
+                                    <tr mapid="<?php echo $pid; ?>">
+                                        <td><?php echo esc_html(get_the_title()); ?></td>
+                                        <td><?php echo PwtcMapdb::build_distance_str($d, $max_d); ?></td>
+                                        <td><?php echo PwtcMapdb::build_terrain_str($t); ?></td>
+                                        <td><?php echo PwtcMapdb::get_map_link($pid); ?></td>
+                                    </tr>
+                                    <?php } ?>
+                                    </table>
+                                <?php } ?>
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+    <?php } ?>
                 </ul>					
             </div>
             <div class="row column">
