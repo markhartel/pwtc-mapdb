@@ -952,7 +952,7 @@
                                         <td><?php echo PwtcMapdb::get_map_link($pid); ?></td>
                                     </tr>
                                     <?php } ?>
-                                    </table>
+                                </table>
                                 <?php } ?>
                                 </div>
                             </div>
