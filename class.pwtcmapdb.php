@@ -344,6 +344,25 @@ class PwtcMapdb {
 		}
 		return $link;
 	}
+	
+	public static function build_terrain_str($terrain) {
+		$terrain_str = '';
+		foreach ($terrain as $item) {
+			$terrain_str .= strtoupper($item);
+		}
+		return $terrain_str;
+	}
+
+	public static function build_distance_str($length, $max_length) {
+		$distance_str = '';
+		if ($max_length == '') {
+			$distance_str = $length . ' miles';
+		}
+		else {
+			$distance_str = $length . '-' . $max_length . ' miles';
+		}
+		return $distance_str;
+	}
 
 	/******* AJAX request/response callback functions *******/
 
