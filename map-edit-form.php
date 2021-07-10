@@ -288,7 +288,7 @@
         <p>
     <?php } else { ?>
         <div class="callout small warning">
-            <p>Before submitting a new map, check the Map Library to ensure that your route does not already exist, or that there is a satisfactory similar route that you may use.</p>
+            <p>Before submitting a new map, check the Map Library to ensure that your route does not already exist, or that there is a satisfactory similar route you may use instead.</p>
         </div>
         <p>This is a new route map, fill out the form below and press the save button at the bottom of the form.</p>
     <?php } ?>
@@ -337,7 +337,7 @@
                     </span>
                     <input type="url" name="map_link" value="<?php echo $map_link; ?>"/>
                 </label>
-		<p class="help-text">When using a map from Ride With GPS...</p>
+		<p class="help-text">When using a map from Ride With GPS, it needs to be public and placed into the club account library. The link format needs to resemble this example: "https://ridewithgps.com/routes/36699009".</p>
             </div>
 	    <div class="row">
                 <div class="small-12 medium-4 columns">
