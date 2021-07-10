@@ -270,8 +270,8 @@
     </div>
     <?php } ?>
     <div>
-        <p>
     <?php if ($postid != 0) { ?>
+        <p>
         This route map was authored by 
         <?php if ($author != $current_user->ID) { 
             echo '<a href="' . esc_url('mailto:' . $author_email) . '">' . $author_name . '</a>';
@@ -285,14 +285,13 @@
         <?php } else if ($status == 'publish') { ?>
         published and ready for use. It can be updated or unpublished using the buttons at the bottom of the form.
         <?php } ?>
+        <p>
     <?php } else { ?>
-        <?php if ($copy_ride) { ?>
-        This is a new route map copied from an existing route map, set the <em>ride date</em> in the form below (and modify any other desired fields) and press the save button at the bottom of the form.
-        <?php } else { ?>
-        This is a new route map, fill out the form below and press the save button at the bottom of the form.
-        <?php } ?>
+        <div class="callout small warning">
+            <p>Before submitting a new map, check the Map Library to ensure that your route does not already exist, or that there is a satisfactory similar route that you may use.</p>
+        </div>
+        <p>This is a new route map, fill out the form below and press the save button at the bottom of the form.</p>
     <?php } ?>
-        </p>
     </div>
     <div class="callout">
         <form method="POST" enctype="multipart/form-data" novalidate>
@@ -303,6 +302,7 @@
                     <input type="hidden" name="postid" value="<?php echo $postid; ?>"/>
                     <input type="hidden" name="post_status" value="<?php echo $status; ?>"/>
                 </label>
+		<p class="help-text">When naming this map, use a title that is descriptive of the route.</p>
             </div>
             <div class="row">
                 <div class="small-12 medium-6 columns">
@@ -325,7 +325,8 @@
             </div>
             <div class="row column map-type-file">
                 <label for="map-file-upload" class="dark button file-upload-lbl">Upload File</label>
-                <input type="file" id="map-file-upload" class="show-for-sr" accept="image/*,.pdf" name="map_file_upload"/>
+                <input type="file" id="map-file-upload" class="show-for-sr" accept=".pdf" name="map_file_upload"/>
+                <p class="help-text">When uploading a map file, it must first exist on your desktop and be in the PDF format.</p>
             </div>
             <div class="row column map-type-link">
                 <label>Route Map Link
@@ -336,6 +337,7 @@
                     </span>
                     <input type="url" name="map_link" value="<?php echo $map_link; ?>"/>
                 </label>
+		<p class="help-text">When using a map from Ride With GPS...</p>
             </div>
 	    <div class="row">
                 <div class="small-12 medium-4 columns">
