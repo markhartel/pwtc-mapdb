@@ -55,7 +55,7 @@
         <input type="hidden" name="delete_ride" value="yes"/>
         <div class="callout">
             <div class="row column">
-                <p>To delete draft ride "<?php echo $ride_title; ?>" on <?php echo $ride_date; ?>, press the delete button below. <?php echo $return_to_ride; ?></p>
+                <p>To delete draft ride "<?php echo $ride_title; ?>" on <?php echo $ride_date; ?>, press the delete button below.</p>
             </div>
             <div class="row column errmsg"></div>
             <div class="row column clearfix">
