@@ -81,3 +81,19 @@ function pwtc_mapdb_get_signup() {
 
     return $result;
 }
+
+function pwtc_mapdb_get_map_metadata() {
+    $disable = false;
+    if ($disable) {
+        $result['edit_map_url'] = false;
+        return $result;
+    }
+    $current_user = wp_get_current_user();
+    $postid = get_the_ID();
+    $return_uri = $_SERVER['REQUEST_URI'];
+    $result['edit_map_url'] = false;
+    if (user_can($current_user,'edit_published_rides')) {
+        $result['edit_map_url'] = esc_url(PwtcMapdb_Map::EDIT_MAP_URI.'?post='.$postid.'&return='.urlencode($return_uri));
+    }
+    return $result;
+}   
