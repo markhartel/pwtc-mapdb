@@ -17,6 +17,12 @@
         <?php } else if ($email_status == 'failed') { ?> but failed to notify road captain by email<?php } ?>. 
         <a class="revert-action">Undo</a></p>
     </div>
+    <div class="row column clearfix">
+        <div class="button-group float-left">
+            <a class="dark button" href="<?php echo $create_map_link; ?>">Create Another Map</a>
+            <a class="dark button" href="<?php echo $create_ride_link; ?>">Create New Ride</a>
+        </div>
+    </div>
     <form method="POST">
         <?php wp_nonce_field('map-edit-form', 'nonce_field'); ?>
         <input type="hidden" name="postid" value="<?php echo $postid; ?>"/>
