@@ -527,6 +527,14 @@ class PwtcMapdb_Ride {
                			return $return_to_ride . '<div class="callout small warning"><p>Ride "' . $ride_title . '" is published so you cannot edit it.</p></div>';
 			}
 			else if ($status == 'pending') {
+				if (!empty($return) and $use_return) {
+					$create_map_link = PwtcMapdb_Map::new_map_link($return);
+					$create_ride_link = self::new_ride_link($return);
+				}
+				else {
+					$create_map_link = PwtcMapdb_Map::new_map_link();
+					$create_ride_link = self::new_ride_link();
+				}
 				ob_start();
 				include('ride-pending-form.php');
 				return ob_get_clean();
