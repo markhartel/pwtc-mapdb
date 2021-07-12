@@ -509,10 +509,18 @@ class PwtcMapdb_Map {
                 return $return_to_map . '<div class="callout small warning"><p>Route map "' . $map_title . '" is published so you cannot edit it.</p></div>';
 			}
 			else if ($status == 'pending') {
+				if (!empty($return) and $use_return) {
+					$create_map_link = self::new_map_link($return);
+					$create_ride_link = PwtcMapdb_Ride::new_ride_link($return);
+				}
+				else {
+					$create_map_link = self::new_map_link();
+					$create_ride_link = PwtcMapdb_Ride::new_ride_link();
+				}
 				ob_start();
 				include('map-pending-form.php');
 				return ob_get_clean();
-            }
+            		}
 		}
 		
 		if ($postid != 0) {
@@ -1086,7 +1094,7 @@ class PwtcMapdb_Map {
 	}
 
 	public static function create_return_link($map_url) {
-		return '<a class="dark button" href="' . $map_url . '"><i class="fa fa-chevron-left"></i> Previous Page</a>';
+		return '<a class="dark button" href="' . $map_url . '"><i class="fa fa-chevron-left"></i> Back</a>';
 	}
 
 	public static function set_post_lock( $post_id ) {
