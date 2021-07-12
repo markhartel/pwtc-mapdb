@@ -70,7 +70,7 @@
         </div>
         <div class="reveal" id="confirm-delete-modal" data-reveal>
             <div class="row column">
-                <p>This route map has an attached file. Both will be permanently deleted if you continue. Do you really want to do this?</p>
+                <p>This route map has an attached file. Both will be permanently deleted if you continue and cannot be undone. Do you really want to do this?</p>
             </div>
             <div class="row column clearfix">
                 <button class="confirm-delete-btn dark button float-left" type="button">Yes, Delete Map</button>
