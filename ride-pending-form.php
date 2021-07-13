@@ -19,6 +19,7 @@
     </div>
     <div class="row column clearfix">
         <div class="button-group float-left">
+            <a class="dark button" href="<?php echo $copy_ride_link; ?>">Copy This Ride</a>
             <a class="dark button" href="<?php echo $create_ride_link; ?>">Create Another Ride</a>
             <a class="dark button" href="<?php echo $create_map_link; ?>">Create New Map</a>
         </div>
