@@ -530,10 +530,12 @@ class PwtcMapdb_Ride {
 				if (!empty($return) and $use_return) {
 					$create_map_link = PwtcMapdb_Map::new_map_link($return);
 					$create_ride_link = self::new_ride_link($return);
+					$copy_ride_link = self::copy_ride_link($postid, $return);
 				}
 				else {
 					$create_map_link = PwtcMapdb_Map::new_map_link();
 					$create_ride_link = self::new_ride_link();
+					$copy_ride_link = self::copy_ride_link($postid);
 				}
 				ob_start();
 				include('ride-pending-form.php');
