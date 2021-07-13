@@ -1094,7 +1094,7 @@ class PwtcMapdb_Map {
 	}
 
 	public static function create_return_link($map_url) {
-		return '<a class="dark button" href="' . $map_url . '"><i class="fa fa-chevron-left"></i> Back</a>';
+		return '<ul class="breadcrumbs"><li><a href="' . $map_url . '">Back to Previous Page</a></li></ul>';
 	}
 
 	public static function set_post_lock( $post_id ) {
