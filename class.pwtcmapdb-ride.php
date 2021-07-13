@@ -1227,7 +1227,7 @@ EOT;
 	}
 
 	public static function create_return_link($ride_url) {
-		return '<a class="dark button" href="' . $ride_url . '"><i class="fa fa-chevron-left"></i> Back</a>';
+		return '<ul class="breadcrumbs"><li><a href="' . $ride_url . '">Back to Previous Page</a></li></ul>';
 	}
 
 	public static function set_post_lock( $post_id ) {
