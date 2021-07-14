@@ -10,8 +10,15 @@
             header += '</tr></thead><tbody></tbody></table>';
             $('#pwtc-mapdb-maps-div').append(header);
             maps.forEach(function(item) {
+                var icon = '';
+                if (item.type == 'file') {
+                    icon = '<i class="fa fa-download"></i> ';
+                }
+                else if (item.type == 'link') {
+                    icon = '<i class="fa fa-link"></i> ';
+                }           
                 var data = '<tr postid="' + item.ID + '">' +
-                '<td><span>Title</span>' + copylink + ' ' + item.media + item.title + '</a></td>' +
+                '<td><span>Title</span>' + item.media + icon + item.title + '</a></td>' +
                 '<td><span>Distance</span>' + item.distance + '</td>' +
                 '<td><span>Terrain</span>' + item.terrain + '</td>';
                 if (can_edit) {
