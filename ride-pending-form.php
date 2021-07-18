@@ -17,6 +17,9 @@
         <?php } else if ($email_status == 'failed') { ?> but failed to notify road captain by email<?php } ?>.
         <a class="revert-action">Undo</a></p>
     </div>
+    <div class="row column">
+        <p class="help-text">Do you wish to create additional rides or route maps? If yes, you may use the convenience buttons below.</p>
+    </div>
     <div class="row column clearfix">
         <div class="button-group float-left">
             <a class="dark button" href="<?php echo $copy_ride_link; ?>">Copy This Ride</a>
