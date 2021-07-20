@@ -11,14 +11,23 @@
             $('#pwtc-mapdb-maps-div').append(header);
             maps.forEach(function(item) {
                 var icon = '';
+                var icon2 = '';
+                var title = '';
                 if (item.type == 'file') {
-                    icon = '<i class="fa fa-download"></i> ';
+                    icon = ' <i class="fa fa-download"></i>';
+                    title = item.media + item.title + icon + '</a>';
                 }
                 else if (item.type == 'link') {
-                    icon = '<i class="fa fa-link"></i> ';
-                }           
+                    icon = ' <i class="fa fa-link"></i>';
+                    title = item.media + item.title + icon + '</a>';
+                }  
+                else if (item.type == 'both') {
+                    icon = ' <i class="fa fa-download"></i>';
+                    icon2 = ' <i class="fa fa-link"></i>';
+                    title = item.title + ' ' + item.media + 'PDF' + icon + '</a> ' + item.media2 + 'GPS' + icon2 + '</a>';
+                }
                 var data = '<tr postid="' + item.ID + '">' +
-                '<td><span>Title</span>' + item.media + icon + item.title + '</a></td>' +
+                '<td><span>Title</span>' + title + '</td>' +
                 '<td><span>Distance</span>' + item.distance + '</td>' +
                 '<td><span>Terrain</span>' + item.terrain + '</td>';
                 if (can_edit) {
