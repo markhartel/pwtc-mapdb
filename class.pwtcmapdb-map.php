@@ -1041,7 +1041,7 @@ class PwtcMapdb_Map {
 					$url = '<a title="Download ride route map file." target="_blank" href="' . $href . '" download>';
 					$link = get_sub_field(PwtcMapdb::MAP_LINK_FIELD);
 					$href2 = esc_url($link);
-					$url2 = '<a title="Display online ride route map." target="_blank" href="' . $href . '">';
+					$url2 = '<a title="Display online ride route map." target="_blank" href="' . $href2 . '">';
 				}
 			endwhile;
 
