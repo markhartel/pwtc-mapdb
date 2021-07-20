@@ -341,6 +341,9 @@ class PwtcMapdb {
 			else if ($maps[0][self::MAP_TYPE_FIELD] == 'file') {
 				$link = '<a title="Download ride route map file." href="' . $maps[0][self::MAP_FILE_FIELD]['url'] . '" target="_blank" download><i class="fa fa-download"></i></a>';
 			}
+			else if ($maps[0][self::MAP_TYPE_FIELD] == 'both') {
+				$link = '<a title="Download ride route map file." href="' . $maps[0][self::MAP_FILE_FIELD]['url'] . '" target="_blank" download><i class="fa fa-download"></i></a><a title="Display online ride route map." href="' . $maps[0][self::MAP_LINK_FIELD] . '" target="_blank"><i class="fa fa-link"></i></a>';
+			}
 		}
 		return $link;
 	}
