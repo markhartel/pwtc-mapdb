@@ -1020,18 +1020,28 @@ class PwtcMapdb_Map {
 
 			$url = '';
 			$href = '';
+			$url2 = '';
+			$href2 = '';
 			$href_type = '';
 			while (have_rows(PwtcMapdb::MAP_FIELD) ): the_row();
 				$href_type = get_sub_field(PwtcMapdb::MAP_TYPE_FIELD);
 				if ($href_type == 'file') {
 					$file = get_sub_field(PwtcMapdb::MAP_FILE_FIELD);
 					$href = esc_url($file['url']);
-					$url = '<a title="Download ride route map file." target="_blank" href="' . $href . '">';
+					$url = '<a title="Download ride route map file." target="_blank" href="' . $href . '" download>';
 				}
 				else if ($href_type == 'link') {
 					$link = get_sub_field(PwtcMapdb::MAP_LINK_FIELD);
 					$href = esc_url($link);
 					$url = '<a title="Display online ride route map." target="_blank" href="' . $href . '">';
+				}
+				else if ($href_type == 'both') {
+					$file = get_sub_field(PwtcMapdb::MAP_FILE_FIELD);
+					$href = esc_url($file['url']);
+					$url = '<a title="Download ride route map file." target="_blank" href="' . $href . '" download>';
+					$link = get_sub_field(PwtcMapdb::MAP_LINK_FIELD);
+					$href2 = esc_url($link);
+					$url2 = '<a title="Display online ride route map." target="_blank" href="' . $href . '">';
 				}
 			endwhile;
 
@@ -1047,8 +1057,10 @@ class PwtcMapdb_Map {
 				'terrain' => $terrain_str,
 				'distance' => $distance_str,
 				'media' => $url,
+				'media2' => $url2,
 				'type' => $href_type,
 				'href' => $href,
+				'href2' => $href2,
 				'edit' => $edit_url
 			];
 			$results[] = $map;
