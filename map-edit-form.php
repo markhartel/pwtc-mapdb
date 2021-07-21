@@ -73,6 +73,12 @@
                 $('#pwtc-mapdb-edit-map-div form .map-type-link input').prop('disabled',false);
                 $('#pwtc-mapdb-edit-map-div form .map-type-link').show();
             }
+	    else if (this.value == 'both') {
+                $('#pwtc-mapdb-edit-map-div form .map-type-file').show();
+                $('#pwtc-mapdb-edit-map-div form .map-type-file input').prop('disabled',false);
+                $('#pwtc-mapdb-edit-map-div form .map-type-link input').prop('disabled',false);
+                $('#pwtc-mapdb-edit-map-div form .map-type-link').show();
+            }
             is_dirty = true;
         });
         
@@ -191,13 +197,18 @@
             $('#pwtc-mapdb-edit-map-div form .map-type-link input').prop('disabled',true);
             $('#pwtc-mapdb-edit-map-div form .map-type-file input').prop('disabled',false);
             $('#pwtc-mapdb-edit-map-div form .map-type-file').show();
-        <?php } else { ?>
+        <?php } else if ($map_type == 'link') { ?>
             $('#pwtc-mapdb-edit-map-div form .map-type-file').hide();
             $('#pwtc-mapdb-edit-map-div form .map-type-file input').prop('disabled',true);
             $('#pwtc-mapdb-edit-map-div form .map-type-link input').prop('disabled',false);
             $('#pwtc-mapdb-edit-map-div form .map-type-link').show();
+        <?php } else if ($map_type == 'both') { ?>
+            $('#pwtc-mapdb-edit-map-div form .map-type-file').show();
+            $('#pwtc-mapdb-edit-map-div form .map-type-file input').prop('disabled',false);
+            $('#pwtc-mapdb-edit-map-div form .map-type-link input').prop('disabled',false);
+            $('#pwtc-mapdb-edit-map-div form .map-type-link').show();
         <?php } ?>
-
+	    
         window.addEventListener('beforeunload', function(e) {
             if (is_dirty) {
                 e.preventDefault();
@@ -310,6 +321,7 @@
                         <legend>Route Map Type</legend>
                         <input type="radio" name="map_type" value="file" id="type-file" <?php echo $map_type == 'file' ? 'checked': ''; ?>><label for="type-file">Download File</label>
                         <input type="radio" name="map_type" value="link" id="type-link" <?php echo $map_type == 'link' ? 'checked': ''; ?>><label for="type-link">URL Link</label>
+			<input type="radio" name="map_type" value="both" id="type-both" <?php echo $map_type == 'both' ? 'checked': ''; ?>><label for="type-both">Both</label>
                     </fieldset>
                 </div>
             </div>
