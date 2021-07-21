@@ -109,7 +109,7 @@
                 return;
             }
 
-	    if ($('#pwtc-mapdb-edit-map-div input[name="map_type"]:checked').val() == 'link') {
+	    if ($('#pwtc-mapdb-edit-map-div input[name="map_type"]:checked').val() != 'file') {
                 var url = $('#pwtc-mapdb-edit-map-div input[name="map_link"]').val().trim();
                 if (url.length == 0) {
                     show_warning('The <strong>route map link</strong> must be set.');
@@ -127,7 +127,8 @@
                     }
                 }
             }
-            else {
+		
+            if ($('#pwtc-mapdb-edit-map-div input[name="map_type"]:checked').val() != 'link') {
                 var attach_id = $('#pwtc-mapdb-edit-map-div input[name="map_file_id"]').val().trim();
                 var file = $('#pwtc-mapdb-edit-map-div input[name="map_file_upload"]').val().trim();
                 if (file.length == 0 && attach_id == '0') {
