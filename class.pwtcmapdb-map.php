@@ -291,6 +291,11 @@ class PwtcMapdb_Map {
 			
 			if (isset($_POST['map_type'])) {
 				$map_type = $_POST['map_type'];
+				
+				$update = false;
+				$row = array(
+					PwtcMapdb::MAP_TYPE_FIELD_KEY => $map_type
+				);
 
 				if (isset($_POST['map_file_id'])) {
 					$map_file_id = intval($_POST['map_file_id']);
@@ -326,64 +331,40 @@ class PwtcMapdb_Map {
 						}
 						add_post_meta($map_file_id, '_rml_folder', 3, true);
 					}
+					$update = true;
 					if ($new_post) {
 						if ($map_file_id > 0) {
-							$row = array(
-								PwtcMapdb::MAP_TYPE_FIELD_KEY => $map_type,
-								PwtcMapdb::MAP_FILE_FIELD_KEY => $map_file_id
-							);
+							$row[PwtcMapdb::MAP_FILE_FIELD_KEY] = $map_file_id;
 						}
-						else {
-							$row = array(
-								PwtcMapdb::MAP_TYPE_FIELD_KEY => $map_type
-							);
-						}
-						if (have_rows(PwtcMapdb::MAP_FIELD_KEY, $postid)) {
-							update_row(PwtcMapdb::MAP_FIELD_KEY, 1, $row, $postid);
-						}
-						else {
-							add_row(PwtcMapdb::MAP_FIELD_KEY, $row, $postid);
-						}						}
+					}
 					else {
 						if ($map_file_id > 0) {
-							$row = array(
-								PwtcMapdb::MAP_TYPE_FIELD => $map_type,
-								PwtcMapdb::MAP_FILE_FIELD => $map_file_id
-							);
-						}
-						else {
-							$row = array(
-								PwtcMapdb::MAP_TYPE_FIELD => $map_type,
-							);
-						}
-						if (have_rows(PwtcMapdb::MAP_FIELD, $postid)) {
-							update_row(PwtcMapdb::MAP_FIELD, 1, $row, $postid);
-						}
-						else {
-							add_row(PwtcMapdb::MAP_FIELD, $row, $postid);
+							$row[PwtcMapdb::MAP_FILE_FIELD] = $map_file_id;
 						}
 					}
 				}
 
 				if (isset($_POST['map_link'])) {
+					$update = true;
 					$map_link = trim($_POST['map_link']);
 					if ($new_post) {
-						$row = array(
-							PwtcMapdb::MAP_TYPE_FIELD_KEY => $map_type,
-							PwtcMapdb::MAP_LINK_FIELD_KEY => $map_link
-						);
+						$row[PwtcMapdb::MAP_LINK_FIELD_KEY] = $map_link;			
+					}
+					else {
+						$row[PwtcMapdb::MAP_LINK_FIELD] = $map_link;
+					}
+				}
+				
+				if ($update) {
+					if ($new_post) {
 						if (have_rows(PwtcMapdb::MAP_FIELD_KEY, $postid)) {
 							update_row(PwtcMapdb::MAP_FIELD_KEY, 1, $row, $postid);
 						}
 						else {
 							add_row(PwtcMapdb::MAP_FIELD_KEY, $row, $postid);
-						}						
+						}	
 					}
 					else {
-						$row = array(
-							PwtcMapdb::MAP_TYPE_FIELD => $map_type,
-							PwtcMapdb::MAP_LINK_FIELD => $map_link
-						);
 						if (have_rows(PwtcMapdb::MAP_FIELD, $postid)) {
 							update_row(PwtcMapdb::MAP_FIELD, 1, $row, $postid);
 						}
