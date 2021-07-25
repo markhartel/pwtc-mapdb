@@ -19,7 +19,7 @@ class PwtcMapdb_Ride {
 
 		// Register action callbacks
 		add_action('wp_enqueue_scripts', array('PwtcMapdb_Ride', 'load_javascripts'));
-		add_action('transition_post_status', array('PwtcMapdb_Ride', 'status_change_callback'), 10, 3);
+		//add_action('transition_post_status', array('PwtcMapdb_Ride', 'status_change_callback'), 10, 3);
 
 		// Register filter callbacks
 		add_filter('heartbeat_received', array('PwtcMapdb_Ride', 'refresh_post_lock'), 10, 3);
