@@ -108,25 +108,6 @@
                 evt.preventDefault();
                 return;
             }
-
-	    if ($('#pwtc-mapdb-edit-map-div input[name="map_type"]:checked').val() != 'file') {
-                var url = $('#pwtc-mapdb-edit-map-div input[name="map_link"]').val().trim();
-                if (url.length == 0) {
-                    show_warning('The <strong>route map link</strong> must be set.');
-                    $('#pwtc-mapdb-edit-map-div input[name="map_link"]').addClass('indicate-error');
-                    evt.preventDefault();
-                    return;
-                }
-                var elem = $('#pwtc-mapdb-edit-map-div input[name="map_link"]')[0];
-                if (elem.validity) {
-                    if (!elem.validity.valid) {
-                        show_warning('The <strong>route map link</strong> has an invalid format.');
-                        $('#pwtc-mapdb-edit-map-div input[name="map_link"]').addClass('indicate-error');
-                        evt.preventDefault();
-                        return;                     
-                    }
-                }
-            }
 		
             if ($('#pwtc-mapdb-edit-map-div input[name="map_type"]:checked').val() != 'link') {
                 var attach_id = $('#pwtc-mapdb-edit-map-div input[name="map_file_id"]').val().trim();
@@ -146,6 +127,25 @@
                             evt.preventDefault();
                             return;                     
                         }
+                    }
+                }
+            }
+		
+	    if ($('#pwtc-mapdb-edit-map-div input[name="map_type"]:checked').val() != 'file') {
+                var url = $('#pwtc-mapdb-edit-map-div input[name="map_link"]').val().trim();
+                if (url.length == 0) {
+                    show_warning('The <strong>route map link</strong> must be set.');
+                    $('#pwtc-mapdb-edit-map-div input[name="map_link"]').addClass('indicate-error');
+                    evt.preventDefault();
+                    return;
+                }
+                var elem = $('#pwtc-mapdb-edit-map-div input[name="map_link"]')[0];
+                if (elem.validity) {
+                    if (!elem.validity.valid) {
+                        show_warning('The <strong>route map link</strong> has an invalid format.');
+                        $('#pwtc-mapdb-edit-map-div input[name="map_link"]').addClass('indicate-error');
+                        evt.preventDefault();
+                        return;                     
                     }
                 }
             }
