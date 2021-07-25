@@ -829,7 +829,9 @@
                     <label>Departure Time
                         <input type="time" name="ride_time" value="<?php echo $ride_time; ?>" <?php echo $edit_date ? '': 'readonly'; ?>/>	
                     </label>
-                    <?php if (!$edit_date) { ?>
+                    <?php if ($edit_date) { ?>
+                    <p class="help-text">To set the time, enter hours then minutes then AM or PM. For example, "10:00 AM".</p>
+                    <?php } else { ?>
                     <p class="help-text">You are not allowed to edit the departure time.</p>
                     <?php } ?>
                 </div>
