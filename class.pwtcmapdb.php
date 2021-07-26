@@ -93,12 +93,14 @@ class PwtcMapdb {
 
 		// Register action callbacks
 		add_action('wp_enqueue_scripts', array('PwtcMapdb', 'load_report_scripts') );
+		//add_action('woocommerce_account_dashboard', array('PwtcMapdb', 'add_mileage_stats_callback'));
 
 		// Register ajax callbacks
 		add_action('wp_ajax_pwtc_mapdb_lookup_ride_leaders', array('PwtcMapdb', 'lookup_ride_leaders_callback'));
 		add_action('wp_ajax_pwtc_mapdb_lookup_riderid', array('PwtcMapdb', 'lookup_riderid_callback'));
 		
 		// Register shortcode callbacks
+		add_shortcode('pwtc_mapdb_ride_leader_check', array('PwtcMapdb', 'shortcode_ride_leader_check'));
 		add_shortcode('pwtc_mapdb_leader_contact', array('PwtcMapdb', 'shortcode_leader_contact'));
 		add_shortcode('pwtc_mapdb_alert_contact', array('PwtcMapdb', 'shortcode_alert_contact'));
 		add_shortcode('pwtc_mapdb_search_riders', array('PwtcMapdb', 'shortcode_search_riders'));
@@ -111,8 +113,38 @@ class PwtcMapdb {
 			PWTC_MAPDB__PLUGIN_URL . 'reports-style-v2.css', array());
 	}
 	
+	public static function add_mileage_stats_callback() {
+		echo '<p>';
+		echo do_shortcode('[pwtc_rider_report]');
+		echo '</p>';
+		echo '<p>Emergency contact information is used to contact a spouse or family member should you suffer an accident or other health related issue on a club ride. <a href="/rider-emergency-contact">Review and edit your emergency contact information.</a></p>';
+		echo '<p>Statistics are maintained on the club rides that members attend. <a href="/your-ytd-rides">View the club rides that you have ridden so far this year.</a></p>';
+		echo '<p>Online sign up is available for club rides at the discretion of the ride leader. <a href="/your-ride-signups">View the upcoming rides for which you are currently signed up.</a></p>';
+	}
+	
 	/******************* Shortcode Functions ******************/
 
+	// Generates the [pwtc_mapdb_ride_leader_check] shortcode.
+	public static function shortcode_ride_leader_check($atts) {
+		$current_user = wp_get_current_user();
+		if (0 == $current_user->ID) {
+			return '';
+		}
+		$user_info = get_userdata($current_user->ID);
+		if (!$user_info) {
+			return '';
+		}
+		$user_name = $user_info->first_name . ' ' . $user_info->last_name;
+		$is_road_captain = in_array(self::ROLE_ROAD_CAPTAIN, $user_info->roles);
+		$is_ride_leader = in_array(self::ROLE_RIDE_LEADER, $user_info->roles);
+		if ($is_ride_leader) {
+			return '<div class="callout"><p>Hello ' . $user_name . ', you are a ride leader.</p></div>';
+		}
+		else {
+			return '<div class="callout warning"><p>Hello ' . $user_name . ', you are NOT a ride leader.</p></div>';
+		}
+	}
+	
 	// Generates the [pwtc_mapdb_leader_contact] shortcode.
 	public static function shortcode_leader_contact($atts) {
 		$error = self::check_plugin_dependency();
