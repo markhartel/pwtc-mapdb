@@ -138,10 +138,10 @@ class PwtcMapdb {
 		$is_road_captain = in_array(self::ROLE_ROAD_CAPTAIN, $user_info->roles);
 		$is_ride_leader = in_array(self::ROLE_RIDE_LEADER, $user_info->roles);
 		if ($is_ride_leader) {
-			return '<div class="callout"><p>Hello ' . $user_name . ', you are a ride leader.</p></div>';
+			return '';
 		}
 		else {
-			return '<div class="callout warning"><p>Hello ' . $user_name . ', you are NOT a ride leader.</p></div>';
+			return '<div class="callout warning"><p>Attention ' . $user_name . ', you must have Ride Leader permissions on the website to lead club rides. Please contact a <a href="mailto:roadcaptain@portlandbicyclingclub.com">road captain</a> if you wish to have this done.</p></div>';
 		}
 	}
 	
