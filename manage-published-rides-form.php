@@ -11,7 +11,7 @@
 
         $('#pwtc-mapdb-manage-published-rides-div .load-more-frm').on('submit', function(evt) {
             $('#pwtc-mapdb-manage-published-rides-div .load-more-frm .errmsg').html('<div class="callout small"><i class="fa fa-spinner fa-pulse waiting"></i> please wait...</div>');
-            $('#pwtc-mapdb-manage-published-rides-div button[type="submit"]').prop('disabled',true);
+            //$('#pwtc-mapdb-manage-published-rides-div button[type="submit"]').prop('disabled',true);
         });
 
         $('#pwtc-mapdb-manage-published-rides-div .search-frm').on('submit', function(evt) {
@@ -78,6 +78,7 @@
     $total = $query->found_posts;
     $warn = $total > $limit;
     $is_more = ($limit > 0) && ($total > ($offset + $limit));
+    $is_prev = ($limit > 0) && ($offset > 0);
     ?>
     <?php if ($warn) { ?>
     <div class="callout small warning">
@@ -131,16 +132,24 @@
     ?>
         </tbody>
     </table>
-    <?php if ($is_more) { ?>
+    <?php if ($is_more or $is_prev) { ?>
     <form class="load-more-frm" method="POST">
-        <input type="hidden" name="offset" value="<?php echo $offset + $limit; ?>">
         <input type="hidden" name="ride_title" value="<?php echo $ride_title; ?>">
         <input type="hidden" name="ride_leader" value="<?php echo $ride_leader; ?>">
         <input type="hidden" name="ride_month" value="<?php echo $ride_month; ?>">
         <div class="row column errmsg"></div>
         <div class="row column clearfix">
-            <button class="dark button float-left" type="submit">Show Next <?php echo $limit; ?> Rides</button>
+            <div class="button-group float-left">
+            <?php if ($is_prev) { ?>
+                <button class="dark button" type="submit" name="offset" value="<?php echo $offset - $limit; ?>">Show Previous <?php echo $limit; ?> Rides</button>
+            <?php } ?>
+            <?php if ($is_more) { ?>
+                <button class="dark button" type="submit" name="offset" value="<?php echo $offset + $limit; ?>">Show Next <?php echo $limit; ?> Rides</button>
+            <?php } ?>
+            </div>
+            <?php if ($is_more) { ?>
             <label class="float-right">Remaining rides: <?php echo ($total - ($offset + $limit)); ?></label>
+            <?php } ?>
         </div>
     </form>
     <?php } ?>
