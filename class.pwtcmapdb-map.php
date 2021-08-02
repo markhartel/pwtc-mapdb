@@ -661,7 +661,7 @@ class PwtcMapdb_Map {
 			return $return_to_map . '<div class="callout small warning"><p>You are not allowed to delete route maps.</p></div>';
 		}
 
-		if ($status == 'publish') {
+		if ($status == 'publish' and !$is_road_captain) {
 			return $return_to_map . '<div class="callout small warning"><p>Route map "' . $map_title . '" is published so you cannot delete it.</p></div>';
 		}
 		else if ($status == 'pending') {
