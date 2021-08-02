@@ -30,6 +30,7 @@ class PwtcMapdb_Map {
 	add_shortcode('pwtc_mapdb_delete_map', array( 'PwtcMapdb_Map', 'shortcode_delete_map'));
 	add_shortcode('pwtc_mapdb_manage_maps', array('PwtcMapdb_Map', 'shortcode_manage_maps'));
 	add_shortcode('pwtc_mapdb_manage_pending_maps', array('PwtcMapdb_Map', 'shortcode_manage_pending_maps'));
+	add_shortcode('pwtc_mapdb_manage_published_maps', array('PwtcMapdb_Map', 'shortcode_manage_published_maps'));
 	add_shortcode('pwtc_mapdb_new_map_link', array('PwtcMapdb_Map', 'shortcode_new_map_link'));
 
         // Register ajax callbacks
@@ -789,6 +790,74 @@ class PwtcMapdb_Map {
 
 		ob_start();
 		include('manage-pending-maps-form.php');
+		return ob_get_clean();
+	}	
+	
+	// Generates the [pwtc_mapdb_manage_published_maps] shortcode.
+	public static function shortcode_manage_published_maps($atts) {
+		$a = shortcode_atts(array('leaders' => 'no', 'limit' => '10'), $atts);
+		$allow_leaders = $a['leaders'] == 'yes';
+		$limit = intval($a['limit']);
+
+		$current_user = wp_get_current_user();
+
+		if ( 0 == $current_user->ID ) {
+			return '<div class="callout small warning"><p>Please <a href="/wp-login.php">log in</a> to view the published route maps.</p></div>';
+		}
+
+		if (isset($_POST['map_title']) and isset($_POST['offset'])) {
+			wp_redirect(add_query_arg(array(
+				'title' => urlencode(trim($_POST['map_title'])),
+				'offset' => intval($_POST['offset'])
+			), get_permalink()), 303);
+			exit;
+		}
+
+		$user_info = get_userdata($current_user->ID);
+		if ($allow_leaders) {
+			$is_road_captain = in_array(PwtcMapdb::ROLE_ROAD_CAPTAIN, $user_info->roles);
+		}
+		else {
+			$is_road_captain = user_can($current_user,'edit_published_rides');
+		}
+		$is_ride_leader = in_array(PwtcMapdb::ROLE_RIDE_LEADER, $user_info->roles);
+
+		if (isset($_GET['title'])) {
+			$map_title = $_GET['title'];
+		}
+		else {
+			$map_title = '';
+		}
+
+		if (isset($_GET['offset'])) {
+			$offset = intval($_GET['offset']);
+		}
+		else {
+			$offset = 0;
+		}
+
+		$query_args = [
+			'posts_per_page' => $limit > 0 ? $limit : -1,
+			'post_status' => 'publish',
+			'post_type' => PwtcMapdb::MAP_POST_TYPE,
+			'orderby'   => 'title',
+			'order'     => 'ASC',
+		];
+
+		if (!empty($map_title)) {
+			$query_args['s'] = $map_title;	
+		}
+		
+		if ($limit > 0)	{
+			$query_args['offset'] = $offset;
+		}
+
+		$query = new WP_Query($query_args);
+
+		$return_uri = $_SERVER['REQUEST_URI'];
+
+		ob_start();
+		include('manage-published-maps-form.php');
 		return ob_get_clean();
 	}	
 
