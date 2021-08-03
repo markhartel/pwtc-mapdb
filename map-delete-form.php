@@ -61,7 +61,7 @@
         <input type="hidden" name="map_file_id" value="<?php echo $map_file_id; ?>"/>
         <div class="callout">
             <div class="row column">
-                <p>To delete draft route map "<?php echo $map_title; ?>", press the delete button below.</p>
+                <p>To delete draft route map "<?php echo $map_title; ?>" and attached file, press the delete button below.</p>
             </div>
             <div class="row column errmsg"></div>
             <div class="row column clearfix">
