@@ -693,10 +693,14 @@ class PwtcMapdb_Map {
 					if ($map_file_id > 0) {
 						$attached_file = true;
 						$query = new WP_Query([
+							'post_type'    => PwtcMapdb::MAP_POST_TYPE,
 							'post__not_in' => [$postid],
 							'post_status'  => ['pending', 'draft', 'publish'],
-							'meta_key'     => 'maps_0_file',
-							'meta_value'   => ''.$map_file_id,
+							'meta_query'   => [[
+								'key'   => 'maps_0_file',
+								'value' => $map_file_id,
+								'type'  => 'numeric',
+							]],
 						]);
 						if ($query->have_posts()) { 
 							$attached_file = false;
