@@ -33,9 +33,33 @@
                 <form class="search-frm" method="POST" novalidate>
                     <input type="hidden" name="offset" value="0">
                     <div class="row">
-                        <div class="small-12 medium-6 columns">
+                        <div class="small-12 medium-4 columns">
                             <label>Map Title 
                                 <input type="text" name="map_title" value="<?php echo $map_title; ?>">
+                            </label>
+                        </div>
+                        <div class="small-12 medium-4 columns">
+                            <label>Distance
+                                <select name="map_distance">
+                                    <option value="0" <?php echo $map_distance == '0' ? 'selected': ''; ?>>Any</option> 
+                                    <option value="1" <?php echo $map_distance == '1' ? 'selected': ''; ?>>0-25 miles</option>
+                                    <option value="2" <?php echo $map_distance == '2' ? 'selected': ''; ?>>25-50 miles</option>
+                                    <option value="3" <?php echo $map_distance == '3' ? 'selected': ''; ?>>50-75 miles</option>
+                                    <option value="4" <?php echo $map_distance == '4' ? 'selected': ''; ?>>75-100 miles</option>
+                                    <option value="5" <?php echo $map_distance == '5' ? 'selected': ''; ?>>&gt; 100 miles</option>
+                                </select>		
+                            </label>
+                        </div>
+                        <div class="small-12 medium-4 columns">
+                            <label>Terrain
+                                <select name="map_terrain">
+                                    <option value="0" <?php echo $map_terrain == '0' ? 'selected': ''; ?>>Any</option> 
+                                    <option value="a" <?php echo $map_terrain == 'a' ? 'selected': ''; ?>>A (flat)</option>
+                                    <option value="b" <?php echo $map_terrain == 'b' ? 'selected': ''; ?>>B (gently rolling)</option>
+                                    <option value="c" <?php echo $map_terrain == 'c' ? 'selected': ''; ?>>C (short steep hills)</option>
+                                    <option value="d" <?php echo $map_terrain == 'd' ? 'selected': ''; ?>>D (longer hills)</option>
+                                    <option value="e" <?php echo $map_terrain == 'e' ? 'selected': ''; ?>>E (mountainous)</option>
+                                </select>
                             </label>
                         </div>
                     </div>
@@ -98,6 +122,8 @@
     <?php if ($is_more or $is_prev) { ?>
     <form class="load-more-frm" method="POST">
         <input type="hidden" name="map_title" value="<?php echo $map_title; ?>">
+        <input type="hidden" name="map_distance" value="<?php echo $map_distance; ?>">
+        <input type="hidden" name="map_terrain" value="<?php echo $map_terrain; ?>">
         <div class="row column errmsg"></div>
         <div class="row column clearfix">
             <div class="button-group float-left">
