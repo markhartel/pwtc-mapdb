@@ -673,7 +673,10 @@ class PwtcMapdb_Map {
 		}
 
 		$deleted = false;
-		if ($status != 'trash') {
+		if ($status == 'trash') {
+			$deleted = true;
+		}
+		else {
 			$lock_user = self::check_post_lock($postid);
 			if ($lock_user) {
 				$info = get_userdata($lock_user);
@@ -681,21 +684,27 @@ class PwtcMapdb_Map {
 				return $return_to_map . '<div class="callout small warning"><p>Route map "' . $map_title . '" is currently being edited by ' . $name . '.</p></div>';
 			}
 			self::set_post_lock($postid);
-		}
-		else {
-			$deleted = true;
-		}
-		
-		$attached_file = false;
-		while (have_rows(PwtcMapdb::MAP_FIELD, $postid) ): the_row();
-			$map_file = get_sub_field(PwtcMapdb::MAP_FILE_FIELD);
-			if (!empty($map_file)) {
-				$map_file_id = $map_file['id'];
-				if ($map_file_id > 0) {
-					$attached_file = true;
+
+			$attached_file = false;
+			while (have_rows(PwtcMapdb::MAP_FIELD, $postid) ): the_row();
+				$map_file = get_sub_field(PwtcMapdb::MAP_FILE_FIELD);
+				if (!empty($map_file)) {
+					$map_file_id = $map_file['id'];
+					if ($map_file_id > 0) {
+						$attached_file = true;
+						$query = new WP_Query([
+							'post__not_in' => [$postid],
+							'post_status'  => ['pending', 'draft', 'publish'],
+							'meta_key'     => 'maps_0_file',
+							'meta_value'   => ''.$map_file_id,
+						]);
+						if ($query->have_posts()) { 
+							$attached_file = false;
+						}
+					}
 				}
-			}
-		endwhile;
+			endwhile;
+		}
 
 		ob_start();
 		include('map-delete-form.php');
