@@ -805,9 +805,11 @@ class PwtcMapdb_Map {
 			return '<div class="callout small warning"><p>Please <a href="/wp-login.php">log in</a> to view the published route maps.</p></div>';
 		}
 
-		if (isset($_POST['map_title']) and isset($_POST['offset'])) {
+		if (isset($_POST['map_title']) and isset($_POST['map_distance']) and isset($_POST['map_terrain']) and isset($_POST['offset'])) {
 			wp_redirect(add_query_arg(array(
 				'title' => urlencode(trim($_POST['map_title'])),
+				'distance' => $_POST['map_distance'],
+				'terrain' => $_POST['map_terrain'],
 				'offset' => intval($_POST['offset'])
 			), get_permalink()), 303);
 			exit;
@@ -828,6 +830,20 @@ class PwtcMapdb_Map {
 		else {
 			$map_title = '';
 		}
+		
+		if (isset($_GET['distance'])) {
+			$map_distance = $_GET['distance'];
+		}
+		else {
+			$map_distance = '0';
+		}
+
+		if (isset($_GET['terrain'])) {
+			$map_terrain = $_GET['terrain'];
+		}
+		else {
+			$map_terrain = '0';
+		}
 
 		if (isset($_GET['offset'])) {
 			$offset = intval($_GET['offset']);
@@ -846,6 +862,67 @@ class PwtcMapdb_Map {
 
 		if (!empty($map_title)) {
 			$query_args['s'] = $map_title;	
+		}
+		
+		if ($map_distance != '0') {
+			$min_dist = -1;
+			$max_dist = -1;
+			switch ($map_distance) {
+				case 1:
+					$max_dist = 25;
+					break;
+				case 2:
+					$min_dist = 25;
+					$max_dist = 50;
+					break;
+				case 3:
+					$min_dist = 50;
+					$max_dist = 75;
+					break;
+				case 4:
+					$min_dist = 75;
+					$max_dist = 100;
+					break;
+				case 5:
+					$min_dist = 100;
+					break;
+				default:
+					break;
+			}
+			if ($min_dist >= 0 or $max_dist >= 0) {
+				if ($min_dist < 0) {
+					$query_args['meta_query'][] = [
+						'key' => PwtcMapdb::LENGTH_FIELD,
+						'value' => [0, $max_dist],
+						'type' => 'NUMERIC',
+						'compare' => 'BETWEEN',
+					];	
+				}
+				else if ($max_dist < 0) {
+					$query_args['meta_query'][] = [
+						'key' => PwtcMapdb::LENGTH_FIELD,
+						'value' => $min_dist,
+						'type' => 'NUMERIC',
+						'compare' => '>',
+					];
+				}
+				else {
+					$query_args['meta_query'][] = [
+						'key' => PwtcMapdb::LENGTH_FIELD,
+						'value' => [$min_dist, $max_dist],
+						'type' => 'NUMERIC',
+						'compare' => 'BETWEEN',
+					];	
+				}
+			}
+		}
+
+		if ($map_terrain != '0') {
+			$query_args['meta_query'][] = [
+                		'key' => PwtcMapdb::TERRAIN_FIELD,
+                		'value' => '"' . $map_terrain . '"',
+                		'compare' => 'LIKE',
+            		];
 		}
 		
 		if ($limit > 0)	{
