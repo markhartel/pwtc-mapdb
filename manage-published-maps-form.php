@@ -21,6 +21,8 @@
 
         $('#pwtc-mapdb-manage-published-maps-div .search-frm a').on('click', function(evt) {
             $('#pwtc-mapdb-manage-published-maps-div .search-frm input[name="map_title"]').val('');
+            $('#pwtc-mapdb-manage-published-maps-div .search-frm select[name="map_distance"]').val('0');
+            $('#pwtc-mapdb-manage-published-maps-div .search-frm select[name="map_terrain"]').val('0');
         });
 
     });
