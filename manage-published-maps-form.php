@@ -86,7 +86,7 @@
     </div>
     <?php } ?>
     <table class="pwtc-mapdb-rwd-table">
-        <thead><tr><th>Map Title</th><th>Type</th><th>Distance</th><th>Terrain</th><th>Actions</th></tr></thead>
+        <thead><tr><th>Map Title</th><th>Distance</th><th>Terrain</th><th>Actions</th></tr></thead>
         <tbody>
     <?php
     while ($query->have_posts()) {
@@ -103,8 +103,7 @@
         $delete_link = self::delete_map_link($postid, $return_uri);
     ?>
         <tr>
-            <td><span>Map Title</span><?php echo $title; ?></td>
-            <td><span>Type</span><?php echo $type; ?></td>
+            <td><span>Map Title</span><?php echo $title; ?> <?php echo $type; ?></td>
             <td><span>Distance</span><?php echo $distance; ?></td>
             <td><span>Terrain</span><?php echo $terrain; ?></td>
             <td><span>Actions</span>
