@@ -69,7 +69,7 @@
     <?php if ($delete_file) { ?>
                 This route map has an attached file which will also be deleted.
     <?php } else { ?>
-                This route map has an attached file used by other posts so it will NOT be deleted.
+                This route map has an attached file used by other posts so the file will NOT be deleted.
     <?php } ?>
                 </p>
             </div>
