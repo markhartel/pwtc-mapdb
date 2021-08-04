@@ -315,6 +315,31 @@ class PwtcMapdb_Map {
 						$filename = sanitize_file_name($_FILES['map_file_upload']['name']);
 						$upload_dir = wp_upload_dir();
 						$movefile = $upload_dir['path'] . '/' . $filename;
+						if (file_exists($movefile)) {
+							$file_count = 0;
+							$split = strrpos($filename, ".");
+							if ($split === false) {
+								$firstpart = $filename;
+								$lastpart = '';
+							}
+							else {
+								$firstpart = substr($filename, 0, $split);
+								$lastpart = substr($filename, $split);
+							}
+							while (true) {
+								$file_count++;
+								$testfile = $firstpart . '-' . $file_count . $lastpart;
+								$testpath = $upload_dir['path'] . '/' . $testfile;
+								if (!file_exists($testpath)) {
+									$filename = $testfile;
+									$movefile = $testpath;
+									break;
+								}
+								if ($file_count > 100) {
+									wp_die('Too many iterations when renaming uploaded route map file.', 403);
+								}
+							}
+						}
 						$status = move_uploaded_file($tmpname, $movefile);
 						if ($status === false) {
 							wp_die('Could not move uploaded route map file.', 403);
