@@ -28,7 +28,7 @@
             if ( data['pwtc-refresh-post-lock'] ) {
                 var received = data['pwtc-refresh-post-lock'];
                 if ( received.lock_error ) {
-                    $('#pwtc-mapdb-delete-ride-div').html('<div class="callout small alert">You cannot delete draft ride "<?php echo $ride_title; ?>" on <?php echo $ride_date; ?>. ' + received.lock_error.text + '</div>');
+                    $('#pwtc-mapdb-delete-ride-div').html('<div class="callout small alert">You cannot delete ride "<?php echo $ride_title; ?>" on <?php echo $ride_date; ?>. ' + received.lock_error.text + '</div>');
                 } 
                 else if ( received.new_lock ) {
                 }
@@ -55,7 +55,7 @@
         <input type="hidden" name="delete_ride" value="yes"/>
         <div class="callout">
             <div class="row column">
-                <p>To delete draft ride "<?php echo $ride_title; ?>" on <?php echo $ride_date; ?>, press the delete button below.</p>
+                <p>To delete ride "<?php echo $ride_title; ?>" on <?php echo $ride_date; ?>, press the delete button below.</p>
             </div>
             <div class="row column errmsg"></div>
             <div class="row column clearfix">
