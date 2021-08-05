@@ -63,6 +63,11 @@
     <?php } else { ?>
         <input type="hidden" name="trash_map" value="yes"/>
     <?php } ?>
+    <?php if ($used_in_ride) { ?>
+        <div class="callout small warning">
+            <p>Warning, this route map is used by a scheduled ride. It can be deleted, but will then be unavailable to the ride.</p>
+        </div>
+    <?php } ?>
         <div class="callout">
             <div class="row column">
                 <p>To delete draft route map "<?php echo $map_title; ?>", press the delete button below.
@@ -93,6 +98,11 @@
         </div>
 <?php } else { ?>
         <input type="hidden" name="trash_map" value="yes"/>
+    <?php if ($used_in_ride) { ?>
+        <div class="callout small warning">
+            <p>Warning, this route map is used by a scheduled ride. It can be deleted, but will then be unavailable to the ride.</p>
+        </div>
+    <?php } ?>
         <div class="callout">
             <div class="row column">
                 <p>To delete route map "<?php echo $map_title; ?>", press the delete button below.</p>
