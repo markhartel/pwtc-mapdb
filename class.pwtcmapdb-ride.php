@@ -810,7 +810,16 @@ class PwtcMapdb_Ride {
 		}
 
 		if ($status == 'publish') {
-			return $return_to_ride . '<div class="callout small warning"><p>Ride "' . $ride_title . '" is published so you cannot delete it.</p></div>';
+			if ($is_road_captain) {
+				$now_date = PwtcMapdb::get_current_time();
+				$ride_datetime = PwtcMapdb::get_ride_start_time($postid);
+				if ($ride_datetime < $now_date) {
+					return $return_to_ride . '<div class="callout small warning"><p>Ride "' . $ride_title . '" has already finished so you cannot delete it.</p></div>';
+				}
+			}
+			else {
+				return $return_to_ride . '<div class="callout small warning"><p>Ride "' . $ride_title . '" is published so you cannot delete it.</p></div>';
+			}
 		}
 		else if ($status == 'pending') {
 			return $return_to_ride . '<div class="callout small warning"><p>Ride "' . $ride_title . '" is pending review so you cannot delete it.</p></div>';
