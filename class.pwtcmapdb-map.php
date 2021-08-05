@@ -709,6 +709,28 @@ class PwtcMapdb_Map {
 				return $return_to_map . '<div class="callout small warning"><p>Route map "' . $map_title . '" is currently being edited by ' . $name . '.</p></div>';
 			}
 			self::set_post_lock($postid);
+			
+			$used_in_ride = false;
+			$query = new WP_Query([
+				'post_type'    => PwtcMapdb::POST_TYPE_RIDE,
+				'post_status'  => ['pending', 'draft', 'publish'],
+				'meta_query'   => [
+					'relation' => 'AND',
+					[
+						'key'     => PwtcMapdb::RIDE_MAPS,
+						'value'   => '"'.$postid.'"',
+						'compare' => 'LIKE',
+					],
+					[
+						'key'   => PwtcMapdb::RIDE_ATTACH_MAP,
+						'value' => 1,
+						'type'  => 'numeric',
+					],
+				],
+			]);
+			if ($query->have_posts()) { 
+				$used_in_ride = true;
+			}			
 
 			$attached_file = false;
 			$delete_file = false;
