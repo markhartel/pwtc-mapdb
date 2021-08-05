@@ -109,6 +109,7 @@
         $view_link = esc_url(get_the_permalink());
         $edit_link = self::edit_ride_link($postid, $return_uri);
         $copy_link = self::copy_ride_link($postid, $return_uri);
+        $delete_link = self::delete_ride_link($postid, $return_uri);
         $start = PwtcMapdb::get_ride_start_time($postid);
         $start_date = $start->format('m/d/Y g:ia');
     ?>
@@ -123,6 +124,7 @@
                 <?php } ?>
                 <?php if ($is_road_captain) { ?>
                 <a href="<?php echo $edit_link; ?>">Edit</a>
+                <a href="<?php echo $delete_link; ?>">Delete</a>
                 <?php } ?>
             </td>	
         </tr>
