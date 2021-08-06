@@ -100,7 +100,7 @@ class PwtcMapdb {
 		add_action('wp_ajax_pwtc_mapdb_lookup_riderid', array('PwtcMapdb', 'lookup_riderid_callback'));
 		
 		// Register shortcode callbacks
-		add_shortcode('pwtc_mapdb_ride_leader_check', array('PwtcMapdb', 'shortcode_ride_leader_check'));
+		add_shortcode('pwtc_mapdb_role_content', array('PwtcMapdb', 'shortcode_role_content'));
 		add_shortcode('pwtc_mapdb_leader_contact', array('PwtcMapdb', 'shortcode_leader_contact'));
 		add_shortcode('pwtc_mapdb_alert_contact', array('PwtcMapdb', 'shortcode_alert_contact'));
 		add_shortcode('pwtc_mapdb_search_riders', array('PwtcMapdb', 'shortcode_search_riders'));
@@ -124,8 +124,9 @@ class PwtcMapdb {
 	
 	/******************* Shortcode Functions ******************/
 
-	// Generates the [pwtc_mapdb_ride_leader_check] shortcode.
-	public static function shortcode_ride_leader_check($atts) {
+	// Generates the [pwtc_mapdb_role_content] shortcode.
+	public static function shortcode_role_content($atts, $content) {
+		$a = shortcode_atts(array('role' => '', 'not_role' => ''), $atts);
 		$current_user = wp_get_current_user();
 		if (0 == $current_user->ID) {
 			return '';
@@ -134,15 +135,13 @@ class PwtcMapdb {
 		if (!$user_info) {
 			return '';
 		}
-		$user_name = $user_info->first_name . ' ' . $user_info->last_name;
-		$is_road_captain = in_array(self::ROLE_ROAD_CAPTAIN, $user_info->roles);
-		$is_ride_leader = in_array(self::ROLE_RIDE_LEADER, $user_info->roles);
-		if ($is_ride_leader) {
-			return '';
+		if (!empty($a['role']) and in_array($a['role'], $user_info->roles)) {
+			return do_shortcode($content);
 		}
-		else {
-			return '<div class="callout warning"><p>Attention ' . $user_name . ', you must have Ride Leader permissions on the website to lead club rides. Please contact a <a href="mailto:roadcaptain@portlandbicyclingclub.com">road captain</a> if you wish to have this done.</p></div>';
+		else if (!empty($a['not_role']) and !in_array($a['not_role'], $user_info->roles)) {
+			return do_shortcode($content);
 		}
+		return '';
 	}
 	
 	// Generates the [pwtc_mapdb_leader_contact] shortcode.
