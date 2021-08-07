@@ -174,16 +174,16 @@
                 res.maps.forEach(function(item) {
                     var a = '';
                     if (item.type == 'file') {
-                        a = '<a title="Download ride route map file." href="' + item.href + '" target="_blank" download><i class="fa fa-download"></i></a>';
+                        a = ' <a title="Download ride route map file." href="' + item.href + '" target="_blank" download><i class="fa fa-download"></i></a>';
                     }
                     else if (item.type == 'link') {
-                        a = '<a title="Display online ride route map." href="' + item.href + '" target="_blank"><i class="fa fa-link"></i></a>';
+                        a = ' <a title="Display online ride route map." href="' + item.href + '" target="_blank"><i class="fa fa-link"></i></a>';
                     }
                     else if (item.type == 'both') {
-                        a = '<a title="Download ride route map file." href="' + item.href + '" target="_blank" download><i class="fa fa-download"></i></a> <a title="Display online ride route map." href="' + item.href2 + '" target="_blank"><i class="fa fa-link"></i></a>';
+                        a = ' <a title="Download ride route map file." href="' + item.href + '" target="_blank" download><i class="fa fa-download"></i></a> <a title="Display online ride route map." href="' + item.href2 + '" target="_blank"><i class="fa fa-link"></i></a>';
                     }
                     $('#pwtc-mapdb-edit-ride-div .map-search-div table').append(
-                        '<tr mapid="' + item.ID + '"><td>' + item.title + '</td><td>' + item.distance + '</td><td>' + item.terrain + '</td><td>' + a + '</td></tr>');  
+                        '<tr mapid="' + item.ID + '"><td>' + item.title + a + '</td><td>' + item.distance + '</td><td>' + item.terrain + '</td></tr>');  
                 });
                 if (res.offset !== undefined) {
                     $('#pwtc-mapdb-edit-ride-div .map-search-div').append('<a class="dark button fetch" offset="' + res.offset + '" count="' + res.count + '">Show Next 10 Maps</a>');
@@ -195,9 +195,8 @@
                     var mapid = $(this).attr('mapid');
                     if (!has_map_id(mapid)) {
                         var title = $(this).find('td').first().html();
-                        var link = $(this).find('td').last().html();
                         is_dirty = true;
-                        $('#pwtc-mapdb-edit-ride-div .maps-div').append('<div mapid="' + mapid + '"><i class="fa fa-times"></i> ' + title + ' ' + link + '</div>').find('.fa-times').on('click', function(evt) {
+                        $('#pwtc-mapdb-edit-ride-div .maps-div').append('<div mapid="' + mapid + '"><i class="fa fa-times"></i> ' + title + '</div>').find('.fa-times').on('click', function(evt) {
                             $(this).parent().remove();
                         });
                     }
@@ -233,9 +232,8 @@
             var mapid = $(this).attr('mapid');
             if (!has_map_id(mapid)) {
                 var title = $(this).find('td').first().html();
-                var link = $(this).find('td').last().html();
                 is_dirty = true;
-                $('#pwtc-mapdb-edit-ride-div .maps-div').append('<div mapid="' + mapid + '"><i class="fa fa-times"></i> ' + title + ' (pending) ' + link + '</div>').find('.fa-times').on('click', function(evt) {
+                $('#pwtc-mapdb-edit-ride-div .maps-div').append('<div mapid="' + mapid + '"><i class="fa fa-times"></i> ' + title + '</div>').find('.fa-times').on('click', function(evt) {
                     $(this).parent().remove();
                 });
             }
@@ -957,10 +955,9 @@
                                         $t = get_field(PwtcMapdb::TERRAIN_FIELD, $pid);
                                     ?>
                                     <tr mapid="<?php echo $pid; ?>">
-                                        <td><?php echo esc_html(get_the_title()); ?></td>
+                                        <td><?php echo esc_html(get_the_title()); ?> (pending) <?php echo PwtcMapdb::get_map_link($pid); ?></td>
                                         <td><?php echo PwtcMapdb::build_distance_str($d, $max_d); ?></td>
                                         <td><?php echo PwtcMapdb::build_terrain_str($t); ?></td>
-                                        <td><?php echo PwtcMapdb::get_map_link($pid); ?></td>
                                     </tr>
                                     <?php } ?>
                                 </table>
