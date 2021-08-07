@@ -135,7 +135,12 @@ class PwtcMapdb {
 		if (!$user_info) {
 			return '';
 		}
-		if (!empty($a['role']) and in_array($a['role'], $user_info->roles)) {
+		if (!empty($a['role']) and !empty($a['not_role'])) {
+			if (in_array($a['role'], $user_info->roles) and !in_array($a['not_role'], $user_info->roles)) {
+				return do_shortcode($content);
+			}
+		}
+		else if (!empty($a['role']) and in_array($a['role'], $user_info->roles)) {
 			return do_shortcode($content);
 		}
 		else if (!empty($a['not_role']) and !in_array($a['not_role'], $user_info->roles)) {
