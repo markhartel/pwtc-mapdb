@@ -957,10 +957,15 @@ class PwtcMapdb_Ride {
 		}
 
 		if (isset($_POST['ride_title']) and isset($_POST['ride_leader']) and isset($_POST['ride_month']) and isset($_POST['offset'])) {
+			$ride_status = 'publish';
+			if (isset($_POST['ride_status'])) {
+				$ride_status = $_POST['ride_status'];
+			}
 			wp_redirect(add_query_arg(array(
 				'month' => $_POST['ride_month'],
 				'leader' => $_POST['ride_leader'],
 				'title' => urlencode(trim($_POST['ride_title'])),
+				'status' => $ride_status,
 				'offset' => intval($_POST['offset'])
 			), get_permalink()), 303);
 			exit;
@@ -980,6 +985,24 @@ class PwtcMapdb_Ride {
 		}
 		else {
 			$ride_title = '';
+		}
+		
+		if (isset($_GET['status']) and $is_road_captain) {
+			$ride_status = $_GET['status'];
+			if ($ride_status == 'all' or $ride_status == 'mine') {
+				$post_status = ['publish', 'pending', 'draft'];
+			}
+			else {
+				$post_status = $ride_status;
+			}
+		}
+		else if ($is_road_captain) {
+			$ride_status = 'all';
+			$post_status = ['publish', 'pending', 'draft'];
+		}
+		else {
+			$ride_status = 'publish';
+			$post_status = $ride_status;
 		}
 
 		if (isset($_GET['leader'])) {
@@ -1019,6 +1042,7 @@ class PwtcMapdb_Ride {
 		$now = PwtcMapdb::get_current_time();
 		$query_args = [
 			'posts_per_page' => $limit > 0 ? $limit : -1,
+			'post_status' => $post_status,
 			'post_status' => 'publish',
 			'post_type' => PwtcMapdb::POST_TYPE_RIDE,
 			'meta_query' => [],
@@ -1026,6 +1050,9 @@ class PwtcMapdb_Ride {
 			'meta_type' => 'DATETIME',
 			'orderby' => ['meta_value' => 'DESC'],
 		];
+		if ($ride_status == 'mine') {
+			$query_args['author'] = $current_user->ID;
+		}
 		if (!empty($ride_month)) {
 			$query_args['meta_query'][] = [
 				'key' => PwtcMapdb::RIDE_DATE,
