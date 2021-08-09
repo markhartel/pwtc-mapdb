@@ -157,6 +157,7 @@
     </table>
     <?php if ($is_more or $is_prev) { ?>
     <form class="load-more-frm" method="POST">
+        <input type="hidden" name="ride_status" value="<?php echo $ride_status; ?>">
         <input type="hidden" name="ride_title" value="<?php echo $ride_title; ?>">
         <input type="hidden" name="ride_leader" value="<?php echo $ride_leader; ?>">
         <input type="hidden" name="ride_month" value="<?php echo $ride_month; ?>">
