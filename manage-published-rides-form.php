@@ -30,6 +30,7 @@
 
         $('#pwtc-mapdb-manage-published-rides-div .search-frm a').on('click', function(evt) {
             $('#pwtc-mapdb-manage-published-rides-div .search-frm input[name="ride_title"]').val('');
+            $('#pwtc-mapdb-manage-published-rides-div .search-frm select[name="ride_status"]').val('all');
             $('#pwtc-mapdb-manage-published-rides-div .search-frm select[name="ride_leader"]').val('anyone');
             $('#pwtc-mapdb-manage-published-rides-div .search-frm input[name="ride_month"]').val('');
         });
@@ -44,7 +45,21 @@
                 <form class="search-frm" method="POST" novalidate>
                     <input type="hidden" name="offset" value="0">
                     <div class="row">
-                        <div class="small-12 medium-6 columns">
+                    <?php if ($is_road_captain) { ?>
+                        <div class="small-12 medium-2 columns">
+                            <label>Ride Status
+                                <select name="ride_status">
+                                    <option value="all" <?php echo $ride_status == 'all' ? 'selected': ''; ?>>All</option>
+                                    <option value="mine" <?php echo $ride_status == 'mine' ? 'selected': ''; ?>>Mine</option>
+                                    <option value="publish" <?php echo $ride_status == 'publish' ? 'selected': ''; ?>>Published</option>
+                                    <option value="pending" <?php echo $ride_status == 'pending' ? 'selected': ''; ?>>Pending Review</option>
+                                    <option value="draft" <?php echo $ride_status == 'draft' ? 'selected': ''; ?>>Draft</option>
+                                    <option value="trash" <?php echo $ride_status == 'trash' ? 'selected': ''; ?>>Trash</option>
+                                </select>
+                            </label>
+                        </div>
+                    <?php } ?>
+                        <div class="small-12 medium-4 columns">
                             <label>Ride Title 
                                 <input type="text" name="ride_title" value="<?php echo $ride_title; ?>">
                             </label>
@@ -92,7 +107,13 @@
     while ($query->have_posts()) {
         $query->the_post();
         $postid = get_the_ID();
+        $status = get_post_status();
         $title = esc_html(get_the_title());
+        if ($ride_status == 'all' or $ride_status == 'mine') {
+            if ($status == 'pending' or $status == 'draft') {
+                $title .= ' <em>' . $status . '</em>';
+            }
+        }
         $leaders = PwtcMapdb::get_leader_userids($postid);
         if (count($leaders)) {
             $user_info = get_userdata($leaders[0]);
