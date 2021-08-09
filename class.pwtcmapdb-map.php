@@ -1008,12 +1008,13 @@ class PwtcMapdb_Map {
 
 	// Generates the [pwtc_mapdb_new_map_link] shortcode.
 	public static function shortcode_new_map_link($atts, $content) {
+		$a = shortcode_atts(array('class' => ''), $atts);
 		$return_uri = $_SERVER['REQUEST_URI'];
 		if (empty($content)) {
 			$content = 'new route map';
 		}
 		$new_link = self::new_map_link($return_uri);
-		return '<a href="' . $new_link . '">' . $content . '</a>';
+		return '<a class="' . $a['class'] . '" href="' . $new_link . '">' . $content . '</a>';
 	}
     
     /******* AJAX request/response callback functions *******/
