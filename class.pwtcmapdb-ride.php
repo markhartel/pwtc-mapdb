@@ -1159,12 +1159,13 @@ class PwtcMapdb_Ride {
 
 	// Generates the [pwtc_mapdb_new_ride_link] shortcode.
 	public static function shortcode_new_ride_link($atts, $content) {
+		$a = shortcode_atts(array('class' => ''), $atts);
 		$return_uri = $_SERVER['REQUEST_URI'];
 		if (empty($content)) {
 			$content = 'new ride';
 		}
 		$new_link = self::new_ride_link($return_uri);
-		return '<a href="' . $new_link . '">' . $content . '</a>';
+		return '<a class="' . $a['class'] . '" href="' . $new_link . '">' . $content . '</a>';
 	}
 
 	/******************* Utility Functions ******************/
