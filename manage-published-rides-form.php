@@ -111,7 +111,7 @@
         $title = esc_html(get_the_title());
         if ($ride_status == 'all' or $ride_status == 'mine') {
             if ($status == 'pending' or $status == 'draft') {
-                $title .= ' <em>' . $status . '</em>';
+                $title .= ' <em>(' . $status . ')</em>';
             }
         }
         $leaders = PwtcMapdb::get_leader_userids($postid);
@@ -139,14 +139,22 @@
             <td><span>Ride Title</span><?php echo $title; ?></td>
             <td><span>1st Leader</span><?php echo $leader; ?></td>
             <td><span>Actions</span>
+            <?php if ($status == 'publish') { ?>
                 <a href="<?php echo $view_link; ?>">View</a>
-                <?php if ($is_road_captain or ($is_ride_leader and $allow_leaders)) { ?>
+            <?php } else if (user_can($current_user,'edit_published_rides') and ($status == 'draft' or $status == 'pending')) { ?> 
+                <a href="<?php echo $view_link; ?>">Preview</a>
+            <?php } ?>   
+            <?php if ($status != 'trash' and ($is_road_captain or ($is_ride_leader and $allow_leaders))) { ?>
                 <a href="<?php echo $copy_link; ?>">Copy</a>
-                <?php } ?>
-                <?php if ($is_road_captain) { ?>
+            <?php } ?>
+            <?php if ($status != 'trash' and $is_road_captain) { ?>
                 <a href="<?php echo $edit_link; ?>">Edit</a>
+            <?php } ?>
+            <?php if ($status != 'trash' and $is_road_captain) { ?>
                 <a href="<?php echo $delete_link; ?>">Delete</a>
-                <?php } ?>
+            <?php } else if ($status == 'trash' and $is_road_captain) { ?>
+                <a href="<?php echo $delete_link; ?>">Restore</a>
+            <?php } ?>
             </td>	
         </tr>
     <?php
