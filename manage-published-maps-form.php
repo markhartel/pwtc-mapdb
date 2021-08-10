@@ -21,6 +21,7 @@
 
         $('#pwtc-mapdb-manage-published-maps-div .search-frm a').on('click', function(evt) {
             $('#pwtc-mapdb-manage-published-maps-div .search-frm input[name="map_title"]').val('');
+            $('#pwtc-mapdb-manage-published-maps-div .search-frm select[name="map_status"]').val('all');
             $('#pwtc-mapdb-manage-published-maps-div .search-frm select[name="map_distance"]').val('0');
             $('#pwtc-mapdb-manage-published-maps-div .search-frm select[name="map_terrain"]').val('0');
         });
@@ -35,12 +36,26 @@
                 <form class="search-frm" method="POST" novalidate>
                     <input type="hidden" name="offset" value="0">
                     <div class="row">
+                    <?php if ($is_road_captain) { ?>
+                        <div class="small-12 medium-2 columns">
+                            <label>Map Status
+                                <select name="map_status">
+                                    <option value="all" <?php echo $map_status == 'all' ? 'selected': ''; ?>>All</option>
+                                    <option value="mine" <?php echo $map_status == 'mine' ? 'selected': ''; ?>>Mine</option>
+                                    <option value="publish" <?php echo $map_status == 'publish' ? 'selected': ''; ?>>Published</option>
+                                    <option value="pending" <?php echo $map_status == 'pending' ? 'selected': ''; ?>>Pending Review</option>
+                                    <option value="draft" <?php echo $map_status == 'draft' ? 'selected': ''; ?>>Draft</option>
+                                    <option value="trash" <?php echo $map_status == 'trash' ? 'selected': ''; ?>>Trash</option>
+                                </select>
+                            </label>
+                        </div>
+                    <?php } ?>
                         <div class="small-12 medium-4 columns">
                             <label>Map Title 
                                 <input type="text" name="map_title" value="<?php echo $map_title; ?>">
                             </label>
                         </div>
-                        <div class="small-12 medium-4 columns">
+                        <div class="small-12 medium-3 columns">
                             <label>Distance
                                 <select name="map_distance">
                                     <option value="0" <?php echo $map_distance == '0' ? 'selected': ''; ?>>Any</option> 
@@ -52,7 +67,7 @@
                                 </select>		
                             </label>
                         </div>
-                        <div class="small-12 medium-4 columns">
+                        <div class="small-12 medium-3 columns">
                             <label>Terrain
                                 <select name="map_terrain">
                                     <option value="0" <?php echo $map_terrain == '0' ? 'selected': ''; ?>>Any</option> 
@@ -86,13 +101,19 @@
     </div>
     <?php } ?>
     <table class="pwtc-mapdb-rwd-table">
-        <thead><tr><th>Map Title</th><th>Distance</th><th>Terrain</th><th>Actions</th></tr></thead>
+        <thead><tr><th>Map Title</th><th>Distance</th><th>Terrain</th><?php if ($is_road_captain) { ?><th>Actions</th><?php } ?></tr></thead>
         <tbody>
     <?php
     while ($query->have_posts()) {
         $query->the_post();
         $postid = get_the_ID();
+        $status = get_post_status();
         $title = esc_html(get_the_title());
+        if ($map_status == 'all' or $map_status == 'mine') {
+            if ($status == 'pending' or $status == 'draft') {
+                $title .= ' <em>(' . $status . ')</em>';
+            }
+        }
         $type = PwtcMapdb::get_map_link($postid);
         $d = get_field(PwtcMapdb::LENGTH_FIELD, $postid);
         $max_d = get_field(PwtcMapdb::MAX_LENGTH_FIELD, $postid);
@@ -103,16 +124,30 @@
         $delete_link = self::delete_map_link($postid, $return_uri);
     ?>
         <tr>
-            <td><span>Map Title</span><?php echo $title; ?> <?php echo $type; ?></td>
+            <td><span>Map Title</span><?php echo $title; ?>
+        <?php if ($status == 'publish') { ?> 
+            <?php echo $type; ?>
+        <?php } ?>
+            </td>
             <td><span>Distance</span><?php echo $distance; ?></td>
             <td><span>Terrain</span><?php echo $terrain; ?></td>
+        <?php if ($is_road_captain) { ?>
             <td><span>Actions</span>
+            <?php if ($status == 'publish') { ?>
                 <a href="<?php echo $view_link; ?>">View</a>
-                <?php if ($is_road_captain) { ?>
+            <?php } else if (user_can($current_user,'edit_published_rides') and ($status == 'draft' or $status == 'pending')) { ?>
+                <a href="<?php echo $view_link; ?>">Preview</a>
+            <?php } ?>
+            <?php if ($status != 'trash' and $is_road_captain) { ?>
                 <a href="<?php echo $edit_link; ?>">Edit</a>
+            <?php } ?>
+            <?php if ($status != 'trash' and $is_road_captain) { ?>
                 <a href="<?php echo $delete_link; ?>">Delete</a>
-                <?php } ?>
-            </td>	
+            <?php } else if ($status == 'trash' and $is_road_captain) { ?>
+                <a href="<?php echo $delete_link; ?>">Restore</a>
+            <?php } ?>
+            </td>
+        <?php } ?>	
         </tr>
     <?php
     }
@@ -122,6 +157,7 @@
     </table>
     <?php if ($is_more or $is_prev) { ?>
     <form class="load-more-frm" method="POST">
+        <input type="hidden" name="map_status" value="<?php echo $map_status; ?>">
         <input type="hidden" name="map_title" value="<?php echo $map_title; ?>">
         <input type="hidden" name="map_distance" value="<?php echo $map_distance; ?>">
         <input type="hidden" name="map_terrain" value="<?php echo $map_terrain; ?>">
@@ -142,7 +178,7 @@
     </form>
     <?php } ?>
     <?php } else { ?>
-    <div class="callout small"><p>No published maps found, use the <em>Search Map Library</em> section to broaden your search.</p></div>
+    <div class="callout small"><p>No route maps found, use the <em>Search Map Library</em> section to broaden your search.</p></div>
     <?php } ?>
 </div>
 <?php 
