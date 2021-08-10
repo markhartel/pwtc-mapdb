@@ -129,18 +129,16 @@ class PwtcMapdb {
 		$a = shortcode_atts(array('role' => '', 'not_role' => ''), $atts);
 		$current_user = wp_get_current_user();
 		if (0 == $current_user->ID) {
-			return '';
-		}
-		$user_info = get_userdata($current_user->ID);
-		if (!$user_info) {
-			return '';
-		}
-		if (!empty($a['role']) and !empty($a['not_role'])) {
-			if (in_array($a['role'], $user_info->roles) and !in_array($a['not_role'], $user_info->roles)) {
+			if (!empty($a['not_role'])) {
 				return do_shortcode($content);
 			}
+			else {
+				return '';
+			}
 		}
-		else if (!empty($a['role']) and in_array($a['role'], $user_info->roles)) {
+		$user_info = get_userdata($current_user->ID);
+
+		if (!empty($a['role']) and in_array($a['role'], $user_info->roles)) {
 			return do_shortcode($content);
 		}
 		else if (!empty($a['not_role']) and !in_array($a['not_role'], $user_info->roles)) {
