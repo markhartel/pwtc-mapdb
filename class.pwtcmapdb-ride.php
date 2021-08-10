@@ -946,7 +946,7 @@ class PwtcMapdb_Ride {
 
 	// Generates the [pwtc_mapdb_manage_published_rides] shortcode.
 	public static function shortcode_manage_published_rides($atts) {
-		$a = shortcode_atts(array('leaders' => 'no', 'limit' => '10'), $atts);
+		$a = shortcode_atts(array('leaders' => 'no', 'limit' => '10', 'status' => 'all'), $atts);
 		$allow_leaders = $a['leaders'] == 'yes';
 		$limit = intval($a['limit']);
 
@@ -997,8 +997,13 @@ class PwtcMapdb_Ride {
 			}
 		}
 		else if ($is_road_captain) {
-			$ride_status = 'all';
-			$post_status = ['publish', 'pending', 'draft'];
+			$ride_status = $a['status'];
+			if ($ride_status == 'all' or $ride_status == 'mine') {
+				$post_status = ['publish', 'pending', 'draft'];
+			}
+			else {
+				$post_status = $ride_status;
+			}
 		}
 		else {
 			$ride_status = 'publish';
