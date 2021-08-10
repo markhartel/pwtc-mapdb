@@ -863,7 +863,7 @@ class PwtcMapdb_Map {
 	
 	// Generates the [pwtc_mapdb_manage_published_maps] shortcode.
 	public static function shortcode_manage_published_maps($atts) {
-		$a = shortcode_atts(array('leaders' => 'no', 'limit' => '10'), $atts);
+		$a = shortcode_atts(array('leaders' => 'no', 'limit' => '10', 'status' => 'all'), $atts);
 		$allow_leaders = $a['leaders'] == 'yes';
 		$limit = intval($a['limit']);
 
@@ -914,8 +914,13 @@ class PwtcMapdb_Map {
 			}
 		}
 		else if ($is_road_captain) {
-			$map_status = 'all';
-			$post_status = ['publish', 'pending', 'draft'];
+			$map_status = $a['status'];
+			if ($map_status == 'all' or $map_status == 'mine') {
+				$post_status = ['publish', 'pending', 'draft'];
+			}
+			else {
+				$post_status = $map_status;
+			}
 		}
 		else {
 			$map_status = 'publish';
