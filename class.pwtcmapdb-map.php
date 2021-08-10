@@ -874,10 +874,15 @@ class PwtcMapdb_Map {
 		}
 
 		if (isset($_POST['map_title']) and isset($_POST['map_distance']) and isset($_POST['map_terrain']) and isset($_POST['offset'])) {
+			$map_status = 'publish';
+			if (isset($_POST['map_status'])) {
+				$map_status = $_POST['map_status'];
+			}
 			wp_redirect(add_query_arg(array(
 				'title' => urlencode(trim($_POST['map_title'])),
 				'distance' => $_POST['map_distance'],
 				'terrain' => $_POST['map_terrain'],
+				'status' => $map_status,
 				'offset' => intval($_POST['offset'])
 			), get_permalink()), 303);
 			exit;
@@ -897,6 +902,24 @@ class PwtcMapdb_Map {
 		}
 		else {
 			$map_title = '';
+		}
+		
+		if (isset($_GET['status']) and $is_road_captain) {
+			$map_status = $_GET['status'];
+			if ($map_status == 'all' or $map_status == 'mine') {
+				$post_status = ['publish', 'pending', 'draft'];
+			}
+			else {
+				$post_status = $map_status;
+			}
+		}
+		else if ($is_road_captain) {
+			$map_status = 'all';
+			$post_status = ['publish', 'pending', 'draft'];
+		}
+		else {
+			$map_status = 'publish';
+			$post_status = $map_status;
 		}
 		
 		if (isset($_GET['distance'])) {
@@ -922,11 +945,15 @@ class PwtcMapdb_Map {
 
 		$query_args = [
 			'posts_per_page' => $limit > 0 ? $limit : -1,
-			'post_status' => 'publish',
+			'post_status' => $post_status,
 			'post_type' => PwtcMapdb::MAP_POST_TYPE,
 			'orderby'   => 'title',
 			'order'     => 'ASC',
 		];
+		
+		if ($map_status == 'mine') {
+			$query_args['author'] = $current_user->ID;
+		}
 
 		if (!empty($map_title)) {
 			$query_args['s'] = $map_title;	
