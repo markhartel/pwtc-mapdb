@@ -39,7 +39,7 @@
 </script>			
 <div id="pwtc-mapdb-manage-published-rides-div">
     <ul class="accordion" data-accordion data-allow-all-closed="true">
-        <li class="accordion-item" data-accordion-item>
+        <li class="accordion-item <?php if ($search_open) { ?>is-active<?php } ?>" data-accordion-item>
             <a href="#" class="accordion-title">Search Scheduled Rides...</a>
             <div class="accordion-content" data-tab-content>
                 <form class="search-frm" method="POST" novalidate>
@@ -47,7 +47,7 @@
                     <div class="row">
                     <?php if ($is_road_captain) { ?>
                         <div class="small-12 medium-2 columns">
-                            <label>Ride Status
+                            <label>Post Status
                                 <select name="ride_status">
                                     <option value="all" <?php echo $ride_status == 'all' ? 'selected': ''; ?>>All</option>
                                     <option value="mine" <?php echo $ride_status == 'mine' ? 'selected': ''; ?>>Mine</option>
@@ -82,7 +82,7 @@
                     </div>
                     <div class="row column errmsg"></div>
                     <div class="row column clearfix">
-                        <button class="accent button float-left" type="submit">Submit</button>
+                        <button class="dark button float-left" type="submit">Search</button>
                         <a class="dark button float-right">Reset</a>
                     </div>
                 </form>
