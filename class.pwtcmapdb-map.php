@@ -1410,25 +1410,7 @@ EOT;
 		$headers = ['Content-type: text/html'];
 		return wp_mail($captain_email, $subject , $message, $headers);
 	}
-	
-	public static function submit_map_link($return=false, $postid=0, $action=false) {
-		$uri = self::SUBMIT_MAP_URI;
-		if ($postid > 0) {
-			$uri .= '?post=' . $postid;
-			if ($action) {
-				$uri .= '&action=' . $action;
-			}
-			if ($return) {
-				$uri .= '&return=' . urlencode($return);
-			}
-		}
-		else {
-			if ($return) {
-				$uri .= '?return=' . urlencode($return);
-			}
-		}
-		return esc_url($uri);
-	}
+
 
 	public static function delete_map_link($postid, $return=false) {
 		$uri = self::DELETE_MAP_URI;
@@ -1440,11 +1422,20 @@ EOT;
 	}
 
 	public static function new_map_link($return=false) {
-		return self::submit_map_link($return);
+		$uri = self::SUBMIT_MAP_URI;
+		if ($return) {
+			$uri .= '?return=' . urlencode($return);
+		}
+		return esc_url($uri);
 	}
 
 	public static function edit_map_link($post_id, $return=false) {
-		return self::submit_map_link($return, $post_id);
+		$uri = self::EDIT_MAP_URI;
+		$uri .= '?post=' . $postid;
+		if ($return) {
+			$uri .= '&return=' . urlencode($return);
+		}
+		return esc_url($uri);
 	}
 	
 }
