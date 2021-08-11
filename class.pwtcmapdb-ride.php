@@ -726,6 +726,8 @@ class PwtcMapdb_Ride {
 			$view_link = get_permalink($postid);
 		}
 		
+		$show_submitted_maps = ($postid == 0 || $status == 'draft' || $status == 'pending');
+		
         	ob_start();
         	include('ride-edit-form.php');
         	return ob_get_clean();
