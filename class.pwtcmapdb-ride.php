@@ -1337,7 +1337,7 @@ EOT;
 		return esc_url($uri);
 	}
 
-	public static function copy_ride_link($post_id, $return=false) {
+	public static function copy_ride_link($postid, $return=false) {
 		$uri = self::SUBMIT_RIDE_URI;
 		$uri .= '?post=' . $postid;
 		$uri .= '&action=copy';
@@ -1347,7 +1347,7 @@ EOT;
 		return esc_url($uri);
 	}
 
-	public static function edit_ride_link($post_id, $return=false) {
+	public static function edit_ride_link($postid, $return=false) {
 		$uri = self::EDIT_RIDE_URI;
 		$uri .= '?post=' . $postid;
 		if ($return) {
@@ -1356,7 +1356,7 @@ EOT;
 		return esc_url($uri);
 	}
 
-	public static function template_ride_link($post_id, $return=false) {
+	public static function template_ride_link($postid, $return=false) {
 		$uri = self::SUBMIT_RIDE_URI;
 		$uri .= '?post=' . $postid;
 		$uri .= '&action=template';
