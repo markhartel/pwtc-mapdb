@@ -1318,25 +1318,6 @@ EOT;
 	 
 		return false;
 	}
-	
-	public static function submit_ride_link($return=false, $postid=0, $action=false) {
-		$uri = self::SUBMIT_RIDE_URI;
-		if ($postid > 0) {
-			$uri .= '?post=' . $postid;
-			if ($action) {
-				$uri .= '&action=' . $action;
-			}
-			if ($return) {
-				$uri .= '&return=' . urlencode($return);
-			}
-		}
-		else {
-			if ($return) {
-				$uri .= '?return=' . urlencode($return);
-			}
-		}
-		return esc_url($uri);
-	}
 
 	public static function delete_ride_link($postid, $return=false) {
 		$uri = self::DELETE_RIDE_URI;
@@ -1348,19 +1329,40 @@ EOT;
 	}
 
 	public static function new_ride_link($return=false) {
-		return self::submit_ride_link($return);
+		$uri = self::SUBMIT_RIDE_URI;
+		if ($return) {
+			$uri .= '?return=' . urlencode($return);
+		}
+		return esc_url($uri);
 	}
 
 	public static function copy_ride_link($post_id, $return=false) {
-		return self::submit_ride_link($return, $post_id, 'copy');
+		$uri = self::SUBMIT_RIDE_URI;
+		$uri .= '?post=' . $postid;
+		$uri .= '&action=copy';
+		if ($return) {
+			$uri .= '&return=' . urlencode($return);
+		}
+		return esc_url($uri);
 	}
 
 	public static function edit_ride_link($post_id, $return=false) {
-		return self::submit_ride_link($return, $post_id);
+		$uri = self::EDIT_RIDE_URI;
+		$uri .= '?post=' . $postid;
+		if ($return) {
+			$uri .= '&return=' . urlencode($return);
+		}
+		return esc_url($uri);
 	}
 
 	public static function template_ride_link($post_id, $return=false) {
-		return self::submit_ride_link($return, $post_id, 'template');
+		$uri = self::SUBMIT_RIDE_URI;
+		$uri .= '?post=' . $postid;
+		$uri .= '&action=template';
+		if ($return) {
+			$uri .= '&return=' . urlencode($return);
+		}
+		return esc_url($uri);
 	}
 	
 	public static function ride_submitted_email($postid, $captain_email) {
