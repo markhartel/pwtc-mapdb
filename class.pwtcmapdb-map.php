@@ -1430,7 +1430,7 @@ EOT;
 		return esc_url($uri);
 	}
 
-	public static function edit_map_link($post_id, $return=false) {
+	public static function edit_map_link($postid, $return=false) {
 		$uri = self::EDIT_MAP_URI;
 		$uri .= '?post=' . $postid;
 		if ($return) {
