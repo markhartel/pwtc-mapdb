@@ -929,7 +929,7 @@
                         <a href="#" class="accordion-title">Add Submitted Map...</a>
                         <div class="accordion-content" data-tab-content>
                             <div class="row column">
-                                <p class="help-text">Below is a list of route maps that you have submitted for review. Scroll through the list and choose the desired map. When choosing a map, make certain that the start location on the route map matches the start location of the ride. To inspect the map, press the download or link icon.</p>
+                                <p class="help-text">Below is a list of route maps that the author has submitted for review. Scroll through the list and choose the desired map. When choosing a map, make certain that the start location on the route map matches the start location of the ride. To inspect the map, press the download or link icon.</p>
                             </div>
                             <div class="row column">
                                 <div class="pending-maps-div" style="border:1px solid; overflow: auto; height: 100px;">
