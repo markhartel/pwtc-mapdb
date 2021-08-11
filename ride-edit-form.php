@@ -924,7 +924,7 @@
                             </div>
                         </div>
                     </li>
-    <?php if ($author == $current_user->ID and ($postid == 0 or $status == 'draft')) { ?>
+    <?php if ($show_submitted_maps) { ?>
                     <li class="accordion-item" data-accordion-item>
                         <a href="#" class="accordion-title">Add Submitted Map...</a>
                         <div class="accordion-content" data-tab-content>
@@ -938,7 +938,7 @@
                                     'posts_per_page' => -1,
                                     'post_status' => 'pending',
                                     'post_type' => PwtcMapdb::MAP_POST_TYPE,
-                                    'author' => $current_user->ID,
+                                    'author' => $author,
                                     'orderby' => 'date',
                                     'order' => 'DESC',
                                 ];
