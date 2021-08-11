@@ -863,9 +863,10 @@ class PwtcMapdb_Map {
 	
 	// Generates the [pwtc_mapdb_manage_published_maps] shortcode.
 	public static function shortcode_manage_published_maps($atts) {
-		$a = shortcode_atts(array('leaders' => 'no', 'limit' => '10', 'status' => 'all'), $atts);
+		$a = shortcode_atts(array('leaders' => 'no', 'limit' => '10', 'status' => 'all', 'search' => 'close'), $atts);
 		$allow_leaders = $a['leaders'] == 'yes';
 		$limit = intval($a['limit']);
+		$search_open = $a['search'] == 'open';
 
 		$current_user = wp_get_current_user();
 
