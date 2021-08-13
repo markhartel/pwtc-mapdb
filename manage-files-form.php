@@ -60,19 +60,21 @@
     </div>
     <?php } ?>
     <table class="pwtc-mapdb-rwd-table">
-        <thead><tr><th>File Title</th><th>Actions</th></tr></thead>
+        <thead><tr><th>File Title</th><th>File URL</th><th>Actions</th></tr></thead>
         <tbody>
     <?php
     while ($query->have_posts()) {
         $query->the_post();
         $postid = get_the_ID();
         $title = esc_html(get_the_title());
+        $url = wp_get_attachment_url($postid);
         $view_link = esc_url(get_the_permalink());
         $edit_link = self::edit_file_link($postid, $return_uri);
         $delete_link = self::delete_file_link($postid, $return_uri);
     ?>
         <tr>
             <td><span>File Title</span><?php echo $title; ?></td>
+            <td><span>File URL</span><?php echo $url; ?></td>
             <td><span>Actions</span>
                 <a href="<?php echo $view_link; ?>">View</a>
                 <a href="<?php echo $edit_link; ?>">Edit</a>
