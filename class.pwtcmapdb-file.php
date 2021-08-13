@@ -218,6 +218,7 @@ class PwtcMapdb_File {
 
 		$query_args = [
 			'posts_per_page' => $limit > 0 ? $limit : -1,
+			'post_status' => 'any',
 			'post_type' => 'attachment',
 			'orderby'   => 'title',
 			'order'     => 'ASC',
