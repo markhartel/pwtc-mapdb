@@ -91,7 +91,7 @@
             is_dirty = false;
             show_waiting();
             $('#pwtc-mapdb-upload-file-div button[type="submit"]').prop('disabled',true);
-        }
+        });
 
         window.addEventListener('beforeunload', function(e) {
             if (is_dirty) {
