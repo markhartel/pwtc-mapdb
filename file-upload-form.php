@@ -25,18 +25,8 @@
 
         $('#pwtc-mapdb-upload-file-div form .clipboard-btn').on('click', function(evt) {
             var url = $('#pwtc-mapdb-upload-file-div input[name="attachment_url"]')[0];
-            if (window.getSelection().rangeCount > 0) window.getSelection().removeAllRanges();
-            var range = document.createRange();  
-            range.selectNode(url);  
-            window.getSelection().addRange(range);  
-            try {  
-                var successful = document.execCommand('copy');  
-                var msg = successful ? 'successful' : 'unsuccessful';  
-                console.log('Copy URL command was ' + msg);  
-            } catch(err) {  
-                console.log('Oops, unable to copy');  
-            }  
-            window.getSelection().removeAllRanges();  
+            url.select();
+            document.execCommand("copy");
         });
 
         $('#pwtc-mapdb-upload-file-div input[name="title"]').on('input', function() {
