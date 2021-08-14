@@ -44,13 +44,13 @@
 <div id="pwtc-mapdb-manage-files-div">
     <ul class="accordion" data-accordion data-allow-all-closed="true">
         <li class="accordion-item <?php if ($search_open) { ?>is-active<?php } ?>" data-accordion-item>
-            <a href="#" class="accordion-title">Search Uploaded Files...</a>
+            <a href="#" class="accordion-title">Search File Attachments...</a>
             <div class="accordion-content" data-tab-content>
                 <form class="search-frm" method="POST" novalidate>
                     <input type="hidden" name="offset" value="0">
                     <div class="row">
                         <div class="small-12 medium-6 columns">
-                            <label>File Title 
+                            <label>Attachment Title 
                                 <input type="text" name="file_title" value="<?php echo $file_title; ?>">
                             </label>
                         </div>
@@ -72,11 +72,11 @@
     ?>
     <?php if ($warn) { ?>
     <div class="callout small warning">
-        <p>There were more files found than can be shown on the page, use the <em>Search Uploaded Files</em> section to narrow your search.</p>
+        <p>There were more attachments found than can be shown on the page, use the <em>Search File Attachments</em> section to narrow your search.</p>
     </div>
     <?php } ?>
     <table class="pwtc-mapdb-rwd-table">
-        <thead><tr><th>File Title</th><th>File URL</th><th>Actions</th></tr></thead>
+        <thead><tr><th>Attachment Title</th><th>File URL</th><th>Actions</th></tr></thead>
         <tbody>
     <?php
     while ($query->have_posts()) {
@@ -84,12 +84,12 @@
         $postid = get_the_ID();
         $title = esc_html(get_the_title());
         $url = wp_get_attachment_url($postid);
-        $view_link = esc_url(get_the_permalink());
+        $view_link = esc_url($url);
         $edit_link = self::edit_file_link($postid, $return_uri);
         $delete_link = self::delete_file_link($postid, $return_uri);
     ?>
         <tr>
-            <td><span>File Title</span><?php echo $title; ?></td>
+            <td><span>Attachment Title</span><?php echo $title; ?></td>
             <td><span>File URL</span><?php echo $url; ?> <a class="clipboard-btn" title="Copy URL to clipboard."><i class="fa fa-clipboard"></i></a></td>
             <td><span>Actions</span>
                 <a href="<?php echo $view_link; ?>">View</a>
@@ -123,7 +123,7 @@
     </form>
     <?php } ?>
     <?php } else { ?>
-    <div class="callout small"><p>No files found, use the <em>Search Uploaded Files</em> section to broaden your search.</p></div>
+    <div class="callout small"><p>No attachments found, use the <em>Search File Attachments</em> section to broaden your search.</p></div>
     <?php } ?>
 </div>
 <?php 
