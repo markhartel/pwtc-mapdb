@@ -95,6 +95,12 @@ class PwtcMapdb_File {
                 		if ($status === false) {
                     			wp_die('Could not move uploaded file.', 403);
                 		}
+				if ($attach_id != 0) {
+					$operation = 'update_upload';
+				}
+				else {
+					$operation = 'insert';
+				}
                			$attachment = array(
                     			'guid'           => $upload_dir['url'] . '/' . $filename, 
                     			'post_mime_type' => $filetype['type'],
@@ -109,6 +115,7 @@ class PwtcMapdb_File {
                 		add_post_meta($attach_id, '_road_captain', $current_user->ID, true);
             		}
             		else if ($attach_id > 0) {
+				$operation = 'update';
                 		$my_post = array(
 					'ID' => $attach_id,
 					'post_title' => esc_html($title)
@@ -122,6 +129,7 @@ class PwtcMapdb_File {
             		if ($attach_id > 0) {
                			 wp_redirect(add_query_arg(array(
                     			'post' => $attach_id,
+					'op' => $operation,
                     			'return' => urlencode($return)
                 		), get_permalink()), 303);
             		}
@@ -164,6 +172,11 @@ class PwtcMapdb_File {
             		$title = '';
             		$attachment_url = '';
         	}
+		
+		$operation = '';
+		if (isset($_GET['op'])) {
+			$operation = $_GET['op'];
+		}
 
         	ob_start();
         	include('file-upload-form.php');
