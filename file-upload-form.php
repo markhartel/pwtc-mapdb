@@ -61,7 +61,7 @@
             var attach_id = $('#pwtc-mapdb-upload-file-div input[name="attach_id"]').val().trim();
             var file = $('#pwtc-mapdb-upload-file-div input[name="file_upload"]').val().trim();
             if (file.length == 0 && attach_id == '0') {
-                show_warning('The <strong>upload file</strong> must be selected.');
+                show_warning('An initial <strong>upload file</strong> must be selected.');
                 $('#pwtc-mapdb-upload-file-div .file-upload-lbl').addClass('indicate-error');
                 evt.preventDefault();
                 return;
@@ -99,6 +99,24 @@
 </script>
 <div id='pwtc-mapdb-upload-file-div'>
     <?php echo $return_to_page; ?>
+    <?php if (!empty($operation)) { ?>
+    <div class="callout small success">
+        <?php if ($operation == 'insert') { ?>
+        <p>The new file attachment was saved.</p>
+        <?php } else if ($operation == 'update') { ?>
+        <p>The file attachment was updated.</p>
+        <?php } else if ($operation == 'update_upload') { ?>
+        <p>The file attachment was updated and a new file uploaded.</p>
+        <?php } ?>
+    </div>
+    <?php } ?>
+    <div>
+    <?php if ($attach_id != 0) { ?>
+        <p>To modify this file attachment, fill out the form below and press the update button at the bottom of the form.</p>
+    <?php } else { ?>
+        <p>This is a new file attachment, fill out the form below and press the save button at the bottom of the form.</p>
+    <?php } ?>
+    </div>
     <div class="callout">
         <form method="POST" enctype="multipart/form-data" novalidate>
             <?php wp_nonce_field('file-upload-form', 'nonce_field'); ?>
@@ -126,9 +144,9 @@
             <div class="row column errmsg"></div>
             <div class="row column clearfix">
             <?php if ($attach_id == 0) { ?>
-                <button class="dark button float-left" type="submit">Save Attachment</button>
+                <button class="dark button float-left" type="submit">Save</button>
             <?php } else { ?>
-                <button class="dark button float-left" type="submit">Update Attachment</button>
+                <button class="dark button float-left" type="submit">Update</button>
             <?php } ?>
         </form>
     </div>
