@@ -18,6 +18,7 @@ class PwtcMapdb_File {
 
         	// Register shortcode callbacks
         	add_shortcode('pwtc_mapdb_upload_file', array('PwtcMapdb_File', 'shortcode_upload_file'));
+		add_shortcode('pwtc_mapdb_delete_file', array( 'PwtcMapdb_File', 'shortcode_delete_file'));
 		add_shortcode('pwtc_mapdb_manage_files', array('PwtcMapdb_File', 'shortcode_manage_files'));
        		add_shortcode('pwtc_mapdb_new_file_link', array('PwtcMapdb_File', 'shortcode_new_file_link'));
     	}
@@ -168,6 +169,72 @@ class PwtcMapdb_File {
         	include('file-upload-form.php');
         	return ob_get_clean();
     	}
+	
+	// Generates the [pwtc_mapdb_delete_file] shortcode.
+	public static function shortcode_delete_file($atts) {
+		$a = shortcode_atts(array('use_return' => 'no'), $atts);
+		$use_return = $a['use_return'] == 'yes';
+
+		$current_user = wp_get_current_user();
+		if ( 0 == $current_user->ID ) {
+			return '<div class="callout small alert"><p>You must be logged in to delete upload files.</p></div>';
+		}
+		$user_info = get_userdata($current_user->ID);
+		if ($allow_leaders) {
+			$is_road_captain = in_array(PwtcMapdb::ROLE_ROAD_CAPTAIN, $user_info->roles);
+		}
+		else {
+			$is_road_captain = user_can($current_user,'edit_published_rides');
+		}
+		$is_ride_leader = in_array(PwtcMapdb::ROLE_RIDE_LEADER, $user_info->roles);
+
+		$return = '';
+		if (isset($_GET['return'])) {
+			$return = $_GET['return'];
+		}
+
+		if (isset($_POST['attach_id'])) {
+			if (!isset($_POST['nonce_field']) or !wp_verify_nonce($_POST['nonce_field'], 'file-delete-form')) {
+				wp_nonce_ays('');
+			}
+
+            		$attach_id = intval($_POST['attach_id']);
+            		$status = wp_delete_attachment($attach_id, true);
+            		if ($status === false) {
+                		wp_die('Failed to delete the upload file', 403);
+            		}	
+
+            		wp_redirect(add_query_arg(array(
+                		'post' => $attach_id,
+                		'return' => urlencode($return)
+            		), get_permalink()), 303);
+            		exit;
+        	}
+
+        	$return_link = '';
+		$return_to_page = '';
+		if (!empty($return) and $use_return) {
+			$return_link = esc_url($return);
+			$return_to_page = self::create_return_link($return_link);
+		}
+
+        	$error = self::check_post_id();
+        	if (!empty($error)) {
+            		return $return_to_page . $error;
+        	}
+        	$attach_id = intval($_GET['post']);
+
+        	if (!$is_road_captain) {
+			return $return_to_page . '<div class="callout small warning"><p>You are not allowed to delete upload files.</p></div>';
+		}
+
+        	$post = get_post($attach_id);
+        	$title = $post->post_title;
+
+		ob_start();
+		include('file-delete-form.php');
+		return ob_get_clean();
+	}
 	
         // Generates the [pwtc_mapdb_manage_files] shortcode.
 	public static function shortcode_manage_files($atts) {
