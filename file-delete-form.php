@@ -19,16 +19,16 @@
         <input type="hidden" name="attach_id" value="<?php echo $attach_id; ?>"/>
         <div class="callout">
             <div class="row column">
-                <p>To delete upload file "<?php echo $title; ?>", press the delete button below.</p>
+                <p>To delete file attachment "<?php echo $title; ?>", press the delete button below.</p>
             </div>
             <div class="row column errmsg"></div>
             <div class="row column clearfix">
-                <button class="dark button float-left" type="button" data-open="confirm-delete-modal">Delete Map</button>
+                <button class="dark button float-left" type="button" data-open="confirm-delete-modal">Delete File</button>
             </div>
         </div>
         <div class="reveal" id="confirm-delete-modal" data-reveal>
             <div class="row column">
-                <p>This file will be permanently deleted if you continue and cannot be undone. Do you really want to do this?</p>
+                <p>This attachment and its uploaded file will be permanently deleted if you continue and cannot be undone. Do you really want to do this?</p>
             </div>
             <div class="row column clearfix">
                 <button class="confirm-delete-btn dark button float-left" type="button">Yes, Delete File</button>
