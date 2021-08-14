@@ -13,7 +13,7 @@
     });
 </script>
 <div id="pwtc-mapdb-delete-file-div">
-    <?php echo $return_to_map; ?>
+    <?php echo $return_to_page; ?>
     <form method="POST">
         <?php wp_nonce_field('file-delete-form', 'nonce_field'); ?>
         <input type="hidden" name="attach_id" value="<?php echo $attach_id; ?>"/>
