@@ -22,6 +22,22 @@
         $('#pwtc-mapdb-manage-files-div .search-frm a').on('click', function(evt) {
             $('#pwtc-mapdb-manage-files-div .search-frm input[name="file_title"]').val('');
         });
+        
+        $('#pwtc-mapdb-manage-files-div table .clipboard-btn').on('click', function(evt) {
+            var title = $(this).parent()[0];
+            if (window.getSelection().rangeCount > 0) window.getSelection().removeAllRanges();
+            var range = document.createRange();  
+            range.selectNode(title);  
+            window.getSelection().addRange(range);  
+            try {  
+                var successful = document.execCommand('copy');  
+                var msg = successful ? 'successful' : 'unsuccessful';  
+                console.log('Copy title command was ' + msg);  
+            } catch(err) {  
+                console.log('Oops, unable to copy');  
+            }  
+            window.getSelection().removeAllRanges();  
+        });
 
     });
 </script>			
@@ -74,7 +90,7 @@
     ?>
         <tr>
             <td><span>File Title</span><?php echo $title; ?></td>
-            <td><span>File URL</span><?php echo $url; ?></td>
+            <td><span>File URL</span><?php echo $url; ?> <a class="clipboard-btn" title="Copy URL to clipboard."><i class="fa fa-clipboard"></i></a></td>
             <td><span>Actions</span>
                 <a href="<?php echo $view_link; ?>">View</a>
                 <a href="<?php echo $edit_link; ?>">Edit</a>
