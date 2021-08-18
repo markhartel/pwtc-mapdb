@@ -38,18 +38,36 @@
             }  
             window.getSelection().removeAllRanges();  
         });
+        
+        $('#pwtc-mapdb-manage-files-div .sort-frm input[name="sort_by"]').change(function() {
+            $('#pwtc-mapdb-manage-files-div .sort-frm').submit();
+            $('#pwtc-mapdb-manage-files-div .sort-frm span').html('<i class="fa fa-spinner fa-pulse waiting"></i> please wait...');
+        });
 
     });
 </script>			
 <div id="pwtc-mapdb-manage-files-div">
+    <div class="row column">
+        <form class="sort-frm" method="POST" novalidate>
+            <input type="hidden" name="file_title" value="<?php echo $file_title; ?>">
+            <input type="hidden" name="offset" value="0">
+            <fieldset class="fieldset">
+                <legend>Sort file attachments by</legend>
+                <input type="radio" name="sort_by" value="title" id="sort-by-title" <?php echo $sort_by == 'title' ? 'checked': ''; ?>><label for="sort-by-title">Title</label>
+                <input type="radio" name="sort_by" value="date" id="sort-by-date" <?php echo $sort_by == 'date' ? 'checked': ''; ?>><label for="sort-by-date">Post Date</label>
+                <span></span>
+            </fieldset>
+        </form>
+    </div>
     <ul class="accordion" data-accordion data-allow-all-closed="true">
         <li class="accordion-item <?php if ($search_open) { ?>is-active<?php } ?>" data-accordion-item>
             <a href="#" class="accordion-title">Search File Attachments...</a>
             <div class="accordion-content" data-tab-content>
                 <form class="search-frm" method="POST" novalidate>
                     <input type="hidden" name="offset" value="0">
+                    <input type="hidden" name="sort_by" value="<?php echo $sort_by; ?>">
                     <div class="row">
-                        <div class="small-12 medium-6 columns">
+                        <div class="small-12 medium-12 columns">
                             <label>Attachment Title 
                                 <input type="text" name="file_title" value="<?php echo $file_title; ?>">
                             </label>
@@ -106,6 +124,7 @@
     <?php if ($is_more or $is_prev) { ?>
     <form class="load-more-frm" method="POST">
         <input type="hidden" name="file_title" value="<?php echo $file_title; ?>">
+        <input type="hidden" name="sort_by" value="<?php echo $sort_by; ?>">
         <div class="row column errmsg"></div>
         <div class="row column clearfix">
             <div class="button-group float-left">
