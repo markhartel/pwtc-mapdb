@@ -251,7 +251,7 @@ class PwtcMapdb_File {
 	
         // Generates the [pwtc_mapdb_manage_files] shortcode.
 	public static function shortcode_manage_files($atts) {
-		$a = shortcode_atts(array('limit' => '10', 'search' => 'close'), $atts);
+		$a = shortcode_atts(array('limit' => '10', 'search' => 'close', 'sort' => 'title'), $atts);
 		$limit = intval($a['limit']);
 		$search_open = $a['search'] == 'open';
 
@@ -262,8 +262,13 @@ class PwtcMapdb_File {
 		}
 
 		if (isset($_POST['file_title']) and isset($_POST['offset'])) {
+			$sort_by = 'title';
+			if (isset($_POST['sort_by'])) {
+				$sort_by = $_POST['sort_by'];
+			}
 			wp_redirect(add_query_arg(array(
 				'title' => urlencode(trim($_POST['file_title'])),
+				'sort' => $sort_by,
 				'offset' => intval($_POST['offset'])
 			), get_permalink()), 303);
 			exit;
@@ -295,18 +300,32 @@ class PwtcMapdb_File {
 		else {
 			$offset = 0;
 		}
+		
+		if (isset($_GET['sort'])) {
+			$sort_by = $_GET['sort'];
+		}
+		else {
+			$sort_by = $a['sort'];
+		}
 
 		$query_args = [
 			'posts_per_page' => $limit > 0 ? $limit : -1,
 			'post_status' => 'any',
 			'post_type' => 'attachment',
-			'orderby'   => 'title',
-			'order'     => 'ASC',
 		];
         	$query_args['meta_query'][] = [
             		'key' => '_road_captain',
             		'compare' => 'EXISTS',
         	];
+		
+		if ($sort_by == 'date') {
+			$query_args['orderby'] = 'date';
+			$query_args['order'] = 'DESC';
+		}
+		else if ($sort_by == 'title') {
+			$query_args['orderby'] = 'title';
+			$query_args['order'] = 'ASC';
+		}
 
 		if (!empty($file_title)) {
 			$query_args['s'] = $file_title;	
