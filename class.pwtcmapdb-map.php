@@ -863,7 +863,7 @@ class PwtcMapdb_Map {
 	
 	// Generates the [pwtc_mapdb_manage_published_maps] shortcode.
 	public static function shortcode_manage_published_maps($atts) {
-		$a = shortcode_atts(array('leaders' => 'no', 'limit' => '10', 'status' => 'all', 'search' => 'close'), $atts);
+		$a = shortcode_atts(array('leaders' => 'no', 'limit' => '10', 'status' => 'all', 'search' => 'close', 'sort' => 'title'), $atts);
 		$allow_leaders = $a['leaders'] == 'yes';
 		$limit = intval($a['limit']);
 		$search_open = $a['search'] == 'open';
@@ -879,11 +879,16 @@ class PwtcMapdb_Map {
 			if (isset($_POST['map_status'])) {
 				$map_status = $_POST['map_status'];
 			}
+			$sort_by = 'title';
+			if (isset($_POST['sort_by'])) {
+				$sort_by = $_POST['sort_by'];
+			}
 			wp_redirect(add_query_arg(array(
 				'title' => urlencode(trim($_POST['map_title'])),
 				'distance' => $_POST['map_distance'],
 				'terrain' => $_POST['map_terrain'],
 				'status' => $map_status,
+				'sort' => $sort_by,
 				'offset' => intval($_POST['offset'])
 			), get_permalink()), 303);
 			exit;
@@ -948,14 +953,31 @@ class PwtcMapdb_Map {
 		else {
 			$offset = 0;
 		}
+		
+		if (isset($_GET['sort']) and $is_road_captain) {
+			$sort_by = $_GET['sort'];
+		}
+		else if ($is_road_captain) {
+			$sort_by = $a['sort'];
+		}
+		else {
+			$sort_by = 'title';
+		}
 
 		$query_args = [
 			'posts_per_page' => $limit > 0 ? $limit : -1,
 			'post_status' => $post_status,
 			'post_type' => PwtcMapdb::MAP_POST_TYPE,
-			'orderby'   => 'title',
-			'order'     => 'ASC',
 		];
+		
+		if ($sort_by == 'date') {
+			$query_args['orderby'] = 'date';
+			$query_args['order'] = 'DESC';
+		}
+		else if ($sort_by == 'title') {
+			$query_args['orderby'] = 'title';
+			$query_args['order'] = 'ASC';
+		}
 		
 		if ($map_status == 'mine') {
 			$query_args['author'] = $current_user->ID;
