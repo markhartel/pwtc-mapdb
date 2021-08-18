@@ -25,16 +25,39 @@
             $('#pwtc-mapdb-manage-published-maps-div .search-frm select[name="map_distance"]').val('0');
             $('#pwtc-mapdb-manage-published-maps-div .search-frm select[name="map_terrain"]').val('0');
         });
+        
+        $('#pwtc-mapdb-manage-published-maps-div .sort-frm input[name="sort_by"]').change(function() {
+            $('#pwtc-mapdb-manage-published-maps-div .sort-frm').submit();
+            $('#pwtc-mapdb-manage-published-maps-div .sort-frm span').html('<i class="fa fa-spinner fa-pulse waiting"></i> please wait...');
+        });
 
     });
 </script>			
 <div id="pwtc-mapdb-manage-published-maps-div">
+<?php if ($is_road_captain) { ?>
+    <div class="row column">
+        <form class="sort-frm" method="POST" novalidate>
+            <input type="hidden" name="map_status" value="<?php echo $map_status; ?>">
+            <input type="hidden" name="map_title" value="<?php echo $map_title; ?>">
+            <input type="hidden" name="map_distance" value="<?php echo $map_distance; ?>">
+            <input type="hidden" name="map_terrain" value="<?php echo $map_terrain; ?>">
+            <input type="hidden" name="offset" value="0">
+            <fieldset class="fieldset">
+                <legend>Sort route maps by</legend>
+                <input type="radio" name="sort_by" value="title" id="sort-by-title" <?php echo $sort_by == 'title' ? 'checked': ''; ?>><label for="sort-by-title">Title</label>
+                <input type="radio" name="sort_by" value="date" id="sort-by-date" <?php echo $sort_by == 'date' ? 'checked': ''; ?>><label for="sort-by-date">Post Date</label>
+                <span></span>
+            </fieldset>
+        </form>
+    </div>
+<?php } ?>
     <ul class="accordion" data-accordion data-allow-all-closed="true">
         <li class="accordion-item <?php if ($search_open) { ?>is-active<?php } ?>" data-accordion-item>
             <a href="#" class="accordion-title">Search Map Library...</a>
             <div class="accordion-content" data-tab-content>
                 <form class="search-frm" method="POST" novalidate>
                     <input type="hidden" name="offset" value="0">
+                    <input type="hidden" name="sort_by" value="<?php echo $sort_by; ?>">
                     <div class="row">
                     <?php if ($is_road_captain) { ?>
                         <div class="small-12 medium-2 columns">
@@ -161,6 +184,7 @@
         <input type="hidden" name="map_title" value="<?php echo $map_title; ?>">
         <input type="hidden" name="map_distance" value="<?php echo $map_distance; ?>">
         <input type="hidden" name="map_terrain" value="<?php echo $map_terrain; ?>">
+        <input type="hidden" name="sort_by" value="<?php echo $sort_by; ?>">
         <div class="row column errmsg"></div>
         <div class="row column clearfix">
             <div class="button-group float-left">
