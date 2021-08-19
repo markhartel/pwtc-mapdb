@@ -948,7 +948,7 @@ class PwtcMapdb_Ride {
 
 	// Generates the [pwtc_mapdb_manage_published_rides] shortcode.
 	public static function shortcode_manage_published_rides($atts) {
-		$a = shortcode_atts(array('leaders' => 'no', 'limit' => '10', 'status' => 'all', 'search' => 'close'), $atts);
+		$a = shortcode_atts(array('leaders' => 'no', 'limit' => '10', 'status' => 'all', 'search' => 'close', 'sort' => 'start'), $atts);
 		$allow_leaders = $a['leaders'] == 'yes';
 		$limit = intval($a['limit']);
 		$search_open = $a['search'] == 'open';
@@ -964,11 +964,16 @@ class PwtcMapdb_Ride {
 			if (isset($_POST['ride_status'])) {
 				$ride_status = $_POST['ride_status'];
 			}
+			$sort_by = 'start';
+			if (isset($_POST['sort_by'])) {
+				$sort_by = $_POST['sort_by'];
+			}
 			wp_redirect(add_query_arg(array(
 				'month' => $_POST['ride_month'],
 				'leader' => $_POST['ride_leader'],
 				'title' => urlencode(trim($_POST['ride_title'])),
 				'status' => $ride_status,
+				'sort' => $sort_by,
 				'offset' => intval($_POST['offset'])
 			), get_permalink()), 303);
 			exit;
@@ -1046,6 +1051,16 @@ class PwtcMapdb_Ride {
 		else {
 			$offset = 0;
 		}
+		
+		if (isset($_GET['sort']) and $is_road_captain) {
+			$sort_by = $_GET['sort'];
+		}
+		else if ($is_road_captain) {
+			$sort_by = $a['sort'];
+		}
+		else {
+			$sort_by = 'start';
+		}
 
 		$now = PwtcMapdb::get_current_time();
 		$query_args = [
@@ -1053,10 +1068,22 @@ class PwtcMapdb_Ride {
 			'post_status' => $post_status,
 			'post_type' => PwtcMapdb::POST_TYPE_RIDE,
 			'meta_query' => [],
-			'meta_key'  => PwtcMapdb::RIDE_DATE,
-			'meta_type' => 'DATETIME',
-			'orderby' => ['meta_value' => 'DESC'],
 		];
+		
+		if ($sort_by == 'date') {
+			$query_args['orderby'] = 'date';
+			$query_args['order'] = 'DESC';
+		}
+		else if ($sort_by == 'title') {
+			$query_args['orderby'] = 'title';
+			$query_args['order'] = 'ASC';
+		}
+		else if ($sort_by == 'start') {
+			$query_args['meta_key'] = PwtcMapdb::RIDE_DATE;
+			$query_args['meta_type'] = 'DATETIME';
+			$query_args['orderby'] = ['meta_value' => 'DESC'];
+		}
+		
 		if ($ride_status == 'mine') {
 			$query_args['author'] = $current_user->ID;
 		}
