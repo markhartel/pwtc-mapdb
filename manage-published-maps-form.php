@@ -53,7 +53,7 @@
 <?php } ?>
     <ul class="accordion" data-accordion data-allow-all-closed="true">
         <li class="accordion-item <?php if ($search_open) { ?>is-active<?php } ?>" data-accordion-item>
-            <a href="#" class="accordion-title">Search Map Library...</a>
+            <a href="#" class="accordion-title">Search Route Maps...</a>
             <div class="accordion-content" data-tab-content>
                 <form class="search-frm" method="POST" novalidate>
                     <input type="hidden" name="offset" value="0">
@@ -120,7 +120,7 @@
     ?>
     <?php if ($warn) { ?>
     <div class="callout small warning">
-        <p>There were more maps found than can be shown on the page, use the <em>Search Map Library</em> section to narrow your search.</p>
+        <p>There were more maps found than can be shown on the page, use the <em>Search Route Maps</em> section to narrow your search.</p>
     </div>
     <?php } ?>
     <table class="pwtc-mapdb-rwd-table">
@@ -202,7 +202,7 @@
     </form>
     <?php } ?>
     <?php } else { ?>
-    <div class="callout small"><p>No route maps found, use the <em>Search Map Library</em> section to broaden your search.</p></div>
+    <div class="callout small"><p>No route maps found, use the <em>Search Route Maps</em> section to broaden your search.</p></div>
     <?php } ?>
 </div>
 <?php 
