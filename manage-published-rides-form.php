@@ -52,7 +52,7 @@
             <input type="hidden" name="ride_month" value="<?php echo $ride_month; ?>">
             <input type="hidden" name="offset" value="0">
             <fieldset class="fieldset">
-                <legend>Sort route maps by</legend>
+                <legend>Sort scheduled rides by</legend>
                 <input type="radio" name="sort_by" value="start" id="sort-by-start" <?php echo $sort_by == 'start' ? 'checked': ''; ?>><label for="sort-by-start">Start Time</label>
                 <input type="radio" name="sort_by" value="date" id="sort-by-date" <?php echo $sort_by == 'date' ? 'checked': ''; ?>><label for="sort-by-date">Post Date</label>
                 <input type="radio" name="sort_by" value="title" id="sort-by-title" <?php echo $sort_by == 'title' ? 'checked': ''; ?>><label for="sort-by-title">Title</label>
