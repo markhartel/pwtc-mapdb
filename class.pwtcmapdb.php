@@ -497,7 +497,7 @@ class PwtcMapdb {
 	public static function add_road_captain_role() {
 		$road_captain = get_role('road_captain');
     		if ($road_captain === null) {
-			$road_captain = add_role('road_captain', 'Road Captain');
+			$road_captain = add_role('road_captain', 'Road Captain', ['read' => true]);
 		}
 		if ($road_captain !== null) {
 			/*
