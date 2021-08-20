@@ -78,6 +78,19 @@ class PwtcMapdb {
 	const POST_TYPE_RIDE = 'scheduled_rides';
 	
 	const ROAD_CAPTAIN_EMAIL = 'roadcaptain@portlandbicyclingclub.com';
+	
+	const ROAD_CAPTAIN_CAPS = [
+        	'delete_others_rides',
+        	'delete_private_rides',
+        	'delete_published_rides',
+        	'delete_rides',
+        	'edit_others_rides',
+        	'edit_private_rides',
+        	'edit_published_rides',
+        	'edit_rides',
+        	'publish_rides',
+        	'read_private_rides',
+    	];
 		
     	private static $initiated = false;
 
@@ -480,6 +493,38 @@ class PwtcMapdb {
 	}
 
 	/******* Plugin installation and removal functions  *********/
+	
+	public static function add_road_captain_role() {
+		$road_captain = get_role('road_captain');
+    		if ($road_captain === null) {
+			$road_captain = add_role('road_captain', 'Road Captain');
+		}
+		if ($road_captain !== null) {
+			/*
+			foreach (self::ROAD_CAPTAIN_CAPS as $capability) {
+				$road_captain->add_cap($capability);
+			}
+			*/
+		}
+	}
+
+	public static function remove_road_captain_role() {
+		$users = get_users(array('role' => 'road_captain'));
+		if (count($users) > 0) {
+			$road_captain = get_role('road_captain');
+			/*
+			foreach (self::ROAD_CAPTAIN_CAPS as $capability) {
+				$road_captain->remove_cap($capability);
+			}
+			*/
+		}
+		else {
+			$road_captain = get_role('road_captain');
+			if ($road_captain !== null) {
+				remove_role('road_captain');
+			}
+		}
+	}
 
 	public static function plugin_activation() {
 		self::write_log( 'PWTC MapDB plugin activated' );
@@ -487,10 +532,12 @@ class PwtcMapdb {
 			deactivate_plugins(plugin_basename(__FILE__));
 			wp_die('PWTC MapDB plugin requires Wordpress version of at least ' . PWTC_MAPDB__MINIMUM_WP_VERSION);
 		}
+		self::add_road_captain_role();
 	}
 
 	public static function plugin_deactivation( ) {
 		self::write_log( 'PWTC MapDB plugin deactivated' );
+		self::remove_road_captain_role();
 	}
 
 	public static function plugin_uninstall() {
