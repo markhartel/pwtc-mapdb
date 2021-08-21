@@ -60,6 +60,17 @@ class PwtcMapdb {
 	const RIDE_SIGNUP_CUTOFF = '_signup_cutoff';
 	const RIDE_SIGNUP_LIMIT = '_signup_limit';
 	const RIDE_SIGNUP_MEMBERS_ONLY = '_signup_members_only';
+	
+	const TEMPLATE_LEADERS_KEY = 'field_57bcbeb986cb6';
+	const TEMPLATE_ATTACH_MAP_KEY = 'field_57d1f61d65188';
+	const TEMPLATE_MAPS_KEY = 'field_57bcc10b7286c';
+	const TEMPLATE_TYPE_KEY = 'field_57bcbefd86cb7';
+	const TEMPLATE_PACE_KEY = 'field_57bcbf4686cb8';
+	const TEMPLATE_TERRAIN_KEY = 'field_57d1f901c850f';
+	const TEMPLATE_LENGTH_KEY = 'field_57d1f948c8510';
+	const TEMPLATE_MAX_LENGTH_KEY = 'field_57d1f96dc8511';
+	const TEMPLATE_START_LOCATION_KEY = 'field_57d1fd23c8517';
+	const TEMPLATE_DESCRIPTION_KEY = 'field_57bcbf7086cb9';
 
 	const USER_EMER_PHONE = 'emergency_contact_phone';
 	const USER_EMER_NAME = 'emergency_contact_name';
@@ -76,6 +87,7 @@ class PwtcMapdb {
 	const ROLE_ROAD_CAPTAIN = 'ride_captain';
 
 	const POST_TYPE_RIDE = 'scheduled_rides';
+	const POST_TYPE_TEMPLATE = 'ride_template';
 	
 	const ROAD_CAPTAIN_EMAIL = 'roadcaptain@portlandbicyclingclub.com';
 	
