@@ -193,13 +193,8 @@ class PwtcMapdb_File {
 			return '<div class="callout small alert"><p>You must be logged in to delete upload files.</p></div>';
 		}
 		$user_info = get_userdata($current_user->ID);
-		if ($allow_leaders) {
-			$is_road_captain = in_array(PwtcMapdb::ROLE_ROAD_CAPTAIN, $user_info->roles);
-		}
-		else {
-			$is_road_captain = user_can($current_user,'edit_published_rides');
-		}
 		$is_ride_leader = in_array(PwtcMapdb::ROLE_RIDE_LEADER, $user_info->roles);
+		$is_road_captain = in_array(PwtcMapdb::ROLE_ROAD_CAPTAIN, $user_info->roles);
 
 		$return = '';
 		if (isset($_GET['return'])) {
@@ -275,13 +270,8 @@ class PwtcMapdb_File {
 		}
 
 		$user_info = get_userdata($current_user->ID);
-		if ($allow_leaders) {
-			$is_road_captain = in_array(PwtcMapdb::ROLE_ROAD_CAPTAIN, $user_info->roles);
-		}
-		else {
-			$is_road_captain = user_can($current_user,'edit_published_rides');
-		}
 		$is_ride_leader = in_array(PwtcMapdb::ROLE_RIDE_LEADER, $user_info->roles);
+		$is_road_captain = in_array(PwtcMapdb::ROLE_ROAD_CAPTAIN, $user_info->roles);
 
         	if (!$is_road_captain) {
 			return '<div class="callout small warning"><p>You are not allowed to manage upload files.</p></div>';
