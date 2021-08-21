@@ -32,8 +32,10 @@
             <td><span>Ride Title</span><?php echo $title; ?></td>
             <td><span>Author</span><?php echo $author_name; ?></td>
             <td><span>Actions</span>
+            <?php if (user_can($current_user,'edit_published_rides')) { ?>
                 <a href="<?php echo $view_link; ?>">Preview</a>
-                <a href="<?php echo $edit_link; ?>">Edit</a>
+            <?php } ?>
+		<a href="<?php echo $edit_link; ?>">Edit</a>
             </td>	
         </tr>
     <?php
