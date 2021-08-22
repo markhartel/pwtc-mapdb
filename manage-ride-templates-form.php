@@ -50,7 +50,7 @@
     </div>
 <?php } ?>
     <ul class="accordion" data-accordion data-allow-all-closed="true">
-        <li class="accordion-item" data-accordion-item>
+        <li class="accordion-item <?php if ($search_open) { ?>is-active<?php } ?>" data-accordion-item>
             <a href="#" class="accordion-title">Search Ride Templates...</a>
             <div class="accordion-content" data-tab-content>
                 <form class="search-frm" method="POST">
@@ -71,7 +71,7 @@
                             </label>
                         </div>
                     <?php } ?>
-                        <div class="small-12 medium-9 columns">
+                        <div class="small-12 medium-7 columns">
                             <label>Ride Title 
                                 <input type="text" name="ride_title" value="<?php echo $ride_title; ?>">
                             </label>
@@ -134,6 +134,7 @@
         else {
             $leader = '';
         }
+        $view_link = esc_url(get_the_permalink());
         $edit_link = self::edit_template_link($postid, $return_uri);
         $copy_link = self::copy_template_link($postid, $return_uri);
         $delete_link = self::delete_template_link($postid, $return_uri);
