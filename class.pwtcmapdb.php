@@ -84,7 +84,8 @@ class PwtcMapdb {
 	const ROLE_CURRENT_MEMBER = 'current_member';
 	const ROLE_EXPIRED_MEMBER = 'expired_member';
 	const ROLE_RIDE_LEADER = 'ride_leader';
-	const ROLE_ROAD_CAPTAIN = 'ride_captain';
+	//const ROLE_ROAD_CAPTAIN = 'ride_captain';
+	const ROLE_ROAD_CAPTAIN = 'road_captain';
 
 	const POST_TYPE_RIDE = 'scheduled_rides';
 	const POST_TYPE_TEMPLATE = 'ride_template';
