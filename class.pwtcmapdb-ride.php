@@ -1168,10 +1168,11 @@ class PwtcMapdb_Ride {
 
 	// Generates the [pwtc_mapdb_manage_ride_templates] shortcode.
 	public static function shortcode_manage_ride_templates($atts) {
-		$a = shortcode_atts(array('leaders' => 'no', 'limit' => '0'), $atts);
+		$a = shortcode_atts(array('leaders' => 'no', 'limit' => '10', 'status' => 'all', 'search' => 'close', 'sort' => 'date'), $atts);
 		$allow_leaders = $a['leaders'] == 'yes';
 		$limit = intval($a['limit']);
-
+		$search_open = $a['search'] == 'open';
+		
 		$current_user = wp_get_current_user();
 		
 		if ( 0 == $current_user->ID ) {
@@ -1179,9 +1180,19 @@ class PwtcMapdb_Ride {
 		}
 
 		if (isset($_POST['ride_title']) and isset($_POST['ride_leader']) and isset($_POST['offset'])) {
+			$ride_status = 'publish';
+			if (isset($_POST['ride_status'])) {
+				$ride_status = $_POST['ride_status'];
+			}
+			$sort_by = 'date';
+			if (isset($_POST['sort_by'])) {
+				$sort_by = $_POST['sort_by'];
+			}
 			wp_redirect(add_query_arg(array(
 				'leader' => $_POST['ride_leader'],
 				'title' => urlencode(trim($_POST['ride_title'])),
+				'status' => $ride_status,
+				'sort' => $sort_by,
 				'offset' => intval($_POST['offset'])
 			), get_permalink()), 303);
 			exit;
@@ -1202,6 +1213,29 @@ class PwtcMapdb_Ride {
 		else {
 			$ride_title = '';
 		}
+		
+		if (isset($_GET['status']) and $is_road_captain) {
+			$ride_status = $_GET['status'];
+			if ($ride_status == 'all' or $ride_status == 'mine') {
+				$post_status = ['publish', 'pending', 'draft'];
+			}
+			else {
+				$post_status = $ride_status;
+			}
+		}
+		else if ($is_road_captain) {
+			$ride_status = $a['status'];
+			if ($ride_status == 'all' or $ride_status == 'mine') {
+				$post_status = ['publish', 'pending', 'draft'];
+			}
+			else {
+				$post_status = $ride_status;
+			}
+		}
+		else {
+			$ride_status = 'publish';
+			$post_status = $ride_status;
+		}
 
 		if (isset($_GET['leader'])) {
 			$ride_leader = $_GET['leader'];
@@ -1221,14 +1255,36 @@ class PwtcMapdb_Ride {
 		else {
 			$offset = 0;
 		}
+		
+		if (isset($_GET['sort']) and $is_road_captain) {
+			$sort_by = $_GET['sort'];
+		}
+		else if ($is_road_captain) {
+			$sort_by = $a['sort'];
+		}
+		else {
+			$sort_by = 'date';
+		}
 
 		$query_args = [
 			'posts_per_page' => $limit > 0 ? $limit : -1,
 			'post_status' => 'publish',
 			'post_type' => 'ride_template',
-			'orderby' => 'title',
-			'order'   => 'ASC',
 		];
+		
+		if ($sort_by == 'date') {
+			$query_args['orderby'] = 'date';
+			$query_args['order'] = 'DESC';
+		}
+		else if ($sort_by == 'title') {
+			$query_args['orderby'] = 'title';
+			$query_args['order'] = 'ASC';
+		}
+
+		if ($ride_status == 'mine') {
+			$query_args['author'] = $current_user->ID;
+		}
+
 		if (!empty($ride_title)) {
 			$query_args['s'] = $ride_title;	
 		}	
