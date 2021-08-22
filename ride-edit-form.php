@@ -375,6 +375,7 @@
                 return;
             }
 
+    <?php if (!$is_template) { ?>
             var date = $('#pwtc-mapdb-edit-ride-div input[name="ride_date"]').val().trim();
             var time = $('#pwtc-mapdb-edit-ride-div input[name="ride_time"]').val().trim();
             if (date.length == 0) {
@@ -413,6 +414,7 @@
                     return; 
                 }
             }
+    <?php } ?>
 
             var attach_map = $('#pwtc-mapdb-edit-ride-div input[name="attach_maps"]:checked').val() == '1';
             if (attach_map) {
@@ -521,7 +523,9 @@
             }
             set_coord_string(lat, lng);
             $('#pwtc-mapdb-edit-ride-div input[name="start_address"]').val(decodeHtml(title+', '+addr));
+    <?php if (!$is_template) { ?>
             $('#pwtc-mapdb-edit-ride-div input[name="start_location_comment"]').val(decodeHtml(comment));
+    <?php } ?>
             $('#pwtc-mapdb-edit-ride-div input[name="start_lat"]').val(lat);
             $('#pwtc-mapdb-edit-ride-div input[name="start_lng"]').val(lng);
             $('#pwtc-mapdb-edit-ride-div input[name="start_zoom"]').val(zoom);
@@ -812,6 +816,7 @@
                     <p class="help-text">You are not allowed to edit the ride title.</p>
                 <?php } ?>
             </div>
+    <?php if (!$is_template) { ?>
             <div class="row">
                 <div class="small-12 medium-6 columns">
                     <label>Ride Date
@@ -834,6 +839,7 @@
                     <?php } ?>
                 </div>
             </div>
+    <?php } ?>
             <div class="row column">
                 <label>Ride Description
                     <textarea name="description" rows="10"><?php echo $description; ?></textarea>
@@ -980,9 +986,11 @@
     <?php } else { ?>
                 <p class="help-text">You are not allowed to edit the start location.</p>
     <?php } ?>
+    <?php if (!$is_template) { ?>
                 <label>Start Location Comment
                     <input type="text" name="start_location_comment" value="<?php echo esc_attr($start_location_comment); ?>"/>
                 </label>
+    <?php } ?>
                 <input type="hidden" name="start_lat" value="<?php echo esc_attr($start_location['lat']); ?>"/>
                 <input type="hidden" name="start_lng" value="<?php echo esc_attr($start_location['lng']); ?>"/>
                 <input type="hidden" name="start_zoom" value="<?php echo esc_attr(isset($start_location['zoom']) ? $start_location['zoom'] : ''); ?>"/>
