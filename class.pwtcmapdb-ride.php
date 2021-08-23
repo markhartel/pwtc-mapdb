@@ -121,11 +121,12 @@ class PwtcMapdb_Ride {
 
 	// Generates the [pwtc_mapdb_edit_ride] shortcode.
 	public static function shortcode_edit_ride($atts, $content) {
-		$a = shortcode_atts(array('leaders' => 'no', 'interval' => 'P14D', 'use_return' => 'no', 'email' => 'no', 'captain' => PwtcMapdb::ROAD_CAPTAIN_EMAIL, 'template' => 'no'), $atts);
+		$a = shortcode_atts(array('leaders' => 'no', 'interval' => 'P14D', 'use_return' => 'no', 'email' => 'no', 'captain' => PwtcMapdb::ROAD_CAPTAIN_EMAIL, 'template' => 'no', 'coords' => 'no'), $atts);
 		$allow_leaders = $a['leaders'] == 'yes';
 		$use_return = $a['use_return'] == 'yes';
 		$allow_email = $a['email'] == 'yes';
 		$is_template = $a['template'] == 'yes';
+		$set_coords = $a['coords'] == 'yes';
 		$captain_email = $a['captain'];
 		
 		$current_user = wp_get_current_user();
