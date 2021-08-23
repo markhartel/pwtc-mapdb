@@ -353,6 +353,22 @@
         $('#pwtc-mapdb-edit-ride-div input[name="start_location_comment"]').on('input', function() {
             is_dirty = true;
         });
+        
+    <?php if ($set_coords) { ?>
+
+        $('#pwtc-mapdb-edit-ride-div input[name="start_address"]').on('input', function() {
+            is_dirty = true;
+        });
+
+        $('#pwtc-mapdb-edit-ride-div input[name="start_lat"]').on('input', function() {
+            is_dirty = true;
+        });
+
+        $('#pwtc-mapdb-edit-ride-div input[name="start_lng"]').on('input', function() {
+            is_dirty = true;
+        });
+
+    <?php } ?>
 
         $('#pwtc-mapdb-edit-ride-div form').on('submit', function(evt) {
             $('#pwtc-mapdb-edit-ride-div input').removeClass('indicate-error');
@@ -472,11 +488,31 @@
             }
 
             if ($('#pwtc-mapdb-edit-ride-div input[name="start_address"]').val().trim().length == 0) {
-                show_warning('You must choose a <strong>start location</strong> for this ride.');
+                show_warning('You must enter a <strong>start location</strong> for this ride.');
                 $('#pwtc-mapdb-edit-ride-div input[name="start_address"]').addClass('indicate-error');
                 evt.preventDefault();
                 return;
             }
+            
+    <?php if ($set_coords) { ?>
+
+            var lat = $('#pwtc-mapdb-edit-ride-div input[name="start_lat"]').val().trim();
+            if (lat.length == 0 || lat == '0') {
+                show_warning('You must enter a <strong>latitude</strong> for this ride.');
+                $('#pwtc-mapdb-edit-ride-div input[name="start_lat"]').addClass('indicate-error');
+                evt.preventDefault();
+                return;
+            }
+
+            var lng = $('#pwtc-mapdb-edit-ride-div input[name="start_lng"]').val().trim();
+            if (lng.length == 0 || lng == '0') {
+                show_warning('You must enter a <strong>longitude</strong> for this ride.');
+                $('#pwtc-mapdb-edit-ride-div input[name="start_lng"]').addClass('indicate-error');
+                evt.preventDefault();
+                return;
+            }
+
+    <?php } ?>
 
             var new_leaders = [];
             $('#pwtc-mapdb-edit-ride-div .leaders-div div').each(function() {
