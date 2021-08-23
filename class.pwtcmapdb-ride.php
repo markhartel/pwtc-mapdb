@@ -1268,7 +1268,7 @@ class PwtcMapdb_Ride {
 
 		$query_args = [
 			'posts_per_page' => $limit > 0 ? $limit : -1,
-			'post_status' => 'publish',
+			'post_status' => $post_status,
 			'post_type' => 'ride_template',
 		];
 		
