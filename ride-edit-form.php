@@ -979,22 +979,43 @@
                 <label>Start Location
                     <span class="coord-span"><?php echo $start_coords; ?></span>
                     <a class="goolmap" <?php if (empty($start_coords)) { ?>style="display:none"<?php } ?> title="Display start location in Google Maps."><i class="fa fa-map-marker"></i></a>
-                    <input type="text" name="start_address" value="<?php echo esc_attr($start_location['address']); ?>" readonly/>
+                    <input type="text" name="start_address" value="<?php echo esc_attr($start_location['address']); ?>" <?php echo $set_coords ? '': 'readonly'; ?>/>
                 </label>
-    <?php if ($edit_start_location) { ?>
+    <?php if ($set_coords) { ?>
+                <p class="help-text">To be determined...</p>
+    <?php } else if ($edit_start_location) { ?>
                 <p class="help-text">You cannot edit the start location directly, instead press the find or choose start location buttons below.</p>
     <?php } else { ?>
                 <p class="help-text">You are not allowed to edit the start location.</p>
     <?php } ?>
+            </div>
+    <?php if ($set_coords) { ?>
+            <div class="row">
+                <div class="small-12 medium-6 columns">
+                    <label>Latitude
+                        <input type="text" name="start_lat" value="<?php echo esc_attr($start_location['lat']); ?>"/>
+                    </label>
+                    <p class="help-text">To be determined...</p>
+                </div>
+                <div class="small-12 medium-6 columns">
+                    <label>Longitude
+                        <input type="text" name="start_lng" value="<?php echo esc_attr($start_location['lng']); ?>"/>
+                    </label>
+                    <p class="help-text">To be determined...</p>
+                </div>
+            </div>
+    <?php } else { ?>
+            <input type="hidden" name="start_lat" value="<?php echo esc_attr($start_location['lat']); ?>"/>
+            <input type="hidden" name="start_lng" value="<?php echo esc_attr($start_location['lng']); ?>"/>
+    <?php } ?>
+            <input type="hidden" name="start_zoom" value="<?php echo esc_attr(isset($start_location['zoom']) ? $start_location['zoom'] : ''); ?>"/>
     <?php if (!$is_template) { ?>
+            <div class="row column">
                 <label>Start Location Comment
                     <input type="text" name="start_location_comment" value="<?php echo esc_attr($start_location_comment); ?>"/>
                 </label>
-    <?php } ?>
-                <input type="hidden" name="start_lat" value="<?php echo esc_attr($start_location['lat']); ?>"/>
-                <input type="hidden" name="start_lng" value="<?php echo esc_attr($start_location['lng']); ?>"/>
-                <input type="hidden" name="start_zoom" value="<?php echo esc_attr(isset($start_location['zoom']) ? $start_location['zoom'] : ''); ?>"/>
             </div>
+    <?php } ?>
     <?php if ($edit_start_location) { ?>
             <div class="row column">
                 <ul class="accordion" data-accordion data-allow-all-closed="true">
