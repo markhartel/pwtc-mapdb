@@ -766,7 +766,7 @@
             if ( data['pwtc-refresh-post-lock'] ) {
                 var received = data['pwtc-refresh-post-lock'];
                 if ( received.lock_error ) {
-                    show_warning('You can no longer edit this ride. ' + received.lock_error.text);
+                    show_warning('You can no longer edit this post. ' + received.lock_error.text);
                     $('#pwtc-mapdb-edit-ride-div button[type="submit"]').prop('disabled',true);
                 } 
                 else if ( received.new_lock ) {
