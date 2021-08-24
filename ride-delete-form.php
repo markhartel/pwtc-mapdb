@@ -49,17 +49,17 @@
 <?php if ($deleted) { ?>
         <input type="hidden" name="undo_delete" value="yes"/>
         <div class="callout small success">
-            <p>This ride has been successfully deleted. <a class="revert-action">Undo</a></p>
+            <p>This ride<?php echo $is_template ? ' template': ''; ?> has been successfully deleted. <a class="revert-action">Undo</a></p>
         </div>
 <?php } else { ?>
         <input type="hidden" name="delete_ride" value="yes"/>
         <div class="callout">
             <div class="row column">
-                <p>To delete ride "<?php echo $ride_title; ?>", press the delete button below.</p>
+                <p>To delete ride<?php echo $is_template ? ' template': ''; ?> "<?php echo $ride_title; ?>", press the delete button below.</p>
             </div>
             <div class="row column errmsg"></div>
             <div class="row column clearfix">
-                <input class="dark button float-left" type="submit" value="Delete Ride"/>
+                <input class="dark button float-left" type="submit" value="Delete"/>
             </div>
         </div>
 <?php } ?>
