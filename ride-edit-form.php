@@ -785,29 +785,29 @@
     <div class="callout small success">
         <p>
         <?php if ($operation == 'update_draft') { ?>
-        The draft ride was updated.
+        The draft ride<?php echo $is_template ? ' template': ''; ?> was updated.
         <?php } else if ($operation == 'submit_review') { ?>
-        The draft ride was submitted for review.
+        The draft ride<?php echo $is_template ? ' template': ''; ?> was submitted for review.
         <?php } else if ($operation == 'update_pending') { ?>
-        The pending ride was updated.
+        The pending ride<?php echo $is_template ? ' template': ''; ?> was updated.
         <?php } else if ($operation == 'published_draft') { ?>
-        The draft ride was published.
+        The draft ride<?php echo $is_template ? ' template': ''; ?> was published.
         <?php } else if ($operation == 'published') { ?>
-        The pending ride was published
+        The pending ride<?php echo $is_template ? ' template': ''; ?> was published
         <?php if ($email_status == 'yes') { ?> and the author notified by email
         <?php } else if ($email_status == 'failed') { ?> but failed to notify author by email<?php } ?>.
         <?php } else if ($operation == 'rejected') { ?>
-        The pending ride was rejected
+        The pending ride<?php echo $is_template ? ' template': ''; ?> was rejected
         <?php if ($email_status == 'yes') { ?> and the author notified by email
         <?php } else if ($email_status == 'failed') { ?> but failed to notify author by email<?php } ?>.
         <?php } else if ($operation == 'update_published') { ?>
-        The published ride was updated.
+        The published ride<?php echo $is_template ? ' template': ''; ?> was updated.
         <?php } else if ($operation == 'unpublished') { ?>
-        The published ride was unpublished.
+        The published ride<?php echo $is_template ? ' template': ''; ?> was unpublished.
         <?php } else if ($operation == 'insert') { ?>
-        The first draft of your ride was saved.
+        The first draft of your ride<?php echo $is_template ? ' template': ''; ?> was saved.
         <?php } else if ($operation == 'revert_draft') { ?>
-        The ride was reverted back to draft
+        The ride<?php echo $is_template ? ' template': ''; ?> was reverted back to draft
         <?php if ($email_status == 'yes') { ?> and the road captain notified by email
         <?php } else if ($email_status == 'failed') { ?> but failed to notify road captain by email<?php } ?>.
         <?php } ?>
@@ -817,7 +817,7 @@
     <div>
         <p>
     <?php if ($postid != 0) { ?>
-        This ride was authored by 
+        This ride<?php echo $is_template ? ' template': ''; ?> was authored by 
         <?php if ($author != $current_user->ID) { 
             echo '<a href="' . esc_url('mailto:' . $author_email) . '">' . $author_name . '</a>';
         } else { 
@@ -828,15 +828,21 @@
         <?php } else if ($status == 'pending') { ?>
         pending review by a road captain. It can be updated, published or rejected using the buttons at the bottom of the form.
         <?php } else if ($status == 'publish') { ?>
-        published and on the ride calendar. It can be updated or unpublished using the buttons at the bottom of the form.
+        published<?php if (!$is_template) { ?> and on the ride calendar<?php } ?>. It can be updated or unpublished using the buttons at the bottom of the form.
         <?php } ?>
     <?php } else { ?>
         <?php if ($template) { ?>
         This is a new ride created from a template, set the <em>ride date</em> and <em>departure time</em> in the form below (and modify any other desired fields) and press the save button at the bottom of the form.
         <?php } else if ($copy_ride) { ?>
-        This is a new ride copied from an existing ride, set the <em>ride date</em> in the form below (and modify any other desired fields) and press the save button at the bottom of the form.
+        This is a new ride<?php echo $is_template ? ' template': ''; ?> copied from an existing ride<?php echo $is_template ? ' template': ''; ?>, 
+        <?php if ($is_template) { ?>
+        modify any fields that you desire 
         <?php } else { ?>
-        This is a new ride, fill out the form below and press the save button at the bottom of the form.
+        set the <em>ride date</em> in the form below (and modify any other desired fields) 
+        <?php } ?> 
+        and press the save button at the bottom of the form.
+        <?php } else { ?>
+        This is a new ride<?php echo $is_template ? ' template': ''; ?>, fill out the form below and press the save button at the bottom of the form.
         <?php } ?>
     <?php } ?>
         </p>
