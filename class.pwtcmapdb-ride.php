@@ -44,7 +44,8 @@ class PwtcMapdb_Ride {
 
 	public static function load_javascripts() {
 		$link = get_the_permalink();
-		if ($link and (strpos($link, self::DELETE_RIDE_URI)!==false or strpos($link, self::EDIT_RIDE_URI)!==false or strpos($link, self::SUBMIT_RIDE_URI)!==false)) {
+		if ($link and (strpos($link, self::DELETE_RIDE_URI)!==false or strpos($link, self::EDIT_RIDE_URI)!==false or strpos($link, self::SUBMIT_RIDE_URI)!==false or 
+		strpos($link, self::DELETE_TEMPLATE_URI)!==false or strpos($link, self::EDIT_TEMPLATE_URI)!==false or strpos($link, self::SUBMIT_TEMPLATE_URI)!==false)) {
 			wp_enqueue_script('heartbeat');
 		}
 	}
