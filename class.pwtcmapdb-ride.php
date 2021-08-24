@@ -131,7 +131,7 @@ class PwtcMapdb_Ride {
 		
 		$current_user = wp_get_current_user();
 		if ( 0 == $current_user->ID ) {
-			return '<div class="callout small alert"><p>You must be logged in to submit rides.</p></div>';
+			return '<div class="callout small alert"><p>You must be logged in to submit rides or ride templates.</p></div>';
 		}
 		$user_info = get_userdata($current_user->ID);
 		if ($allow_leaders) {
@@ -165,7 +165,7 @@ class PwtcMapdb_Ride {
 			);
 			$status = wp_update_post($my_post);
 			if ($status != $postid) {
-				wp_die('Failed to update this ride.', 403);
+				wp_die('Failed to update this post.', 403);
 			}
 			
 			$email = 'no';
@@ -237,7 +237,7 @@ class PwtcMapdb_Ride {
 				//error_log(print_r($my_post, true));
 				$status = wp_update_post( $my_post );	
 				if ($status != $postid) {
-					wp_die('Failed to update this ride.', 403);
+					wp_die('Failed to update this post.', 403);
 				}
 				update_post_meta($postid, '_edit_last', $current_user->ID);
 			}
@@ -251,7 +251,7 @@ class PwtcMapdb_Ride {
 				$operation = 'insert';
 				$postid = wp_insert_post( $my_post );
 				if ($postid == 0) {
-					wp_die('Failed to create a new ride.', 403);
+					wp_die('Failed to create a new post.', 403);
 				}
 			}
 
@@ -499,7 +499,7 @@ class PwtcMapdb_Ride {
 		    if ($lock_user) {
 				$info = get_userdata($lock_user);
 				$name = $info->first_name . ' ' . $info->last_name;	
-				return $return_to_ride . '<div class="callout small warning"><p>Ride "' . $ride_title . '" is currently being edited by ' . $name . '. </p></div>';
+				return $return_to_ride . '<div class="callout small warning"><p>Post "' . $ride_title . '" is currently being edited by ' . $name . '. </p></div>';
 			}
 		}
 		
@@ -775,7 +775,7 @@ class PwtcMapdb_Ride {
 
 		$current_user = wp_get_current_user();
 		if ( 0 == $current_user->ID ) {
-			return '<div class="callout small alert"><p>You must be logged in to delete rides.</p></div>';
+			return '<div class="callout small alert"><p>You must be logged in to delete rides or ride templates.</p></div>';
 		}
 		$user_info = get_userdata($current_user->ID);
 		if ($allow_leaders) {
@@ -805,7 +805,7 @@ class PwtcMapdb_Ride {
 					), get_permalink()), 303);
 				}
 				else {
-					wp_die('Failed to delete this ride.', 403);
+					wp_die('Failed to delete this post.', 403);
 				}
 			}
 			else if (isset($_POST['undo_delete'])) {
@@ -816,7 +816,7 @@ class PwtcMapdb_Ride {
 					), get_permalink()), 303);
 				}
 				else {
-					wp_die('Failed to undo the delete of this ride.', 403);
+					wp_die('Failed to undo the delete of this post.', 403);
 				}
 			}
 			exit;
@@ -882,7 +882,7 @@ class PwtcMapdb_Ride {
 			if ($lock_user) {
 				$info = get_userdata($lock_user);
 				$name = $info->first_name . ' ' . $info->last_name;	
-				return $return_to_ride . '<div class="callout small warning"><p>Ride "' . $ride_title . '" is currently being edited by ' . $name . '.</p></div>';
+				return $return_to_ride . '<div class="callout small warning"><p>Post "' . $ride_title . '" is currently being edited by ' . $name . '.</p></div>';
 			}
 			self::set_post_lock($postid);
 		}
