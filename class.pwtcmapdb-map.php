@@ -161,7 +161,7 @@ class PwtcMapdb_Map {
 			);
 			$status = wp_update_post($my_post);
 			if ($status != $postid) {
-				wp_die('Failed to update this route map.', 403);
+				wp_die('Failed to update this post.', 403);
 			}
 
 			$email = 'no';
@@ -234,7 +234,7 @@ class PwtcMapdb_Map {
 				//error_log(print_r($my_post, true));
 				$status = wp_update_post( $my_post );	
 				if ($status != $postid) {
-					wp_die('Failed to update this route map.', 403);
+					wp_die('Failed to update this post.', 403);
 				}
 				update_post_meta($postid, '_edit_last', $current_user->ID);
 			}
@@ -248,7 +248,7 @@ class PwtcMapdb_Map {
 				$operation = 'insert';
 				$postid = wp_insert_post( $my_post );
 				if ($postid == 0) {
-					wp_die('Failed to create a new route map.', 403);
+					wp_die('Failed to create a new post.', 403);
 				}
 			}
 			
@@ -499,7 +499,7 @@ class PwtcMapdb_Map {
 		    	if ($lock_user) {
 				$info = get_userdata($lock_user);
 				$name = $info->first_name . ' ' . $info->last_name;	
-				return $return_to_map . '<div class="callout small warning"><p>Route map "' . $map_title . '" is currently being edited by ' . $name . '. </p></div>';
+				return $return_to_map . '<div class="callout small warning"><p>Post "' . $map_title . '" is currently being edited by ' . $name . '. </p></div>';
 			}
 		}
 
@@ -626,7 +626,7 @@ class PwtcMapdb_Map {
 					), get_permalink()), 303);
 				}
 				else {
-					wp_die('Failed to trash this route map.', 403);
+					wp_die('Failed to trash this post.', 403);
 				}
 			}
 			else if (isset($_POST['delete_map'])) {
@@ -646,7 +646,7 @@ class PwtcMapdb_Map {
 					), get_permalink()), 303);
 				}
 				else {
-					wp_die('Failed to delete this route map.', 403);
+					wp_die('Failed to delete this post.', 403);
 				}
 			}
 			else if (isset($_POST['undo_delete'])) {
@@ -657,7 +657,7 @@ class PwtcMapdb_Map {
 					), get_permalink()), 303);
 				}
 				else {
-					wp_die('Failed to undo the delete of this route map.', 403);
+					wp_die('Failed to undo the delete of this post.', 403);
 				}
 			}
 			exit;
@@ -706,7 +706,7 @@ class PwtcMapdb_Map {
 			if ($lock_user) {
 				$info = get_userdata($lock_user);
 				$name = $info->first_name . ' ' . $info->last_name;	
-				return $return_to_map . '<div class="callout small warning"><p>Route map "' . $map_title . '" is currently being edited by ' . $name . '.</p></div>';
+				return $return_to_map . '<div class="callout small warning"><p>Post "' . $map_title . '" is currently being edited by ' . $name . '.</p></div>';
 			}
 			self::set_post_lock($postid);
 			
