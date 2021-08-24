@@ -96,8 +96,10 @@
         }
         
         function set_coord_string(lat, lng) {
+    <?php if (!$set_coords) { ?>
             $('#pwtc-mapdb-edit-ride-div .coord-span').html('(' + lat + ', ' + lng + ')');
             $('#pwtc-mapdb-edit-ride-div .goolmap').show();
+    <?php } ?>
         }
 
         function has_user_id(id) {
@@ -1013,8 +1015,12 @@
             </div>
             <div class="row column">
                 <label>Start Location
+    <?php if ($set_coords) { ?>
+                    <a class="goolmap" title="Display start location in Google Maps."><i class="fa fa-map-marker"></i></a>
+    <?php } else { ?>
                     <span class="coord-span"><?php echo $start_coords; ?></span>
                     <a class="goolmap" <?php if (empty($start_coords)) { ?>style="display:none"<?php } ?> title="Display start location in Google Maps."><i class="fa fa-map-marker"></i></a>
+    <?php } ?>                
                     <input type="text" name="start_address" value="<?php echo esc_attr($start_location['address']); ?>" <?php echo $set_coords ? '': 'readonly'; ?>/>
                 </label>
     <?php if ($set_coords) { ?>
