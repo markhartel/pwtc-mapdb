@@ -28,7 +28,7 @@
             if ( data['pwtc-refresh-post-lock'] ) {
                 var received = data['pwtc-refresh-post-lock'];
                 if ( received.lock_error ) {
-                    $('#pwtc-mapdb-delete-ride-div').html('<div class="callout small alert">You cannot delete ride "<?php echo $ride_title; ?>". ' + received.lock_error.text + '</div>');
+                    $('#pwtc-mapdb-delete-ride-div').html('<div class="callout small alert">You cannot delete post "<?php echo $ride_title; ?>". ' + received.lock_error.text + '</div>');
                 } 
                 else if ( received.new_lock ) {
                 }
