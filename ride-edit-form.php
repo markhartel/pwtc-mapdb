@@ -1024,7 +1024,7 @@
                     <input type="text" name="start_address" value="<?php echo esc_attr($start_location['address']); ?>" <?php echo $set_coords ? '': 'readonly'; ?>/>
                 </label>
     <?php if ($set_coords) { ?>
-                <p class="help-text">Enter the string to be shown as the ride start location. The actual Google map location will be determined by the latitude and longitude numbers entered below.</p>
+                <p class="help-text">Enter the string to be shown as the ride start location. The actual Google map location will be determined by the latitude and longitude coordinates entered below.</p>
     <?php } else if ($edit_start_location) { ?>
                 <p class="help-text">You cannot edit the start location directly, instead press the find or choose start location buttons below.</p>
     <?php } else { ?>
@@ -1034,13 +1034,13 @@
     <?php if ($set_coords) { ?>
             <div class="row">
                 <div class="small-12 medium-6 columns">
-                    <label>Latitude
+                    <label>Latitude Coordinate
                         <input type="text" name="start_lat" value="<?php echo esc_attr($start_location['lat']); ?>"/>
                     </label>
                     <p class="help-text">Enter a positive number for the northern hemisphere and a negative number for the southern hemisphere.</p>
                 </div>
                 <div class="small-12 medium-6 columns">
-                    <label>Longitude
+                    <label>Longitude Coordinate
                         <input type="text" name="start_lng" value="<?php echo esc_attr($start_location['lng']); ?>"/>
                     </label>
                     <p class="help-text">Enter a positive number for the eastern hemisphere and a negative number for the western hemisphere.</p>
