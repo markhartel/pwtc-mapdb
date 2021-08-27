@@ -172,11 +172,9 @@
             }
             else {
                 if (res.offset == 0) {
+                    $('#pwtc-mapdb-edit-ride-div .map-search-div').removeAttr('offset');
                     $('#pwtc-mapdb-edit-ride-div .map-search-div').empty();
                     $('#pwtc-mapdb-edit-ride-div .map-search-div').append('<table></table>');
-                }
-                else {
-                    $('#pwtc-mapdb-edit-ride-div .map-search-div a.fetch').remove();
                 }
                 res.maps.forEach(function(item) {
                     var a = '';
@@ -193,7 +191,7 @@
                         '<tr mapid="' + item.ID + '"><td>' + item.title + a + '</td><td>' + item.distance + '</td><td>' + item.terrain + '</td></tr>');  
                 });
                 if (res.more !== undefined) {
-                    $('#pwtc-mapdb-edit-ride-div .map-search-div').append('<a class="dark button fetch" offset="' + (res.offset+10) + '">Load Next 10 Maps</a>');
+                    $('#pwtc-mapdb-edit-ride-div .map-search-div').attr('offset', res.offset+10);
                 }
                 $('#pwtc-mapdb-edit-ride-div .map-search-div tr a').on('click', function(evt) {
                     evt.stopPropagation();
@@ -208,8 +206,13 @@
                         });
                     }
                 });
-                $('#pwtc-mapdb-edit-ride-div .map-search-div a.fetch').on('click', function(evt) {
-                    var offset = $(this).attr('offset');
+            }
+        }
+        
+        $('#pwtc-mapdb-edit-ride-div .map-search-div').on('scroll', function() {            
+            if ($(this).scrollTop() + $(this).innerHeight() >= $(this)[0].scrollHeight) {
+                var offset = $(this).attr('offset');
+                if (offset) {
                     var searchstr = $('#pwtc-mapdb-edit-ride-div input[name="map-pattern"]').val();
                     var action = "<?php echo admin_url('admin-ajax.php'); ?>";
                     var data = {
@@ -219,9 +222,10 @@
                         'offset': offset
                     };
                     $.post(action, data, maps_lookup_cb);
-                });
+                    $(this).removeAttr('offset');
+                }
             }
-        }
+        });
         
         $('#pwtc-mapdb-edit-ride-div .pending-maps-div tr a').on('click', function(evt) {
             evt.stopPropagation();
