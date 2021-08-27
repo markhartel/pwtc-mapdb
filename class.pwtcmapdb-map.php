@@ -35,6 +35,7 @@ class PwtcMapdb_Map {
 
         // Register ajax callbacks
         add_action('wp_ajax_pwtc_mapdb_lookup_maps', array('PwtcMapdb_Map', 'lookup_maps_callback') );
+	add_action('wp_ajax_pwtc_mapdb_fetch_maps', array('PwtcMapdb_Map', 'fetch_maps_callback') );
 
     }
 	
@@ -1074,7 +1075,119 @@ class PwtcMapdb_Map {
     
     /******* AJAX request/response callback functions *******/
 
-    public static function lookup_maps_callback() {
+	public static function fetch_maps_callback() {
+		$current_user = wp_get_current_user();
+		if ( 0 == $current_user->ID ) {
+			$response = array(
+				'error' => 'Map fetch failed - user access denied.'
+			);
+			echo wp_json_encode($response);		
+		}
+		else if (!isset($_POST['title']) or !isset($_POST['limit'])) {
+			$response = array(
+				'error' => 'Map fetch failed - AJAX arguments missing.'
+			);
+			echo wp_json_encode($response);
+		}
+		else {
+			$title = sanitize_text_field($_POST['title']);
+			$limit = intval($_POST['limit']);
+			if (isset($_POST['offset'])) {
+				$offset = intval($_POST['offset']);
+			}
+			else {
+				$offset = 0;
+			}
+
+			$query_args = [
+				'posts_per_page' => $limit > 0 ? $limit : -1,
+				'post_type' => PwtcMapdb::MAP_POST_TYPE,
+				'post_status' => 'publish',
+				'orderby'   => 'title',
+				'order'     => 'ASC',
+			];
+			if (!empty($title)) {
+				$query_args['s'] = $title;	
+			}	
+			if ($limit > 0)	{
+				$query_args['offset'] = $offset;
+			}
+
+			$query = new WP_Query($query_args);	
+
+			$is_more = false;
+			$maps = [];	
+			if ($query->have_posts()) {
+				$total = $query->found_posts;
+				$is_more = ($limit > 0) && ($total > ($offset + $limit));
+				while ($query->have_posts()) {
+					$query->the_post();
+		
+					$terrain = get_field(PwtcMapdb::TERRAIN_FIELD);
+					$terrain_str = '';
+					foreach ($terrain as $item) {
+						$terrain_str .= strtoupper($item);
+					}
+		
+					$length = get_field(PwtcMapdb::LENGTH_FIELD);
+					$max_length = get_field(PwtcMapdb::MAX_LENGTH_FIELD);
+					$distance_str = '';
+					if ($max_length == '') {
+						$distance_str = $length . ' miles';
+					}
+					else {
+						$distance_str = $length . '-' . $max_length . ' miles';
+					}
+
+					$href = '';
+					$href2 = '';
+					$type = '';
+					while (have_rows(PwtcMapdb::MAP_FIELD) ): the_row();
+						$type = get_sub_field(PwtcMapdb::MAP_TYPE_FIELD);
+						if ($type == 'file') {
+							$file = get_sub_field(PwtcMapdb::MAP_FILE_FIELD);
+							$href = esc_url($file['url']);
+						}
+						else if ($type == 'link') {
+							$link = get_sub_field(PwtcMapdb::MAP_LINK_FIELD);
+							$href = esc_url($link);
+						}
+						else if ($type == 'both') {
+							$file = get_sub_field(PwtcMapdb::MAP_FILE_FIELD);
+							$href = esc_url($file['url']);
+							$link = get_sub_field(PwtcMapdb::MAP_LINK_FIELD);
+							$href2 = esc_url($link);
+						}
+					endwhile;
+
+					$map = [
+						'ID' => get_the_ID(),
+						'title' => esc_html(get_the_title()),
+						'terrain' => $terrain_str,
+						'distance' => $distance_str,
+						'type' => $type,
+						'href' => $href,
+						'href2' => $href2
+					];
+					$maps[] = $map;
+				}
+				wp_reset_postdata();
+			}
+
+			$response = array(
+				'limit' => $limit,
+				'offset' => $offset,
+				'maps' => $maps
+			);
+			if ($is_more) {
+				$response['more'] = 1;
+			}
+			echo wp_json_encode($response);
+		}
+		wp_die();
+	}
+	
+    	public static function lookup_maps_callback() {
 		$current_user = wp_get_current_user();
 		if ( 0 == $current_user->ID ) {
 			$response = array(
