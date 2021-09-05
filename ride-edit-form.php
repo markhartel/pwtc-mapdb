@@ -47,6 +47,12 @@
     #pwtc-mapdb-edit-ride-div .leaders-div div i {
         cursor: pointer;
     }
+    #pwtc-mapdb-edit-ride-div .leaders-div input {
+        width: 150px;
+        margin: 10px; 
+        padding: 10px; 
+        border: 1px dashed;
+    }
     #pwtc-mapdb-edit-ride-div .leader-search-div ul {
         list-style-type: none;
     }
@@ -150,8 +156,10 @@
                     if (!has_user_id(userid)) {
                         var name = $(this).html();
                         is_dirty = true;
-                        $('#pwtc-mapdb-edit-ride-div .leaders-div').append('<div userid="' + userid + '"><i class="fa fa-times"></i> ' + name + '</div>').find('i').on('click', function(evt) {
+                        $('#pwtc-mapdb-edit-ride-div .leaders-div input').before('<div userid="' + userid + '"><i class="fa fa-times"></i> ' + name + '</div>');
+                        $('#pwtc-mapdb-edit-ride-div .leaders-div div[userid="' + userid + '"] .fa-times').on('click', function(evt) {
                             $(this).parent().remove();
+                            evt.stopPropagation();
                         });
                     }
                 });
@@ -209,6 +217,74 @@
             }
         }
         
+        function fetch_route_maps(offset) {
+            var searchstr = $('#pwtc-mapdb-edit-ride-div input[name="map-pattern"]').val();
+            var action = "<?php echo admin_url('admin-ajax.php'); ?>";
+            var data = {
+                'action': 'pwtc_mapdb_fetch_maps',
+                'limit': 10,
+                'title': searchstr,
+                'offset': offset
+            };
+            $.post(action, data, maps_lookup_cb);
+            if (offset > 0) {
+                $('#pwtc-mapdb-edit-ride-div .map-search-div').html('<div class="callout small"><i class="fa fa-spinner fa-pulse"></i> please wait...</div>');
+            }
+        }
+
+        function fetch_ride_leaders() {
+            var searchstr = $('#pwtc-mapdb-edit-ride-div input[name="leader-pattern"]').val();
+            var action = "<?php echo admin_url('admin-ajax.php'); ?>";
+            var data = {
+                'action': 'pwtc_mapdb_lookup_ride_leaders',
+                'search': searchstr
+            };
+            $.post(action, data, leaders_lookup_cb);
+            $('#pwtc-mapdb-edit-ride-div .leader-search-div').html('<div class="callout small"><i class="fa fa-spinner fa-pulse"></i> please wait...</div>');
+        }
+        
+    <?php if ($edit_leader) { ?>
+
+        $('#pwtc-mapdb-edit-ride-div input[name="leader-pattern"]').on('input', function() {
+            fetch_ride_leaders();
+            $('#pwtc-mapdb-edit-ride-div .leader-search-div').show();
+        });
+
+        $('#pwtc-mapdb-edit-ride-div input[name="leader-pattern"]').on('click', function(evt) {
+            if ($('#pwtc-mapdb-edit-ride-div .leader-search-div').is(':hidden')) {
+                fetch_ride_leaders();
+                $('#pwtc-mapdb-edit-ride-div .leader-search-div').show();
+            }
+            evt.stopPropagation();		
+        });
+
+        $('#pwtc-mapdb-edit-ride-div input[name="leader-pattern"]').on('keypress', function(evt) {
+            var keyPressed = evt.keyCode || evt.which; 
+            if (keyPressed === 13) { 
+                $('#pwtc-mapdb-edit-ride-div .leader-search-div ul li:first-child').trigger( 'click');
+            } 
+        });	
+
+        $('#pwtc-mapdb-edit-ride-div .leaders-div').on('click', function(evt) { 
+            if ($('#pwtc-mapdb-edit-ride-div .leader-search-div').is(':hidden')) {
+                fetch_ride_leaders();
+                $('#pwtc-mapdb-edit-ride-div .leader-search-div').show();
+                $('#pwtc-mapdb-edit-ride-div input[name="leader-pattern"]').focus();
+            }
+            else {
+                $('#pwtc-mapdb-edit-ride-div .leader-search-div').hide();
+                $('#pwtc-mapdb-edit-ride-div input[name="leader-pattern"]').val('');
+            }
+        });      
+
+        $('#pwtc-mapdb-edit-ride-div .leaders-div .fa-times').on('click', function(evt) {
+            is_dirty = true;
+            $(this).parent().remove();
+            evt.stopPropagation();
+        });
+
+    <?php } ?>
+        
         $('#pwtc-mapdb-edit-ride-div .map-search-div').on('scroll', function() {            
             if ($(this).scrollTop() + $(this).innerHeight() >= $(this)[0].scrollHeight) {
                 var offset = $(this).attr('offset');
@@ -242,25 +318,9 @@
             }
         });        
 
-        $('#pwtc-mapdb-edit-ride-div .leaders-div i').on('click', function(evt) {
-            is_dirty = true;
-            $(this).parent().remove();
-        });
-
         $('#pwtc-mapdb-edit-ride-div .maps-div .fa-times').on('click', function(evt) {
             is_dirty = true;
             $(this).parent().remove();
-        });
-
-        $('#pwtc-mapdb-edit-ride-div input[name="search-leaders"]').on('click', function(evt) {
-            var searchstr = $('#pwtc-mapdb-edit-ride-div input[name="leader-pattern"]').val();
-            var action = "<?php echo admin_url('admin-ajax.php'); ?>";
-            var data = {
-                'action': 'pwtc_mapdb_lookup_ride_leaders',
-                'search': searchstr
-            };
-            $.post(action, data, leaders_lookup_cb);
-            $('#pwtc-mapdb-edit-ride-div .leader-search-div').html('<div class="callout small"><i class="fa fa-spinner fa-pulse"></i> please wait...</div>');		
         });
 
         $('#pwtc-mapdb-edit-ride-div input[name="search-maps"]').on('click', function(evt) {
@@ -288,13 +348,6 @@
             var keyPressed = evt.keyCode || evt.which; 
             if (keyPressed === 13) { 
                 evt.stopPropagation(); 
-            } 
-        });	
-
-        $('#pwtc-mapdb-edit-ride-div input[name="leader-pattern"]').on('keypress', function(evt) {
-            var keyPressed = evt.keyCode || evt.which; 
-            if (keyPressed === 13) { 
-                $('#pwtc-mapdb-edit-ride-div input[name="search-leaders"]').trigger( 'click');
             } 
         });	
 
@@ -1109,41 +1162,25 @@
             </div>
             <div class="row column">
                 <div class= "leaders-div" style="min-height:40px; border:1px solid; display:flex; flex-wrap:wrap;">
-                    <?php foreach ($leaders as $leader) {
-                        $info = get_userdata($leader);
-                        if ($info) {
-                            $name = $info->first_name . ' ' . $info->last_name;
-                    ?>
+    <?php foreach ($leaders as $leader) {
+        $info = get_userdata($leader);
+        if ($info) {
+            $name = $info->first_name . ' ' . $info->last_name;
+    ?>
                     <div userid="<?php echo $leader; ?>"><?php if ($edit_leader) { ?><i class="fa fa-times"></i> <?php } ?><?php echo $name; ?></div>
-                    <?php } } ?>
+    <?php } } ?>
+    <?php if ($edit_leader) { ?>
+                    <input type="text" name="leader-pattern" placeholder="Enter name here">
+    <?php } ?>
                 </div>
             </div>
     <?php if ($edit_leader) { ?>
             <div class="row column">
-                <ul class="accordion" data-accordion data-allow-all-closed="true">
-                    <li class="accordion-item" data-accordion-item>
-                        <a href="#" class="accordion-title">Add Ride Leader...</a>
-                        <div class="accordion-content" data-tab-content>
-                            <div class="row column">
-                                <p class="help-text">Find ride leaders by entering a name and pressing search, then choose the desired leader from the resulting list.</p>
-                                <div class="input-group">
-                                    <input class="input-group-field" type="text" name="leader-pattern" placeholder="Enter leader name">
-                                    <div class="input-group-button">
-                                        <input type="button" class="dark button" name= "search-leaders" value="Search">
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="row column">
-                                <div class="leader-search-div" style="border:1px solid; overflow: auto; height: 100px;">
-                                </div>
-                            </div>
-                        </div>
-                    </li>
-                </ul>					
+                <div class="leader-search-div" style="border:1px solid; border-top-width: 0 !important; overflow: auto; height: 100px; display:none;">
+                </div>
             </div>
-    <?php } else { ?>
-            <div class="row column" style="min-height:20px;"></div>
     <?php } ?>
+            <div class="row column" style="min-height:20px;"></div>
             <div class="row column errmsg"></div>
             <div class="row column clearfix">
             <?php if ($postid == 0) { ?>
