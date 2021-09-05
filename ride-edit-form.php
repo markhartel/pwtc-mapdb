@@ -159,9 +159,13 @@
                         $('#pwtc-mapdb-edit-ride-div .leaders-div input').before('<div userid="' + userid + '"><i class="fa fa-times"></i> ' + name + '</div>');
                         $('#pwtc-mapdb-edit-ride-div .leaders-div div[userid="' + userid + '"] .fa-times').on('click', function(evt) {
                             $(this).parent().remove();
+                            $('#pwtc-mapdb-edit-ride-div .leader-search-div').hide();
+                            $('#pwtc-mapdb-edit-ride-div input[name="leader-pattern"]').val('');
                             evt.stopPropagation();
                         });
                     }
+                    $('#pwtc-mapdb-edit-ride-div .leader-search-div').hide();
+                    $('#pwtc-mapdb-edit-ride-div input[name="leader-pattern"]').val('');
                 });
             }
         }
@@ -280,6 +284,8 @@
         $('#pwtc-mapdb-edit-ride-div .leaders-div .fa-times').on('click', function(evt) {
             is_dirty = true;
             $(this).parent().remove();
+            $('#pwtc-mapdb-edit-ride-div .leader-search-div').hide();
+            $('#pwtc-mapdb-edit-ride-div input[name="leader-pattern"]').val('');
             evt.stopPropagation();
         });
 
