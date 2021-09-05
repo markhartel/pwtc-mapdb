@@ -145,7 +145,7 @@
                 $('#pwtc-mapdb-edit-ride-div .leader-search-div').html('<div class="callout small alert"><p>' + res.error + '</p></div>');
             }
             else if (res.users.length == 0) {
-                $('#pwtc-mapdb-edit-ride-div .leader-search-div').html('<div class="callout small warning"><p>No results found</p></div>');
+                $('#pwtc-mapdb-edit-ride-div .leader-search-div').html('<div class="callout small warning"><p>No leaders found</p></div>');
             }
             else {
                 $('#pwtc-mapdb-edit-ride-div .leader-search-div').empty();
