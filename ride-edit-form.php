@@ -144,6 +144,9 @@
             if (res.error) {
                 $('#pwtc-mapdb-edit-ride-div .leader-search-div').html('<div class="callout small alert"><p>' + res.error + '</p></div>');
             }
+            else if (res.users.length == 0) {
+                $('#pwtc-mapdb-edit-ride-div .leader-search-div').html('<div class="callout small warning"><p>No results found</p></div>');
+            }
             else {
                 $('#pwtc-mapdb-edit-ride-div .leader-search-div').empty();
                 $('#pwtc-mapdb-edit-ride-div .leader-search-div').append('<ul></ul>');
@@ -1176,7 +1179,7 @@
                     <div userid="<?php echo $leader; ?>"><?php if ($edit_leader) { ?><i class="fa fa-times"></i> <?php } ?><?php echo $name; ?></div>
     <?php } } ?>
     <?php if ($edit_leader) { ?>
-                    <input type="text" name="leader-pattern" placeholder="Enter name here">
+                    <input type="text" name="leader-pattern" placeholder="Select leader">
     <?php } ?>
                 </div>
             </div>
