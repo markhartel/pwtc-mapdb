@@ -1105,6 +1105,7 @@ class PwtcMapdb_Map {
 			else {
 				$maps = [];
 			}
+			$num_pending = count($maps);
 
 			$query_args = [
 				'posts_per_page' => $limit > 0 ? $limit : -1,
@@ -1137,6 +1138,7 @@ class PwtcMapdb_Map {
 			$response = array(
 				'limit' => $limit,
 				'offset' => $offset,
+				'pending' => $num_pending,
 				'maps' => $maps
 			);
 			if ($is_more) {
@@ -1418,8 +1420,12 @@ class PwtcMapdb_Map {
 	public static function build_map_array_from_post() {
 		$status = get_post_status();
 		$title = esc_html(get_the_title());
-		if ($status == 'pending' or $status == 'draft') {
+		if ($status == 'pending') {
 			$title .= ' (' . $status . ')';
+			$is_pending = true;
+		}
+		else {
+			$is_pending = false;
 		}
 
 		$terrain = get_field(PwtcMapdb::TERRAIN_FIELD);
@@ -1468,6 +1474,9 @@ class PwtcMapdb_Map {
 			'href' => $href,
 			'href2' => $href2
 		];
+		if ($is_pending) {
+			$map['pending'] = 1;
+		}
 		
 		return $map;
 	}
