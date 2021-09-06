@@ -1098,6 +1098,13 @@ class PwtcMapdb_Map {
 			else {
 				$offset = 0;
 			}
+			
+			if ($offset == 0 and isset($_POST['author'])) {
+				$maps = self::fetch_pending_maps(intval($_POST['author']));
+			}
+			else {
+				$maps = [];
+			}
 
 			$query_args = [
 				'posts_per_page' => $limit > 0 ? $limit : -1,
@@ -1116,59 +1123,12 @@ class PwtcMapdb_Map {
 			$query = new WP_Query($query_args);	
 
 			$is_more = false;
-			$maps = [];	
 			if ($query->have_posts()) {
 				$total = $query->found_posts;
 				$is_more = ($limit > 0) && ($total > ($offset + $limit));
 				while ($query->have_posts()) {
 					$query->the_post();
-		
-					$terrain = get_field(PwtcMapdb::TERRAIN_FIELD);
-					$terrain_str = '';
-					foreach ($terrain as $item) {
-						$terrain_str .= strtoupper($item);
-					}
-		
-					$length = get_field(PwtcMapdb::LENGTH_FIELD);
-					$max_length = get_field(PwtcMapdb::MAX_LENGTH_FIELD);
-					$distance_str = '';
-					if ($max_length == '') {
-						$distance_str = $length . ' miles';
-					}
-					else {
-						$distance_str = $length . '-' . $max_length . ' miles';
-					}
-
-					$href = '';
-					$href2 = '';
-					$type = '';
-					while (have_rows(PwtcMapdb::MAP_FIELD) ): the_row();
-						$type = get_sub_field(PwtcMapdb::MAP_TYPE_FIELD);
-						if ($type == 'file') {
-							$file = get_sub_field(PwtcMapdb::MAP_FILE_FIELD);
-							$href = esc_url($file['url']);
-						}
-						else if ($type == 'link') {
-							$link = get_sub_field(PwtcMapdb::MAP_LINK_FIELD);
-							$href = esc_url($link);
-						}
-						else if ($type == 'both') {
-							$file = get_sub_field(PwtcMapdb::MAP_FILE_FIELD);
-							$href = esc_url($file['url']);
-							$link = get_sub_field(PwtcMapdb::MAP_LINK_FIELD);
-							$href2 = esc_url($link);
-						}
-					endwhile;
-
-					$map = [
-						'ID' => get_the_ID(),
-						'title' => esc_html(get_the_title()),
-						'terrain' => $terrain_str,
-						'distance' => $distance_str,
-						'type' => $type,
-						'href' => $href,
-						'href2' => $href2
-					];
+					$map = self::build_map_array_from_post();
 					$maps[] = $map;
 				}
 				wp_reset_postdata();
@@ -1431,6 +1391,85 @@ class PwtcMapdb_Map {
 		}
 		wp_reset_postdata();
 		return $results;
+	}
+	
+	public static function fetch_pending_maps($author) {
+		$query_args = [
+			'posts_per_page' => -1,
+			'post_status' => 'pending',
+			'post_type' => PwtcMapdb::MAP_POST_TYPE,
+			'author' => $author,
+			'orderby' => 'date',
+			'order' => 'DESC',
+		];
+		$query = new WP_Query($query_args);
+		$maps = [];
+		if ($query->have_posts()) {
+			while ($query->have_posts()) {
+				$query->the_post();
+				$map = self::build_map_array_from_post();
+				$maps[] = $map;
+			}
+			wp_reset_postdata();
+		}
+		return $maps;
+	}
+
+	public static function build_map_array_from_post() {
+		$status = get_post_status();
+		$title = esc_html(get_the_title());
+		if ($status == 'pending' or $status == 'draft') {
+			$title .= ' (' . $status . ')';
+		}
+
+		$terrain = get_field(PwtcMapdb::TERRAIN_FIELD);
+		$terrain_str = '';
+		foreach ($terrain as $item) {
+			$terrain_str .= strtoupper($item);
+		}
+
+		$length = get_field(PwtcMapdb::LENGTH_FIELD);
+		$max_length = get_field(PwtcMapdb::MAX_LENGTH_FIELD);
+		$distance_str = '';
+		if ($max_length == '') {
+			$distance_str = $length . ' miles';
+		}
+		else {
+			$distance_str = $length . '-' . $max_length . ' miles';
+		}
+
+		$href = '';
+		$href2 = '';
+		$type = '';
+		while (have_rows(PwtcMapdb::MAP_FIELD) ): the_row();
+			$type = get_sub_field(PwtcMapdb::MAP_TYPE_FIELD);
+			if ($type == 'file') {
+				$file = get_sub_field(PwtcMapdb::MAP_FILE_FIELD);
+				$href = esc_url($file['url']);
+			}
+			else if ($type == 'link') {
+				$link = get_sub_field(PwtcMapdb::MAP_LINK_FIELD);
+				$href = esc_url($link);
+			}
+			else if ($type == 'both') {
+				$file = get_sub_field(PwtcMapdb::MAP_FILE_FIELD);
+				$href = esc_url($file['url']);
+				$link = get_sub_field(PwtcMapdb::MAP_LINK_FIELD);
+				$href2 = esc_url($link);
+			}
+		endwhile;
+
+		$map = [
+			'ID' => get_the_ID(),
+			'title' => $title,
+			'terrain' => $terrain_str,
+			'distance' => $distance_str,
+			'type' => $type,
+			'href' => $href,
+			'href2' => $href2
+		];
+		
+		return $map;
 	}
 	
 	public static function check_post_id($ignore_trash = false) {
