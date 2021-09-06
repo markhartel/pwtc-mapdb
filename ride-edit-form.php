@@ -231,10 +231,13 @@
                 'action': 'pwtc_mapdb_fetch_maps',
                 'limit': 10,
                 'title': searchstr,
+    <?php if ($show_submitted_maps) { ?>
+                'author': <?php echo $author; ?>,
+    <?php } ?>
                 'offset': offset
             };
             $.post(action, data, maps_lookup_cb);
-            if (offset > 0) {
+            if (offset == 0) {
                 $('#pwtc-mapdb-edit-ride-div .map-search-div').html('<div class="callout small"><i class="fa fa-spinner fa-pulse"></i> please wait...</div>');
             }
         }
