@@ -11,8 +11,17 @@
     #pwtc-mapdb-edit-ride-div .maps-div div i {
         cursor: pointer;
     }
+    #pwtc-mapdb-edit-ride-div .maps-div input {
+        width: 150px;
+        margin: 10px; 
+        padding: 10px; 
+        border: 1px dashed;
+    }
     #pwtc-mapdb-edit-ride-div .map-search-div table tr {
         cursor: pointer;
+    }
+    #pwtc-mapdb-edit-ride-div .map-search-div table tr[pending] {
+        color: red;
     }
     #pwtc-mapdb-edit-ride-div .map-search-div table tr:hover {
         background-color: black !important;
@@ -23,20 +32,6 @@
         vertical-align: top;
     }
     #pwtc-mapdb-edit-ride-div .map-search-div table tr:nth-child(odd) {
-        background-color: #f2f2f2;
-    }
-    #pwtc-mapdb-edit-ride-div .pending-maps-div table tr {
-        cursor: pointer;
-    }
-    #pwtc-mapdb-edit-ride-div .pending-maps-div table tr:hover {
-        background-color: black !important;
-        color: white !important;
-    }
-    #pwtc-mapdb-edit-ride-div .pending-maps-div table td {
-        padding: 3px;
-        vertical-align: top;
-    }
-    #pwtc-mapdb-edit-ride-div .pending-maps-div table tr:nth-child(odd) {
         background-color: #f2f2f2;
     }
     #pwtc-mapdb-edit-ride-div .leaders-div div {
@@ -174,6 +169,7 @@
         }
 
         function maps_lookup_cb(response) {
+            $('#pwtc-mapdb-edit-ride-div .map-search-div').removeAttr('offset');
             var res;
             try {
                 res = JSON.parse(response);
@@ -185,10 +181,15 @@
             if (res.error) {
                 $('#pwtc-mapdb-edit-ride-div .map-search-div').html('<div class="callout small alert"><p>' + res.error + '</p></div>');
             }
+            else if (res.maps.length == 0 && res.offset == 0) {
+                $('#pwtc-mapdb-edit-ride-div .map-search-div').html('<div class="callout small warning"><p>No maps found</p></div>');
+            }
             else {
                 if (res.offset == 0) {
-                    $('#pwtc-mapdb-edit-ride-div .map-search-div').removeAttr('offset');
                     $('#pwtc-mapdb-edit-ride-div .map-search-div').empty();
+                    if (res.pending > 0) {
+                        $('#pwtc-mapdb-edit-ride-div .map-search-div').append('<div class="callout small warning">The first ' + res.pending + ' maps (submitted by the ride&#39;s author) are pending review.</div>');
+                    }
                     $('#pwtc-mapdb-edit-ride-div .map-search-div').append('<table></table>');
                 }
                 res.maps.forEach(function(item) {
@@ -202,8 +203,12 @@
                     else if (item.type == 'both') {
                         a = ' <a title="Download ride route map file." href="' + item.href + '" target="_blank" download><i class="fa fa-download"></i></a> <a title="Display online ride route map." href="' + item.href2 + '" target="_blank"><i class="fa fa-link"></i></a>';
                     }
+                    var pending = '';
+                    if (item.pending !== undefined) {
+                        pending = 'pending';
+                    }
                     $('#pwtc-mapdb-edit-ride-div .map-search-div table').append(
-                        '<tr mapid="' + item.ID + '"><td>' + item.title + a + '</td><td>' + item.distance + '</td><td>' + item.terrain + '</td></tr>');  
+                        '<tr mapid="' + item.ID + '" ' + pending + '><td>' + item.title + a + '</td><td>' + item.distance + '</td><td>' + item.terrain + '</td></tr>');  
                 });
                 if (res.more !== undefined) {
                     $('#pwtc-mapdb-edit-ride-div .map-search-div').attr('offset', res.offset+10);
@@ -216,10 +221,19 @@
                     if (!has_map_id(mapid)) {
                         var title = $(this).find('td').first().html();
                         is_dirty = true;
-                        $('#pwtc-mapdb-edit-ride-div .maps-div').append('<div mapid="' + mapid + '"><i class="fa fa-times"></i> ' + title + '</div>').find('.fa-times').on('click', function(evt) {
+                        $('#pwtc-mapdb-edit-ride-div .maps-div input').before('<div mapid="' + mapid + '"><i class="fa fa-times"></i> ' + title + '</div>');
+                        $('#pwtc-mapdb-edit-ride-div .maps-div div[mapid="' + mapid + '"] .fa-times').on('click', function(evt) {
                             $(this).parent().remove();
+                            $('#pwtc-mapdb-edit-ride-div .map-search-div').hide();
+                            $('#pwtc-mapdb-edit-ride-div input[name="map-pattern"]').val('');
+                            evt.stopPropagation();
+                        });
+                        $('#pwtc-mapdb-edit-ride-div .maps-div div[mapid="' + mapid + '"] a').on('click', function(evt) {
+                            evt.stopPropagation();
                         });
                     }
+                    $('#pwtc-mapdb-edit-ride-div .map-search-div').hide();
+                    $('#pwtc-mapdb-edit-ride-div input[name="map-pattern"]').val('');
                 });
             }
         }
