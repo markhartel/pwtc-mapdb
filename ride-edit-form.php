@@ -607,7 +607,6 @@
             $('#pwtc-mapdb-edit-ride-div button[type="submit"]').prop('disabled',true);
         });
 
-    <?php if ($edit_start_location) { ?>
         $('#pwtc-mapdb-edit-ride-div .start_locations table tbody tr').each(function(index) {
             var lat = $(this).data('lat');
             var lng = $(this).data('lng');
@@ -797,7 +796,6 @@
         var hardcode_zoom = true;
         var google_map = false;
         load_google_map();
-    <?php } ?>
 
         $('#pwtc-mapdb-edit-ride-div a.goolmap').on('click', function(evt) {
             var lat = $('#pwtc-mapdb-edit-ride-div input[name="start_lat"]').val();
@@ -1047,10 +1045,8 @@
                 </label>
     <?php if ($set_coords) { ?>
                 <p class="help-text">Enter the string to be shown as the ride start location. The actual Google map location will be determined by the latitude and longitude coordinates entered below.</p>
-    <?php } else if ($edit_start_location) { ?>
-                <p class="help-text">You cannot edit the start location directly, instead press the find or choose start location buttons below.</p>
     <?php } else { ?>
-                <p class="help-text">You are not allowed to edit the start location.</p>
+                <p class="help-text">You cannot edit the start location directly, instead press the find or choose start location buttons below.</p>
     <?php } ?>
             </div>
     <?php if ($set_coords) { ?>
@@ -1080,7 +1076,6 @@
                 </label>
             </div>
     <?php } ?>
-    <?php if ($edit_start_location) { ?>
             <div class="row column">
                 <ul class="accordion" data-accordion data-allow-all-closed="true">
                     <li class="accordion-item" data-accordion-item>
@@ -1120,7 +1115,6 @@
                     </li>
                 </ul>
             </div>
-    <?php } ?>
             <div class="row column">
                 <label>Ride Leaders
                     <input type="hidden" name="leaders" value="<?php echo json_encode($leaders); ?>"/>	
@@ -1175,7 +1169,6 @@
             </div>
         </form>
     </div>
-    <?php if ($edit_start_location) { ?>
     <div class="start_locations" style="display:none">
         <?php
         $content = get_page_by_title('Ride Start Locations');
@@ -1184,6 +1177,5 @@
         }
         ?>
     </div>
-    <?php } ?>
 </div>
 <?php 
