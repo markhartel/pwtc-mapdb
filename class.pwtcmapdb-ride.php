@@ -661,13 +661,6 @@ class PwtcMapdb_Ride {
 		}
 		
 		$edit_title = $edit_date;
-		
-		$edit_start_location = true;
-		/*
-		if ($copy_ride) {
-			$edit_start_location = false;
-		}
-		*/
 
 		if ($postid != 0) {
 			$start_location = get_field(PwtcMapdb::RIDE_START_LOCATION, $postid);
