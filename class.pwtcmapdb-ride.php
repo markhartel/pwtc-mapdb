@@ -665,7 +665,7 @@ class PwtcMapdb_Ride {
 		if ($postid != 0) {
 			$start_location = get_field(PwtcMapdb::RIDE_START_LOCATION, $postid);
 			if (empty($start_location)) {
-				$start_location = array('address' => '', 'lat' => 0.0, 'lng' => 0.0, 'zoom' => 16);
+				$start_location = array('address' => '', 'lat' => 0, 'lng' => 0, 'zoom' => 16);
 				$start_coords = '';
 			}
 			else {
@@ -673,7 +673,7 @@ class PwtcMapdb_Ride {
 			}
 		}
 		else {
-			$start_location = array('address' => '', 'lat' => 0.0, 'lng' => 0.0, 'zoom' => 16);
+			$start_location = array('address' => '', 'lat' => 0, 'lng' => 0, 'zoom' => 16);
 			$start_coords = '';
 		}
 
