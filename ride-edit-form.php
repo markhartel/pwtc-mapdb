@@ -98,9 +98,16 @@
         
         function set_coord_string(lat, lng) {
     <?php if (!$set_coords) { ?>
-            $('#pwtc-mapdb-edit-ride-div .coord-span').html('(' + lat + ', ' + lng + ')');
-            $('#pwtc-mapdb-edit-ride-div .goolmap').show();
+            $('#pwtc-mapdb-edit-ride-div .coord-span').html('(' + lat + ', ' + lng + ')');          
     <?php } ?>
+            $('#pwtc-mapdb-edit-ride-div .goolmap').show();
+        }
+
+        function clear_coord_string() {
+    <?php if (!$set_coords) { ?>
+            $('#pwtc-mapdb-edit-ride-div .coord-span').empty();          
+    <?php } ?> 
+            $('#pwtc-mapdb-edit-ride-div .goolmap').hide();           
         }
 
         function has_user_id(id) {
@@ -429,11 +436,11 @@
             is_dirty = true;
         });
         
-    <?php if ($set_coords) { ?>
-
         $('#pwtc-mapdb-edit-ride-div input[name="start_address"]').on('input', function() {
             is_dirty = true;
         });
+        
+    <?php if ($set_coords) { ?>
 
         $('#pwtc-mapdb-edit-ride-div input[name="start_lat"]').on('input', function() {
             is_dirty = true;
@@ -569,25 +576,31 @@
                 return;
             }
             
-    <?php if ($set_coords) { ?>
-
             var lat = $('#pwtc-mapdb-edit-ride-div input[name="start_lat"]').val().trim();
             if (lat.length == 0 || lat == '0') {
+    <?php if ($set_coords) { ?>
                 show_warning('You must enter a <strong>latitude</strong> for this ride.');
                 $('#pwtc-mapdb-edit-ride-div input[name="start_lat"]').addClass('indicate-error');
+    <?php } else { ?>
+                show_warning('Google map location not found for <strong>start location</strong>.');
+                $('#pwtc-mapdb-edit-ride-div input[name="start_address"]').addClass('indicate-error');
+    <?php } ?>
                 evt.preventDefault();
                 return;
             }
 
             var lng = $('#pwtc-mapdb-edit-ride-div input[name="start_lng"]').val().trim();
             if (lng.length == 0 || lng == '0') {
+    <?php if ($set_coords) { ?>
                 show_warning('You must enter a <strong>longitude</strong> for this ride.');
                 $('#pwtc-mapdb-edit-ride-div input[name="start_lng"]').addClass('indicate-error');
+    <?php } else { ?>
+                show_warning('Google map location not found for <strong>start location</strong>.');
+                $('#pwtc-mapdb-edit-ride-div input[name="start_address"]').addClass('indicate-error');
+    <?php } ?>
                 evt.preventDefault();
                 return;
             }
-
-    <?php } ?>
 
             var new_leaders = [];
             $('#pwtc-mapdb-edit-ride-div .leaders-div div').each(function() {
@@ -627,10 +640,7 @@
             var comment = item.find('td').first().next().next().next().html();
             var lat = item.data('lat');
             var lng = item.data('lng');
-            var zoom = '16';
-            if (!hardcode_zoom) {
-                zoom = item.data('zoom');
-            }
+            var zoom = item.data('zoom');
             set_coord_string(lat, lng);
             $('#pwtc-mapdb-edit-ride-div input[name="start_address"]').val(decodeHtml(title+', '+addr));
     <?php if (!$is_template) { ?>
@@ -639,7 +649,9 @@
             $('#pwtc-mapdb-edit-ride-div input[name="start_lat"]').val(lat);
             $('#pwtc-mapdb-edit-ride-div input[name="start_lng"]').val(lng);
             $('#pwtc-mapdb-edit-ride-div input[name="start_zoom"]').val(zoom);
+    <?php if (!$set_coords) { ?>
             load_google_map();
+    <?php } ?>
             is_dirty = true;
         });
 
@@ -652,10 +664,16 @@
             var url = 'https://www.google.com/maps/search/?api=1&query=' + lat + ',' + lng;
             window.open(url, '_blank');
         });
+        
+    <?php if (!$set_coords) { ?>
 
         function show_geocode_error(message) {
             google_map = false;
+            $('#pwtc-mapdb-edit-ride-div input[name="start_lat"]').val('0');
+            $('#pwtc-mapdb-edit-ride-div input[name="start_lng"]').val('0');            
             $('#pwtc-mapdb-edit-ride-div .find-location-div').html('<div class="callout small warning"><p>' + message + '</p></div>');
+            clear_coord_string();
+            is_dirty = true;
         }
 
         function show_google_map(lat, lng, zoom, drag_marker) {
@@ -679,6 +697,16 @@
                     raiseOnDrag: drag_marker,
                     map: google_map
                 });
+                if (drag_marker) {
+                    marker.addListener('drag', function(evt) {
+                        var lat = evt.latLng.lat();
+                        var lng = evt.latLng.lng();
+                        $('#pwtc-mapdb-edit-ride-div input[name="start_lat"]').val(lat);
+                        $('#pwtc-mapdb-edit-ride-div input[name="start_lng"]').val(lng);
+                        set_coord_string(lat, lng);
+                        is_dirty = true;
+                    });
+                }
                 google_map.marker = marker;
             });
         }
@@ -687,7 +715,6 @@
             $('#pwtc-mapdb-edit-ride-div input[name="start_address"]').each(function() {
                 var address = $(this).val();
                 if (address) {
-                    $('#pwtc-mapdb-edit-ride-div input[name="location-address"]').val(address);
                     var lat = $('#pwtc-mapdb-edit-ride-div input[name="start_lat"]').val();
                     var lng = $('#pwtc-mapdb-edit-ride-div input[name="start_lng"]').val();
                     var zoom = $('#pwtc-mapdb-edit-ride-div input[name="start_zoom"]').val();
@@ -699,20 +726,16 @@
                     }
                     lat = parseFloat(lat);
                     lng = parseFloat(lng);
-                    show_google_map(lat, lng, zoom, false);
+                    show_google_map(lat, lng, zoom, true);
                 }
                 else {
-                    $('#pwtc-mapdb-edit-ride-div input[name="location-address"]').val('');
                     google_map = false;
                     $('#pwtc-mapdb-edit-ride-div .find-location-div').empty();
                 }
             });
-            $('#pwtc-mapdb-edit-ride-div .accept-location-div').hide();
         }
-
-        $('#pwtc-mapdb-edit-ride-div input[name="find-location"]').on('click', function(evt) {
-            $('#pwtc-mapdb-edit-ride-div .accept-location-div').hide();
-            var addrstr = $('#pwtc-mapdb-edit-ride-div input[name="location-address"]').val().trim();
+        
+        function run_geocoder(addrstr) {
             if (addrstr.length > 0) {
                 var geocoder = new google.maps.Geocoder();
                 geocoder.geocode({ address: addrstr }, function(results, status) {
@@ -729,18 +752,22 @@
                                 var lat = parseFloat($(this).data('lat'));
                                 var lng = parseFloat($(this).data('lng'));
                                 show_google_map(lat, lng, 16, true);
-                                google_map.marker_address = $(this).html();
-                                $('#pwtc-mapdb-edit-ride-div input[name="location-address"]').val(google_map.marker_address);
-                                $('#pwtc-mapdb-edit-ride-div .accept-location-div').show();
+                                $('#pwtc-mapdb-edit-ride-div input[name="start_lat"]').val(lat);
+                                $('#pwtc-mapdb-edit-ride-div input[name="start_lng"]').val(lng);
+                                $('#pwtc-mapdb-edit-ride-div input[name="start_zoom"]').val(16);
+                                set_coord_string(lat, lng);
+                                is_dirty = true;
                             });
                         }
                         else {
                             var lat = results[0].geometry.location.lat();
                             var lng = results[0].geometry.location.lng();
                             show_google_map(lat, lng, 16, true);
-                            google_map.marker_address = results[0].formatted_address;
-                            $('#pwtc-mapdb-edit-ride-div input[name="location-address"]').val(google_map.marker_address);
-                            $('#pwtc-mapdb-edit-ride-div .accept-location-div').show();
+                            $('#pwtc-mapdb-edit-ride-div input[name="start_lat"]').val(lat);
+                            $('#pwtc-mapdb-edit-ride-div input[name="start_lng"]').val(lng);
+                            $('#pwtc-mapdb-edit-ride-div input[name="start_zoom"]').val(16);
+                            set_coord_string(lat, lng);
+                            is_dirty = true;
                         }
                     }
                     else if (status === 'ZERO_RESULTS') {
@@ -756,47 +783,34 @@
             else {
                 show_geocode_error('You must enter a street address.');
             }
-        });
-
-        $('#pwtc-mapdb-edit-ride-div input[name="location-address"]').on('keypress', function(evt) {
-            var keyPressed = evt.keyCode || evt.which; 
-            if (keyPressed === 13) { 
-                $('#pwtc-mapdb-edit-ride-div input[name="find-location"]').trigger( 'click');
-            } 
-        });
-
-        $('#pwtc-mapdb-edit-ride-div .accept-location-btn').on('click', function(evt) {
-            if (google_map) {
-                var position = google_map.marker.getPosition();
-                if (position) {
-                    var lat = position.lat();
-                    var lng = position.lng();
-                    var zoom = 16;
-                    if (!hardcode_zoom) {
-                        zoom = google_map.getZoom();
-                    }
-                    set_coord_string(lat, lng);
-                    var addr = google_map.marker_address;
-                    $('#pwtc-mapdb-edit-ride-div input[name="start_address"]').val(addr);
+        }
+        
+        $('#pwtc-mapdb-edit-ride-div input[name="start_address"]').each(function() {
+	        var autocomplete = new google.maps.places.Autocomplete($(this)[0]);
+            autocomplete.addListener('place_changed', function() {
+                var place = autocomplete.getPlace();
+                if (!place.geometry || !place.geometry.location) {
+                    run_geocoder(place.name);
+                }
+                else {
+                    var lat = place.geometry.location.lat();
+                    var lng = place.geometry.location.lng();
+                    show_google_map(lat, lng, 16, true);
                     $('#pwtc-mapdb-edit-ride-div input[name="start_lat"]').val(lat);
                     $('#pwtc-mapdb-edit-ride-div input[name="start_lng"]').val(lng);
-                    $('#pwtc-mapdb-edit-ride-div input[name="start_zoom"]').val(zoom);
+                    $('#pwtc-mapdb-edit-ride-div input[name="start_zoom"]').val(16);
+                    set_coord_string(lat, lng);
                     is_dirty = true;
-                    load_google_map();
                 }
-            }
-            $('#pwtc-mapdb-edit-ride-div .accept-location-div').hide();
-        });
-
-        $('#pwtc-mapdb-edit-ride-div .cancel-location-btn').on('click', function(evt) {
-            load_google_map();
-            $('#pwtc-mapdb-edit-ride-div .accept-location-div').hide();
+            });
         });
 
         var hardcode_zoom = true;
         var google_map = false;
         load_google_map();
-
+        
+    <?php } ?>
+        
         $('#pwtc-mapdb-edit-ride-div a.goolmap').on('click', function(evt) {
             var lat = $('#pwtc-mapdb-edit-ride-div input[name="start_lat"]').val();
             var lng = $('#pwtc-mapdb-edit-ride-div input[name="start_lng"]').val();
@@ -1041,12 +1055,10 @@
                     <span class="coord-span"><?php echo $start_coords; ?></span>
                     <a class="goolmap" <?php if (empty($start_coords)) { ?>style="display:none"<?php } ?> title="Display start location in Google Maps."><i class="fa fa-map-marker"></i></a>
     <?php } ?>                
-                    <input type="text" name="start_address" value="<?php echo esc_attr($start_location['address']); ?>" <?php echo $set_coords ? '': 'readonly'; ?>/>
+                    <input type="text" name="start_address" value="<?php echo esc_attr($start_location['address']); ?>">
                 </label>
     <?php if ($set_coords) { ?>
                 <p class="help-text">Enter the string to be shown as the ride start location. The actual Google map location will be determined by the latitude and longitude coordinates entered below.</p>
-    <?php } else { ?>
-                <p class="help-text">You cannot edit the start location directly, instead press the find or choose start location buttons below.</p>
     <?php } ?>
             </div>
     <?php if ($set_coords) { ?>
@@ -1069,39 +1081,21 @@
             <input type="hidden" name="start_lng" value="<?php echo esc_attr($start_location['lng']); ?>"/>
     <?php } ?>
             <input type="hidden" name="start_zoom" value="<?php echo esc_attr(isset($start_location['zoom']) ? $start_location['zoom'] : ''); ?>"/>
-    <?php if (!$is_template) { ?>
+    <?php if (!$set_coords) { ?>
             <div class="row column">
+                <div class="find-location-div" style="border:1px solid; overflow: auto; height: 200px;">
+                </div>
+            </div>
+    <?php } ?>
+            <div class="row column" <?php if (!$set_coords) { ?>style="margin-top:15px;"<?php } ?>>
+    <?php if (!$is_template) { ?>
                 <label>Start Location Comment
                     <input type="text" name="start_location_comment" value="<?php echo esc_attr($start_location_comment); ?>"/>
                 </label>
-            </div>
     <?php } ?>
+            </div>
             <div class="row column">
                 <ul class="accordion" data-accordion data-allow-all-closed="true">
-                    <li class="accordion-item" data-accordion-item>
-                        <a href="#" class="accordion-title">Find New Start Location...</a>
-                        <div class="accordion-content" data-tab-content>
-                            <div class="row column">
-                                <p class="help-text">Find a start location by entering a street address and pressing search. A Google map with the location will display, press accept to use it as the start location.</p>
-                                <div class="input-group">
-                                    <input class="input-group-field" type="text" name="location-address" placeholder="Enter street address">
-                                    <div class="input-group-button">
-                                        <input type="button" class="dark button" name= "find-location" value="Search">
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="row column">
-                                <div class="find-location-div" style="border:1px solid; overflow: auto; height: 200px;">
-                                </div>
-                            </div>
-                            <div class="accept-location-div row column" style="display:none">
-                                <div class="button-group">
-                                    <a class="accept-location-btn dark button">Accept</a>
-                                    <a class="cancel-location-btn dark button">Cancel</a>
-                                </dev>
-                            </div>
-                        </div>
-                    </li>
                     <li class="accordion-item" data-accordion-item>
                         <a href="#" class="accordion-title">Choose Popular Start Location...</a>
                         <div class="accordion-content" data-tab-content>
