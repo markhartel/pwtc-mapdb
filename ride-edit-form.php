@@ -15,7 +15,7 @@
         width: 150px;
         margin: 10px; 
         padding: 10px; 
-        border: 1px dashed;
+        border: none;
     }
     #pwtc-mapdb-edit-ride-div .map-search-div table tr {
         cursor: pointer;
@@ -46,7 +46,7 @@
         width: 150px;
         margin: 10px; 
         padding: 10px; 
-        border: 1px dashed;
+        border: none;
     }
     #pwtc-mapdb-edit-ride-div .leader-search-div ul {
         list-style-type: none;
