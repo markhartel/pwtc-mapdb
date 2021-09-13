@@ -390,22 +390,27 @@
 
         $('#pwtc-mapdb-edit-ride-div input[name="title"]').on('input', function() {
             is_dirty = true;
+            $(this).removeClass('indicate-error');
         });
 
         $('#pwtc-mapdb-edit-ride-div input[name="ride_date"]').change(function() {
             is_dirty = true;
+	    $(this).removeClass('indicate-error');
         });
 
         $('#pwtc-mapdb-edit-ride-div input[name="ride_time"]').change(function() {
             is_dirty = true;
+	    $(this).removeClass('indicate-error');
         });
 
         $('#pwtc-mapdb-edit-ride-div input[name="distance"]').on('input', function() {
             is_dirty = true;
+	    $(this).removeClass('indicate-error');
         });
 
         $('#pwtc-mapdb-edit-ride-div input[name="max_distance"]').on('input', function() {
             is_dirty = true;
+	    $(this).removeClass('indicate-error');
         });
 
         $('#pwtc-mapdb-edit-ride-div input[name="ride_type"]').change(function() {
@@ -418,6 +423,7 @@
 
         $('#pwtc-mapdb-edit-ride-div input[type="checkbox"]').change(function() {
             is_dirty = true;
+	    $('#pwtc-mapdb-edit-ride-div .terrain-fst').removeClass('indicate-error');
         });
 
         $('#pwtc-mapdb-edit-ride-div input[name="attach_maps"]').change(function() {
@@ -438,16 +444,19 @@
         
         $('#pwtc-mapdb-edit-ride-div input[name="start_address"]').on('input', function() {
             is_dirty = true;
+	    $(this).removeClass('indicate-error');
         });
         
     <?php if ($set_coords) { ?>
 
         $('#pwtc-mapdb-edit-ride-div input[name="start_lat"]').on('input', function() {
             is_dirty = true;
+	    $(this).removeClass('indicate-error');
         });
 
         $('#pwtc-mapdb-edit-ride-div input[name="start_lng"]').on('input', function() {
             is_dirty = true;
+	    $(this).removeClass('indicate-error');
         });
 
     <?php } ?>
