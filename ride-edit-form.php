@@ -685,7 +685,21 @@
             is_dirty = true;
         }
 
-        function show_google_map(lat, lng, zoom, drag_marker) {
+	function show_google_map(lat, lng, zoom) {
+            google_map = false;
+            $('#pwtc-mapdb-edit-ride-div .find-location-div').each(function() {
+                $(this).empty();
+                var latlng = new google.maps.LatLng(lat, lng);
+                var mapArgs = {
+                    zoom: zoom,
+                    center: latlng,
+                    mapTypeId: google.maps.MapTypeId.ROADMAP
+                };
+                google_map = new google.maps.Map($(this)[0], mapArgs);
+            });
+        }
+	    
+        function show_google_map_marker(lat, lng, zoom, drag_marker) {
             google_map = false;
             $('#pwtc-mapdb-edit-ride-div .find-location-div').each(function() {
                 $(this).empty();
@@ -735,11 +749,10 @@
                     }
                     lat = parseFloat(lat);
                     lng = parseFloat(lng);
-                    show_google_map(lat, lng, zoom, true);
+                    show_google_map_marker(lat, lng, zoom, true);
                 }
                 else {
-                    google_map = false;
-                    $('#pwtc-mapdb-edit-ride-div .find-location-div').empty();
+                    show_google_map(45.5051064, -122.6750261, 16);
                 }
             });
         }
@@ -760,7 +773,8 @@
                             $('#pwtc-mapdb-edit-ride-div .find-location-div li').on('click', function(evt) {
                                 var lat = parseFloat($(this).data('lat'));
                                 var lng = parseFloat($(this).data('lng'));
-                                show_google_map(lat, lng, 16, true);
+                                show_google_map_marker(lat, lng, 16, true);
+				$('#pwtc-mapdb-edit-ride-div input[name="start_address"]').val($(this).html());
                                 $('#pwtc-mapdb-edit-ride-div input[name="start_lat"]').val(lat);
                                 $('#pwtc-mapdb-edit-ride-div input[name="start_lng"]').val(lng);
                                 $('#pwtc-mapdb-edit-ride-div input[name="start_zoom"]').val(16);
@@ -771,7 +785,8 @@
                         else {
                             var lat = results[0].geometry.location.lat();
                             var lng = results[0].geometry.location.lng();
-                            show_google_map(lat, lng, 16, true);
+                            show_google_map_marker(lat, lng, 16, true);
+			    $('#pwtc-mapdb-edit-ride-div input[name="start_address"]').val(results[0].formatted_address);
                             $('#pwtc-mapdb-edit-ride-div input[name="start_lat"]').val(lat);
                             $('#pwtc-mapdb-edit-ride-div input[name="start_lng"]').val(lng);
                             $('#pwtc-mapdb-edit-ride-div input[name="start_zoom"]').val(16);
@@ -790,7 +805,7 @@
                 $('#pwtc-mapdb-edit-ride-div .find-location-div').html('<div class="callout small"><i class="fa fa-spinner fa-pulse"></i> please wait...</div>');
             }
             else {
-                show_geocode_error('You must enter a street address.');
+                show_geocode_error('Start location not specified.');
             }
         }
         
@@ -804,7 +819,7 @@
                 else {
                     var lat = place.geometry.location.lat();
                     var lng = place.geometry.location.lng();
-                    show_google_map(lat, lng, 16, true);
+                    show_google_map_marker(lat, lng, 16, true);
                     $('#pwtc-mapdb-edit-ride-div input[name="start_lat"]').val(lat);
                     $('#pwtc-mapdb-edit-ride-div input[name="start_lng"]').val(lng);
                     $('#pwtc-mapdb-edit-ride-div input[name="start_zoom"]').val(16);
