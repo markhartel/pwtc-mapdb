@@ -161,6 +161,7 @@
                     if (!has_user_id(userid)) {
                         var name = $(this).html();
                         is_dirty = true;
+			$('#pwtc-mapdb-edit-ride-div .leaders-div').removeClass('indicate-error');
                         $('#pwtc-mapdb-edit-ride-div .leaders-div input').before('<div userid="' + userid + '"><i class="fa fa-times"></i> ' + name + '</div>');
                         $('#pwtc-mapdb-edit-ride-div .leaders-div div[userid="' + userid + '"] .fa-times').on('click', function(evt) {
                             $(this).parent().remove();
@@ -228,6 +229,7 @@
                     if (!has_map_id(mapid)) {
                         var title = $(this).find('td').first().html();
                         is_dirty = true;
+			$('#pwtc-mapdb-edit-ride-div .maps-div').removeClass('indicate-error');
                         $('#pwtc-mapdb-edit-ride-div .maps-div input').before('<div mapid="' + mapid + '"><i class="fa fa-times"></i> ' + title + '</div>');
                         $('#pwtc-mapdb-edit-ride-div .maps-div div[mapid="' + mapid + '"] .fa-times').on('click', function(evt) {
                             $(this).parent().remove();
