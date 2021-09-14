@@ -1083,7 +1083,7 @@
                     <span class="coord-span"><?php echo $start_coords; ?></span>
                     <a class="goolmap" <?php if (empty($start_coords)) { ?>style="display:none"<?php } ?> title="Display start location in Google Maps."><i class="fa fa-map-marker"></i></a>
     <?php } ?>                
-                    <input type="text" name="start_address" value="<?php echo esc_attr($start_location['address']); ?>">
+                    <input type="text" name="start_address" value="<?php echo esc_attr($start_location['address']); ?>" placeholder="Enter a street address">
                 </label>
     <?php if ($set_coords) { ?>
                 <p class="help-text">Enter the string to be shown as the ride start location. The actual Google map location will be determined by the latitude and longitude coordinates entered below.</p>
