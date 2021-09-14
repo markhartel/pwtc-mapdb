@@ -430,6 +430,8 @@
 
         $('#pwtc-mapdb-edit-ride-div input[name="attach_maps"]').change(function() {
             if (this.value == '0') {
+		$('#pwtc-mapdb-edit-ride-div .map-search-div').hide();
+                $('#pwtc-mapdb-edit-ride-div input[name="map-pattern"]').val('');
                 $('#pwtc-mapdb-edit-ride-div form .attach-map-yes').hide();
                 $('#pwtc-mapdb-edit-ride-div form .attach-map-no').show();
             }
