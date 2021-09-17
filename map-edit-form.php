@@ -53,6 +53,7 @@
 	    
 	$('#pwtc-mapdb-edit-map-div input[name="map_link"]').on('input', function(e) {
             is_dirty = true;
+	    $(this).removeClass('indicate-error');
             var span = $('#pwtc-mapdb-edit-map-div form .map-type-link label span');
             span.html('');
             if (e.target.value) {
@@ -98,7 +99,7 @@
 		$('#pwtc-mapdb-edit-map-div .file-upload-lbl').html('Upload File');
             }
 	    is_dirty = true;
-	    $('#pwtc-mapdb-upload-file-div .file-upload-lbl').removeClass('indicate-error');
+	    $('#pwtc-mapdb-edit-file-div .file-upload-lbl').removeClass('indicate-error');
         });
 
         $('#pwtc-mapdb-edit-map-div form').on('submit', function(evt) {
@@ -118,8 +119,8 @@
                 var attach_id = $('#pwtc-mapdb-edit-map-div input[name="map_file_id"]').val().trim();
                 var file = $('#pwtc-mapdb-edit-map-div input[name="map_file_upload"]').val().trim();
                 if (file.length == 0 && attach_id == '0') {
-                    show_warning('The <strong>route map file</strong> must be set.');
-                    $('#pwtc-mapdb-edit-map-div input[name="map_file_name"]').addClass('indicate-error');
+	            show_warning('An initial <strong>upload file</strong> must be selected.');
+                    $('#pwtc-mapdb-edit-map-div .file-upload-lbl').addClass('indicate-error');
                     evt.preventDefault();
                     return;
                 }
