@@ -48,7 +48,7 @@
 
         $('#pwtc-mapdb-edit-map-div input[type="checkbox"]').change(function() {
             is_dirty = true;
-            $('#pwtc-mapdb-edit-ride-div .terrain-fst').removeClass('indicate-error');
+            $('#pwtc-mapdb-edit-map-div .terrain-fst').removeClass('indicate-error');
         });
 	    
 	$('#pwtc-mapdb-edit-map-div input[name="map_link"]').on('input', function(e) {
