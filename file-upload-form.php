@@ -31,20 +31,22 @@
 
         $('#pwtc-mapdb-upload-file-div input[name="title"]').on('input', function() {
             is_dirty = true;
+	    $(this).removeClass('indicate-error');
         });
 
         $('#pwtc-mapdb-upload-file-div input[name="file_upload"]').on('change', function(e) {
             var fileName = '';
             if (e.target.value) {
-				fileName = e.target.value.split('\\').pop();
+		fileName = e.target.value.split('\\').pop();
             }
-			if (fileName) {
-				$('#pwtc-mapdb-upload-file-div .file-upload-lbl').html('Upload File: ' + fileName);
+	    if (fileName) {
+		$('#pwtc-mapdb-upload-file-div .file-upload-lbl').html('Upload File: ' + fileName);
             }
-			else {
-				$('#pwtc-mapdb-upload-file-div .file-upload-lbl').html('Upload File');
+	    else {
+		$('#pwtc-mapdb-upload-file-div .file-upload-lbl').html('Upload File');
             }
             is_dirty = true;
+	    $('#pwtc-mapdb-upload-file-div .file-upload-lbl').removeClass('indicate-error');
         });
 
         $('#pwtc-mapdb-upload-file-div form').on('submit', function(evt) {
