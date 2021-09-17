@@ -33,18 +33,22 @@
 
         $('#pwtc-mapdb-edit-map-div input[name="title"]').on('input', function() {
             is_dirty = true;
+	    $(this).removeClass('indicate-error');
         });
         
         $('#pwtc-mapdb-edit-map-div input[name="distance"]').on('input', function() {
             is_dirty = true;
+	    $(this).removeClass('indicate-error');
         });
 
         $('#pwtc-mapdb-edit-map-div input[name="max_distance"]').on('input', function() {
             is_dirty = true;
+            $(this).removeClass('indicate-error');
         });
 
         $('#pwtc-mapdb-edit-map-div input[type="checkbox"]').change(function() {
             is_dirty = true;
+            $('#pwtc-mapdb-edit-ride-div .terrain-fst').removeClass('indicate-error');
         });
 	    
 	$('#pwtc-mapdb-edit-map-div input[name="map_link"]').on('input', function(e) {
@@ -94,6 +98,7 @@
 		$('#pwtc-mapdb-edit-map-div .file-upload-lbl').html('Upload File');
             }
 	    is_dirty = true;
+	    $('#pwtc-mapdb-upload-file-div .file-upload-lbl').removeClass('indicate-error');
         });
 
         $('#pwtc-mapdb-edit-map-div form').on('submit', function(evt) {
