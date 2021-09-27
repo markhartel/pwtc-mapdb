@@ -362,11 +362,11 @@
                 <div class="small-12 medium-4 columns">
                     <fieldset class="terrain-fst">
                         <legend>Route Map Terrain</legend>
-                        <input type="checkbox" name="terrain[]" value="a" id="terrain-a" <?php echo in_array('a', $terrain) ? 'checked': ''; ?>><label for="terrain-a">A</label>
-                        <input type="checkbox" name="terrain[]" value="b" id="terrain-b" <?php echo in_array('b', $terrain) ? 'checked': ''; ?>><label for="terrain-b">B</label>
-                        <input type="checkbox" name="terrain[]" value="c" id="terrain-c" <?php echo in_array('c', $terrain) ? 'checked': ''; ?>><label for="terrain-c">C</label>
-                        <input type="checkbox" name="terrain[]" value="d" id="terrain-d" <?php echo in_array('d', $terrain) ? 'checked': ''; ?>><label for="terrain-d">D</label>
-                        <input type="checkbox" name="terrain[]" value="e" id="terrain-e" <?php echo in_array('e', $terrain) ? 'checked': ''; ?>><label for="terrain-e">E</label>
+                        <div><input type="checkbox" name="terrain[]" value="a" id="terrain-a" <?php echo in_array('a', $terrain) ? 'checked': ''; ?>><label for="terrain-a">(A) Flat</label></div>
+                        <div><input type="checkbox" name="terrain[]" value="b" id="terrain-b" <?php echo in_array('b', $terrain) ? 'checked': ''; ?>><label for="terrain-b">(B) Mostly flat</label></div>
+                        <div><input type="checkbox" name="terrain[]" value="c" id="terrain-c" <?php echo in_array('c', $terrain) ? 'checked': ''; ?>><label for="terrain-c">(C) Small hills</label></div>
+                        <div><input type="checkbox" name="terrain[]" value="d" id="terrain-d" <?php echo in_array('d', $terrain) ? 'checked': ''; ?>><label for="terrain-d">(D) Large hills</label></div>
+                        <div><input type="checkbox" name="terrain[]" value="e" id="terrain-e" <?php echo in_array('e', $terrain) ? 'checked': ''; ?>><label for="terrain-e">(E) Mountainous</label></div>
                     </fieldset>
                 </div>
                 <div class="small-12 medium-4 columns">
