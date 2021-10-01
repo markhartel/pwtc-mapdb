@@ -431,6 +431,8 @@ class PwtcMapdb {
 
 	public static function lookup_ride_leaders_callback() {
 		if (isset($_POST['search'])) {
+			$limit = 0;
+			$offset = 0;
 			$search = trim($_POST['search']);
 			$query_args = [
 				'meta_key' => 'last_name',
@@ -440,20 +442,38 @@ class PwtcMapdb {
 				'search' => '*'.$search.'*',
 				'search_columns' => array('display_name')
 			];
+			if (isset($_POST['limit'])) {
+				$limit = intval($_POST['limit']);
+				$query_args['number'] = $limit;
+				if (isset($_POST['offset'])) {
+					$offset = intval($_POST['offset']);
+					$query_args['offset'] = $offset;
+				}
+			}
 			$user_query = new WP_User_Query($query_args);
 			$members = $user_query->get_results();
 			$users = array();
-			foreach ( $members as $member ) {
-				$item = array(
-					'userid' => $member->ID,
-					'first_name' => $member->first_name,
-					'last_name' => $member->last_name
-				);
-				$users[] = $item;
+			$is_more = false;
+			if (count($members) > 0) {
+				$total = $user_query->get_total();
+				$is_more = ($limit > 0) && ($total > ($offset + $limit));
+				foreach ( $members as $member ) {
+					$item = array(
+						'userid' => $member->ID,
+						'first_name' => $member->first_name,
+						'last_name' => $member->last_name
+					);
+					$users[] = $item;
+				}
 			}
 			$response = array(
+				'limit' => $limit,
+				'offset' => $offset,
 				'users' => $users
 			);
+			if ($is_more) {
+				$response['more'] = 1;
+			}
 		}
 		else {
 			$response = array(
