@@ -135,6 +135,7 @@
         }
 
         function leaders_lookup_cb(response) {
+	    $('#pwtc-mapdb-edit-ride-div .leader-search-div').removeAttr('offset');
             var res;
             try {
                 res = JSON.parse(response);
@@ -146,16 +147,21 @@
             if (res.error) {
                 $('#pwtc-mapdb-edit-ride-div .leader-search-div').html('<div class="callout small alert"><p>' + res.error + '</p></div>');
             }
-            else if (res.users.length == 0) {
+            else if (res.users.length == 0 && res.offset == 0) {
                 $('#pwtc-mapdb-edit-ride-div .leader-search-div').html('<div class="callout small warning"><p>No leaders found</p></div>');
             }
             else {
-                $('#pwtc-mapdb-edit-ride-div .leader-search-div').empty();
-                $('#pwtc-mapdb-edit-ride-div .leader-search-div').append('<ul></ul>');
+		if (res.offset == 0) {
+                	$('#pwtc-mapdb-edit-ride-div .leader-search-div').empty();
+                	$('#pwtc-mapdb-edit-ride-div .leader-search-div').append('<ul></ul>');
+		}
                 res.users.forEach(function(item) {
                     $('#pwtc-mapdb-edit-ride-div .leader-search-div ul').append(
                         '<li userid="' + item.userid + '">' + item.first_name + ' ' + item.last_name + '</li>');    
                 });
+		if (res.more !== undefined) {
+                    $('#pwtc-mapdb-edit-ride-div .leader-search-div').attr('offset', res.offset+10);
+                }
                 $('#pwtc-mapdb-edit-ride-div .leader-search-div li').on('click', function(evt) {
                     var userid = $(this).attr('userid');
                     if (!has_user_id(userid)) {
@@ -265,27 +271,31 @@
             }
         }
 
-        function fetch_ride_leaders() {
+        function fetch_ride_leaders(offset) {
             var searchstr = $('#pwtc-mapdb-edit-ride-div input[name="leader-pattern"]').val();
             var action = "<?php echo admin_url('admin-ajax.php'); ?>";
             var data = {
                 'action': 'pwtc_mapdb_lookup_ride_leaders',
-                'search': searchstr
+		'limit': 10,
+                'search': searchstr,
+                'offset': offset
             };
             $.post(action, data, leaders_lookup_cb);
-            $('#pwtc-mapdb-edit-ride-div .leader-search-div').html('<div class="callout small"><i class="fa fa-spinner fa-pulse"></i> please wait...</div>');
+            if (offset == 0) {
+            	$('#pwtc-mapdb-edit-ride-div .leader-search-div').html('<div class="callout small"><i class="fa fa-spinner fa-pulse"></i> please wait...</div>');
+	    }
         }
         
     <?php if ($edit_leader) { ?>
 
         $('#pwtc-mapdb-edit-ride-div input[name="leader-pattern"]').on('input', function() {
-            fetch_ride_leaders();
+            fetch_ride_leaders(0);
             $('#pwtc-mapdb-edit-ride-div .leader-search-div').show();
         });
 
         $('#pwtc-mapdb-edit-ride-div input[name="leader-pattern"]').on('click', function(evt) {
             if ($('#pwtc-mapdb-edit-ride-div .leader-search-div').is(':hidden')) {
-                fetch_ride_leaders();
+                fetch_ride_leaders(0);
                 $('#pwtc-mapdb-edit-ride-div .leader-search-div').show();
             }
             evt.stopPropagation();		
@@ -300,7 +310,7 @@
 
         $('#pwtc-mapdb-edit-ride-div .leaders-div').on('click', function(evt) { 
             if ($('#pwtc-mapdb-edit-ride-div .leader-search-div').is(':hidden')) {
-                fetch_ride_leaders();
+                fetch_ride_leaders(0);
                 $('#pwtc-mapdb-edit-ride-div .leader-search-div').show();
                 $('#pwtc-mapdb-edit-ride-div input[name="leader-pattern"]').focus();
             }
@@ -316,6 +326,16 @@
             $('#pwtc-mapdb-edit-ride-div .leader-search-div').hide();
             $('#pwtc-mapdb-edit-ride-div input[name="leader-pattern"]').val('');
             evt.stopPropagation();
+        });
+	    
+	$('#pwtc-mapdb-edit-ride-div .leader-search-div').on('scroll', function() {            
+            if ($(this).scrollTop() + $(this).innerHeight() >= $(this)[0].scrollHeight) {
+                var offset = $(this).attr('offset');
+                if (offset) {
+                    fetch_ride_leaders(parseInt(offset, 10));
+                    $(this).removeAttr('offset');
+                }
+            }
         });
 
     <?php } ?>
