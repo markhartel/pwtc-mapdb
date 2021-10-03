@@ -179,6 +179,9 @@
                     $('#pwtc-mapdb-edit-ride-div .leader-search-div').hide();
                     $('#pwtc-mapdb-edit-ride-div input[name="leader-pattern"]').val('');
                 });
+		if (res.select !== undefined) {
+                    $('#pwtc-mapdb-edit-ride-div .leader-search-div ul li:first-child').trigger( 'click');
+                }
             }
         }
 
@@ -271,14 +274,15 @@
             }
         }
 
-        function fetch_ride_leaders(offset) {
+        function fetch_ride_leaders(offset, select) {
             var searchstr = $('#pwtc-mapdb-edit-ride-div input[name="leader-pattern"]').val();
             var action = "<?php echo admin_url('admin-ajax.php'); ?>";
             var data = {
                 'action': 'pwtc_mapdb_lookup_ride_leaders',
 		'limit': 10,
                 'search': searchstr,
-                'offset': offset
+                'offset': offset,
+                'select': select
             };
             $.post(action, data, leaders_lookup_cb);
             if (offset == 0) {
@@ -289,13 +293,13 @@
     <?php if ($edit_leader) { ?>
 
         $('#pwtc-mapdb-edit-ride-div input[name="leader-pattern"]').on('input', function() {
-            fetch_ride_leaders(0);
+            fetch_ride_leaders(0, 0);
             $('#pwtc-mapdb-edit-ride-div .leader-search-div').show();
         });
 
         $('#pwtc-mapdb-edit-ride-div input[name="leader-pattern"]').on('click', function(evt) {
             if ($('#pwtc-mapdb-edit-ride-div .leader-search-div').is(':hidden')) {
-                fetch_ride_leaders(0);
+                fetch_ride_leaders(0, 0);
                 $('#pwtc-mapdb-edit-ride-div .leader-search-div').show();
             }
             evt.stopPropagation();		
@@ -304,13 +308,14 @@
         $('#pwtc-mapdb-edit-ride-div input[name="leader-pattern"]').on('keypress', function(evt) {
             var keyPressed = evt.keyCode || evt.which; 
             if (keyPressed === 13) { 
-                $('#pwtc-mapdb-edit-ride-div .leader-search-div ul li:first-child').trigger( 'click');
+                fetch_ride_leaders(0, 1);
+                $('#pwtc-mapdb-edit-ride-div .leader-search-div').show();
             } 
         });	
 
         $('#pwtc-mapdb-edit-ride-div .leaders-div').on('click', function(evt) { 
             if ($('#pwtc-mapdb-edit-ride-div .leader-search-div').is(':hidden')) {
-                fetch_ride_leaders(0);
+                fetch_ride_leaders(0, 0);
                 $('#pwtc-mapdb-edit-ride-div .leader-search-div').show();
                 $('#pwtc-mapdb-edit-ride-div input[name="leader-pattern"]').focus();
             }
@@ -332,7 +337,7 @@
             if ($(this).scrollTop() + $(this).innerHeight() >= $(this)[0].scrollHeight) {
                 var offset = $(this).attr('offset');
                 if (offset) {
-                    fetch_ride_leaders(parseInt(offset, 10));
+                    fetch_ride_leaders(parseInt(offset, 10), 0);
                     $(this).removeAttr('offset');
                 }
             }
