@@ -451,6 +451,10 @@ class PwtcMapdb {
 					$query_args['offset'] = $offset;
 				}
 			}
+			$select = 0;
+			if (isset($_POST['select'])) {
+				$select = intval($_POST['select']);
+			}
 			$user_query = new WP_User_Query($query_args);
 			$members = $user_query->get_results();
 			$users = array();
@@ -474,6 +478,9 @@ class PwtcMapdb {
 			);
 			if ($is_more) {
 				$response['more'] = 1;
+			}
+			if ($select > 0) {
+				$response['select'] = 1;
 			}
 		}
 		else {
