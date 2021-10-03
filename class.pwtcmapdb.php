@@ -103,6 +103,7 @@ class PwtcMapdb {
         	'edit_rides',
         	'publish_rides',
         	'read_private_rides',
+		'edit_rides_from_view',
     	];
 		
     	private static $initiated = false;
@@ -533,11 +534,9 @@ class PwtcMapdb {
 			$road_captain = add_role('road_captain', 'Road Captain', ['read' => true]);
 		}
 		if ($road_captain !== null) {
-			/*
 			foreach (self::ROAD_CAPTAIN_CAPS as $capability) {
 				$road_captain->add_cap($capability);
 			}
-			*/
 		}
 	}
 
@@ -545,11 +544,9 @@ class PwtcMapdb {
 		$users = get_users(array('role' => 'road_captain'));
 		if (count($users) > 0) {
 			$road_captain = get_role('road_captain');
-			/*
 			foreach (self::ROAD_CAPTAIN_CAPS as $capability) {
 				$road_captain->remove_cap($capability);
 			}
-			*/
 		}
 		else {
 			$road_captain = get_role('road_captain');
