@@ -27,7 +27,7 @@ function pwtc_mapdb_get_signup() {
     else {
         $return_uri = $_SERVER['REQUEST_URI'];
         $result['edit_ride_url'] = false;
-        if (user_can($current_user,'edit_published_rides')) {
+        if (user_can($current_user,'edit_rides_from_view')) {
             $result['edit_ride_url'] = esc_url(PwtcMapdb_Ride::EDIT_RIDE_URI.'?post='.$postid.'&return='.urlencode($return_uri));
         }
         $result['copy_ride_url'] = false;
@@ -92,8 +92,24 @@ function pwtc_mapdb_get_map_metadata() {
     $postid = get_the_ID();
     $return_uri = $_SERVER['REQUEST_URI'];
     $result['edit_map_url'] = false;
-    if (user_can($current_user,'edit_published_rides')) {
+    if (user_can($current_user,'edit_rides_from_view')) {
         $result['edit_map_url'] = esc_url(PwtcMapdb_Map::EDIT_MAP_URI.'?post='.$postid.'&return='.urlencode($return_uri));
+    }
+    return $result;
+}   
+
+function pwtc_mapdb_get_template_metadata() {
+    $disable = false;
+    if ($disable) {
+        $result['edit_template_url'] = false;
+        return $result;
+    }
+    $current_user = wp_get_current_user();
+    $postid = get_the_ID();
+    $return_uri = $_SERVER['REQUEST_URI'];
+    $result['edit_template_url'] = false;
+    if (user_can($current_user,'edit_rides_from_view')) {
+        $result['edit_template_url'] = esc_url(PwtcMapdb_Ride::EDIT_TEMPLATE_URI.'?post='.$postid.'&return='.urlencode($return_uri));
     }
     return $result;
 }   
