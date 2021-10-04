@@ -131,12 +131,9 @@ class PwtcMapdb_Map {
 			return '<div class="callout small alert"><p>You must be logged in to submit route maps.</p></div>';
 		}
 		$user_info = get_userdata($current_user->ID);
-		if ($allow_leaders) {
-			$is_road_captain = in_array(PwtcMapdb::ROLE_ROAD_CAPTAIN, $user_info->roles);
-		}
-		else {
-			$is_road_captain = user_can($current_user,'edit_published_rides');
-		}
+		
+		$is_road_captain = in_array(PwtcMapdb::ROLE_ROAD_CAPTAIN, $user_info->roles);
+
 		$is_ride_leader = in_array(PwtcMapdb::ROLE_RIDE_LEADER, $user_info->roles);
 
 		$return = '';
@@ -600,12 +597,9 @@ class PwtcMapdb_Map {
 			return '<div class="callout small alert"><p>You must be logged in to delete route maps.</p></div>';
 		}
 		$user_info = get_userdata($current_user->ID);
-		if ($allow_leaders) {
-			$is_road_captain = in_array(PwtcMapdb::ROLE_ROAD_CAPTAIN, $user_info->roles);
-		}
-		else {
-			$is_road_captain = user_can($current_user,'edit_published_rides');
-		}
+		
+		$is_road_captain = in_array(PwtcMapdb::ROLE_ROAD_CAPTAIN, $user_info->roles);
+		
 		$is_ride_leader = in_array(PwtcMapdb::ROLE_RIDE_LEADER, $user_info->roles);
 
 		$return = '';
@@ -783,12 +777,9 @@ class PwtcMapdb_Map {
 		}
 
 		$user_info = get_userdata($current_user->ID);
-		if ($allow_leaders) {
-			$is_road_captain = in_array(PwtcMapdb::ROLE_ROAD_CAPTAIN, $user_info->roles);
-		}
-		else {
-			$is_road_captain = user_can($current_user,'edit_published_rides');
-		}
+		
+		$is_road_captain = in_array(PwtcMapdb::ROLE_ROAD_CAPTAIN, $user_info->roles);
+
 		$is_ride_leader = in_array(PwtcMapdb::ROLE_RIDE_LEADER, $user_info->roles);
 
 		if (!$is_road_captain) {
@@ -835,12 +826,8 @@ class PwtcMapdb_Map {
 		}
 
 		$user_info = get_userdata($current_user->ID);
-		if ($allow_leaders) {
-			$is_road_captain = in_array(PwtcMapdb::ROLE_ROAD_CAPTAIN, $user_info->roles);
-		}
-		else {
-			$is_road_captain = user_can($current_user,'edit_published_rides');
-		}
+		
+		$is_road_captain = in_array(PwtcMapdb::ROLE_ROAD_CAPTAIN, $user_info->roles);
 
 		if (!$is_road_captain) {
 			return '<div class="callout small warning"><p>You must be a road captain to review the pending route maps.</p></div>';
@@ -896,12 +883,9 @@ class PwtcMapdb_Map {
 		}
 
 		$user_info = get_userdata($current_user->ID);
-		if ($allow_leaders) {
-			$is_road_captain = in_array(PwtcMapdb::ROLE_ROAD_CAPTAIN, $user_info->roles);
-		}
-		else {
-			$is_road_captain = user_can($current_user,'edit_published_rides');
-		}
+		
+		$is_road_captain = in_array(PwtcMapdb::ROLE_ROAD_CAPTAIN, $user_info->roles);
+
 		$is_ride_leader = in_array(PwtcMapdb::ROLE_RIDE_LEADER, $user_info->roles);
 
 		if (isset($_GET['title'])) {
