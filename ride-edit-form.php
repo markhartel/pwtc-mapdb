@@ -157,7 +157,7 @@
 		}
                 res.users.forEach(function(item) {
                     $('#pwtc-mapdb-edit-ride-div .leader-search-div ul').append(
-                        '<li userid="' + item.userid + '">' + item.first_name + ' ' + item.last_name + '</li>');    
+                        '<li userid="' + item.userid + '">' + item.display_name + '</li>');    
                 });
 		if (res.more !== undefined) {
                     $('#pwtc-mapdb-edit-ride-div .leader-search-div').attr('offset', res.offset+10);
