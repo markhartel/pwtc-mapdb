@@ -441,7 +441,8 @@ class PwtcMapdb {
 				'order' => 'ASC',
 				'role' => self::ROLE_RIDE_LEADER,
 				'search' => '*'.$search.'*',
-				'search_columns' => array('display_name')
+				'search_columns' => array('display_name'),
+				'fields' => ['ID', 'display_name']
 			];
 			if (isset($_POST['limit'])) {
 				$limit = intval($_POST['limit']);
@@ -465,8 +466,7 @@ class PwtcMapdb {
 				foreach ( $members as $member ) {
 					$item = array(
 						'userid' => $member->ID,
-						'first_name' => $member->first_name,
-						'last_name' => $member->last_name
+						'display_name' => $member->display_name
 					);
 					$users[] = $item;
 				}
