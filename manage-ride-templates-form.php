@@ -149,7 +149,7 @@
             <?php } else if (user_can($current_user,'edit_published_rides') and ($status == 'draft' or $status == 'pending')) { ?> 
                 <a href="<?php echo $view_link; ?>">Preview</a>
             <?php } ?>  
-            <?php if ($is_road_captain or ($is_ride_leader and $allow_leaders)) { ?>
+            <?php if ($status == 'publish' and ($is_road_captain or ($is_ride_leader and $allow_leaders))) { ?>
                 <a href="<?php echo $sched_link; ?>">Schedule</a>
             <?php } ?> 
             <?php if ($status != 'trash' and $is_road_captain) { ?>
