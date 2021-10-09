@@ -3,7 +3,7 @@
 function pwtc_mapdb_get_signup() {
     $disable = false;
     $disable_nonmembers = false;
-    $disable_edit = false;
+    $disable_edit = true;
     if ($disable) {
         $result['view_signup_url'] = false;
         $result['edit_ride_url'] = false;
@@ -83,7 +83,7 @@ function pwtc_mapdb_get_signup() {
 }
 
 function pwtc_mapdb_get_map_metadata() {
-    $disable = false;
+    $disable = true;
     if ($disable) {
         $result['edit_map_url'] = false;
         return $result;
@@ -99,7 +99,7 @@ function pwtc_mapdb_get_map_metadata() {
 }   
 
 function pwtc_mapdb_get_template_metadata() {
-    $disable = false;
+    $disable = true;
     if ($disable) {
         $result['edit_template_url'] = false;
         return $result;
