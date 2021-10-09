@@ -2,6 +2,7 @@
     .indicate-error {
         border-color: #900 !important;
         background-color: #FDD !important;
+	color: black !important;
     }
 </style>
 <script type="text/javascript">
@@ -99,7 +100,7 @@
 		$('#pwtc-mapdb-edit-map-div .file-upload-lbl').html('Upload File');
             }
 	    is_dirty = true;
-	    $('#pwtc-mapdb-edit-file-div .file-upload-lbl').removeClass('indicate-error');
+	    $('#pwtc-mapdb-edit-map-div .file-upload-lbl').removeClass('indicate-error');
         });
 
         $('#pwtc-mapdb-edit-map-div form').on('submit', function(evt) {
