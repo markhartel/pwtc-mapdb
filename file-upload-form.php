@@ -2,6 +2,7 @@
     .indicate-error {
         border-color: #900 !important;
         background-color: #FDD !important;
+	color: black !important;
     }
 </style>
 <script type="text/javascript">
