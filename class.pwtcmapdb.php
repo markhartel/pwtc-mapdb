@@ -479,8 +479,11 @@ class PwtcMapdb {
 			if ($is_more) {
 				$response['more'] = 1;
 			}
-			if ($select > 0) {
+			if ($select > 0 and $offset == 0 and count($users) == 1) {
 				$response['select'] = 1;
+			}
+			if (isset($_POST['count'])) {
+				$response['count'] = intval($_POST['count']);
 			}
 		}
 		else {
