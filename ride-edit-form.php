@@ -1223,7 +1223,7 @@
                     <div userid="<?php echo $leader; ?>"><?php if ($edit_leader) { ?><i class="fa fa-times"></i> <?php } ?><?php echo $name; ?></div>
     <?php } } ?>
     <?php if ($edit_leader) { ?>
-                    <input type="text" name="leader-pattern" placeholder="Select leader">
+                    <input type="text" name="leader-pattern" placeholder="Enter leader">
     <?php } ?>
                 </div>
             </div>
