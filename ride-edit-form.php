@@ -83,6 +83,10 @@
 </style>
 <script type="text/javascript">
     jQuery(document).ready(function($) { 
+	    
+	var leaderTimeoutID = 0;
+        var leaderSentCount = 0;
+        var leaderRecvCount = 0;
 
         function decodeHtml(html) {
             return $('<div/>').html(html).text();
@@ -133,9 +137,27 @@
             });	
             return found;			
         }
+	    
+	function remove_leader_event(evt) {
+            is_dirty = true;
+            $(this).parent().remove();
+            $('#pwtc-mapdb-edit-ride-div .leader-search-div').hide();
+            evt.stopPropagation();
+        }
+
+        function add_leader_event(evt) {
+            var userid = $(this).attr('userid');
+            if (!has_user_id(userid)) {
+                var name = $(this).html();
+                is_dirty = true;
+                $('#pwtc-mapdb-edit-ride-div .leaders-div').removeClass('indicate-error');
+                $('#pwtc-mapdb-edit-ride-div .leaders-div input').before('<div userid="' + userid + '"><i class="fa fa-times"></i> ' + name + '</div>');
+                $('#pwtc-mapdb-edit-ride-div .leaders-div div[userid="' + userid + '"] .fa-times').on('click', remove_leader_event);
+            }
+            $('#pwtc-mapdb-edit-ride-div .leader-search-div').hide();
+        }
 
         function leaders_lookup_cb(response) {
-	    $('#pwtc-mapdb-edit-ride-div .leader-search-div').removeAttr('offset');
             var res;
             try {
                 res = JSON.parse(response);
@@ -144,42 +166,39 @@
                 $('#pwtc-mapdb-edit-ride-div .leader-search-div').html('<div class="callout small alert"><p>' + e.message + '</p></div>');
                 return;
             }
-            if (res.error) {
+	    if (res.error) {
                 $('#pwtc-mapdb-edit-ride-div .leader-search-div').html('<div class="callout small alert"><p>' + res.error + '</p></div>');
+                return;
             }
-            else if (res.users.length == 0 && res.offset == 0) {
-                $('#pwtc-mapdb-edit-ride-div .leader-search-div').html('<div class="callout small warning"><p>No leaders found</p></div>');
+	    if (res.count !== undefined) {
+                if (res.count < leaderRecvCount) {
+                    //console.log('response ' + res.count + ' discarded!');
+                    return;
+                }
+                leaderRecvCount = res.count;
+            }
+            $('#pwtc-mapdb-edit-ride-div .leader-search-div').removeAttr('offset');
+            if (res.users.length == 0 && res.offset == 0) {
+                $('#pwtc-mapdb-edit-ride-div .leader-search-div').empty();
             }
             else {
 		if (res.offset == 0) {
                 	$('#pwtc-mapdb-edit-ride-div .leader-search-div').empty();
                 	$('#pwtc-mapdb-edit-ride-div .leader-search-div').append('<ul></ul>');
 		}
+		else {
+                    $('#pwtc-mapdb-edit-ride-div .leader-search-div li .fa-spinner').parent().remove();
+                }
                 res.users.forEach(function(item) {
                     $('#pwtc-mapdb-edit-ride-div .leader-search-div ul').append(
-                        '<li userid="' + item.userid + '">' + item.display_name + '</li>');    
+                        '<li userid="' + item.userid + '">' + item.display_name + '</li>'); 
+		    $('#pwtc-mapdb-edit-ride-div .leader-search-div li[userid="' + item.userid + '"]').on('click', add_leader_event);
                 });
 		if (res.more !== undefined) {
                     $('#pwtc-mapdb-edit-ride-div .leader-search-div').attr('offset', res.offset+10);
                 }
-                $('#pwtc-mapdb-edit-ride-div .leader-search-div li').on('click', function(evt) {
-                    var userid = $(this).attr('userid');
-                    if (!has_user_id(userid)) {
-                        var name = $(this).html();
-                        is_dirty = true;
-			$('#pwtc-mapdb-edit-ride-div .leaders-div').removeClass('indicate-error');
-                        $('#pwtc-mapdb-edit-ride-div .leaders-div input').before('<div userid="' + userid + '"><i class="fa fa-times"></i> ' + name + '</div>');
-                        $('#pwtc-mapdb-edit-ride-div .leaders-div div[userid="' + userid + '"] .fa-times').on('click', function(evt) {
-                            $(this).parent().remove();
-                            $('#pwtc-mapdb-edit-ride-div .leader-search-div').hide();
-                            $('#pwtc-mapdb-edit-ride-div input[name="leader-pattern"]').val('');
-                            evt.stopPropagation();
-                        });
-                    }
-                    $('#pwtc-mapdb-edit-ride-div .leader-search-div').hide();
-                    $('#pwtc-mapdb-edit-ride-div input[name="leader-pattern"]').val('');
-                });
 		if (res.select !== undefined) {
+                    $('#pwtc-mapdb-edit-ride-div input[name="leader-pattern"]').blur();
                     $('#pwtc-mapdb-edit-ride-div .leader-search-div ul li:first-child').trigger( 'click');
                 }
             }
@@ -275,6 +294,7 @@
         }
 
         function fetch_ride_leaders(offset, select) {
+	    leaderSentCount++;
             var searchstr = $('#pwtc-mapdb-edit-ride-div input[name="leader-pattern"]').val();
             var action = "<?php echo admin_url('admin-ajax.php'); ?>";
             var data = {
@@ -282,19 +302,54 @@
 		'limit': 10,
                 'search': searchstr,
                 'offset': offset,
-                'select': select
+                'select': select,
+                'count': leaderSentCount
             };
             $.post(action, data, leaders_lookup_cb);
             if (offset == 0) {
-            	$('#pwtc-mapdb-edit-ride-div .leader-search-div').html('<div class="callout small"><i class="fa fa-spinner fa-pulse"></i> please wait...</div>');
-	    }
+                $('#pwtc-mapdb-edit-ride-div .leader-search-div').html('<div class="callout small"><i class="fa fa-spinner fa-pulse"></i> searching...</div>');
+            }
+            else {
+                $('#pwtc-mapdb-edit-ride-div .leader-search-div ul').append('<li><i class="fa fa-spinner fa-pulse"></i></li>');
+            }
         }
         
     <?php if ($edit_leader) { ?>
 
-        $('#pwtc-mapdb-edit-ride-div input[name="leader-pattern"]').on('input', function() {
-            fetch_ride_leaders(0, 0);
-            $('#pwtc-mapdb-edit-ride-div .leader-search-div').show();
+	$(document).on('focusin', function(evt) {
+            //console.log('focusin detected on document');
+            if (evt.fromLeaderEdit === undefined) {
+                $('#pwtc-mapdb-edit-ride-div .leader-search-div').hide();
+            }
+        });
+
+        $('#pwtc-mapdb-edit-ride-div .leaders-div').on('focusin', function(evt) {
+            //console.log('focusin detected on leaders-div');
+            evt.fromLeaderEdit = 1;
+        });
+
+        $('#pwtc-mapdb-edit-ride-div .leader-search-div').on('focusin', function(evt) {
+            //console.log('focusin detected on leader-search-div');
+            evt.fromLeaderEdit = 1;
+        });
+
+        $('#pwtc-mapdb-edit-ride-div input[name="leader-pattern"]').on('focus', function() {
+            var interval = 500;
+            function callback(lastval) {
+                var val = $('#pwtc-mapdb-edit-ride-div input[name="leader-pattern"]').val();
+                //console.log('callback: val=' + val + ', lastval=' + lastval);
+                if (val != lastval) {
+                    fetch_ride_leaders(0, 0);
+                    $('#pwtc-mapdb-edit-ride-div .leader-search-div').show();
+                }
+                leaderTimeoutID = setTimeout(callback, interval, val);
+            };
+            leaderTimeoutID = setTimeout(callback, interval, $(this).val());
+        });  
+
+        $('#pwtc-mapdb-edit-ride-div input[name="leader-pattern"]').on('blur', function(evt) {
+            clearTimeout(leaderTimeoutID);
+            $('#pwtc-mapdb-edit-ride-div input[name="leader-pattern"]').val('');
         });
 
         $('#pwtc-mapdb-edit-ride-div input[name="leader-pattern"]').on('click', function(evt) {
@@ -317,21 +372,11 @@
             if ($('#pwtc-mapdb-edit-ride-div .leader-search-div').is(':hidden')) {
                 fetch_ride_leaders(0, 0);
                 $('#pwtc-mapdb-edit-ride-div .leader-search-div').show();
-                $('#pwtc-mapdb-edit-ride-div input[name="leader-pattern"]').focus();
             }
-            else {
-                $('#pwtc-mapdb-edit-ride-div .leader-search-div').hide();
-                $('#pwtc-mapdb-edit-ride-div input[name="leader-pattern"]').val('');
-            }
+            $('#pwtc-mapdb-edit-ride-div input[name="leader-pattern"]').focus();
         });      
 
-        $('#pwtc-mapdb-edit-ride-div .leaders-div .fa-times').on('click', function(evt) {
-            is_dirty = true;
-            $(this).parent().remove();
-            $('#pwtc-mapdb-edit-ride-div .leader-search-div').hide();
-            $('#pwtc-mapdb-edit-ride-div input[name="leader-pattern"]').val('');
-            evt.stopPropagation();
-        });
+        $('#pwtc-mapdb-edit-ride-div .leaders-div .fa-times').on('click', remove_leader_event);
 	    
 	$('#pwtc-mapdb-edit-ride-div .leader-search-div').on('scroll', function() {            
             if ($(this).scrollTop() + $(this).innerHeight() >= $(this)[0].scrollHeight) {
