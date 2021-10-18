@@ -1041,6 +1041,8 @@
                 </label>
                 <?php if (!$edit_title) { ?>
                     <p class="help-text">You are not allowed to edit the ride title.</p>
+		<?php } else { ?>
+                    <p class="help-text">Use creative names as they are more enticing to riders.  Weekly repeating rides can start the title with the day of the week but this isn’t required.  All ride names must start with a letter or number in order to be entered in the Mileage Database. </p>
                 <?php } ?>
             </div>
     <?php if (!$is_template) { ?>
@@ -1071,6 +1073,7 @@
                 <label>Ride Description
                     <textarea name="description" rows="10"><?php echo $description; ?></textarea>
                 </label>
+		<p class="help-text">Describe the ride in a way that helps people find rides that are appropriate for them, and provide any details that help manage riders&#39; expectations.  Provide information about planned stops for refreshments. Do not include any information that appears elsewhere on the ride page to avoid conflicting information and keep the description shorter and &#34;scannable&#34;.</p>
             </div>
             <div class="row">
                 <div class="small-12 medium-6 columns">
@@ -1080,6 +1083,7 @@
                         <input type="radio" name="ride_type" value="group" id="type-group" <?php echo $ride_type == 'group' ? 'checked': ''; ?>><label for="type-group">Group</label>
                         <input type="radio" name="ride_type" value="regroup" id="type-regroup" <?php echo $ride_type == 'regroup' ? 'checked': ''; ?>><label for="type-regroup">Re-group</label>
                     </fieldset>
+		    <p class="help-text">See <a href="/home/ride-ratings-requirements-and-tips" target="_blank">ride ratings, requirements, and tips</a> for more information.</p>
                 </div>
                 <div class="small-12 medium-6 columns">
                     <fieldset>
@@ -1090,7 +1094,7 @@
                         <div><input type="radio" name="ride_pace" value="moderate" id="pace-moderate" <?php echo $ride_pace == 'moderate' ? 'checked': ''; ?>><label for="pace-moderate">Brisk (15-17 mph)</label></div>
                         <div><input type="radio" name="ride_pace" value="fast" id="pace-fast" <?php echo $ride_pace == 'fast' ? 'checked': ''; ?>><label for="pace-fast">Fast (18+ mph)</label></div>
                     </fieldset>
-		    <p class="help-text">Speed indicated is while on a flat or gentle hill terrain—not an average speed, but a cruising speed.</p>
+		    <p class="help-text">Speed indicated is while on a flat or gentle hill terrain—not an average speed, but a cruising speed. On a non-group ride, this is the pace of the ride leader.</p>
                 </div>
                 <div class="small-12 medium-6 columns">
                     <fieldset>
@@ -1098,6 +1102,7 @@
                         <input type="radio" name="attach_maps" value="0" id="attach-no" <?php echo $attach_maps == false ? 'checked': ''; ?>><label for="attach-no">No</label>
                         <input type="radio" name="attach_maps" value="1" id="attach-yes" <?php echo $attach_maps == true ? 'checked': ''; ?>><label for="attach-yes">Yes</label>
                     </fieldset>
+	            <p class="help-text">If possible, maps should be attached for re-group and non-group rides.</p>
                 </div>
                 <div class="small-12 medium-6 columns attach-map-no">
                     <fieldset class="terrain-fst">
@@ -1108,16 +1113,19 @@
                         <div><input type="checkbox" name="ride_terrain[]" value="d" id="terrain-d" <?php echo in_array('d', $ride_terrain) ? 'checked': ''; ?>><label for="terrain-d">(D) Large hills</label></div>
                         <div><input type="checkbox" name="ride_terrain[]" value="e" id="terrain-e" <?php echo in_array('e', $ride_terrain) ? 'checked': ''; ?>><label for="terrain-e">(E) Mountainous</label></div>
                     </fieldset>
+		    <p class="help-text">See <a href="/home/ride-ratings-requirements-and-tips" target="_blank">ride ratings, requirements, and tips</a> for more information.</p>
                 </div>
                 <div class="small-12 medium-6 columns attach-map-no">
                     <label>Ride Distance
                         <input type="number" name="distance" value="<?php echo $distance; ?>"/>	
                     </label>
+		    <p class="help-text">All distances should be listed in miles.</p>
                 </div>
                 <div class="small-12 medium-6 columns attach-map-no">
                     <label>Ride Max Distance
                         <input type="number" name="max_distance" value="<?php echo $max_distance; ?>"/>	
                     </label>
+		    <p class="help-text">Use to indicate a distance range if several route choices will be detailed in the ride description.</p>
                 </div>
             </div>
             <div class="row column attach-map-yes">
@@ -1158,6 +1166,8 @@
                 </label>
     <?php if ($set_coords) { ?>
                 <p class="help-text">Enter the string to be shown as the ride start location. The actual Google map location will be determined by the latitude and longitude coordinates entered below.</p>
+    <?php } else { ?>
+                <p class="help-text">If possible, the name of a Park or Church AND a street intersection is best for riders. They can easily find the general location and know exactly where to look for the group. After an address is entered, you may drag the map pointer to adjust the location on the map.</p>
     <?php } ?>
             </div>
     <?php if ($set_coords) { ?>
@@ -1191,6 +1201,7 @@
                 <label>Start Location Comment
                     <input type="text" name="start_location_comment" value="<?php echo esc_attr($start_location_comment); ?>"/>
                 </label>
+		<p class="help-text">Use this comment to provide additional instruction about the start location.</p>
     <?php } ?>
             </div>
             <div class="row column">
