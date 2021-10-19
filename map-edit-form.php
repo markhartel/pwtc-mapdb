@@ -369,16 +369,19 @@
                         <div><input type="checkbox" name="terrain[]" value="d" id="terrain-d" <?php echo in_array('d', $terrain) ? 'checked': ''; ?>><label for="terrain-d">(D) Large hills</label></div>
                         <div><input type="checkbox" name="terrain[]" value="e" id="terrain-e" <?php echo in_array('e', $terrain) ? 'checked': ''; ?>><label for="terrain-e">(E) Mountainous</label></div>
                     </fieldset>
+		    <p class="help-text">See <a href="/home/ride-ratings-requirements-and-tips" target="_blank">ride ratings, requirements, and tips</a> for more information.</p>
                 </div>
                 <div class="small-12 medium-4 columns">
                     <label>Route Map Distance
                         <input type="number" name="distance" value="<?php echo $distance; ?>"/>	
                     </label>
+		    <p class="help-text">All distances should be listed in miles.</p>
                 </div>
                 <div class="small-12 medium-4 columns">
                     <label>Route Map Max Distance
                         <input type="number" name="max_distance" value="<?php echo $max_distance; ?>"/>	
                     </label>
+		    <p class="help-text">Use to indicate a distance range if several choices are available in the route.</p>
                 </div>
             </div>
             <div class="row column errmsg"></div>
