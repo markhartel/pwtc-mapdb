@@ -1244,8 +1244,12 @@
                 </div>
             </div>
     <?php } ?>
-            <div class="row column" style="min-height:20px;"></div>
-            <div class="row column errmsg"></div>
+            <div class="row column" style="margin-top:15px;">
+    <?php if ($edit_leader) { ?>
+                <p class="help-text">Riders must have ride leader access on the website to be assigned as leader.</p>
+    <?php } ?>   
+            </div>
+	    <div class="row column errmsg"></div>
             <div class="row column clearfix">
             <?php if ($postid == 0) { ?>
                 <button class="dark button float-left" type="submit">Save Draft</button>
