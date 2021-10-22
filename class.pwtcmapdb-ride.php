@@ -1318,7 +1318,7 @@ class PwtcMapdb_Ride {
 	// Generates the [pwtc_mapdb_schedule_template] shortcode.
 	public static function shortcode_schedule_template($atts) {
 		ob_start();
-		include('schedule-ride-templates-form.php');
+		include('schedule-ride-template-form.php');
 		return ob_get_clean();
 	}
 
