@@ -37,6 +37,7 @@ class PwtcMapdb_Ride {
 		add_shortcode('pwtc_mapdb_manage_ride_templates', array('PwtcMapdb_Ride', 'shortcode_manage_ride_templates'));
 		add_shortcode('pwtc_mapdb_manage_pending_rides', array('PwtcMapdb_Ride', 'shortcode_manage_pending_rides'));
 		add_shortcode('pwtc_mapdb_new_ride_link', array('PwtcMapdb_Ride', 'shortcode_new_ride_link'));
+		add_shortcode('pwtc_mapdb_schedule_template', array('PwtcMapdb_Ride', 'shortcode_schedule_template'));
 		
 	}
 	
@@ -1312,6 +1313,13 @@ class PwtcMapdb_Ride {
 		}
 		
 		return '<a class="' . $a['class'] . '" href="' . $new_link . '">' . $content . '</a>';
+	}
+	
+	// Generates the [pwtc_mapdb_schedule_template] shortcode.
+	public static function shortcode_schedule_template($atts) {
+		ob_start();
+		include('schedule-ride-templates-form.php');
+		return ob_get_clean();
 	}
 
 	/******************* Utility Functions ******************/
