@@ -17,7 +17,7 @@
                 <fieldset>
                     <legend>Repeat Every</legend>
                     <input type="radio" name="repeat_every" value="week" id="repeat-every-week" checked><label for="repeat-every-week">Week</label>
-                    <input type="radio" name="repeat_every" value="day" id="repeat-every-day" checked><label for="repeat-every-day">Day</label>
+                    <input type="radio" name="repeat_every" value="day" id="repeat-every-day"><label for="repeat-every-day">Day</label>
                 </fieldset>
             </div>
             <div class="small-12 medium-3 columns">
