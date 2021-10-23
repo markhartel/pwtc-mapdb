@@ -125,6 +125,7 @@ class PwtcMapdb {
 		// Register ajax callbacks
 		add_action('wp_ajax_pwtc_mapdb_lookup_ride_leaders', array('PwtcMapdb', 'lookup_ride_leaders_callback'));
 		add_action('wp_ajax_pwtc_mapdb_lookup_riderid', array('PwtcMapdb', 'lookup_riderid_callback'));
+		add_action('wp_ajax_pwtc_mapdb_lookup_schedule_dates', array('PwtcMapdb', 'lookup_schedule_dates_callback'));
 		
 		// Register shortcode callbacks
 		add_shortcode('pwtc_mapdb_role_content', array('PwtcMapdb', 'shortcode_role_content'));
@@ -532,6 +533,48 @@ class PwtcMapdb {
 				'error' => 'Lookup failed, server post arguments missing.'
 			);		
 		}		
+		echo wp_json_encode($response);
+		wp_die();
+	}
+	
+	public static function lookup_schedule_dates_callback() {
+		if (isset($_POST['repeat']) and isset($_POST['from_date']) and isset($_POST['to_date'])) {
+			$repeat = trim($_POST['repeat']);
+			$from_date = trim($_POST['from_date']);
+			$to_date = trim($_POST['to_date']);
+			$timezone = new DateTimeZone(pwtc_get_timezone_string());
+			$start = DateTime::createFromFormat('Y-m-d H:i:s', $from_date.' 00:00:00', $timezone);
+			$end = DateTime::createFromFormat('Y-m-d H:i:s', $to_date.' 00:00:00', $timezone);
+			if ($start === false) {
+				$response = array(
+					'error' => 'Lookup failed, invalid date format for from date.'
+				);
+			}
+			else if ($end === false) {
+				$response = array(
+					'error' => 'Lookup failed, invalid date format for to date.'
+				);
+			}
+			else if ($end < $start) {
+				$response = array(
+					'error' => 'Lookup failed, to date is earlier than from date.'
+				);
+			}
+			else {
+				if ($repeat == 'day') {
+					$interval = new DateInterval('P1D');
+				}
+				else {
+					$interval = new DateInterval('P7D');
+				}
+				//TODO: Implement this!
+			}
+		}
+		else {
+			$response = array(
+				'error' => 'Lookup failed, server post arguments missing.'
+			);			
+		}
 		echo wp_json_encode($response);
 		wp_die();
 	}
