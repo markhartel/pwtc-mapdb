@@ -87,8 +87,6 @@
             var to_date = $(this).val();
             var datergx = /^\d{4}-\d{2}-\d{2}$/;
             if (datergx.test(to_date)) {
-                $('#pwtc-mapdb-sched-template-div form').show();
-/*
                 var repeat = $('#pwtc-mapdb-sched-template-div input[name="repeat_every"]:checked').val();
                 var from_date = $('#pwtc-mapdb-sched-template-div input[name="from_date"]').val();
                 var action = "<?php echo admin_url('admin-ajax.php'); ?>";
@@ -100,7 +98,6 @@
                 };
                 $.post(action, data, dates_lookup_cb);
                 show_lookup_waiting();
-*/
             }
             else { 
                 hide_form();   
