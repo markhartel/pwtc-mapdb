@@ -57,6 +57,10 @@
                     $('#pwtc-mapdb-sched-template-div .schedule-dates-fst').append(
                         '<div><input type="checkbox" name="schedule_dates[]" value="' + item.date + '" id="' + item.date + '" checked><label for="' + item.date + '">' + item.prettydate + '</label></div>');
                 });
+                $('#pwtc-mapdb-sched-template-div input[type="checkbox"]').change(function() {
+                    is_dirty = true;
+                    $('#pwtc-mapdb-sched-template-div .schedule-dates-fst').removeClass('indicate-error');
+                });
                 $('#pwtc-mapdb-sched-template-div form').show();
             }
         }
@@ -99,19 +103,12 @@
                 $.post(action, data, dates_lookup_cb);
                 show_lookup_waiting();
             }
-            else { 
-                hide_form();   
-            }            
-        });
+            hide_form();   
+       });
 
         $('#pwtc-mapdb-sched-template-div input[name="ride_time"]').change(function() {
             is_dirty = true;
             $(this).removeClass('indicate-error');
-        });
-
-        $('#pwtc-mapdb-sched-template-div input[type="checkbox"]').change(function() {
-            is_dirty = true;
-            $('#pwtc-mapdb-sched-template-div .schedule-dates-fst').removeClass('indicate-error');
         });
 
         $('#pwtc-mapdb-sched-template-div form').on('submit', function(evt) {
