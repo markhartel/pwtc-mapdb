@@ -567,7 +567,18 @@ class PwtcMapdb {
 				else {
 					$interval = new DateInterval('P7D');
 				}
-				//TODO: Implement this!
+				$dates = array();
+				while ($start <= $end) {
+					$date = array(
+						'date' => $start->format('Y-m-d'),
+						'prettydate' => $start->format('D, F jS, Y')
+					);
+					$dates[] = $date;
+					$start->add($interval);
+				}
+				$response = array(
+					'dates' => $dates
+				);
 			}
 		}
 		else {
