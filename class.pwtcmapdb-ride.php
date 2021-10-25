@@ -1317,6 +1317,114 @@ class PwtcMapdb_Ride {
 	
 	// Generates the [pwtc_mapdb_schedule_template] shortcode.
 	public static function shortcode_schedule_template($atts) {
+		$a = shortcode_atts(array('use_return' => 'no'), $atts);
+		$use_return = $a['use_return'] == 'yes';
+
+		$current_user = wp_get_current_user();
+		if ( 0 == $current_user->ID ) {
+			return '<div class="callout small alert"><p>You must be logged in to schedule ride templates.</p></div>';
+		}
+		$user_info = get_userdata($current_user->ID);
+
+		$is_road_captain = in_array(PwtcMapdb::ROLE_ROAD_CAPTAIN, $user_info->roles);
+
+		$postid = 0;
+		$post_check_error = self::check_post_id(true);
+		if (empty($post_check_error)) {
+			$postid = intval($_GET['post']);
+		}
+
+		$return = '';
+		if (isset($_GET['return'])) {
+			$return = $_GET['return'];
+		}
+
+		if (isset($_POST['ride_time']) and isset($_POST['schedule_dates'])) {
+			if (!isset($_POST['nonce_field']) or !wp_verify_nonce($_POST['nonce_field'], 'schedule-template-form')) {
+				wp_nonce_ays('');
+			}
+
+			if ($postid == 0) {
+				wp_die('Invalid ride template post ID.', 403);
+			}
+
+			if (!$is_road_captain) {
+				wp_die('Invalid access rights.', 403);
+			}
+
+			$post = get_post($postid);
+            		$title = $post->post_title;
+			$type = get_field(PwtcMapdb::RIDE_TYPE, $postid);
+			$pace = get_field(PwtcMapdb::RIDE_PACE, $postid);
+			$desc = get_field(PwtcMapdb::RIDE_DESCRIPTION, $postid, false);
+			$location = get_field(PwtcMapdb::RIDE_START_LOCATION, $postid, false);
+			$leaders = [];
+			foreach (get_field(PwtcMapdb::RIDE_LEADERS, $postid) as $leader) {
+				$leaders[] = $leader['ID'];
+			}
+			$attach = get_field(PwtcMapdb::RIDE_ATTACH_MAP, $postid);
+			$maps = get_field(PwtcMapdb::RIDE_MAPS, $postid, false);
+			$terrain = get_field(PwtcMapdb::RIDE_TERRAIN, $postid);
+			$length = get_field(PwtcMapdb::RIDE_LENGTH, $postid);
+			$max_length = get_field(PwtcMapdb::RIDE_MAX_LENGTH, $postid);
+
+			$timezone = new DateTimeZone(pwtc_get_timezone_string());
+			foreach ($_POST['schedule_dates'] as $event) {
+				$date_str = trim($event) . ' ' . trim($_POST['ride_time']) . ':00';
+				$date = DateTime::createFromFormat('Y-m-d H:i:s', $date_str, $timezone);
+				if ($date === false) {
+					wp_die('Invalid date format.', 403);
+				}
+				$my_post = array(
+					'post_title'    => esc_html($title),
+					'post_type'     => PwtcMapdb::POST_TYPE_RIDE,
+                    			'post_status'   => 'publish',
+                    			'post_author'   => $current_user->ID
+				);
+				$newpostid = wp_insert_post($my_post);
+				if ($newpostid == 0) {
+					wp_die('Failed to create a new post.', 403);
+				}
+				update_field(PwtcMapdb::RIDE_DATE_KEY, $date->format('Y-m-d H:i:s'), $newpostid);
+				update_field(PwtcMapdb::RIDE_TYPE_KEY, $type, $newpostid);
+				update_field(PwtcMapdb::RIDE_PACE_KEY, $pace, $newpostid);
+				update_field(PwtcMapdb::RIDE_DESCRIPTION_KEY, $desc, $newpostid);
+				update_field(PwtcMapdb::RIDE_START_LOCATION_KEY, $location, $newpostid);
+				update_field(PwtcMapdb::RIDE_LEADERS_KEY, $leaders, $newpostid);
+				update_field(PwtcMapdb::RIDE_ATTACH_MAP_KEY, $attach, $newpostid);
+				update_field(PwtcMapdb::RIDE_MAPS_KEY, $maps, $newpostid);
+				update_field(PwtcMapdb::RIDE_TERRAIN_KEY, $terrain, $newpostid);
+				update_field(PwtcMapdb::RIDE_LENGTH_KEY, $length, $newpostid);
+				update_field(PwtcMapdb::RIDE_MAX_LENGTH_KEY, $max_length, $newpostid);
+			}
+
+			wp_redirect(add_query_arg(array(
+				'sort' => 'date',
+				'status' => 'publish'
+			), '/manage-scheduled-rides'), 303);
+			exit;
+		}
+
+		$return_link = '';
+		$return_to_page = '';
+		if (!empty($return) and $use_return) {
+			$return_link = esc_url($return);
+			$return_to_page = self::create_return_link($return_link);
+		}
+
+		if (!empty($post_check_error)) {
+			return $return_to_ride . $post_check_error;
+		}
+
+		if (!$is_road_captain) {
+			return $return_to_page . '<div class="callout small warning"><p>You must be a road captain to schedule ride templates.</p></div>';
+		}
+
+		$template_title = esc_html(get_the_title($postid));
+
+		$now_date = PwtcMapdb::get_current_time();
+		$min_date = $now_date->format('Y-m-d');
+		
 		ob_start();
 		include('schedule-ride-template-form.php');
 		return ob_get_clean();
@@ -1471,6 +1579,15 @@ EOT;
 
 	public static function edit_ride_link($postid, $return=false) {
 		$uri = self::EDIT_RIDE_URI;
+		$uri .= '?post=' . $postid;
+		if ($return) {
+			$uri .= '&return=' . urlencode($return);
+		}
+		return esc_url($uri);
+	}
+	
+	public static function schedule_template_link($postid, $return=false) {
+		$uri = '/schedule-ride-template';
 		$uri .= '?post=' . $postid;
 		if ($return) {
 			$uri .= '&return=' . urlencode($return);
