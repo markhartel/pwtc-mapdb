@@ -138,7 +138,7 @@
         $edit_link = self::edit_template_link($postid, $return_uri);
         $copy_link = self::copy_template_link($postid, $return_uri);
         $delete_link = self::delete_template_link($postid, $return_uri);
-        $sched_link = self::template_ride_link($postid, $return_uri);
+        $sched_link = self::schedule_template_link($postid, $return_uri);
     ?>
         <tr>
             <td><span>Ride Title</span><?php echo $title; ?></td>
