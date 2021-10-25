@@ -35,6 +35,7 @@
             $('#pwtc-mapdb-sched-template-div form').hide();
             $('#pwtc-mapdb-sched-template-div .schedule-dates-fst div').remove();
             $('#pwtc-mapdb-sched-template-div input[name="ride_time"]').val('');
+            $('#pwtc-mapdb-sched-template-div .indicate-error').removeClass('indicate-error');
             clear_submit_msg();
         }
 
@@ -112,8 +113,7 @@
         });
 
         $('#pwtc-mapdb-sched-template-div form').on('submit', function(evt) {
-            $('#pwtc-mapdb-sched-template-div input').removeClass('indicate-error');
-            $('#pwtc-mapdb-sched-template-div .schedule-dates-fst').removeClass('indicate-error');
+            $('#pwtc-mapdb-sched-template-div .indicate-error').removeClass('indicate-error');
 
             var dates_empty = $('#pwtc-mapdb-sched-template-div input[name="schedule_dates[]"]:checked').length == 0;
             if (dates_empty) {
@@ -159,12 +159,12 @@
 </script>
 <div id='pwtc-mapdb-sched-template-div'>
     <?php echo $return_to_page; ?>
-    <p>Schedule ride template "<?php echo $template_title; ?>"</p>
+    <p>Schedule rides based on ride template "<?php echo $template_title; ?>".</p>
     <div class="callout">
         <div class="row">
             <div class="small-12 medium-4 columns">
                 <fieldset>
-                    <legend>Repeat Every</legend>
+                    <legend>Repeat Ride Every</legend>
                     <input type="radio" name="repeat_every" value="week" id="repeat-every-week" checked><label for="repeat-every-week">Week</label>
                     <input type="radio" name="repeat_every" value="day" id="repeat-every-day"><label for="repeat-every-day">Day</label>
                 </fieldset>
@@ -173,13 +173,13 @@
                 <label>From Date
                     <input type="date" name="from_date" value="" min="<?php echo $min_date; ?>">
                 </label>
-                <p class="help-text">TBD...</p>
+                <p class="help-text">Choose a date from which to begin the set of rides.</p>
             </div>
             <div class="small-12 medium-4 columns">
                 <label>To Date
                     <input type="date" name="to_date" value="" disabled>
                 </label>
-                <p class="help-text">TBD...</p>
+                <p class="help-text">Choose a date to end the set of rides.</p>
             </div>
         </div>
         <div class="row column lookup-errmsg"></div>
@@ -188,9 +188,9 @@
             <div class="row">
                 <div class="small-12 medium-4 columns">
                     <fieldset class="schedule-dates-fst">
-                        <legend>Schedule These Dates</legend>
+                        <legend>Schedule Rides On These Dates</legend>
                     </fieldset>
-                    <p class="help-text">Uncheck a date to not schedule it.</p>
+                    <p class="help-text">Uncheck a date to NOT schedule a ride for it.</p>
                 </div>
             </div>
             <div class="row">
