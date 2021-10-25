@@ -169,7 +169,7 @@
             </div>
             <div class="small-12 medium-4 columns">
                 <label>From Date
-                    <input type="date" name="from_date" value="">
+                    <input type="date" name="from_date" value="" min="<?php echo $min_date; ?>">
                 </label>
                 <p class="help-text">TBD...</p>
             </div>
@@ -182,6 +182,7 @@
         </div>
         <div class="row column lookup-errmsg"></div>
         <form style="display:none" method="POST" novalidate>
+            <?php wp_nonce_field('schedule-template-form', 'nonce_field'); ?>
             <div class="row">
                 <div class="small-12 medium-4 columns">
                     <fieldset class="schedule-dates-fst">
