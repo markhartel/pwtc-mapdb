@@ -158,6 +158,8 @@
     });
 </script>
 <div id='pwtc-mapdb-sched-template-div'>
+    <?php echo $return_to_page; ?>
+    <p>Schedule ride template "<?php echo $template_title; ?>"</p>
     <div class="callout">
         <div class="row">
             <div class="small-12 medium-4 columns">
