@@ -635,10 +635,14 @@ class PwtcMapdb_Map {
 					}
 				}
 				if (wp_delete_post($postid, true)) {
-					wp_redirect(add_query_arg(array(
-						'post' => $postid,
-						'return' => urlencode($return)
-					), get_permalink()), 303);
+					if (!empty($return)) {
+						wp_redirect($return, 303);
+					}
+					else {
+						wp_redirect(add_query_arg(array(
+							'post' => $postid
+						), get_permalink()), 303);
+					}
 				}
 				else {
 					wp_die('Failed to delete this post.', 403);
