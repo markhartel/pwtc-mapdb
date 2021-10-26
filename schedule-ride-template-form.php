@@ -200,6 +200,20 @@
                     </label>
                     <p class="help-text">To set the time, enter hours then minutes then AM or PM. For example, "10:00 AM".</p>
                 </div>
+                <div class="small-12 medium-4 columns">
+                    <fieldset>
+                        <legend>Create As</legend>
+                        <input type="radio" name="create_as" value="publish" id="create-as-publish" checked><label for="create-as-publish">Published</label>
+                        <input type="radio" name="create_as" value="draft" id="create-as-draft"><label for="create-as-draft">Draft</label>
+                    </fieldset>
+                </div>
+                <div class="small-12 medium-4 columns">
+                    <fieldset>
+                        <legend>Return To</legend>
+                        <input type="radio" name="return_to" value="rides" id="return-to-rides" checked><label for="return-to-rides">Ride View</label>
+                        <input type="radio" name="return_to" value="previous" id="return-to-previous"><label for="return-to-previous">Previous Page</label>
+                    </fieldset>
+                </div>
             </div>
             <div class="row column errmsg"></div>
             <div class="row column clearfix">
