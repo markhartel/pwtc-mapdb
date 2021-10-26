@@ -1339,7 +1339,7 @@ class PwtcMapdb_Ride {
 			$return = $_GET['return'];
 		}
 
-		if (isset($_POST['ride_time']) and isset($_POST['schedule_dates'])) {
+		if (isset($_POST['ride_time']) and isset($_POST['schedule_dates']) and isset($_POST['create_as']) and isset($_POST['return_to'])) {
 			if (!isset($_POST['nonce_field']) or !wp_verify_nonce($_POST['nonce_field'], 'schedule-template-form')) {
 				wp_nonce_ays('');
 			}
@@ -1368,6 +1368,12 @@ class PwtcMapdb_Ride {
 			$length = get_field(PwtcMapdb::RIDE_LENGTH, $postid);
 			$max_length = get_field(PwtcMapdb::RIDE_MAX_LENGTH, $postid);
 
+			if ($_POST['create_as'] == 'draft') {
+				$newstatus = 'draft';
+			}
+			else {
+				$newstatus = 'publish';
+			}
 			$timezone = new DateTimeZone(pwtc_get_timezone_string());
 			foreach ($_POST['schedule_dates'] as $event) {
 				$date_str = trim($event) . ' ' . trim($_POST['ride_time']) . ':00';
@@ -1378,8 +1384,8 @@ class PwtcMapdb_Ride {
 				$my_post = array(
 					'post_title'    => esc_html($title),
 					'post_type'     => PwtcMapdb::POST_TYPE_RIDE,
-                    			'post_status'   => 'publish',
-                    			'post_author'   => $current_user->ID
+                    			'post_status'   => $newstatus,
+                   	 		'post_author'   => $current_user->ID
 				);
 				$newpostid = wp_insert_post($my_post);
 				if ($newpostid == 0) {
@@ -1398,13 +1404,23 @@ class PwtcMapdb_Ride {
 				update_field(PwtcMapdb::RIDE_MAX_LENGTH_KEY, $max_length, $newpostid);
 			}
 
-			wp_redirect(add_query_arg(array(
-				'sort' => 'date',
-				'status' => 'publish'
-			), '/manage-scheduled-rides'), 303);
+			if ($_POST['return_to'] == 'rides') {
+				wp_redirect(add_query_arg(array(
+					'sort' => 'date',
+					'status' => 'mine'
+				), '/manage-scheduled-rides'), 303);
+			}
+			else if (!empty($return)) {
+				wp_redirect($return, 303);
+			}
+			else {
+				wp_redirect(add_query_arg(array(
+					'post' => $postid
+				), get_permalink()), 303);				
+			}
 			exit;
 		}
-
+		
 		$return_link = '';
 		$return_to_page = '';
 		if (!empty($return) and $use_return) {
