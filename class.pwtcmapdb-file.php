@@ -212,10 +212,14 @@ class PwtcMapdb_File {
                 		wp_die('Failed to delete the upload file', 403);
             		}	
 
-            		wp_redirect(add_query_arg(array(
-                		'post' => $attach_id,
-                		'return' => urlencode($return)
-            		), get_permalink()), 303);
+			if (!empty($return)) {
+				wp_redirect($return, 303);
+			}
+			else {
+            			wp_redirect(add_query_arg(array(
+                			'post' => $attach_id
+            			), get_permalink()), 303);
+			}
             		exit;
         	}
 
