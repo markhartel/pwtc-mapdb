@@ -1320,13 +1320,12 @@ class PwtcMapdb_Ride {
 		$a = shortcode_atts(array('use_return' => 'no'), $atts);
 		$use_return = $a['use_return'] == 'yes';
 
+		$is_road_captain = false;
 		$current_user = wp_get_current_user();
-		if ( 0 == $current_user->ID ) {
-			return '<div class="callout small alert"><p>You must be logged in to schedule ride templates.</p></div>';
-		}
 		$user_info = get_userdata($current_user->ID);
-
-		$is_road_captain = in_array(PwtcMapdb::ROLE_ROAD_CAPTAIN, $user_info->roles);
+		if ($user_info) {
+			$is_road_captain = in_array(PwtcMapdb::ROLE_ROAD_CAPTAIN, $user_info->roles);
+		}
 
 		$postid = 0;
 		$post_check_error = self::check_post_id(true);
@@ -1429,7 +1428,11 @@ class PwtcMapdb_Ride {
 		}
 
 		if (!empty($post_check_error)) {
-			return $return_to_ride . $post_check_error;
+			return $return_to_page . $post_check_error;
+		}
+		
+		if ( 0 == $current_user->ID ) {
+			return $return_to_page . '<div class="callout small alert"><p>You must be logged in to schedule ride templates.</p></div>';
 		}
 
 		if (!$is_road_captain) {
