@@ -1086,6 +1086,10 @@ class PwtcMapdb_Map {
 			else {
 				$offset = 0;
 			}
+			$select = 0;
+			if (isset($_POST['select'])) {
+				$select = intval($_POST['select']);
+			}
 			
 			if ($offset == 0 and isset($_POST['author'])) {
 				$maps = self::fetch_pending_maps(intval($_POST['author']));
@@ -1131,6 +1135,12 @@ class PwtcMapdb_Map {
 			);
 			if ($is_more) {
 				$response['more'] = 1;
+			}
+			if ($select > 0 and $offset == 0 and $num_pending == 0 and count($maps) == 1) {
+				$response['select'] = 1;
+			}
+			if (isset($_POST['count'])) {
+				$response['count'] = intval($_POST['count']);
 			}
 			echo wp_json_encode($response);
 		}
