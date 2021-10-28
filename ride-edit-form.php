@@ -87,6 +87,10 @@
 	var leaderTimeoutID = 0;
         var leaderSentCount = 0;
         var leaderRecvCount = 0;
+	    
+	var mapTimeoutID = 0;
+        var mapSentCount = 0;
+        var mapRecvCount = 0;
 
         function decodeHtml(html) {
             return $('<div/>').html(html).text();
@@ -203,9 +207,30 @@
                 }
             }
         }
+	    
+	function remove_map_event(evt) {
+            is_dirty = true;
+            $(this).parent().remove();
+            $('#pwtc-mapdb-edit-ride-div .map-search-div').hide();
+            evt.stopPropagation();
+        }
+
+        function add_map_event(evt) {
+            var mapid = $(this).attr('mapid');
+            if (!has_map_id(mapid)) {
+                var title = $(this).find('td').first().html();
+                is_dirty = true;
+                $('#pwtc-mapdb-edit-ride-div .maps-div').removeClass('indicate-error');
+                $('#pwtc-mapdb-edit-ride-div .maps-div input').before('<div mapid="' + mapid + '"><i class="fa fa-times"></i> ' + title + '</div>');
+                $('#pwtc-mapdb-edit-ride-div .maps-div div[mapid="' + mapid + '"] .fa-times').on('click', remove_map_event);
+                $('#pwtc-mapdb-edit-ride-div .maps-div div[mapid="' + mapid + '"] a').on('click', function(evt) {
+                    evt.stopPropagation();
+                });
+            }
+            $('#pwtc-mapdb-edit-ride-div .map-search-div').hide();
+        }
 
         function maps_lookup_cb(response) {
-            $('#pwtc-mapdb-edit-ride-div .map-search-div').removeAttr('offset');
             var res;
             try {
                 res = JSON.parse(response);
@@ -216,9 +241,18 @@
             }
             if (res.error) {
                 $('#pwtc-mapdb-edit-ride-div .map-search-div').html('<div class="callout small alert"><p>' + res.error + '</p></div>');
+                return;
             }
-            else if (res.maps.length == 0 && res.offset == 0) {
-                $('#pwtc-mapdb-edit-ride-div .map-search-div').html('<div class="callout small warning"><p>No maps found</p></div>');
+            if (res.count !== undefined) {
+                if (res.count < mapRecvCount) {
+                    //console.log('response ' + res.count + ' discarded!');
+                    return;
+                }
+                mapRecvCount = res.count;
+            }
+            $('#pwtc-mapdb-edit-ride-div .map-search-div').removeAttr('offset');
+            if (res.maps.length == 0 && res.offset == 0) {
+                $('#pwtc-mapdb-edit-ride-div .map-search-div').empty();
             }
             else {
                 if (res.offset == 0) {
@@ -227,6 +261,9 @@
                         $('#pwtc-mapdb-edit-ride-div .map-search-div').append('<div class="callout small warning">The first ' + res.pending + ' maps (submitted by the ride&#39;s author) are pending review.</div>');
                     }
                     $('#pwtc-mapdb-edit-ride-div .map-search-div').append('<table></table>');
+                }
+                else {
+                    $('#pwtc-mapdb-edit-ride-div .map-search-div tr td .fa-spinner').parent().parent().remove();
                 }
                 res.maps.forEach(function(item) {
                     var a = '';
@@ -245,37 +282,23 @@
                     }
                     $('#pwtc-mapdb-edit-ride-div .map-search-div table').append(
                         '<tr mapid="' + item.ID + '" ' + pending + '><td>' + item.title + a + '</td><td>' + item.distance + '</td><td>' + item.terrain + '</td></tr>');  
+                    $('#pwtc-mapdb-edit-ride-div .map-search-div table tr[mapid="' + item.ID + '"]').on('click', add_map_event); 
+                    $('#pwtc-mapdb-edit-ride-div .map-search-div table tr[mapid="' + item.ID + '"] a').on('click', function(evt) {
+                        evt.stopPropagation();
+                    }); 
                 });
                 if (res.more !== undefined) {
                     $('#pwtc-mapdb-edit-ride-div .map-search-div').attr('offset', res.offset+10);
                 }
-                $('#pwtc-mapdb-edit-ride-div .map-search-div tr a').on('click', function(evt) {
-                    evt.stopPropagation();
-                });
-                $('#pwtc-mapdb-edit-ride-div .map-search-div tr').on('click', function(evt) {
-                    var mapid = $(this).attr('mapid');
-                    if (!has_map_id(mapid)) {
-                        var title = $(this).find('td').first().html();
-                        is_dirty = true;
-			$('#pwtc-mapdb-edit-ride-div .maps-div').removeClass('indicate-error');
-                        $('#pwtc-mapdb-edit-ride-div .maps-div input').before('<div mapid="' + mapid + '"><i class="fa fa-times"></i> ' + title + '</div>');
-                        $('#pwtc-mapdb-edit-ride-div .maps-div div[mapid="' + mapid + '"] .fa-times').on('click', function(evt) {
-                            $(this).parent().remove();
-                            $('#pwtc-mapdb-edit-ride-div .map-search-div').hide();
-                            $('#pwtc-mapdb-edit-ride-div input[name="map-pattern"]').val('');
-                            evt.stopPropagation();
-                        });
-                        $('#pwtc-mapdb-edit-ride-div .maps-div div[mapid="' + mapid + '"] a').on('click', function(evt) {
-                            evt.stopPropagation();
-                        });
-                    }
-                    $('#pwtc-mapdb-edit-ride-div .map-search-div').hide();
-                    $('#pwtc-mapdb-edit-ride-div input[name="map-pattern"]').val('');
-                });
+                if (res.select !== undefined) {
+                    $('#pwtc-mapdb-edit-ride-div input[name="map-pattern"]').blur();
+                    $('#pwtc-mapdb-edit-ride-div .map-search-div table tr:first-child').trigger( 'click');
+                }
             }
         }
         
-        function fetch_route_maps(offset) {
+        function fetch_route_maps(offset, select) {
+            mapSentCount++;
             var searchstr = $('#pwtc-mapdb-edit-ride-div input[name="map-pattern"]').val();
             var action = "<?php echo admin_url('admin-ajax.php'); ?>";
             var data = {
@@ -285,11 +308,16 @@
     <?php if ($show_submitted_maps) { ?>
                 'author': <?php echo $author; ?>,
     <?php } ?>
-                'offset': offset
+                'offset': offset,
+                'select': select,
+                'count': mapSentCount
             };
             $.post(action, data, maps_lookup_cb);
             if (offset == 0) {
-                $('#pwtc-mapdb-edit-ride-div .map-search-div').html('<div class="callout small"><i class="fa fa-spinner fa-pulse"></i> please wait...</div>');
+                $('#pwtc-mapdb-edit-ride-div .map-search-div').html('<div class="callout small"><i class="fa fa-spinner fa-pulse"></i> searching...</div>');
+            }
+            else {
+                $('#pwtc-mapdb-edit-ride-div .map-search-div table').append('<tr><td><i class="fa fa-spinner fa-pulse"></i></td><td></td><td></td></tr>');
             }
         }
 
@@ -390,14 +418,45 @@
 
     <?php } ?>
         
-        $('#pwtc-mapdb-edit-ride-div input[name="map-pattern"]').on('input', function() {
-            fetch_route_maps(0);
-            $('#pwtc-mapdb-edit-ride-div .map-search-div').show();
+        $(document).on('focusin', function(evt) {
+            //console.log('focusin detected on document');
+            if (evt.fromMapEdit === undefined) {
+                $('#pwtc-mapdb-edit-ride-div .map-search-div').hide();
+            }
+        });
+
+        $('#pwtc-mapdb-edit-ride-div .maps-div').on('focusin', function(evt) {
+            //console.log('focusin detected on map-div');
+            evt.fromMapEdit = 1;
+        });
+
+        $('#pwtc-mapdb-edit-ride-div .map-search-div').on('focusin', function(evt) {
+            //console.log('focusin detected on map-search-div');
+            evt.fromMapEdit = 1;
+        });
+
+        $('#pwtc-mapdb-edit-ride-div input[name="map-pattern"]').on('focus', function() {
+            var interval = 500;
+            function callback(lastval) {
+                var val = $('#pwtc-mapdb-edit-ride-div input[name="map-pattern"]').val();
+                //console.log('callback: val=' + val + ', lastval=' + lastval);
+                if (val != lastval) {
+                    fetch_route_maps(0, 0);
+                    $('#pwtc-mapdb-edit-ride-div .map-search-div').show();
+                }
+                mapTimeoutID = setTimeout(callback, interval, val);
+            };
+            mapTimeoutID = setTimeout(callback, interval, $(this).val());
+        });  
+
+        $('#pwtc-mapdb-edit-ride-div input[name="map-pattern"]').on('blur', function(evt) {
+            clearTimeout(mapTimeoutID);
+            $('#pwtc-mapdb-edit-ride-div input[name="map-pattern"]').val('');
         });
 
         $('#pwtc-mapdb-edit-ride-div input[name="map-pattern"]').on('click', function(evt) {
             if ($('#pwtc-mapdb-edit-ride-div .map-search-div').is(':hidden')) {
-                fetch_route_maps(0);
+                fetch_route_maps(0, 0);
                 $('#pwtc-mapdb-edit-ride-div .map-search-div').show();
             }
             evt.stopPropagation();		
@@ -406,29 +465,20 @@
         $('#pwtc-mapdb-edit-ride-div input[name="map-pattern"]').on('keypress', function(evt) {
             var keyPressed = evt.keyCode || evt.which; 
             if (keyPressed === 13) { 
-                $('#pwtc-mapdb-edit-ride-div .map-search-div table tr:first-child').trigger( 'click');
+                fetch_route_maps(0, 1);
+                $('#pwtc-mapdb-edit-ride-div .map-search-div').show();
             } 
         });	
 
         $('#pwtc-mapdb-edit-ride-div .maps-div').on('click', function(evt) { 
             if ($('#pwtc-mapdb-edit-ride-div .map-search-div').is(':hidden')) {
-                fetch_route_maps(0);
+                fetch_route_maps(0, 0);
                 $('#pwtc-mapdb-edit-ride-div .map-search-div').show();
-                $('#pwtc-mapdb-edit-ride-div input[name="map-pattern"]').focus();
             }
-            else {
-                $('#pwtc-mapdb-edit-ride-div .map-search-div').hide();
-                $('#pwtc-mapdb-edit-ride-div input[name="map-pattern"]').val('');
-            }
+            $('#pwtc-mapdb-edit-ride-div input[name="map-pattern"]').focus();
         }); 
 
-        $('#pwtc-mapdb-edit-ride-div .maps-div .fa-times').on('click', function(evt) {
-            is_dirty = true;
-            $(this).parent().remove();
-            $('#pwtc-mapdb-edit-ride-div .map-search-div').hide();
-            $('#pwtc-mapdb-edit-ride-div input[name="map-pattern"]').val('');
-            evt.stopPropagation();
-        }); 
+        $('#pwtc-mapdb-edit-ride-div .maps-div .fa-times').on('click', remove_map_event); 
 
         $('#pwtc-mapdb-edit-ride-div .maps-div a').on('click', function(evt) {
             evt.stopPropagation();
@@ -438,7 +488,7 @@
             if ($(this).scrollTop() + $(this).innerHeight() >= $(this)[0].scrollHeight) {
                 var offset = $(this).attr('offset');
                 if (offset) {
-                    fetch_route_maps(parseInt(offset, 10));
+                    fetch_route_maps(parseInt(offset, 10), 0);
                     $(this).removeAttr('offset');
                 }
             }
