@@ -30,13 +30,14 @@ class PwtcMapdb_File {
 		$a = shortcode_atts(array('use_return' => 'no'), $atts);
         	$use_return = $a['use_return'] == 'yes';
 
+		$is_road_captain = false;
+		$is_ride_leader = false;
         	$current_user = wp_get_current_user();
-		if ( 0 == $current_user->ID ) {
-			return '<div class="callout small alert"><p>You must be logged in to upload files.</p></div>';
-		}
 		$user_info = get_userdata($current_user->ID);
-		$is_road_captain = in_array(PwtcMapdb::ROLE_ROAD_CAPTAIN, $user_info->roles);
-		$is_ride_leader = in_array(PwtcMapdb::ROLE_RIDE_LEADER, $user_info->roles);
+		if ($user_info) {
+			$is_road_captain = in_array(PwtcMapdb::ROLE_ROAD_CAPTAIN, $user_info->roles);
+			$is_ride_leader = in_array(PwtcMapdb::ROLE_RIDE_LEADER, $user_info->roles);
+		}
 
         	$return = '';
 		if (isset($_GET['return'])) {
@@ -46,6 +47,10 @@ class PwtcMapdb_File {
         	if (isset($_POST['attach_id']) and isset($_POST['title'])) {
 			if (!isset($_POST['nonce_field']) or !wp_verify_nonce($_POST['nonce_field'], 'file-upload-form')) {
 				wp_nonce_ays('');
+			}
+			
+			if (!$is_road_captain) {
+				wp_die('Authorization failed.', 403);
 			}
 
 			$attach_id = intval($_POST['attach_id']); 
@@ -158,6 +163,10 @@ class PwtcMapdb_File {
 		else {
 			$attach_id = 0;
 		}
+		
+		if (0 == $current_user->ID) {
+			return $return_to_page . '<div class="callout small warning"><p>You must be logged in to upload files.</p></div>';
+		}
 
         	if (!$is_road_captain) {
 			return $return_to_page . '<div class="callout small warning"><p>You are not allowed to upload files.</p></div>';
@@ -188,13 +197,14 @@ class PwtcMapdb_File {
 		$a = shortcode_atts(array('use_return' => 'no'), $atts);
 		$use_return = $a['use_return'] == 'yes';
 
+		$is_ride_leader = false;
+		$is_road_captain = false;
 		$current_user = wp_get_current_user();
-		if ( 0 == $current_user->ID ) {
-			return '<div class="callout small alert"><p>You must be logged in to delete upload files.</p></div>';
-		}
 		$user_info = get_userdata($current_user->ID);
-		$is_ride_leader = in_array(PwtcMapdb::ROLE_RIDE_LEADER, $user_info->roles);
-		$is_road_captain = in_array(PwtcMapdb::ROLE_ROAD_CAPTAIN, $user_info->roles);
+		if ($user_info) {
+			$is_ride_leader = in_array(PwtcMapdb::ROLE_RIDE_LEADER, $user_info->roles);
+			$is_road_captain = in_array(PwtcMapdb::ROLE_ROAD_CAPTAIN, $user_info->roles);
+		}
 
 		$return = '';
 		if (isset($_GET['return'])) {
@@ -204,6 +214,10 @@ class PwtcMapdb_File {
 		if (isset($_POST['attach_id'])) {
 			if (!isset($_POST['nonce_field']) or !wp_verify_nonce($_POST['nonce_field'], 'file-delete-form')) {
 				wp_nonce_ays('');
+			}
+			
+			if (!$is_road_captain) {
+				wp_die('Authorization failed.', 403);
 			}
 
             		$attach_id = intval($_POST['attach_id']);
@@ -236,6 +250,10 @@ class PwtcMapdb_File {
         	}
         	$attach_id = intval($_GET['post']);
 
+		if (0 == $current_user->ID) {
+			return $return_to_page . '<div class="callout small warning"><p>You must be logged in to delete upload files.</p></div>';
+		}
+		
         	if (!$is_road_captain) {
 			return $return_to_page . '<div class="callout small warning"><p>You are not allowed to delete upload files.</p></div>';
 		}
@@ -254,13 +272,20 @@ class PwtcMapdb_File {
 		$limit = intval($a['limit']);
 		$search_open = $a['search'] == 'open';
 
+		$is_ride_leader = false;
+		$is_road_captain = false;
 		$current_user = wp_get_current_user();
-
-		if ( 0 == $current_user->ID ) {
-			return '<div class="callout small warning"><p>Please <a href="/wp-login.php">log in</a> to view the uploaded files.</p></div>';
+		$user_info = get_userdata($current_user->ID);
+		if ($user_info) {
+			$is_ride_leader = in_array(PwtcMapdb::ROLE_RIDE_LEADER, $user_info->roles);
+			$is_road_captain = in_array(PwtcMapdb::ROLE_ROAD_CAPTAIN, $user_info->roles);
 		}
 
 		if (isset($_POST['file_title']) and isset($_POST['offset'])) {
+			if (!$is_road_captain) {
+				wp_die('Authorization failed.', 403);
+			}
+			
 			$sort_by = 'title';
 			if (isset($_POST['sort_by'])) {
 				$sort_by = $_POST['sort_by'];
@@ -273,9 +298,9 @@ class PwtcMapdb_File {
 			exit;
 		}
 
-		$user_info = get_userdata($current_user->ID);
-		$is_ride_leader = in_array(PwtcMapdb::ROLE_RIDE_LEADER, $user_info->roles);
-		$is_road_captain = in_array(PwtcMapdb::ROLE_ROAD_CAPTAIN, $user_info->roles);
+		if (0 == $current_user->ID) {
+			return '<div class="callout small warning"><p>You must be logged in to manage upload files.</p></div>';
+		}
 
         	if (!$is_road_captain) {
 			return '<div class="callout small warning"><p>You are not allowed to manage upload files.</p></div>';
