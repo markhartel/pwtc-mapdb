@@ -1348,7 +1348,7 @@ class PwtcMapdb_Ride {
 			}
 
 			if (!$is_road_captain) {
-				wp_die('Invalid access rights.', 403);
+				wp_die('Authorization failed.', 403);
 			}
 
 			$post = get_post($postid);
