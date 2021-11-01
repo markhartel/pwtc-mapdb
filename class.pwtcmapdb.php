@@ -183,14 +183,14 @@ class PwtcMapdb {
 		}
 
 		$current_user = wp_get_current_user();
-		if ( 0 == $current_user->ID ) {
-			return '<div class="callout small warning"><p>You must be logged in edit your ride leader contact information.</p></div>';
-		}
 		$userid = $current_user->ID;
 
 		if (isset($_POST['use_contact_email']) and isset($_POST['contact_email']) and isset($_POST['voice_phone']) and isset($_POST['text_phone'])) {
 			if (!isset($_POST['nonce_field']) or !wp_verify_nonce($_POST['nonce_field'], 'leader-contact-form')) {
 				wp_nonce_ays('');
+			}
+			if (0 == $current_user->ID) {
+				wp_die('Authorization failed.', 403);
 			}
 			if ($_POST['use_contact_email'] == 'yes') {
 				update_field(self::USER_USE_EMAIL, true, 'user_'.$userid);
@@ -204,6 +204,10 @@ class PwtcMapdb {
 
 			wp_redirect(get_permalink(), 303);
 			exit;
+		}
+		
+		if (0 == $current_user->ID) {
+			return '<div class="callout small warning"><p>You must be logged in edit your ride leader contact information.</p></div>';
 		}
 
 		$user_info = get_userdata($userid);
@@ -229,20 +233,24 @@ class PwtcMapdb {
 		}
 
 		$current_user = wp_get_current_user();
-		if ( 0 == $current_user->ID ) {
-			return '<div class="callout small warning"><p>You must be logged in edit your emergency contact information.</p></div>';
-		}
 		$userid = $current_user->ID;
 
 		if (isset($_POST['contact_phone']) and isset($_POST['contact_name'])) {
 			if (!isset($_POST['nonce_field']) or !wp_verify_nonce($_POST['nonce_field'], 'alert-contact-form')) {
 				wp_nonce_ays('');
 			}
+			if (0 == $current_user->ID) {
+				wp_die('Authorization failed.', 403);
+			}
 			update_field(self::USER_EMER_PHONE, pwtc_members_format_phone_number($_POST['contact_phone']), 'user_'.$userid);
 			update_field(self::USER_EMER_NAME, sanitize_text_field($_POST['contact_name']), 'user_'.$userid);
 
 			wp_redirect(get_permalink(), 303);
 			exit;
+		}
+		
+		if (0 == $current_user->ID) {
+			return '<div class="callout small warning"><p>You must be logged in edit your emergency contact information.</p></div>';
 		}
 
 		$contact_phone = pwtc_members_format_phone_number(get_field(self::USER_EMER_PHONE, 'user_'.$userid));
@@ -264,17 +272,21 @@ class PwtcMapdb {
 		}
 
 		$current_user = wp_get_current_user();
-		if ( 0 == $current_user->ID ) {
-			return '<div class="callout small warning"><p>You must be logged in to search rider contact information.</p></div>';
-		}
 		
 		if (isset($_POST['rider_name']) and isset($_POST['rider_id']) and isset($_POST['offset'])) {
+			if (0 == $current_user->ID) {
+				wp_die('Authorization failed.', 403);
+			}
 			wp_redirect(add_query_arg(array(
 				'rider' => urlencode(trim($_POST['rider_name'])),
 				'riderid' => urlencode(trim($_POST['rider_id'])),
 				'offset' => intval($_POST['offset'])
 			), get_permalink()), 303);
 			exit;
+		}
+		
+		if (0 == $current_user->ID) {
+			return '<div class="callout small warning"><p>You must be logged in to search rider contact information.</p></div>';
 		}
 		
 		$userid = $current_user->ID;
