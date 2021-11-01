@@ -126,15 +126,14 @@ class PwtcMapdb_Map {
 		$allow_email = $a['email'] == 'yes';
 		$captain_email = $a['captain'];
 
+		$is_ride_leader = false;
+		$is_road_captain = false;
 		$current_user = wp_get_current_user();
-		if ( 0 == $current_user->ID ) {
-			return '<div class="callout small alert"><p>You must be logged in to submit route maps.</p></div>';
-		}
 		$user_info = get_userdata($current_user->ID);
-		
-		$is_road_captain = in_array(PwtcMapdb::ROLE_ROAD_CAPTAIN, $user_info->roles);
-
-		$is_ride_leader = in_array(PwtcMapdb::ROLE_RIDE_LEADER, $user_info->roles);
+		if ($user_info) {
+			$is_road_captain = in_array(PwtcMapdb::ROLE_ROAD_CAPTAIN, $user_info->roles);
+			$is_ride_leader = in_array(PwtcMapdb::ROLE_RIDE_LEADER, $user_info->roles);
+		}
 
 		$return = '';
 		if (isset($_GET['return'])) {
@@ -144,6 +143,10 @@ class PwtcMapdb_Map {
 		if (isset($_POST['postid']) and isset($_POST['revert'])) {
 			if (!isset($_POST['nonce_field']) or !wp_verify_nonce($_POST['nonce_field'], 'map-edit-form')) {
 				wp_nonce_ays('');
+			}
+			
+			if (!$is_road_captain and !$is_ride_leader) {
+				wp_die('Authorization failed.', 403);
 			}
 
 			$postid = intval($_POST['postid']);
@@ -180,6 +183,10 @@ class PwtcMapdb_Map {
 		else if (isset($_POST['postid']) and isset($_POST['title']) and $current_user->ID != 0) {
 			if (!isset($_POST['nonce_field']) or !wp_verify_nonce($_POST['nonce_field'], 'map-edit-form')) {
 				wp_nonce_ays('');
+			}
+			
+			if (!$is_road_captain and !$is_ride_leader) {
+				wp_die('Authorization failed.', 403);
 			}
 
 			$operation = '';
@@ -444,6 +451,10 @@ class PwtcMapdb_Map {
 		else {
 			$postid = 0;
 		}
+		
+		if (0 == $current_user->ID) {
+			return $return_to_map . '<div class="callout small alert"><p>You must be logged in to submit route maps.</p></div>';
+		}
 
         	if ($postid != 0) {
 			$post = get_post($postid);
@@ -592,15 +603,14 @@ class PwtcMapdb_Map {
 		$allow_leaders = $a['leaders'] == 'yes';
 		$use_return = $a['use_return'] == 'yes';
 
+		$is_ride_leader = false;
+		$is_road_captain = false;
 		$current_user = wp_get_current_user();
-		if ( 0 == $current_user->ID ) {
-			return '<div class="callout small alert"><p>You must be logged in to delete route maps.</p></div>';
-		}
 		$user_info = get_userdata($current_user->ID);
-		
-		$is_road_captain = in_array(PwtcMapdb::ROLE_ROAD_CAPTAIN, $user_info->roles);
-		
-		$is_ride_leader = in_array(PwtcMapdb::ROLE_RIDE_LEADER, $user_info->roles);
+		if ($user_info) {
+			$is_road_captain = in_array(PwtcMapdb::ROLE_ROAD_CAPTAIN, $user_info->roles);
+			$is_ride_leader = in_array(PwtcMapdb::ROLE_RIDE_LEADER, $user_info->roles);
+		}
 
 		$return = '';
 		if (isset($_GET['return'])) {
@@ -610,6 +620,10 @@ class PwtcMapdb_Map {
 		if (isset($_POST['postid'])) {
 			if (!isset($_POST['nonce_field']) or !wp_verify_nonce($_POST['nonce_field'], 'map-delete-form')) {
 				wp_nonce_ays('');
+			}
+			
+			if (!$is_road_captain and !$is_ride_leader) {
+				wp_die('Authorization failed.', 403);
 			}
 
 			$postid = intval($_POST['postid']);
@@ -674,6 +688,10 @@ class PwtcMapdb_Map {
 			return $return_to_map . $error;
 		}
 		$postid = intval($_GET['post']);
+		
+		if (0 == $current_user->ID) {
+			return $return_to_map . '<div class="callout small alert"><p>You must be logged in to delete route maps.</p></div>';
+		}
 
 		$map_title = esc_html(get_the_title($postid));
 
@@ -862,11 +880,11 @@ class PwtcMapdb_Map {
 
 		$current_user = wp_get_current_user();
 
-		if ( 0 == $current_user->ID ) {
-			return '<div class="callout small warning"><p>Please <a href="/wp-login.php">log in</a> to view the published route maps.</p></div>';
-		}
-
 		if (isset($_POST['map_title']) and isset($_POST['map_distance']) and isset($_POST['map_terrain']) and isset($_POST['offset'])) {
+			if (0 == $current_user->ID) {
+				wp_die('Authorization failed.', 403);
+			}
+			
 			$map_status = 'publish';
 			if (isset($_POST['map_status'])) {
 				$map_status = $_POST['map_status'];
@@ -884,6 +902,10 @@ class PwtcMapdb_Map {
 				'offset' => intval($_POST['offset'])
 			), get_permalink()), 303);
 			exit;
+		}
+		
+		if (0 == $current_user->ID) {
+			return '<div class="callout small warning"><p>You must be logged in to view the published route maps.</p></div>';
 		}
 
 		$user_info = get_userdata($current_user->ID);
