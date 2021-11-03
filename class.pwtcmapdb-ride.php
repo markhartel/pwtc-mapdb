@@ -131,15 +131,14 @@ class PwtcMapdb_Ride {
 		$set_coords = $a['coords'] == 'yes';
 		$captain_email = $a['captain'];
 		
+		$is_ride_leader = false;
+		$is_road_captain = false;
 		$current_user = wp_get_current_user();
-		if ( 0 == $current_user->ID ) {
-			return '<div class="callout small alert"><p>You must be logged in to submit rides or ride templates.</p></div>';
-		}
 		$user_info = get_userdata($current_user->ID);
-		
-		$is_road_captain = in_array(PwtcMapdb::ROLE_ROAD_CAPTAIN, $user_info->roles);
-
-		$is_ride_leader = in_array(PwtcMapdb::ROLE_RIDE_LEADER, $user_info->roles);
+		if ($user_info) {
+			$is_road_captain = in_array(PwtcMapdb::ROLE_ROAD_CAPTAIN, $user_info->roles);
+			$is_ride_leader = in_array(PwtcMapdb::ROLE_RIDE_LEADER, $user_info->roles);
+		}
 
 		$return = '';
 		if (isset($_GET['return'])) {
@@ -149,6 +148,10 @@ class PwtcMapdb_Ride {
 		if (isset($_POST['postid']) and isset($_POST['revert'])) {
 			if (!isset($_POST['nonce_field']) or !wp_verify_nonce($_POST['nonce_field'], 'ride-edit-form')) {
 				wp_nonce_ays('');
+			}
+			
+			if (!$is_road_captain and !$is_ride_leader) {
+				wp_die('Authorization failed.', 403);
 			}
 
 			$postid = intval($_POST['postid']);
@@ -185,6 +188,10 @@ class PwtcMapdb_Ride {
 		else if (isset($_POST['postid']) and isset($_POST['title']) and $current_user->ID != 0) {
 			if (!isset($_POST['nonce_field']) or !wp_verify_nonce($_POST['nonce_field'], 'ride-edit-form')) {
 				wp_nonce_ays('');
+			}
+			
+			if (!$is_road_captain and !$is_ride_leader) {
+				wp_die('Authorization failed.', 403);
 			}
 			
 			$operation = '';
@@ -458,6 +465,10 @@ class PwtcMapdb_Ride {
 		}
 		else {
 			$postid = 0;
+		}
+		
+		if (0 == $current_user->ID) {
+			return $return_to_ride . '<div class="callout small alert"><p>You must be logged in to submit rides or ride templates.</p></div>';
 		}
 
 		$now_date = PwtcMapdb::get_current_time();
@@ -765,16 +776,15 @@ class PwtcMapdb_Ride {
 		$use_return = $a['use_return'] == 'yes';
 		$is_template = $a['template'] == 'yes';
 
+		$is_ride_leader = false;
+		$is_road_captain = false;
 		$current_user = wp_get_current_user();
-		if ( 0 == $current_user->ID ) {
-			return '<div class="callout small alert"><p>You must be logged in to delete rides or ride templates.</p></div>';
-		}
 		$user_info = get_userdata($current_user->ID);
+		if ($user_info) {
+			$is_road_captain = in_array(PwtcMapdb::ROLE_ROAD_CAPTAIN, $user_info->roles);
+			$is_ride_leader = in_array(PwtcMapdb::ROLE_RIDE_LEADER, $user_info->roles);
+		}
 		
-		$is_road_captain = in_array(PwtcMapdb::ROLE_ROAD_CAPTAIN, $user_info->roles);
-
-		$is_ride_leader = in_array(PwtcMapdb::ROLE_RIDE_LEADER, $user_info->roles);
-
 		$return = '';
 		if (isset($_GET['return'])) {
 			$return = $_GET['return'];
@@ -783,6 +793,10 @@ class PwtcMapdb_Ride {
 		if (isset($_POST['postid'])) {
 			if (!isset($_POST['nonce_field']) or !wp_verify_nonce($_POST['nonce_field'], 'ride-delete-form')) {
 				wp_nonce_ays('');
+			}
+			
+			if (!$is_road_captain and !$is_ride_leader) {
+				wp_die('Authorization failed.', 403);
 			}
 			
 			$postid = intval($_POST['postid']);
@@ -823,6 +837,10 @@ class PwtcMapdb_Ride {
 			return $return_to_ride . $error;
 		}
 		$postid = intval($_GET['post']);
+		
+		if (0 == $current_user->ID) {
+			return $return_to_ride . '<div class="callout small alert"><p>You must be logged in to delete rides or ride templates.</p></div>';
+		}
 
 		$ride_title = esc_html(get_the_title($postid));
 
@@ -978,12 +996,12 @@ class PwtcMapdb_Ride {
 		$search_open = $a['search'] == 'open';
 
 		$current_user = wp_get_current_user();
-		
-		if ( 0 == $current_user->ID ) {
-			return '<div class="callout small warning"><p>Please <a href="/wp-login.php">log in</a> to view the scheduled rides.</p></div>';
-		}
 
 		if (isset($_POST['ride_title']) and isset($_POST['ride_leader']) and isset($_POST['ride_month']) and isset($_POST['offset'])) {
+			if (0 == $current_user->ID) {
+				wp_die('Authorization failed.', 403);
+			}
+
 			$ride_status = 'publish';
 			if (isset($_POST['ride_status'])) {
 				$ride_status = $_POST['ride_status'];
@@ -1001,6 +1019,10 @@ class PwtcMapdb_Ride {
 				'offset' => intval($_POST['offset'])
 			), get_permalink()), 303);
 			exit;
+		}
+		
+		if (0 == $current_user->ID) {
+			return '<div class="callout small warning"><p>You must be logged in to view the published rides.</p></div>';
 		}
 		
 		$user_info = get_userdata($current_user->ID);
@@ -1154,12 +1176,12 @@ class PwtcMapdb_Ride {
 		$search_open = $a['search'] == 'open';
 		
 		$current_user = wp_get_current_user();
-		
-		if ( 0 == $current_user->ID ) {
-			return '<div class="callout small warning"><p>Please <a href="/wp-login.php">log in</a> to view the ride templates.</p></div>';
-		}
 
 		if (isset($_POST['ride_title']) and isset($_POST['ride_leader']) and isset($_POST['offset'])) {
+			if (0 == $current_user->ID) {
+				wp_die('Authorization failed.', 403);
+			}
+			
 			$ride_status = 'publish';
 			if (isset($_POST['ride_status'])) {
 				$ride_status = $_POST['ride_status'];
@@ -1176,6 +1198,10 @@ class PwtcMapdb_Ride {
 				'offset' => intval($_POST['offset'])
 			), get_permalink()), 303);
 			exit;
+		}
+		
+		if (0 == $current_user->ID) {
+			return '<div class="callout small warning"><p>You must be logged in to view the ride templates.</p></div>';
 		}
 
 		$user_info = get_userdata($current_user->ID);
