@@ -63,6 +63,7 @@
                     $('#pwtc-mapdb-sched-template-div .schedule-dates-fst').removeClass('indicate-error');
                 });
                 $('#pwtc-mapdb-sched-template-div form').show();
+                is_dirty = true;
             }
         }
 
