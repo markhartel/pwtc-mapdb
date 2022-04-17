@@ -1281,7 +1281,7 @@
         if ($info) {
             $name = $info->first_name . ' ' . $info->last_name;
     ?>
-                    <div userid="<?php echo $leader; ?>"><?php if ($edit_leader) { ?><i class="fa fa-times"></i> <?php } ?><?php echo $name; ?></div>
+                    <div userid="<?php echo $leader; ?>"><?php if ($edit_leader and ($is_road_captain or $leader != $current_user->ID)) { ?><i class="fa fa-times"></i> <?php } ?><?php echo $name; ?></div>
     <?php } } ?>
     <?php if ($edit_leader) { ?>
                     <input type="text" name="leader-pattern" placeholder="Enter leader">
