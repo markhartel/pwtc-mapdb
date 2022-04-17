@@ -639,7 +639,7 @@
             var date_elem = $('#pwtc-mapdb-edit-ride-div input[name="ride_date"]')[0];
             if (date_elem.validity) {
                 if (!date_elem.validity.valid) {
-                    show_warning('The <strong>ride date</strong> must be no earlier than <?php echo $min_date_pretty; ?>.');
+                    show_warning('The <strong>ride date</strong> must be on or after <?php echo $min_date_pretty; ?>.');
                     $('#pwtc-mapdb-edit-ride-div input[name="ride_date"]').addClass('indicate-error');
                     evt.preventDefault();
                     return; 
@@ -1104,7 +1104,7 @@
                     <?php if (!$edit_date) { ?>
                     <p class="help-text">You are not allowed to edit the ride date.</p>
                      <?php } else if (!empty($min_date_pretty)) { ?>
-                    <p class="help-text">The ride date cannot be earlier than <?php echo $min_date_pretty; ?>.</p>
+                    <p class="help-text">The ride date must be on or after <?php echo $min_date_pretty; ?>.</p>
                     <?php } ?>
                 </div>
                 <div class="small-12 medium-6 columns">
