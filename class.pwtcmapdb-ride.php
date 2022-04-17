@@ -606,11 +606,10 @@ class PwtcMapdb_Ride {
 			}
 		}
 
-		$edit_leader = false;
+		$edit_leader = true;
 		if ($postid != 0) {
 			if ($is_road_captain) {
 				$leaders = PwtcMapdb::get_leader_userids($postid);
-				$edit_leader = true;
 			}
 			else if ($copy_ride) {
 				$leaders = [$current_user->ID];
@@ -622,7 +621,6 @@ class PwtcMapdb_Ride {
 		else {
 			if ($is_road_captain) {
 				$leaders = [];
-				$edit_leader = true;
 			}
 			else {
 				$leaders = [$current_user->ID];
