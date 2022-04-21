@@ -89,7 +89,7 @@
                     </div>
                     <div class="row column errmsg"></div>
                     <div class="row column clearfix">
-                        <button class="accent button float-left" type="submit">Submit</button>
+                        <button class="dark button float-left" type="submit">Search</button>
                         <a class="dark button float-right">Reset</a>
                     </div>
                 </form>
