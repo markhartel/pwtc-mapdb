@@ -3,7 +3,7 @@
 function pwtc_mapdb_get_signup() {
     $disable = false;
     $disable_nonmembers = false;
-    $disable_edit = true;
+    $disable_edit = false;
     if ($disable) {
         $result['view_signup_url'] = false;
         $result['edit_ride_url'] = false;
@@ -83,7 +83,7 @@ function pwtc_mapdb_get_signup() {
 }
 
 function pwtc_mapdb_get_map_metadata() {
-    $disable = true;
+    $disable = false;
     if ($disable) {
         $result['edit_map_url'] = false;
         return $result;
