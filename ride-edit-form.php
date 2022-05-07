@@ -1205,6 +1205,21 @@
                 <p class="help-text">When selecting a map, make certain that the start location on the route map matches the start location of the ride. To inspect the map, press the download or link icon.</p>
             </div>
             <div class="row column">
+                <ul class="accordion" data-accordion data-allow-all-closed="true">
+                    <li class="accordion-item" data-accordion-item>
+                        <a href="#" class="accordion-title">Choose Popular Start Location...</a>
+                        <div class="accordion-content" data-tab-content>
+                            <div class="row column">
+                                <p class="help-text">Below is a list of <a href="/ride-start-locations" target="_blank" rel="noopener noreferrer">popular club ride start locations.</a> Scroll through the list and choose your desired start location. To see the location on a Google Map, press the map marker icon.</p>
+                                <div class="start-locations-div" style="border:1px solid; overflow: auto; height: 200px;">
+                                    <table></table>
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+            <div class="row column">
                 <label>Start Location
     <?php if ($set_coords) { ?>
                     <a class="goolmap" title="Display start location in Google Maps."><i class="fa fa-map-marker"></i></a>
@@ -1253,21 +1268,6 @@
                 </label>
 		<p class="help-text">Use this comment to provide additional instruction about the start location.</p>
     <?php } ?>
-            </div>
-            <div class="row column">
-                <ul class="accordion" data-accordion data-allow-all-closed="true">
-                    <li class="accordion-item" data-accordion-item>
-                        <a href="#" class="accordion-title">Choose Popular Start Location...</a>
-                        <div class="accordion-content" data-tab-content>
-                            <div class="row column">
-                                <p class="help-text">Below is a list of <a href="/ride-start-locations" target="_blank" rel="noopener noreferrer">popular club ride start locations.</a> Scroll through the list and choose your desired start location. To see the location on a Google Map, press the map marker icon.</p>
-                                <div class="start-locations-div" style="border:1px solid; overflow: auto; height: 200px;">
-                                    <table></table>
-                                </div>
-                            </div>
-                        </div>
-                    </li>
-                </ul>
             </div>
             <div class="row column">
                 <label>Ride Leaders
