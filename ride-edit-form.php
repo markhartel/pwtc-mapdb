@@ -785,7 +785,8 @@
     <?php if (!$set_coords) { ?>
             load_google_map();
     <?php } ?>
-            is_dirty = true;
+	    $('#pwtc-mapdb-edit-ride-div .accordion').foundation('up', $('#pwtc-mapdb-edit-ride-div .accordion-content'));
+	    is_dirty = true;
         });
 
         $('#pwtc-mapdb-edit-ride-div .start-locations-div tr a').on('click', function(e) {
