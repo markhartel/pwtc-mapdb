@@ -49,7 +49,10 @@
 <?php if ($deleted) { ?>
         <input type="hidden" name="undo_delete" value="yes"/>
         <div class="callout small success">
-            <p>This ride<?php echo $is_template ? ' template': ''; ?> has been successfully deleted. <a class="revert-action">Undo</a></p>
+            <p>This ride<?php echo $is_template ? ' template': ''; ?> has been successfully deleted.</p>
+        </div>
+        <div class="row column">
+            <p>Did you delete this ride<?php echo $is_template ? ' template': ''; ?> by mistake? If so, <a class="revert-action">undo the deletion.</a></p>
         </div>
 <?php } else { ?>
         <input type="hidden" name="delete_ride" value="yes"/>
