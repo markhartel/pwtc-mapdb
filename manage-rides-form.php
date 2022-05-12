@@ -15,6 +15,7 @@
         $status = get_post_status();
         $view_link = esc_url(get_the_permalink());
         $edit_link = self::edit_ride_link($postid, $return_uri);
+	$copy_link = self::copy_ride_link($postid, $return_uri);
         $delete_link = self::delete_ride_link($postid, $return_uri);
         $start = PwtcMapdb::get_ride_start_time($postid);
         $start_date = '';
@@ -32,6 +33,9 @@
                 <?php } ?>
                 <?php if ($status == 'draft' or $is_road_captain) { ?>
                 <a href="<?php echo $edit_link; ?>">Edit</a>
+                <?php } ?>
+		<?php if ($status == 'pending' or $is_road_captain) { ?>
+                <a href="<?php echo $copy_link; ?>">Copy</a>
                 <?php } ?>
                 <?php if ($status == 'draft') { ?>
                 <a href="<?php echo $delete_link; ?>">Delete</a>
