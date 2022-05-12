@@ -54,7 +54,10 @@
 <?php if ($deleted) { ?>
         <input type="hidden" name="undo_delete" value="yes"/>
         <div class="callout small success">
-            <p>This route map has been successfully deleted. <a class="revert-action">Undo</a></p>
+            <p>This route map has been successfully deleted.</p>
+        </div>
+        <div class="row column">
+            <p>Did you delete this route map by mistake? If so, <a class="revert-action">undo the deletion.</a></p>
         </div>
 <?php } else if ($attached_file) { ?>
     <?php if ($delete_file) { ?>
