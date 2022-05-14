@@ -70,6 +70,12 @@
                 return;
             }
             if (file.length > 0) {
+		if (!file.toLowerCase().endsWith('.pdf')) {
+                    show_warning('The <strong>upload file</strong> is not a PDF file.');
+                    $('#pwtc-mapdb-upload-file-div .file-upload-lbl').addClass('indicate-error');
+                    evt.preventDefault();
+                    return;
+                }
                 var elem = $('#pwtc-mapdb-upload-file-div input[name="file_upload"]')[0];
                 if (elem.validity) {
                     if (!elem.validity.valid) {
