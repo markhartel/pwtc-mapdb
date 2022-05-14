@@ -126,6 +126,12 @@
                     return;
                 }
                 if (file.length > 0) {
+		    if (!file.toLowerCase().endsWith('.pdf')) {
+                        show_warning('The <strong>upload file</strong> is not a PDF file.');
+                        $('#pwtc-mapdb-edit-map-div .file-upload-lbl').addClass('indicate-error');
+                        evt.preventDefault();
+                        return;
+                    }
                     var elem = $('#pwtc-mapdb-edit-map-div input[name="map_file_upload"]')[0];
                     if (elem.validity) {
                         if (!elem.validity.valid) {
