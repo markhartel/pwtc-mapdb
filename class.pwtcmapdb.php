@@ -70,6 +70,7 @@ class PwtcMapdb {
 	const TEMPLATE_LENGTH_KEY = 'field_57d1f948c8510';
 	const TEMPLATE_MAX_LENGTH_KEY = 'field_57d1f96dc8511';
 	const TEMPLATE_START_LOCATION_KEY = 'field_57d1fd23c8517';
+	const TEMPLATE_START_LOC_COMMENT_KEY = 'field_start_location_comment2';
 	const TEMPLATE_DESCRIPTION_KEY = 'field_57bcbf7086cb9';
 
 	const USER_EMER_PHONE = 'emergency_contact_phone';
