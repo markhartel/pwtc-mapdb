@@ -1381,6 +1381,7 @@ class PwtcMapdb_Ride {
 			$pace = get_field(PwtcMapdb::RIDE_PACE, $postid);
 			$desc = get_field(PwtcMapdb::RIDE_DESCRIPTION, $postid, false);
 			$location = get_field(PwtcMapdb::RIDE_START_LOCATION, $postid, false);
+			$loc_comment = get_field(PwtcMapdb::RIDE_START_LOC_COMMENT, $postid);
 			$leaders = [];
 			foreach (get_field(PwtcMapdb::RIDE_LEADERS, $postid) as $leader) {
 				$leaders[] = $leader['ID'];
@@ -1419,6 +1420,7 @@ class PwtcMapdb_Ride {
 				update_field(PwtcMapdb::RIDE_PACE_KEY, $pace, $newpostid);
 				update_field(PwtcMapdb::RIDE_DESCRIPTION_KEY, $desc, $newpostid);
 				update_field(PwtcMapdb::RIDE_START_LOCATION_KEY, $location, $newpostid);
+				update_field(PwtcMapdb::RIDE_START_LOC_COMMENT_KEY, $loc_comment, $newpostid);
 				update_field(PwtcMapdb::RIDE_LEADERS_KEY, $leaders, $newpostid);
 				update_field(PwtcMapdb::RIDE_ATTACH_MAP_KEY, $attach, $newpostid);
 				update_field(PwtcMapdb::RIDE_MAPS_KEY, $maps, $newpostid);
