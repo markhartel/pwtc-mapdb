@@ -684,13 +684,11 @@ class PwtcMapdb_Ride {
 			$start_coords = '';
 		}
 
-		if (!$is_template) {
-			if ($postid != 0 and !$template) {
-				$start_location_comment = get_field(PwtcMapdb::RIDE_START_LOC_COMMENT, $postid);
-			}
-			else {
-				$start_location_comment = '';
-			}
+		if ($postid != 0) {
+			$start_location_comment = get_field(PwtcMapdb::RIDE_START_LOC_COMMENT, $postid);
+		}
+		else {
+			$start_location_comment = '';
 		}
 
 		if ($postid != 0) {
