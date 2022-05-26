@@ -776,9 +776,7 @@
             var zoom = item.data('zoom');
             set_coord_string(lat, lng);
             $('#pwtc-mapdb-edit-ride-div input[name="start_address"]').val(decodeHtml(title+', '+addr));
-    <?php if (!$is_template) { ?>
             $('#pwtc-mapdb-edit-ride-div input[name="start_location_comment"]').val(decodeHtml(comment));
-    <?php } ?>
             $('#pwtc-mapdb-edit-ride-div input[name="start_lat"]').val(lat);
             $('#pwtc-mapdb-edit-ride-div input[name="start_lng"]').val(lng);
             $('#pwtc-mapdb-edit-ride-div input[name="start_zoom"]').val(zoom);
@@ -1263,12 +1261,10 @@
             </div>
     <?php } ?>
             <div class="row column" <?php if (!$set_coords) { ?>style="margin-top:15px;"<?php } ?>>
-    <?php if (!$is_template) { ?>
                 <label>Start Location Comment
                     <input type="text" name="start_location_comment" value="<?php echo esc_attr($start_location_comment); ?>"/>
                 </label>
 		<p class="help-text">Use this comment to provide additional instruction about the start location.</p>
-    <?php } ?>
             </div>
             <div class="row column">
                 <label>Ride Leaders
