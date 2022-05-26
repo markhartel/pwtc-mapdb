@@ -307,13 +307,13 @@ class PwtcMapdb_Ride {
 					update_field(PwtcMapdb::RIDE_START_LOCATION_KEY, $location, $postid);
 				}
 			}
-
-			if (!$is_template and isset($_POST['start_location_comment'])) {
-				if ($new_post) {
-					update_field(PwtcMapdb::RIDE_START_LOC_COMMENT_KEY, $_POST['start_location_comment'], $postid);
+			
+			if (isset($_POST['start_location_comment'])) {
+				if ($is_template) {
+					update_field(PwtcMapdb::TEMPLATE_START_LOC_COMMENT_KEY, $_POST['start_location_comment'], $postid);
 				}
 				else {
-					update_field(PwtcMapdb::RIDE_START_LOC_COMMENT, $_POST['start_location_comment'], $postid);
+					update_field(PwtcMapdb::RIDE_START_LOC_COMMENT_KEY, $_POST['start_location_comment'], $postid);
 				}
 			}
 
