@@ -624,13 +624,13 @@
             var datergx = /^\d{4}-\d{2}-\d{2}$/;
             var timergx = /^\d{2}:\d{2}$/;
             if (!datergx.test(date)) {
-                show_warning('The <strong>ride date</strong> format is invalid.');
+                show_warning('The <strong>ride date</strong> format is invalid. Your browser may not support date entry, try upgrading it to the latest version or use a different browser.');
                 $('#pwtc-mapdb-edit-ride-div input[name="ride_date"]').addClass('indicate-error');
                 evt.preventDefault();
                 return;
             }
             if (!timergx.test(time)) {
-                show_warning('The <strong>departure time</strong> format is invalid.');
+                show_warning('The <strong>departure time</strong> format is invalid. Your browser may not support time entry, try upgrading it to the latest version or use a different browser.');
                 $('#pwtc-mapdb-edit-ride-div input[name="ride_time"]').addClass('indicate-error');
                 evt.preventDefault();
                 return;					
