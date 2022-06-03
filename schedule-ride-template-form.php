@@ -133,7 +133,7 @@
             }
             var timergx = /^\d{2}:\d{2}$/;
             if (!timergx.test(time)) {
-                show_submit_warning('The <strong>departure time</strong> format is invalid.');
+                show_submit_warning('The <strong>departure time</strong> format is invalid. Your browser may not support time entry, try upgrading it to the latest version or use a different browser.');
                 $('#pwtc-mapdb-sched-template-div input[name="ride_time"]').addClass('indicate-error');
                 evt.preventDefault();
                 return;					
