@@ -19,7 +19,7 @@
             if (month.length > 0) {
                 var monthrgx = /^\d{4}-\d{2}$/;
                 if (!monthrgx.test(month)) {
-                    show_warning('The <strong>ride month</strong> format is invalid.');
+                    show_warning('The <strong>ride month</strong> format is invalid. Your browser may not support month entry, try upgrading it to the latest version or use a different browser.');
                     evt.preventDefault();
                     return;
                 }
