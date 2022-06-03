@@ -68,6 +68,7 @@
         }
 
         $('#pwtc-mapdb-sched-template-div input[name="repeat_every"]').change(function() {
+            clear_lookup_msg();
             $('#pwtc-mapdb-sched-template-div input[name="from_date"]').val('');
             $('#pwtc-mapdb-sched-template-div input[name="to_date"]').val('');
             $('#pwtc-mapdb-sched-template-div input[name="to_date"]').prop('disabled',true);
@@ -75,6 +76,7 @@
         });
 
         $('#pwtc-mapdb-sched-template-div input[name="from_date"]').change(function() {
+            clear_lookup_msg();
             var date = $(this).val();
             var datergx = /^\d{4}-\d{2}-\d{2}$/;
             if (datergx.test(date)) {
@@ -83,6 +85,7 @@
                 $('#pwtc-mapdb-sched-template-div input[name="to_date"]').prop('disabled',false);
             }
             else {
+                show_lookup_warning('The <strong>from date</strong> format is invalid. Your browser may not support date entry, try upgrading it to the latest version or use a different browser.');
                 $('#pwtc-mapdb-sched-template-div input[name="to_date"]').val('');
                 $('#pwtc-mapdb-sched-template-div input[name="to_date"]').prop('disabled',true);
             }
@@ -90,6 +93,7 @@
         });
 
         $('#pwtc-mapdb-sched-template-div input[name="to_date"]').change(function() {
+            clear_lookup_msg();
             var to_date = $(this).val();
             var datergx = /^\d{4}-\d{2}-\d{2}$/;
             if (datergx.test(to_date)) {
@@ -104,6 +108,9 @@
                 };
                 $.post(action, data, dates_lookup_cb);
                 show_lookup_waiting();
+            }
+            else {
+                show_lookup_warning('The <strong>to date</strong> format is invalid. Your browser may not support date entry, try upgrading it to the latest version or use a different browser.');
             }
             hide_form();   
        });
