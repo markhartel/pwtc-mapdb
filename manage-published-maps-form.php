@@ -22,6 +22,7 @@
         $('#pwtc-mapdb-manage-published-maps-div .search-frm a').on('click', function(evt) {
             $('#pwtc-mapdb-manage-published-maps-div .search-frm input[name="map_title"]').val('');
             $('#pwtc-mapdb-manage-published-maps-div .search-frm select[name="map_status"]').val('all');
+            $('#pwtc-mapdb-manage-published-maps-div .search-frm select[name="map_type"]').val('0');
             $('#pwtc-mapdb-manage-published-maps-div .search-frm select[name="map_distance"]').val('0');
             $('#pwtc-mapdb-manage-published-maps-div .search-frm select[name="map_terrain"]').val('0');
         });
@@ -39,6 +40,7 @@
         <form class="sort-frm" method="POST" novalidate>
             <input type="hidden" name="map_status" value="<?php echo $map_status; ?>">
             <input type="hidden" name="map_title" value="<?php echo $map_title; ?>">
+            <input type="hidden" name="map_type" value="<?php echo $map_type; ?>">
             <input type="hidden" name="map_distance" value="<?php echo $map_distance; ?>">
             <input type="hidden" name="map_terrain" value="<?php echo $map_terrain; ?>">
             <input type="hidden" name="offset" value="0">
@@ -78,7 +80,17 @@
                                 <input type="text" name="map_title" value="<?php echo $map_title; ?>">
                             </label>
                         </div>
-                        <div class="small-12 medium-3 columns">
+                        <div class="small-12 medium-2 columns">
+                            <label>Type
+                                <select name="map_type">
+                                    <option value="0" <?php echo $map_type == '0' ? 'selected': ''; ?>>Any</option>
+                                    <option value="file" <?php echo $map_type == 'file' ? 'selected': ''; ?>>PDF</option>
+                                    <option value="link" <?php echo $map_type == 'link' ? 'selected': ''; ?>>GPS</option>
+                                    <option value="both" <?php echo $map_type == 'both' ? 'selected': ''; ?>>Both</option>
+                                </select>
+                            </label>
+                        </div>
+                        <div class="small-12 medium-2 columns">
                             <label>Distance
                                 <select name="map_distance">
                                     <option value="0" <?php echo $map_distance == '0' ? 'selected': ''; ?>>Any</option> 
@@ -90,7 +102,7 @@
                                 </select>		
                             </label>
                         </div>
-                        <div class="small-12 medium-3 columns">
+                        <div class="small-12 medium-2 columns">
                             <label>Terrain
                                 <select name="map_terrain">
                                     <option value="0" <?php echo $map_terrain == '0' ? 'selected': ''; ?>>Any</option> 
@@ -182,6 +194,7 @@
     <form class="load-more-frm" method="POST">
         <input type="hidden" name="map_status" value="<?php echo $map_status; ?>">
         <input type="hidden" name="map_title" value="<?php echo $map_title; ?>">
+        <input type="hidden" name="map_type" value="<?php echo $map_type; ?>">
         <input type="hidden" name="map_distance" value="<?php echo $map_distance; ?>">
         <input type="hidden" name="map_terrain" value="<?php echo $map_terrain; ?>">
         <input type="hidden" name="sort_by" value="<?php echo $sort_by; ?>">
