@@ -880,7 +880,7 @@ class PwtcMapdb_Map {
 
 		$current_user = wp_get_current_user();
 
-		if (isset($_POST['map_title']) and isset($_POST['map_distance']) and isset($_POST['map_terrain']) and isset($_POST['offset'])) {
+		if (isset($_POST['map_title']) and isset($_POST['map_type']) and isset($_POST['map_distance']) and isset($_POST['map_terrain']) and isset($_POST['offset'])) {
 			if (0 == $current_user->ID) {
 				wp_die('Authorization failed.', 403);
 			}
@@ -895,6 +895,7 @@ class PwtcMapdb_Map {
 			}
 			wp_redirect(add_query_arg(array(
 				'title' => urlencode(trim($_POST['map_title'])),
+				'type' => $_POST['map_type'],
 				'distance' => $_POST['map_distance'],
 				'terrain' => $_POST['map_terrain'],
 				'status' => $map_status,
