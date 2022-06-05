@@ -957,6 +957,13 @@ class PwtcMapdb_Map {
 		else {
 			$map_terrain = '0';
 		}
+		
+		if (isset($_GET['type'])) {
+			$map_type = $_GET['type'];
+		}
+		else {
+			$map_type = '0';
+		}
 
 		if (isset($_GET['offset'])) {
 			$offset = intval($_GET['offset']);
@@ -1057,6 +1064,14 @@ class PwtcMapdb_Map {
                 		'value' => '"' . $map_terrain . '"',
                 		'compare' => 'LIKE',
             		];
+		}
+		
+		if ($map_type != '0') {
+			$query_args['meta_query'][] = [
+				'key' => PwtcMapdb::MAP_TYPE_QUERY,
+				'value' => $map_type,
+				'compare' => 'LIKE',
+			];
 		}
 		
 		if ($limit > 0)	{
