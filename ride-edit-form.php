@@ -219,9 +219,10 @@
             var mapid = $(this).attr('mapid');
             if (!has_map_id(mapid)) {
                 var title = $(this).find('td').first().html();
+		var a = $(this).find('td').first().next().html();
                 is_dirty = true;
                 $('#pwtc-mapdb-edit-ride-div .maps-div').removeClass('indicate-error');
-                $('#pwtc-mapdb-edit-ride-div .maps-div input').before('<div mapid="' + mapid + '"><i class="fa fa-times"></i> ' + title + '</div>');
+                $('#pwtc-mapdb-edit-ride-div .maps-div input').before('<div mapid="' + mapid + '"><i class="fa fa-times"></i> ' + title + ' ' + a + '</div>');
                 $('#pwtc-mapdb-edit-ride-div .maps-div div[mapid="' + mapid + '"] .fa-times').on('click', remove_map_event);
                 $('#pwtc-mapdb-edit-ride-div .maps-div div[mapid="' + mapid + '"] a').on('click', function(evt) {
                     evt.stopPropagation();
@@ -268,20 +269,20 @@
                 res.maps.forEach(function(item) {
                     var a = '';
                     if (item.type == 'file') {
-                        a = ' <a title="Download ride route map file." href="' + item.href + '" target="_blank" download><i class="fa fa-download"></i></a>';
+                        a = '<a title="Download ride route map file." href="' + item.href + '" target="_blank" download><i class="fa fa-download"></i> PDF</a>';
                     }
                     else if (item.type == 'link') {
-                        a = ' <a title="Display online ride route map." href="' + item.href + '" target="_blank"><i class="fa fa-link"></i></a>';
+                        a = '<a title="Display online ride route map." href="' + item.href + '" target="_blank"><i class="fa fa-link"></i> GPS</a>';
                     }
                     else if (item.type == 'both') {
-                        a = ' <a title="Download ride route map file." href="' + item.href + '" target="_blank" download><i class="fa fa-download"></i></a> <a title="Display online ride route map." href="' + item.href2 + '" target="_blank"><i class="fa fa-link"></i></a>';
+                        a = '<a title="Download ride route map file." href="' + item.href + '" target="_blank" download><i class="fa fa-download"></i> PDF</a> <a title="Display online ride route map." href="' + item.href2 + '" target="_blank"><i class="fa fa-link"></i> GPS</a>';
                     }
                     var pending = '';
                     if (item.pending !== undefined) {
                         pending = 'pending';
                     }
                     $('#pwtc-mapdb-edit-ride-div .map-search-div table').append(
-                        '<tr mapid="' + item.ID + '" ' + pending + '><td>' + item.title + a + '</td><td>' + item.distance + '</td><td>' + item.terrain + '</td></tr>');  
+                        '<tr mapid="' + item.ID + '" ' + pending + '><td>' + item.title + '</td><td>' + a + '</td><td>' + item.distance + '</td><td>' + item.terrain + '</td></tr>');  
                     $('#pwtc-mapdb-edit-ride-div .map-search-div table tr[mapid="' + item.ID + '"]').on('click', add_map_event); 
                     $('#pwtc-mapdb-edit-ride-div .map-search-div table tr[mapid="' + item.ID + '"] a').on('click', function(evt) {
                         evt.stopPropagation();
