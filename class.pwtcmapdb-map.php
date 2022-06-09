@@ -28,6 +28,7 @@ class PwtcMapdb_Map {
 	add_shortcode('pwtc_mapdb_map_breadcrumb', array('PwtcMapdb_Map', 'shortcode_map_breadcrumb'));
 	add_shortcode('pwtc_mapdb_edit_map', array('PwtcMapdb_Map', 'shortcode_edit_map'));
 	add_shortcode('pwtc_mapdb_delete_map', array( 'PwtcMapdb_Map', 'shortcode_delete_map'));
+	add_shortcode('pwtc_mapdb_usage_map', array( 'PwtcMapdb_Map', 'shortcode_usage_map'));
 	add_shortcode('pwtc_mapdb_manage_maps', array('PwtcMapdb_Map', 'shortcode_manage_maps'));
 	add_shortcode('pwtc_mapdb_manage_pending_maps', array('PwtcMapdb_Map', 'shortcode_manage_pending_maps'));
 	add_shortcode('pwtc_mapdb_manage_published_maps', array('PwtcMapdb_Map', 'shortcode_manage_published_maps'));
@@ -787,6 +788,61 @@ class PwtcMapdb_Map {
 		return ob_get_clean();
 	}
 	
+	// Generates the [pwtc_mapdb_usage_map] shortcode.
+	public static function shortcode_usage_map($atts) {
+		$a = shortcode_atts(array('leaders' => 'no', 'use_return' => 'no'), $atts);
+		$allow_leaders = $a['leaders'] == 'yes';
+		$use_return = $a['use_return'] == 'yes';
+
+		$is_ride_leader = false;
+		$is_road_captain = false;
+		$current_user = wp_get_current_user();
+		$user_info = get_userdata($current_user->ID);
+		if ($user_info) {
+			$is_road_captain = in_array(PwtcMapdb::ROLE_ROAD_CAPTAIN, $user_info->roles);
+			$is_ride_leader = in_array(PwtcMapdb::ROLE_RIDE_LEADER, $user_info->roles);
+		}
+
+		$return = '';
+		if (isset($_GET['return'])) {
+			$return = $_GET['return'];
+		}
+
+		$map_link = '';
+		$return_to_map = '';
+		if (!empty($return) and $use_return) {
+			$map_link = esc_url($return);
+			$return_to_map = self::create_return_link($map_link);
+		}
+
+		$error = self::check_post_id();
+		if (!empty($error)) {
+			return $return_to_map . $error;
+		}
+		$postid = intval($_GET['post']);
+
+		if (0 == $current_user->ID) {
+			return $return_to_map . '<div class="callout small alert"><p>You must be logged in to view route map usage.</p></div>';
+		}
+
+		$map_title = esc_html(get_the_title($postid));
+
+		$post = get_post($postid);
+		$author = $post->post_author;
+		$status = $post->post_status;
+
+		if (!$allow_leaders and !$is_road_captain) {
+			return $return_to_map . '<div class="callout small warning"><p>You are not allowed to view route map usage.</p></div>';
+		}
+
+		$ride_query = self::ride_usage_query($postid, PwtcMapdb::POST_TYPE_RIDE);
+		$temmplate_query = self::ride_usage_query($postid, PwtcMapdb::POST_TYPE_TEMPLATE);
+
+		ob_start();
+		include('map-usage-form.php');
+		return ob_get_clean();
+	}
+	
 	// Generates the [pwtc_mapdb_manage_maps] shortcode.
 	public static function shortcode_manage_maps($atts) {
 		$a = shortcode_atts(array('leaders' => 'no'), $atts);
@@ -1281,8 +1337,29 @@ class PwtcMapdb_Map {
 	}
 
     /******************* Utility Functions ******************/
+	
+    	public static function ride_usage_query($map_postid, $type) {
+		$query = new WP_Query([
+			'post_type'    => $type,
+			'post_status'  => ['pending', 'draft', 'publish'],
+			'meta_query'   => [
+				'relation' => 'AND',
+				[
+					'key'     => PwtcMapdb::RIDE_MAPS,
+					'value'   => '"'.$map_postid.'"',
+					'compare' => 'LIKE',
+				],
+				[
+					'key'   => PwtcMapdb::RIDE_ATTACH_MAP,
+					'value' => 1,
+					'type'  => 'numeric',
+				],
+			],
+		]);
+		return $query;
+	}
 
-    public static function get_query_args($title, $location, $terrain, $min_dist, $max_dist, $media) {
+    	public static function get_query_args($title, $location, $terrain, $min_dist, $max_dist, $media) {
 		$args = array(
 			'post_type' => PwtcMapdb::MAP_POST_TYPE,
 			'post_status' => 'publish',
