@@ -762,7 +762,7 @@
                 var area = $(this).find('td').first().html();
                 var title = $(this).find('td').first().next().html();
                 $('#pwtc-mapdb-edit-ride-div .start-locations-div table').append(
-                    '<tr itemid="' + (index+1) + '"><td>' + title + '</td><td>' + area + '</td><td><a title="Display location in Google Maps."><i class="fa fa-map-marker"></i></a></td></tr>');
+                    '<tr itemid="' + (index+1) + '"><td>' + title + '</td><td>' + area + '</td><td><a title="Display location in Google Maps."><i class="fa fa-map-marker"></i> Google Map</a></td></tr>');
             }
         });
 
@@ -1222,10 +1222,10 @@
             <div class="row column">
                 <label>Start Location
     <?php if ($set_coords) { ?>
-                    <a class="goolmap" title="Display start location in Google Maps."><i class="fa fa-map-marker"></i></a>
+                    <a class="goolmap" title="Display start location in Google Maps."><i class="fa fa-map-marker"></i> Google Map</a>
     <?php } else { ?>
                     <span class="coord-span"><?php echo $start_coords; ?></span>
-                    <a class="goolmap" <?php if (empty($start_coords)) { ?>style="display:none"<?php } ?> title="Display start location in Google Maps."><i class="fa fa-map-marker"></i></a>
+                    <a class="goolmap" <?php if (empty($start_coords)) { ?>style="display:none"<?php } ?> title="Display start location in Google Maps."><i class="fa fa-map-marker"></i> Google Map</a>
     <?php } ?>                
                     <input type="text" name="start_address" value="<?php echo esc_attr($start_location['address']); ?>" placeholder="Enter a street address">
                 </label>
