@@ -5,6 +5,7 @@ class PwtcMapdb_Map {
 	const EDIT_MAP_URI = '/edit-map';
 	const SUBMIT_MAP_URI = '/submit-map';
 	const DELETE_MAP_URI = '/delete-map';
+	const USAGE_MAP_URI = '/map-usage';
 	
     	private static $initiated = false;
 
@@ -1719,6 +1720,15 @@ EOT;
 
 	public static function edit_map_link($postid, $return=false) {
 		$uri = self::EDIT_MAP_URI;
+		$uri .= '?post=' . $postid;
+		if ($return) {
+			$uri .= '&return=' . urlencode($return);
+		}
+		return esc_url($uri);
+	}
+	
+	public static function usage_map_link($postid, $return=false) {
+		$uri = self::USAGE_MAP_URI;
 		$uri .= '?post=' . $postid;
 		if ($return) {
 			$uri .= '&return=' . urlencode($return);
