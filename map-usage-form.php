@@ -2,13 +2,13 @@
     <?php echo $return_to_map; ?>
     <div class="row column">
 <?php
-    if ($temmplate_query->have_posts() or $ride_query->have_posts()) {
+    if ($template_query->have_posts() or $ride_query->have_posts()) {
 ?>
         <p>The route map "<?php echo $map_title; ?>" is used by the following ride templates and scheduled rides:
 <?php
         $count = 0;
-        while ($temmplate_query->have_posts()) {
-            $temmplate_query->the_post();
+        while ($template_query->have_posts()) {
+            $template_query->the_post();
             $title = esc_html(get_the_title());
             $view_link = esc_url(get_the_permalink());
 ?>
