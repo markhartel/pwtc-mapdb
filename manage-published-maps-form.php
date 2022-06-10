@@ -156,6 +156,7 @@
         $terrain = PwtcMapdb::build_terrain_str(get_field(PwtcMapdb::TERRAIN_FIELD, $postid));
         $view_link = esc_url(get_the_permalink());
         $edit_link = self::edit_map_link($postid, $return_uri);
+        $usage_link = self::usage_map_link($postid, $return_uri);
         $delete_link = self::delete_map_link($postid, $return_uri);
     ?>
         <tr>
@@ -172,6 +173,9 @@
                 <a href="<?php echo $view_link; ?>">View</a>
             <?php } else if (user_can($current_user,'edit_published_rides') and ($status == 'draft' or $status == 'pending')) { ?>
                 <a href="<?php echo $view_link; ?>">Preview</a>
+            <?php } ?>
+            <?php if ($status != 'trash' and $is_road_captain) { ?>
+                <a href="<?php echo $usage_link; ?>">Usage</a>
             <?php } ?>
             <?php if ($status != 'trash' and $is_road_captain) { ?>
                 <a href="<?php echo $edit_link; ?>">Edit</a>
