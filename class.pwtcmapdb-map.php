@@ -30,7 +30,6 @@ class PwtcMapdb_Map {
 	add_shortcode('pwtc_mapdb_delete_map', array( 'PwtcMapdb_Map', 'shortcode_delete_map'));
 	add_shortcode('pwtc_mapdb_usage_map', array( 'PwtcMapdb_Map', 'shortcode_usage_map'));
 	add_shortcode('pwtc_mapdb_manage_maps', array('PwtcMapdb_Map', 'shortcode_manage_maps'));
-	add_shortcode('pwtc_mapdb_manage_maps', array('PwtcMapdb_Map', 'shortcode_manage_maps'));
 	add_shortcode('pwtc_mapdb_manage_pending_maps', array('PwtcMapdb_Map', 'shortcode_manage_pending_maps'));
 	add_shortcode('pwtc_mapdb_manage_published_maps', array('PwtcMapdb_Map', 'shortcode_manage_published_maps'));
 	add_shortcode('pwtc_mapdb_new_map_link', array('PwtcMapdb_Map', 'shortcode_new_map_link'));
@@ -730,26 +729,11 @@ class PwtcMapdb_Map {
 			self::set_post_lock($postid);
 			
 			$used_in_ride = false;
-			$query = new WP_Query([
-				'post_type'    => PwtcMapdb::POST_TYPE_RIDE,
-				'post_status'  => ['pending', 'draft', 'publish'],
-				'meta_query'   => [
-					'relation' => 'AND',
-					[
-						'key'     => PwtcMapdb::RIDE_MAPS,
-						'value'   => '"'.$postid.'"',
-						'compare' => 'LIKE',
-					],
-					[
-						'key'   => PwtcMapdb::RIDE_ATTACH_MAP,
-						'value' => 1,
-						'type'  => 'numeric',
-					],
-				],
-			]);
-			if ($query->have_posts()) { 
+			$ride_query = self::ride_usage_query($postid, PwtcMapdb::POST_TYPE_RIDE);
+			$template_query = self::ride_usage_query($postid, PwtcMapdb::POST_TYPE_TEMPLATE);
+			if ($template_query->have_posts() or $ride_query->have_posts()) { 
 				$used_in_ride = true;
-			}			
+			}
 
 			$attached_file = false;
 			$delete_file = false;
@@ -833,7 +817,7 @@ class PwtcMapdb_Map {
 		}
 
 		$ride_query = self::ride_usage_query($postid, PwtcMapdb::POST_TYPE_RIDE);
-		$temmplate_query = self::ride_usage_query($postid, PwtcMapdb::POST_TYPE_TEMPLATE);
+		$template_query = self::ride_usage_query($postid, PwtcMapdb::POST_TYPE_TEMPLATE);
 
 		ob_start();
 		include('map-usage-form.php');
