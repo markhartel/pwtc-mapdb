@@ -30,6 +30,7 @@ class PwtcMapdb_Map {
 	add_shortcode('pwtc_mapdb_delete_map', array( 'PwtcMapdb_Map', 'shortcode_delete_map'));
 	add_shortcode('pwtc_mapdb_usage_map', array( 'PwtcMapdb_Map', 'shortcode_usage_map'));
 	add_shortcode('pwtc_mapdb_manage_maps', array('PwtcMapdb_Map', 'shortcode_manage_maps'));
+	add_shortcode('pwtc_mapdb_manage_maps', array('PwtcMapdb_Map', 'shortcode_manage_maps'));
 	add_shortcode('pwtc_mapdb_manage_pending_maps', array('PwtcMapdb_Map', 'shortcode_manage_pending_maps'));
 	add_shortcode('pwtc_mapdb_manage_published_maps', array('PwtcMapdb_Map', 'shortcode_manage_published_maps'));
 	add_shortcode('pwtc_mapdb_new_map_link', array('PwtcMapdb_Map', 'shortcode_new_map_link'));
@@ -826,10 +827,6 @@ class PwtcMapdb_Map {
 		}
 
 		$map_title = esc_html(get_the_title($postid));
-
-		$post = get_post($postid);
-		$author = $post->post_author;
-		$status = $post->post_status;
 
 		if (!$allow_leaders and !$is_road_captain) {
 			return $return_to_map . '<div class="callout small warning"><p>You are not allowed to view route map usage.</p></div>';
