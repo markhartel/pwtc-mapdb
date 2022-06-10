@@ -19,10 +19,13 @@
         wp_reset_postdata();
         while ($ride_query->have_posts()) {
             $ride_query->the_post();
+            $postid = get_the_ID();
             $title = esc_html(get_the_title());
+            $start = PwtcMapdb::get_ride_start_time($postid);
+            $start_date = $start->format('m/d/Y');
             $view_link = esc_url(get_the_permalink());
 ?>
-            <?php if ($count > 0) { ?>, <?php } ?><a href="<?php echo $view_link; ?>"><?php echo $title; ?></a>
+            <?php if ($count > 0) { ?>, <?php } ?><a href="<?php echo $view_link; ?>"><?php echo $title; ?> (<?php echo $start_date; ?>)</a>
 <?php
             $count++;
         }
