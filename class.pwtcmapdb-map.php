@@ -1336,7 +1336,7 @@ class PwtcMapdb_Map {
     /******************* Utility Functions ******************/
 	
     	public static function ride_usage_query($map_postid, $type) {
-		$query = new WP_Query([
+		$query_args = [
 			'post_type'    => $type,
 			'post_status'  => ['pending', 'draft', 'publish'],
 			'meta_query'   => [
@@ -1352,7 +1352,17 @@ class PwtcMapdb_Map {
 					'type'  => 'numeric',
 				],
 			],
-		]);
+		];
+		if ($type == PwtcMapdb::POST_TYPE_RIDE) {
+			$query_args['meta_key'] = PwtcMapdb::RIDE_DATE;
+			$query_args['meta_type'] = 'DATETIME';
+			$query_args['orderby'] = ['meta_value' => 'DESC'];
+		}
+		else {
+			$query_args['orderby'] = 'date';
+			$query_args['order'] = 'DESC';			
+		}
+		$query = new WP_Query($query_args);
 		return $query;
 	}
 
