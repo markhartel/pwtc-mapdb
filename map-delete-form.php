@@ -103,7 +103,7 @@
         <input type="hidden" name="trash_map" value="yes"/>
     <?php if ($used_in_ride) { ?>
         <div class="callout small warning">
-            <p>Warning, this route map is used by a scheduled ride. It can be deleted, but will then be unavailable to the ride.</p>
+            <p>Warning, this route map is used by a ride template or scheduled ride. It can be deleted, but will then be unavailable to the ride.</p>
         </div>
     <?php } ?>
         <div class="callout">
