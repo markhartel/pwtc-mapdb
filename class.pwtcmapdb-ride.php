@@ -401,6 +401,28 @@ class PwtcMapdb_Ride {
 					}
 				}
 			}
+			
+			if (!$is_template) {
+				if (isset($_POST['online_signup'])) {
+					$online_signup = $_POST['online_signup'];
+					delete_post_meta($postid, PwtcMapdb::RIDE_SIGNUP_MODE);
+					add_post_meta($postid, PwtcMapdb::RIDE_SIGNUP_MODE, $online_signup, true);
+					if ($online_signup != 'no') {
+						if (isset($_POST['members_only'])) {
+							delete_post_meta($postid, PwtcMapdb::RIDE_SIGNUP_MEMBERS_ONLY);
+							add_post_meta($postid, PwtcMapdb::RIDE_SIGNUP_MEMBERS_ONLY, $_POST['members_only'] == '1', true);
+						}
+						if (isset($_POST['signup_cutoff'])) {
+							delete_post_meta($postid, PwtcMapdb::RIDE_SIGNUP_CUTOFF);
+							add_post_meta($postid, PwtcMapdb::RIDE_SIGNUP_CUTOFF, abs(intval($_POST['signup_cutoff'])), true);
+						}
+						if (isset($_POST['signup_limit'])) {
+							delete_post_meta($postid, PwtcMapdb::RIDE_SIGNUP_LIMIT);
+							add_post_meta($postid, PwtcMapdb::RIDE_SIGNUP_LIMIT, abs(intval($_POST['signup_limit'])), true);
+						}
+					}	
+				}
+			}
 
 			$email = 'no';
 			if ($allow_email) {
