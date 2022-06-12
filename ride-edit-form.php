@@ -564,11 +564,16 @@
         });
 	    
 	$('#pwtc-mapdb-edit-ride-div input[name="online_signup"]').change(function() {
-            if (this.value == 'no') {
-                $('#pwtc-mapdb-edit-ride-div form .online-signup-yes').hide();
+            if (this.value == 'paperless') {
+                $('#pwtc-mapdb-edit-ride-div form .online-signup-yes').show();
+                $('#cutoff-time-span').html('(hours after ride start)');
+            }
+            else if (this.value == 'hardcopy') {
+                $('#pwtc-mapdb-edit-ride-div form .online-signup-yes').show();
+                $('#cutoff-time-span').html('(hours before ride start)');
             }
             else {
-                $('#pwtc-mapdb-edit-ride-div form .online-signup-yes').show();
+                $('#pwtc-mapdb-edit-ride-div form .online-signup-yes').hide();
             }
             is_dirty = true;
         });
@@ -1035,10 +1040,14 @@
     <?php } ?>
 	    
     <?php if (!$is_template) { ?>
-        <?php if ($online_signup == 'no') { ?>
-        $('#pwtc-mapdb-edit-ride-div form .online-signup-yes').hide();
-        <?php } else { ?>
+        <?php if ($online_signup == 'paperless') { ?>
         $('#pwtc-mapdb-edit-ride-div form .online-signup-yes').show();
+        $('#cutoff-time-span').html('(hours after ride start)');
+        <?php } else if ($online_signup == 'hardcopy') { ?>
+        $('#pwtc-mapdb-edit-ride-div form .online-signup-yes').show();
+        $('#cutoff-time-span').html('(hours before ride start)');
+        <?php } else { ?>
+        $('#pwtc-mapdb-edit-ride-div form .online-signup-yes').hide();
         <?php } ?>
     <?php } ?>
 
@@ -1383,16 +1392,16 @@
                     <p class="help-text">If yes, only club members are allowed to sign up online for the ride.</p>
                 </div>
                 <div class="small-12 medium-6 columns online-signup-yes">
-                    <label>Cutoff Time (hours)
+                    <label>Cutoff Time <span id="cutoff-time-span"></span>
                         <input type="number" name="signup_cutoff" value="<?php echo $signup_cutoff; ?>"/>	
                     </label>
                     <p class="help-text">Determines when the online sign up period ends relative to the start of the ride.</p>
                 </div>
                 <div class="small-12 medium-6 columns online-signup-yes">
-                    <label>Attendance Limit
+                    <label>Attendance Limit (0 means unlimited)
                         <input type="number" name="signup_limit" value="<?php echo $signup_limit; ?>"/>	
                     </label>
-                    <p class="help-text">Limits the number of riders allowed to sign up online for the ride (zero means unlimited.)</p>
+                    <p class="help-text">Limits the number of riders allowed to sign up online for the ride.</p>
                 </div>
             </div>
     <?php } ?>
