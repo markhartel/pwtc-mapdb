@@ -730,6 +730,21 @@ class PwtcMapdb_Ride {
 			$maps_obj = [];
 			$maps = [];
 		}
+		
+		if (!$is_template) {
+			if ($postid != 0) {
+				$online_signup = PwtcMapdb_Signup::get_signup_mode($postid);
+				$members_only = PwtcMapdb_Signup::get_signup_members_only($postid);
+				$signup_limit = PwtcMapdb_Signup::get_signup_limit($postid);
+				$signup_cutoff = PwtcMapdb_Signup::get_signup_cutoff($postid);
+			}
+			else {
+				$online_signup = 'no';
+				$members_only = false;
+				$signup_limit = 0;
+				$signup_cutoff = 0;
+			}
+		}
 
 		$operation = '';
 		if (isset($_GET['op'])) {
