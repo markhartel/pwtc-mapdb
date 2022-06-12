@@ -562,6 +562,30 @@
             }
             is_dirty = true;
         });
+	    
+	$('#pwtc-mapdb-edit-ride-div input[name="online_signup"]').change(function() {
+            if (this.value == 'no') {
+                $('#pwtc-mapdb-edit-ride-div form .online-signup-yes').hide();
+            }
+            else {
+                $('#pwtc-mapdb-edit-ride-div form .online-signup-yes').show();
+            }
+            is_dirty = true;
+        });
+
+        $('#pwtc-mapdb-edit-ride-div input[name="members_only"]').change(function() {
+            is_dirty = true;
+        });
+
+        $('#pwtc-mapdb-edit-ride-div input[name="signup_cutoff"]').on('input', function() {
+            is_dirty = true;
+            $(this).removeClass('indicate-error');
+        });
+
+        $('#pwtc-mapdb-edit-ride-div input[name="signup_limit"]').on('input', function() {
+            is_dirty = true;
+            $(this).removeClass('indicate-error');
+        });
 
         $('#pwtc-mapdb-edit-ride-div input[name="start_location_comment"]').on('input', function() {
             is_dirty = true;
@@ -748,6 +772,40 @@
                 return;
             }
             $('#pwtc-mapdb-edit-ride-div input[name="leaders"]').val(JSON.stringify(new_leaders));
+		
+    <?php if (!$is_template) { ?>  
+            var signup = $('#pwtc-mapdb-edit-ride-div input[name="online_signup"]:checked').val() != 'no';
+            if (signup) {
+                var cutoff = $('#pwtc-mapdb-edit-ride-div input[name="signup_cutoff"]').val().trim();
+                if (cutoff.length == 0) {
+                    show_warning('You must enter a <strong>cutoff time</strong>.');
+                    $('#pwtc-mapdb-edit-ride-div input[name="signup_cutoff"]').addClass('indicate-error');
+                    evt.preventDefault();
+                    return;							
+                }
+                cutoff = parseInt(cutoff, 10);
+                if (cutoff == NaN || cutoff < 0) {
+                    show_warning('You must enter a <strong>cutoff time</strong> that is a non-negative number.');
+                    $('#pwtc-mapdb-edit-ride-div input[name="signup_cutoff"]').addClass('indicate-error');
+                    evt.preventDefault();
+                    return;							
+                }
+                var limit = $('#pwtc-mapdb-edit-ride-div input[name="signup_limit"]').val().trim();
+                if (limit.length == 0) {
+                    show_warning('You must enter a <strong>attendance limit</strong>.');
+                    $('#pwtc-mapdb-edit-ride-div input[name="signup_limit"]').addClass('indicate-error');
+                    evt.preventDefault();
+                    return;							
+                }
+                limit = parseInt(limit, 10);
+                if (limit == NaN || limit < 0) {
+                    show_warning('You must enter a <strong>attendance limit</strong> that is a non-negative number.');
+                    $('#pwtc-mapdb-edit-ride-div input[name="signup_limit"]').addClass('indicate-error');
+                    evt.preventDefault();
+                    return;							
+                }
+            }
+    <?php } ?>      
 
             is_dirty = false;
             show_waiting();
@@ -974,6 +1032,14 @@
     <?php } else { ?>
         $('#pwtc-mapdb-edit-ride-div form .attach-map-yes').hide();
         $('#pwtc-mapdb-edit-ride-div form .attach-map-no').show();
+    <?php } ?>
+	    
+    <?php if (!$is_template) { ?>
+        <?php if ($online_signup == 'no') { ?>
+        $('#pwtc-mapdb-edit-ride-div form .online-signup-yes').hide();
+        <?php } else { ?>
+        $('#pwtc-mapdb-edit-ride-div form .online-signup-yes').show();
+        <?php } ?>
     <?php } ?>
 
         window.addEventListener('beforeunload', function(e) {
@@ -1297,6 +1363,39 @@
                 <p class="help-text">Riders must have ride leader access on the website to be assigned as leader.</p>
     <?php } ?>   
             </div>
+    <?php if (!$is_template) { ?>
+            <div class="row">
+                <div class="small-12 medium-6 columns">
+                    <fieldset>
+                        <legend>Online Signup</legend>
+                        <input type="radio" name="online_signup" value="no" id="signup-no" <?php echo $online_signup == 'no' ? 'checked': ''; ?>><label for="signup-no">No</label>
+                        <input type="radio" name="online_signup" value="hardcopy" id="signup-hardcopy" <?php echo $online_signup == 'hardcopy' ? 'checked': ''; ?>><label for="signup-hardcopy">Yes, use hardcopy</label>
+                        <input type="radio" name="online_signup" value="paperless" id="signup-paperless" <?php echo $online_signup == 'paperless' ? 'checked': ''; ?>><label for="signup-paperless">Yes, use paperless</label>
+                    </fieldset>
+                    <p class="help-text">Online signup allows riders to sign up for the ride on the website.</p>
+                </div>
+                <div class="small-12 medium-6 columns online-signup-yes">
+                    <fieldset>
+                        <legend>Members Only</legend>
+                        <input type="radio" name="members_only" value="0" id="members-only-no" <?php echo $members_only == false ? 'checked': ''; ?>><label for="members-only-no">No</label>
+                        <input type="radio" name="members_only" value="1" id="members-only-yes" <?php echo $members_only == true ? 'checked': ''; ?>><label for="members-only-yes">Yes</label>
+                    </fieldset>
+                    <p class="help-text">If yes, only club members are allowed to sign up online for the ride.</p>
+                </div>
+                <div class="small-12 medium-6 columns online-signup-yes">
+                    <label>Cutoff Time (hours)
+                        <input type="number" name="signup_cutoff" value="<?php echo $signup_cutoff; ?>"/>	
+                    </label>
+                    <p class="help-text">Determines when the online sign up period ends relative to the start of the ride.</p>
+                </div>
+                <div class="small-12 medium-6 columns online-signup-yes">
+                    <label>Attendance Limit
+                        <input type="number" name="signup_limit" value="<?php echo $signup_limit; ?>"/>	
+                    </label>
+                    <p class="help-text">Limits the number of riders allowed to sign up online for the ride (zero means unlimited.)</p>
+                </div>
+            </div>
+    <?php } ?>
 	    <div class="row column errmsg"></div>
             <div class="row column clearfix">
             <?php if ($postid == 0) { ?>
