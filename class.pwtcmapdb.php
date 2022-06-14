@@ -279,7 +279,7 @@ class PwtcMapdb {
 				wp_die('Authorization failed.', 403);
 			}
 			wp_redirect(add_query_arg(array(
-				'rider' => urlencode(trim($_POST['rider_name'])),
+				'rider' => urlencode(stripslashes(trim($_POST['rider_name']))),
 				'riderid' => urlencode(trim($_POST['rider_id'])),
 				'offset' => intval($_POST['offset'])
 			), get_permalink()), 303);
