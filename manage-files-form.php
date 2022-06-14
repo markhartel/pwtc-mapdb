@@ -49,7 +49,7 @@
 <div id="pwtc-mapdb-manage-files-div">
     <div class="row column">
         <form class="sort-frm" method="POST" novalidate>
-            <input type="hidden" name="file_title" value="<?php echo $file_title; ?>">
+            <input type="hidden" name="file_title" value="<?php echo stripslashes($file_title); ?>">
             <input type="hidden" name="offset" value="0">
             <fieldset class="fieldset">
                 <legend>Sort file attachments by</legend>
@@ -69,7 +69,7 @@
                     <div class="row">
                         <div class="small-12 medium-12 columns">
                             <label>Attachment Title 
-                                <input type="text" name="file_title" value="<?php echo $file_title; ?>">
+                                <input type="text" name="file_title" value="<?php echo stripslashes($file_title); ?>">
                             </label>
                         </div>
                     </div>
@@ -123,7 +123,7 @@
     </table>
     <?php if ($is_more or $is_prev) { ?>
     <form class="load-more-frm" method="POST">
-        <input type="hidden" name="file_title" value="<?php echo $file_title; ?>">
+        <input type="hidden" name="file_title" value="<?php echo stripslashes($file_title); ?>">
         <input type="hidden" name="sort_by" value="<?php echo $sort_by; ?>">
         <div class="row column errmsg"></div>
         <div class="row column clearfix">
