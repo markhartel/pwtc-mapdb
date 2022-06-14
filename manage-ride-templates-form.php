@@ -37,7 +37,7 @@
     <div class="row column">
         <form class="sort-frm" method="POST" novalidate>
             <input type="hidden" name="ride_status" value="<?php echo $ride_status; ?>">
-            <input type="hidden" name="ride_title" value="<?php echo $ride_title; ?>">
+            <input type="hidden" name="ride_title" value="<?php echo stripslashes($ride_title); ?>">
             <input type="hidden" name="ride_leader" value="<?php echo $ride_leader; ?>">
             <input type="hidden" name="offset" value="0">
             <fieldset class="fieldset">
@@ -73,7 +73,7 @@
                     <?php } ?>
                         <div class="small-12 medium-7 columns">
                             <label>Ride Title 
-                                <input type="text" name="ride_title" value="<?php echo $ride_title; ?>">
+                                <input type="text" name="ride_title" value="<?php echo stripslashes($ride_title); ?>">
                             </label>
                         </div>
                         <div class="small-12 medium-3 columns">
@@ -171,7 +171,7 @@
     </table>
     <?php if ($is_more or $is_prev) { ?>
     <form class="load-more-frm" method="POST">
-        <input type="hidden" name="ride_title" value="<?php echo $ride_title; ?>">
+        <input type="hidden" name="ride_title" value="<?php echo stripslashes($ride_title); ?>">
         <input type="hidden" name="ride_status" value="<?php echo $ride_status; ?>">
         <input type="hidden" name="ride_leader" value="<?php echo $ride_leader; ?>">
         <input type="hidden" name="sort_by" value="<?php echo $sort_by; ?>">
