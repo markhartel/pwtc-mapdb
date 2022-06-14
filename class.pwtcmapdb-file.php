@@ -109,7 +109,7 @@ class PwtcMapdb_File {
                			$attachment = array(
                     			'guid'           => $upload_dir['url'] . '/' . $filename, 
                     			'post_mime_type' => $filetype['type'],
-                    			'post_title'     => esc_html($title),
+                    			'post_title'     => $title,
                     			'post_content'   => '',
                     			'post_status'    => 'inherit'
                 		);
@@ -123,7 +123,7 @@ class PwtcMapdb_File {
 				$operation = 'update';
                 		$my_post = array(
 					'ID' => $attach_id,
-					'post_title' => esc_html($title)
+					'post_title' => $title
 				);
 				$status = wp_update_post($my_post);	
 				if ($status != $attach_id) {
@@ -291,7 +291,7 @@ class PwtcMapdb_File {
 				$sort_by = $_POST['sort_by'];
 			}
 			wp_redirect(add_query_arg(array(
-				'title' => urlencode(trim($_POST['file_title'])),
+				'title' => urlencode(stripslashes(trim($_POST['file_title']))),
 				'sort' => $sort_by,
 				'offset' => intval($_POST['offset'])
 			), get_permalink()), 303);
