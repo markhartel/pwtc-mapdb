@@ -205,7 +205,7 @@ class PwtcMapdb_Ride {
 			if ($postid != 0) {
 				$my_post = array(
 					'ID' => $postid,
-					'post_title' => esc_html($title)
+					'post_title' => $title
 				);
 				if (isset($_POST['draft'])) {
 					$my_post['post_status'] = 'draft';
@@ -249,7 +249,7 @@ class PwtcMapdb_Ride {
 			}
 			else {
 				$my_post = array(
-					'post_title'    => esc_html($title),
+					'post_title'    => $title,
 					'post_type'     => ($is_template ? PwtcMapdb::POST_TYPE_TEMPLATE : PwtcMapdb::POST_TYPE_RIDE),
                     			'post_status'   => 'draft',
                     			'post_author'   => $current_user->ID
@@ -1046,7 +1046,7 @@ class PwtcMapdb_Ride {
 			wp_redirect(add_query_arg(array(
 				'month' => $_POST['ride_month'],
 				'leader' => $_POST['ride_leader'],
-				'title' => urlencode(trim($_POST['ride_title'])),
+				'title' => urlencode(stripslashes(trim($_POST['ride_title']))),
 				'status' => $ride_status,
 				'sort' => $sort_by,
 				'offset' => intval($_POST['offset'])
@@ -1225,7 +1225,7 @@ class PwtcMapdb_Ride {
 			}
 			wp_redirect(add_query_arg(array(
 				'leader' => $_POST['ride_leader'],
-				'title' => urlencode(trim($_POST['ride_title'])),
+				'title' => urlencode(stripslashes(trim($_POST['ride_title']))),
 				'status' => $ride_status,
 				'sort' => $sort_by,
 				'offset' => intval($_POST['offset'])
@@ -1441,7 +1441,7 @@ class PwtcMapdb_Ride {
 					wp_die('Invalid date format.', 403);
 				}
 				$my_post = array(
-					'post_title'    => esc_html($title),
+					'post_title'    => $title,
 					'post_type'     => PwtcMapdb::POST_TYPE_RIDE,
                     			'post_status'   => $newstatus,
                    	 		'post_author'   => $current_user->ID
