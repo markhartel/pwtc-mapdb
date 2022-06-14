@@ -203,7 +203,7 @@ class PwtcMapdb_Map {
 			if ($postid != 0) {
 				$my_post = array(
 					'ID' => $postid,
-					'post_title' => esc_html($title)
+					'post_title' => $title
 				);
 				if (isset($_POST['draft'])) {
 					$my_post['post_status'] = 'draft';
@@ -247,7 +247,7 @@ class PwtcMapdb_Map {
 			}
 			else {
 				$my_post = array(
-					'post_title'    => esc_html($title),
+					'post_title'    => $title,
 					'post_type'     => PwtcMapdb::MAP_POST_TYPE,
                     			'post_status'   => 'draft',
                     			'post_author'   => $current_user->ID
@@ -354,7 +354,7 @@ class PwtcMapdb_Map {
 						$attachment = array(
 							'guid'           => $upload_dir['url'] . '/' . $filename, 
 							'post_mime_type' => $filetype['type'],
-							'post_title'     => esc_html($title),
+							'post_title'     => $title,
 							'post_content'   => '',
 							'post_status'    => 'inherit'
 						);
@@ -932,7 +932,7 @@ class PwtcMapdb_Map {
 				$sort_by = $_POST['sort_by'];
 			}
 			wp_redirect(add_query_arg(array(
-				'title' => urlencode(trim($_POST['map_title'])),
+				'title' => urlencode(stripslashes(trim($_POST['map_title']))),
 				'type' => $_POST['map_type'],
 				'distance' => $_POST['map_distance'],
 				'terrain' => $_POST['map_terrain'],
