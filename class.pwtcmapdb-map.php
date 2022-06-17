@@ -768,6 +768,9 @@ class PwtcMapdb_Map {
 				}
 			endwhile;
 		}
+		
+		$return_uri = $_SERVER['REQUEST_URI'];
+		$usage_link = self::usage_map_link($postid, $return_uri);
 
 		ob_start();
 		include('map-delete-form.php');
