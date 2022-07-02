@@ -565,6 +565,7 @@
     });
 </script>
 <div id='pwtc-mapdb-view-signup-div'>
+    <ul class="breadcrumbs"><li><a href="<?php echo $ride_link; ?>">Back to Ride</a></li></ul>
     <ul class="accordion" data-accordion data-allow-all-closed="true">
         <li class="accordion-item" data-accordion-item>
                     <a href="#" class="accordion-title">Set Sign-up Options...</a>
@@ -854,7 +855,6 @@
             <input type="hidden" name="lock_signup" value="yes"/>
             <button class="dark button float-left" type="submit" <?php echo $now_date < $cutoff_date ? 'disabled': ''; ?>><i class="fa fa-lock"></i> Close Sign-up</button>
     <?php } ?>
-            <a href="<?php echo $ride_link; ?>" class="dark button float-right"><i class="fa fa-chevron-left"></i> Back to Ride</a>
         </form>
     </div>
     <form class="download-frm" method="POST">
