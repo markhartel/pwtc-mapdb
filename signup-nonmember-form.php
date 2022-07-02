@@ -232,6 +232,7 @@
 </script>
 
 <div id='pwtc-mapdb-nonmember-signup-div'>
+    <ul class="breadcrumbs"><li><a href="<?php echo $ride_link; ?>">Back to Ride</a></li></ul>
     <div class="callout small warning"><p>ONLY non-members should use this page to sign up for rides. If you are a club member, first <a href="/wp-login.php">log in</a> before signing up for a ride.</p></div>
     <div class="errmsg"></div>
     <div class="accept_div callout" style="display: none">
@@ -271,7 +272,6 @@
             <div class="warnmsg"></div>
             <div class="row column clearfix">
                 <button class="dark button float-left" type="submit"><i class="fa fa-user-plus"></i> Accept Sign-up</button>
-                <a href="<?php echo $ride_link; ?>" class="dark button float-right"><i class="fa fa-chevron-left"></i> Back to Ride</a>
             </div>
         </form>
     </div>
@@ -280,7 +280,6 @@
         <form method="POST">
             <div class="row column clearfix">
                 <button class="dark button float-left" type="submit"><i class="fa fa-user-times"></i> Cancel Sign-up</button>
-                <a href="<?php echo $ride_link; ?>" class="dark button float-right"><i class="fa fa-chevron-left"></i> Back to Ride</a>
             </div>
         </form>
     </div>
