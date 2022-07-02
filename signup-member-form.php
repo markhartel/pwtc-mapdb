@@ -36,6 +36,7 @@
     });
 </script>
 <div id='pwtc-mapdb-rider-signup-div'>
+    <ul class="breadcrumbs"><li><a href="<?php echo $ride_link; ?>">Back to Ride</a></li></ul>
     <?php if ($accept_signup) { ?>
         <div class="callout">
             <p>
@@ -84,7 +85,6 @@
                 <div class="row column clearfix">
                     <input type="hidden" name="accept_user_signup" value="yes"/>
                     <button class="dark button float-left" type="submit"><i class="fa fa-user-plus"></i> Accept Sign-up</button>
-                    <a href="<?php echo $ride_link; ?>" class="dark button float-right"><i class="fa fa-chevron-left"></i> Back to Ride</a>
                 </div>
             </form>
         </div>
@@ -118,7 +118,6 @@
                 <div class="row column clearfix">
                     <input type="hidden" name="accept_user_signup" value="no"/>
                     <button class="dark button float-left" type="submit"><i class="fa fa-user-times"></i> Cancel Sign-up</button>
-                    <a href="<?php echo $ride_link; ?>" class="dark button float-right"><i class="fa fa-chevron-left"></i> Back to Ride</a>
                 </div>
             </form>
         </div>
