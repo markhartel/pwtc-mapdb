@@ -268,7 +268,7 @@ class PwtcMapdb_File {
 	
         // Generates the [pwtc_mapdb_manage_files] shortcode.
 	public static function shortcode_manage_files($atts) {
-		$a = shortcode_atts(array('limit' => '10', 'search' => 'close', 'sort' => 'title'), $atts);
+		$a = shortcode_atts(array('limit' => '10', 'search' => 'close', 'sort' => 'title', 'filter' => ''), $atts);
 		$limit = intval($a['limit']);
 		$search_open = $a['search'] == 'open';
 
@@ -332,10 +332,12 @@ class PwtcMapdb_File {
 			'post_status' => 'any',
 			'post_type' => 'attachment',
 		];
-        	$query_args['meta_query'][] = [
-            		'key' => '_road_captain',
-            		'compare' => 'EXISTS',
-        	];
+		if (!empty($a['filter'])) {
+        		$query_args['meta_query'][] = [
+            			'key' => $a['filter'],
+            			'compare' => 'EXISTS',
+        		];
+		}
 		
 		if ($sort_by == 'date') {
 			$query_args['orderby'] = 'date';
