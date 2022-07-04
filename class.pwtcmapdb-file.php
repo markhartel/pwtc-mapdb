@@ -27,8 +27,9 @@ class PwtcMapdb_File {
 
     	// Generates the [pwtc_mapdb_upload_file] shortcode.
 	public static function shortcode_upload_file($atts, $content) {
-		$a = shortcode_atts(array('use_return' => 'no'), $atts);
+		$a = shortcode_atts(array('use_return' => 'no', 'accept' => ''), $atts);
         	$use_return = $a['use_return'] == 'yes';
+		$accept_str = $a['accept'];
 
 		$is_road_captain = false;
 		$is_ride_leader = false;
