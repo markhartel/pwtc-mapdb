@@ -70,11 +70,21 @@
                 return;
             }
             if (file.length > 0) {
-		if (!file.toLowerCase().endsWith('.pdf')) {
-                    show_warning('The <strong>upload file</strong> is not a PDF file.');
-                    $('#pwtc-mapdb-upload-file-div .file-upload-lbl').addClass('indicate-error');
-                    evt.preventDefault();
-                    return;
+                var extensions = '<?php echo $accept_str; ?>'.split(',');
+                if (extensions.length > 0) {
+                    var match = false;
+                    for (let i = 0; i < extensions.length; i++) {
+                        if (file.toLowerCase().endsWith(extensions[i])) {
+                            match = true;
+                            break;
+                        }
+                    }
+                    if (!match) {
+                        show_warning('The <strong>upload file</strong> does not have the following extensions: <?php echo $accept_str; ?>');
+                        $('#pwtc-mapdb-upload-file-div .file-upload-lbl').addClass('indicate-error');
+                        evt.preventDefault();
+                        return;                            
+                    }
                 }
                 var elem = $('#pwtc-mapdb-upload-file-div input[name="file_upload"]')[0];
                 if (elem.validity) {
@@ -147,8 +157,8 @@
             </div>
             <div class="row column">
                 <label for="file-upload" class="dark button file-upload-lbl">Upload File</label>
-                <input type="file" id="file-upload" class="show-for-sr" accept=".pdf" name="file_upload"/>
-                <p class="help-text">When uploading a file, it must first exist on your desktop and be in the PDF format.</p>
+                <input type="file" id="file-upload" class="show-for-sr" accept="<?php echo $accept_str; ?>" name="file_upload"/>
+                <p class="help-text">When uploading a file, it must first exist on your desktop and have the following extensions: <?php echo $accept_str; ?></p>
             </div>
             <div class="row column errmsg"></div>
             <div class="row column clearfix">
