@@ -1285,8 +1285,8 @@
                         <a href="#" class="accordion-title">Choose Popular Start Location...</a>
                         <div class="accordion-content" data-tab-content>
                             <div class="row column">
-                                <p class="help-text">Below is a list of <a href="/ride-start-locations" target="_blank" rel="noopener noreferrer">popular club ride start locations.</a> Scroll through the list and choose your desired start location. To see the location on a Google Map, press the map marker icon.</p>
-                                <div class="start-locations-div" style="border:1px solid; overflow: auto; height: 200px;">
+				<p class="help-text">Below is a list of <a href="/ride-start-locations" target="_blank" rel="noopener noreferrer">popular club ride start locations.</a> Scroll through the list and choose your desired start location. To see the location on a Google Map, press the map marker icon. If you favorite location is not in the list, please contact <a href="<?php echo esc_url('mailto:mark_hartel@hotmail.com'); ?>">Mark Hartel</a> to add it.</p>
+				<div class="start-locations-div" style="border:1px solid; overflow: auto; height: 200px;">
                                     <table></table>
                                 </div>
                             </div>
