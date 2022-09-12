@@ -716,23 +716,23 @@ class PwtcMapdb_Map {
 		if ($author != $current_user->ID and !$is_road_captain) {
 			return $return_to_map . '<div class="callout small warning"><p>You must be the author of route map "' . $map_title . '" to delete it.</p></div>';
 		}
-		
-		$used_in_ride = false;
-		$ride_query = self::ride_usage_query($postid, PwtcMapdb::POST_TYPE_RIDE);
-		$template_query = self::ride_usage_query($postid, PwtcMapdb::POST_TYPE_TEMPLATE);
-		if ($template_query->have_posts() or $ride_query->have_posts()) { 
-			$used_in_ride = true;
-		}
-		
-		if ($check_usage and $used_in_ride) {
-			return $return_to_map . '<div class="callout small warning"><p>Cannot delete map "' . $map_title . '" because it is used by ride templates or scheduled rides.</p></div>';
-		}
 
 		$deleted = false;
 		if ($status == 'trash') {
 			$deleted = true;
 		}
 		else {
+			$used_in_ride = false;
+			$ride_query = self::ride_usage_query($postid, PwtcMapdb::POST_TYPE_RIDE);
+			$template_query = self::ride_usage_query($postid, PwtcMapdb::POST_TYPE_TEMPLATE);
+			if ($template_query->have_posts() or $ride_query->have_posts()) { 
+				$used_in_ride = true;
+			}
+		
+			if ($check_usage and $used_in_ride) {
+				return $return_to_map . '<div class="callout small warning"><p>Cannot delete map "' . $map_title . '" because it is used by ride templates or scheduled rides.</p></div>';
+			}
+			
 			$lock_user = self::check_post_lock($postid);
 			if ($lock_user) {
 				$info = get_userdata($lock_user);
