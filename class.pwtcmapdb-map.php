@@ -601,7 +601,7 @@ class PwtcMapdb_Map {
 	
 	// Generates the [pwtc_mapdb_delete_map] shortcode.
 	public static function shortcode_delete_map($atts) {
-		$a = shortcode_atts(array('leaders' => 'no', 'use_return' => 'no', 'check_usage' => 'no'), $atts);
+		$a = shortcode_atts(array('leaders' => 'no', 'use_return' => 'no', 'check_usage' => 'yes'), $atts);
 		$allow_leaders = $a['leaders'] == 'yes';
 		$use_return = $a['use_return'] == 'yes';
 		$check_usage = $a['check_usage'] == 'yes';
