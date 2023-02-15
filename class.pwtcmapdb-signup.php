@@ -1158,84 +1158,92 @@ class PwtcMapdb_Signup {
 				);
 			}
 			else {
-				$ride_date = PwtcMapdb::get_ride_start_time($postid);
-				$limit_date = self::get_log_mileage_lookback_limit();
-				if ($ride_date < $limit_date) {
+				$plugin_options = PwtcMileage::get_plugin_options();
+				if ($plugin_options['admin_maint_mode']) {
 					$response = array(
-						'error' => 'You cannot log the mileage of a ride that start before ' . $limit_date->format('m/d/Y') . '.'
-					);	
+						'error' => 'You cannot log mileage, the mileage database is maintenance mode. Try again later.'
+					);
 				}
 				else {
-					$results = PwtcMileage_DB::fetch_ride_by_post_id($postid);
-					if (count($results) > 0) {
+					$ride_date = PwtcMapdb::get_ride_start_time($postid);
+					$limit_date = self::get_log_mileage_lookback_limit();
+					if ($ride_date < $limit_date) {
 						$response = array(
-							'error' => 'Mileage for this ride has already been logged.'
-						);
+							'error' => 'You cannot log the mileage of a ride that start before ' . $limit_date->format('m/d/Y') . '.'
+						);	
 					}
 					else {
-						//$title = sanitize_text_field(get_the_title($postid));
-						$post = get_post($postid);
-						$title = $post->post_title;
-						$date = PwtcMapdb::get_ride_start_time($postid);
-						$startdate = $date->format('Y-m-d');
-						$status = PwtcMileage_DB::insert_ride_with_postid($title, $startdate, $postid);
-						if (false === $status or 0 === $status) {
+						$results = PwtcMileage_DB::fetch_ride_by_post_id($postid);
+						if (count($results) > 0) {
 							$response = array(
-								'error' => 'Could not insert new ridesheet into mileage database.'
+								'error' => 'Mileage for this ride has already been logged.'
 							);
 						}
 						else {
-							$ride_id = PwtcMileage_DB::get_new_ride_id();
-							$leaders = PwtcMapdb::get_leader_userids($postid);
-							$nleaders = 0;
-							$nriders = 0;
-							$expired_ids = [];
-							$missing_ids = [];
-							$missing_leader_ids = [];
-							foreach ($leaders as $item) {
-								$memberid = get_field(PwtcMapdb::USER_RIDER_ID, 'user_'.$item);
-								$result = PwtcMileage_DB::fetch_rider($memberid);
-								if (count($result) > 0) {
-									PwtcMileage_DB::insert_ride_leader($ride_id, $memberid);
-									$nleaders++;
-								}
-								else {
-									$missing_leader_ids[] = $memberid;
-								}
+							//$title = sanitize_text_field(get_the_title($postid));
+							$post = get_post($postid);
+							$title = $post->post_title;
+							$date = PwtcMapdb::get_ride_start_time($postid);
+							$startdate = $date->format('Y-m-d');
+							$status = PwtcMileage_DB::insert_ride_with_postid($title, $startdate, $postid);
+							if (false === $status or 0 === $status) {
+								$response = array(
+									'error' => 'Could not insert new ridesheet into mileage database.'
+								);
 							}
-							$signup_list = get_post_meta($postid, PwtcMapdb::RIDE_SIGNUP_USERID);
-							foreach ($signup_list as $item) {
-								$arr = json_decode($item, true);
-								$userid = $arr['userid'];
-								$mileage = $arr['mileage'];
-								$attended = $arr['attended'];
-								if ($attended and !empty($mileage)) {
-									$memberid = get_field(PwtcMapdb::USER_RIDER_ID, 'user_'.$userid);
-									$user_info = get_userdata($userid);
-									if (in_array(PwtcMapdb::ROLE_EXPIRED_MEMBER, (array) $user_info->roles)) {
-										$expired_ids[] = $memberid;
+							else {
+								$ride_id = PwtcMileage_DB::get_new_ride_id();
+								$leaders = PwtcMapdb::get_leader_userids($postid);
+								$nleaders = 0;
+								$nriders = 0;
+								$expired_ids = [];
+								$missing_ids = [];
+								$missing_leader_ids = [];
+								foreach ($leaders as $item) {
+									$memberid = get_field(PwtcMapdb::USER_RIDER_ID, 'user_'.$item);
+									$result = PwtcMileage_DB::fetch_rider($memberid);
+									if (count($result) > 0) {
+										PwtcMileage_DB::insert_ride_leader($ride_id, $memberid);
+										$nleaders++;
 									}
 									else {
-										$result = PwtcMileage_DB::fetch_rider($memberid);
-										if (count($result) > 0) {
-												PwtcMileage_DB::insert_ride_mileage($ride_id, $memberid, intval($mileage));
-												$nriders++;
+										$missing_leader_ids[] = $memberid;
+									}
+								}
+								$signup_list = get_post_meta($postid, PwtcMapdb::RIDE_SIGNUP_USERID);
+								foreach ($signup_list as $item) {
+									$arr = json_decode($item, true);
+									$userid = $arr['userid'];
+									$mileage = $arr['mileage'];
+									$attended = $arr['attended'];
+									if ($attended and !empty($mileage)) {
+										$memberid = get_field(PwtcMapdb::USER_RIDER_ID, 'user_'.$userid);
+										$user_info = get_userdata($userid);
+										if (in_array(PwtcMapdb::ROLE_EXPIRED_MEMBER, (array) $user_info->roles)) {
+											$expired_ids[] = $memberid;
 										}
 										else {
-											$missing_ids[] = $memberid;
+											$result = PwtcMileage_DB::fetch_rider($memberid);
+											if (count($result) > 0) {
+												PwtcMileage_DB::insert_ride_mileage($ride_id, $memberid, intval($mileage));
+												$nriders++;
+											}
+											else {
+												$missing_ids[] = $memberid;
+											}
 										}
 									}
 								}
+								$response = array(
+									'postid' => $postid,
+									'rideid' => $ride_id,
+									'num_leaders' => $nleaders,
+									'num_riders' => $nriders,
+									'missing_leaders' => $missing_leader_ids,
+									'missing_riders' => $missing_ids,
+									'expired_riders' => $expired_ids
+								);											
 							}
-							$response = array(
-								'postid' => $postid,
-								'rideid' => $ride_id,
-								'num_leaders' => $nleaders,
-								'num_riders' => $nriders,
-								'missing_leaders' => $missing_leader_ids,
-								'missing_riders' => $missing_ids,
-								'expired_riders' => $expired_ids
-							);											
 						}
 					}
 				}
