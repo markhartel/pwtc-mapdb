@@ -10,6 +10,7 @@ function pwtc_mapdb_get_signup() {
         $result['copy_ride_url'] = false;
         $result['ride_signup_msg'] = false;
         $result['ride_signup_url'] = false;
+        $result['ride_signup_btn'] = false;
         return $result;
     }
     $current_user = wp_get_current_user();
@@ -36,6 +37,7 @@ function pwtc_mapdb_get_signup() {
     if ($signup_locked) {
         $result['ride_signup_msg'] = false;
         $result['ride_signup_url'] = false;
+        $result['ride_signup_btn'] = false;
     }
     else if ($signup_mode == 'no') {
         if ($members_only) {
@@ -45,36 +47,56 @@ function pwtc_mapdb_get_signup() {
             $result['ride_signup_msg'] = false;
         }
         $result['ride_signup_url'] = false;
+        $result['ride_signup_btn'] = false;
     }
     else {
         //$instruction_link = 'For more information on how to sign up online, click <a href="/online-signup-instructions-2" target="_blank" rel="noopener noreferrer">here</a>.';
         $instruction_link = '';
         if ($current_user->ID != 0) {
+            $signed_up = PwtcMapdb_Signup::fetch_user_signup($postid, $current_user->ID);
             $result['ride_signup_url'] = '/ride-online-signup/?post='.$postid;
             if ($signup_mode == 'paperless') {
-                $result['ride_signup_msg'] = 'You <em>must</em> sign up online to attend this ride. ' . $instruction_link;
+                if ($signed_up) {
+                    $result['ride_signup_msg'] = 'You are currently signed up to attend this ride. If you want to cancel your sign up or modify your mileage, press the button below. ' . $instruction_link;
+                    $result['ride_signup_btn'] = 'Change Sign-up';
+                }
+                else {
+                    $result['ride_signup_msg'] = 'You <em>must</em> sign up online to attend this ride. ' . $instruction_link;
+                    $result['ride_signup_btn'] = '<i class="fa fa-user-plus"></i> Sign-up';
+                }
             }
             else {
-                $result['ride_signup_msg'] = 'Online sign up is available for this ride. ' . $instruction_link;
+                if ($signed_up) {
+                    $result['ride_signup_msg'] = 'You are currently signed up to attend this ride. If you want to cancel your sign up, press the button below. ' . $instruction_link;
+                    $result['ride_signup_btn'] = 'Change Sign-up';
+                }
+                else {                
+                    $result['ride_signup_msg'] = 'Online sign up is available for this ride. ' . $instruction_link;
+                    $result['ride_signup_btn'] = '<i class="fa fa-user-plus"></i> Sign-up';
+                }
             }
         }
         else if (!$members_only) {
             if ($disable_nonmembers) {
                 $result['ride_signup_msg'] = 'Online sign up is available for this ride. Members must first <a href="/wp-login.php">log in</a> to sign up.';
-                $result['ride_signup_url'] = false;        
+                $result['ride_signup_url'] = false;  
+                $result['ride_signup_btn'] = false;
             }
             else {
                 $result['ride_signup_url'] = '/ride-nonmember-signup/?post='.$postid;
                 if ($signup_mode == 'paperless') {
                     $result['ride_signup_msg'] = 'You <em>must</em> sign up online to attend this ride. ONLY non-members should sign up here. If you are a club member, first <a href="/wp-login.php">log in</a> before signing up for this ride.';
+                    $result['ride_signup_btn'] = '<i class="fa fa-user-plus"></i> Sign-up';
                 }
                 else {
                     $result['ride_signup_msg'] = 'Online sign up is available for this ride. ONLY non-members should sign up here. If you are a club member, first <a href="/wp-login.php">log in</a> before signing up for this ride.';
+                    $result['ride_signup_btn'] = '<i class="fa fa-user-plus"></i> Sign-up';
                 }
             }
         }
         else {
             $result['ride_signup_url'] = false;
+            $result['ride_signup_btn'] = false;
             $result['ride_signup_msg'] = 'Only club members may attend this ride. Members must first <a href="/wp-login.php">log in</a> to sign up.';
         }
     }
