@@ -57,13 +57,15 @@
     </div>
     <?php } ?>
     <table class="pwtc-mapdb-rwd-table">
-        <thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>Emergency Contact</th></tr></thead>
+        <thead><tr><th>Name</th><th>Rider ID</th><th>Email</th><th>Phone</th><th>Emergency Contact</th></tr></thead>
         <tbody>
     <?php
     foreach ($riders as $rider) {
         $id = $rider->ID;
-        $hidden = get_field('directory_excluded', 'user_'.$id);
+        //$hidden = get_field('directory_excluded', 'user_'.$id);
+        $hidden = false;
         $name = $rider->first_name . ' ' . $rider->last_name;
+        $riderID = get_field('?', 'user_'.$id);
         $email = '';
         if (!empty($rider->user_email)) {
             if ($hidden) {
@@ -86,6 +88,7 @@
     ?>
             <tr>
                 <td><span>Name</span><?php echo $name; ?></td>
+                <td><span>Rider ID</span><?php echo $riderID; ?></td>
                 <td><span>Email</span><?php echo $email; ?></td>
                 <td><span>Phone</span><?php echo $phone; ?></td>
                 <td><span>Emergency Contact</span><?php echo $contact; ?></td>
