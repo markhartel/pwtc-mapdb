@@ -65,7 +65,7 @@
         //$hidden = get_field('directory_excluded', 'user_'.$id);
         $hidden = false;
         $name = $rider->first_name . ' ' . $rider->last_name;
-        $riderID = get_field('?', 'user_'.$id);
+        $riderID = get_field('rider_number', 'user_'.$id);
         $email = '';
         if (!empty($rider->user_email)) {
             if ($hidden) {
