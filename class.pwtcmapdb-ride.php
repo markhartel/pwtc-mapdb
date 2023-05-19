@@ -1055,14 +1055,15 @@ class PwtcMapdb_Ride {
 		}
 		
 		if (0 == $current_user->ID) {
-			return '<div class="callout small warning"><p>You must be logged in to view the published rides.</p></div>';
+			//return '<div class="callout small warning"><p>You must be logged in to view the published rides.</p></div>';
+			$is_road_captain = false;
+			$is_ride_leader = false;
 		}
-		
-		$user_info = get_userdata($current_user->ID);
-		
-		$is_road_captain = in_array(PwtcMapdb::ROLE_ROAD_CAPTAIN, $user_info->roles);
-
-		$is_ride_leader = in_array(PwtcMapdb::ROLE_RIDE_LEADER, $user_info->roles);
+		else {
+			$user_info = get_userdata($current_user->ID);
+			$is_road_captain = in_array(PwtcMapdb::ROLE_ROAD_CAPTAIN, $user_info->roles);
+			$is_ride_leader = in_array(PwtcMapdb::ROLE_RIDE_LEADER, $user_info->roles);
+		}
 
 		if (isset($_GET['title'])) {
 			$ride_title = $_GET['title'];
