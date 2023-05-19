@@ -1031,9 +1031,11 @@ class PwtcMapdb_Ride {
 		$current_user = wp_get_current_user();
 
 		if (isset($_POST['ride_title']) and isset($_POST['ride_leader']) and isset($_POST['ride_month']) and isset($_POST['offset'])) {
+			/*
 			if (0 == $current_user->ID) {
 				wp_die('Authorization failed.', 403);
 			}
+			*/
 
 			$ride_status = 'publish';
 			if (isset($_POST['ride_status'])) {
@@ -1099,7 +1101,7 @@ class PwtcMapdb_Ride {
 			$ride_leader = $_GET['leader'];
 		}
 		else {
-			if ($is_road_captain or !$is_ride_leader) {
+			if ($is_road_captain or !$is_ride_leader or !$allow_leaders) {
 				$ride_leader = 'anyone';
 			}
 			else {
