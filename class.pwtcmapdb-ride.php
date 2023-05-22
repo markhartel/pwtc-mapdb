@@ -1047,8 +1047,13 @@ class PwtcMapdb_Ride {
 			if (isset($_POST['sort_by'])) {
 				$sort_by = $_POST['sort_by'];
 			}
+			$ride_month = $_POST['ride_month'];
+			if (empty($ride_month)) {
+				$now = PwtcMapdb::get_current_time();
+				$ride_month = $now->format('Y-m');
+			}
 			wp_redirect(add_query_arg(array(
-				'month' => $_POST['ride_month'],
+				'month' => $ride_month,
 				'leader' => $_POST['ride_leader'],
 				'title' => urlencode(stripslashes(trim($_POST['ride_title']))),
 				'status' => $ride_status,
