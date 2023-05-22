@@ -1023,10 +1023,12 @@ class PwtcMapdb_Ride {
 
 	// Generates the [pwtc_mapdb_manage_published_rides] shortcode.
 	public static function shortcode_manage_published_rides($atts) {
-		$a = shortcode_atts(array('leaders' => 'no', 'limit' => '10', 'status' => 'all', 'search' => 'close', 'sort' => 'start'), $atts);
+		$a = shortcode_atts(array('leaders' => 'no', 'limit' => '10', 'status' => 'all', 'search' => 'close', 'sort' => 'start', 'monthonly' => 'no', 'viewonly' => 'no'), $atts);
 		$allow_leaders = $a['leaders'] == 'yes';
 		$limit = intval($a['limit']);
 		$search_open = $a['search'] == 'open';
+		$monthonly = $a['monthonly'] == 'yes';
+		$viewonly = $a['viewonly'] == 'yes';
 
 		$current_user = wp_get_current_user();
 
@@ -1056,7 +1058,7 @@ class PwtcMapdb_Ride {
 			exit;
 		}
 		
-		if (0 == $current_user->ID) {
+		if (0 == $current_user->ID or $viewonly) {
 			//return '<div class="callout small warning"><p>You must be logged in to view the published rides.</p></div>';
 			$is_road_captain = false;
 			$is_ride_leader = false;
@@ -1111,17 +1113,23 @@ class PwtcMapdb_Ride {
 
 		if (isset($_GET['month'])) {
 			$ride_month = $_GET['month'];
-			if (!empty($ride_month)) {
-				$timezone = new DateTimeZone(pwtc_get_timezone_string());
-				$interval = new DateInterval('P1M');	
-				$this_month = DateTime::createFromFormat('Y-m-d H:i:s', $ride_month.'-01 00:00:00', $timezone);
-				$next_month = DateTime::createFromFormat('Y-m-d H:i:s', $ride_month.'-01 00:00:00', $timezone);
-				$next_month->add($interval);
-				$ride_month = $this_month->format('Y-m');
-			}
 		}
 		else {
-			$ride_month = '';
+			if ($monthonly) {
+				$ride_month = ''; //TODO: set current month!
+			}
+			else {
+				$ride_month = '';
+			}
+		}
+		
+		if (!empty($ride_month)) {
+			$timezone = new DateTimeZone(pwtc_get_timezone_string());
+			$interval = new DateInterval('P1M');	
+			$this_month = DateTime::createFromFormat('Y-m-d H:i:s', $ride_month.'-01 00:00:00', $timezone);
+			$next_month = DateTime::createFromFormat('Y-m-d H:i:s', $ride_month.'-01 00:00:00', $timezone);
+			$next_month->add($interval);
+			$ride_month = $this_month->format('Y-m');
 		}
 
 		if (isset($_GET['offset'])) {
@@ -1160,7 +1168,12 @@ class PwtcMapdb_Ride {
 		else if ($sort_by == 'start') {
 			$query_args['meta_key'] = PwtcMapdb::RIDE_DATE;
 			$query_args['meta_type'] = 'DATETIME';
-			$query_args['orderby'] = ['meta_value' => 'DESC'];
+			if ($monthonly) {
+				$query_args['orderby'] = ['meta_value' => 'ASC'];
+			}
+			else {
+				$query_args['orderby'] = ['meta_value' => 'DESC'];
+			}
 		}
 		
 		if ($ride_status == 'mine') {
