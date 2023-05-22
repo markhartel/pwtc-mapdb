@@ -1110,13 +1110,15 @@ class PwtcMapdb_Ride {
 				$ride_leader = $current_user->ID;
 			}
 		}
+		
+		$now = PwtcMapdb::get_current_time();
 
 		if (isset($_GET['month'])) {
 			$ride_month = $_GET['month'];
 		}
 		else {
 			if ($monthonly) {
-				$ride_month = ''; //TODO: set current month!
+				$ride_month = $now->format('Y-m');
 			}
 			else {
 				$ride_month = '';
@@ -1149,7 +1151,6 @@ class PwtcMapdb_Ride {
 			$sort_by = 'start';
 		}
 
-		$now = PwtcMapdb::get_current_time();
 		$query_args = [
 			'posts_per_page' => $limit > 0 ? $limit : -1,
 			'post_status' => $post_status,
