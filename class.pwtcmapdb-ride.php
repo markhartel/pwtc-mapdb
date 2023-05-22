@@ -1048,7 +1048,7 @@ class PwtcMapdb_Ride {
 				$sort_by = $_POST['sort_by'];
 			}
 			$ride_month = $_POST['ride_month'];
-			if (empty($ride_month)) {
+			if (empty($ride_month) and $monthonly) {
 				$now = PwtcMapdb::get_current_time();
 				$ride_month = $now->format('Y-m');
 			}
