@@ -1168,7 +1168,7 @@ class PwtcMapdb_Ride {
 		else if ($sort_by == 'start') {
 			$query_args['meta_key'] = PwtcMapdb::RIDE_DATE;
 			$query_args['meta_type'] = 'DATETIME';
-			if ($monthonly) {
+			if (!empty($ride_month)) {
 				$query_args['orderby'] = ['meta_value' => 'ASC'];
 			}
 			else {
