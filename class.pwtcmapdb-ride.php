@@ -360,7 +360,34 @@ class PwtcMapdb_Ride {
 					else {
 						update_field(PwtcMapdb::RIDE_MAPS_KEY, $new_maps, $postid);
 					}
-				}	
+				}
+				
+				$terrain = get_actual_ride_terrain($postid);
+				if ($is_template) {
+					update_field(PwtcMapdb::TEMPLATE_TERRAIN_KEY, $terrain, $postid);
+				}
+				else {
+					update_field(PwtcMapdb::RIDE_TERRAIN_KEY, $terrain, $postid);
+				}
+				
+				$length = get_actual_ride_length($postid);
+				if ($is_template) {
+					update_field(PwtcMapdb::TEMPLATE_LENGTH_KEY, $length, $postid);
+				}
+				else {
+					update_field(PwtcMapdb::RIDE_LENGTH_KEY, $length, $postid);
+				}
+				
+				$max_length = get_actual_ride_maxlength($postid);
+				if ($length == $max_length) {
+					$max_length = null;
+				}
+				if ($is_template) {
+					update_field(PwtcMapdb::TEMPLATE_MAX_LENGTH_KEY, $max_length, $postid);
+				}
+				else {
+					update_field(PwtcMapdb::RIDE_MAX_LENGTH_KEY, $max_length, $postid);
+				}
 			}
 			else {
 				if (isset($_POST['distance'])) {
