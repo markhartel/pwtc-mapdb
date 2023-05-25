@@ -1472,9 +1472,15 @@ class PwtcMapdb_Ride {
 			}
 			$attach = get_field(PwtcMapdb::RIDE_ATTACH_MAP, $postid);
 			$maps = get_field(PwtcMapdb::RIDE_MAPS, $postid, false);
-			$terrain = get_field(PwtcMapdb::RIDE_TERRAIN, $postid);
-			$length = get_field(PwtcMapdb::RIDE_LENGTH, $postid);
-			$max_length = get_field(PwtcMapdb::RIDE_MAX_LENGTH, $postid);
+			//$terrain = get_field(PwtcMapdb::RIDE_TERRAIN, $postid);
+			//$length = get_field(PwtcMapdb::RIDE_LENGTH, $postid);
+			//$max_length = get_field(PwtcMapdb::RIDE_MAX_LENGTH, $postid);
+			$terrain = get_actual_ride_terrain($postid);
+			$length = get_actual_ride_length($postid);
+			$max_length = get_actual_ride_maxlength($postid);
+			if ($length == $max_length) {
+				$max_length = null;
+			}
 
 			if ($_POST['create_as'] == 'draft') {
 				$newstatus = 'draft';
