@@ -43,7 +43,7 @@
     });
 </script>			
 <div id="pwtc-mapdb-manage-published-rides-div">
-<?php if ($monthonly) { ?>
+<?php if ($viewonly) { ?>
     <a class="dark button" href="/scheduled_rides/?month=<?php echo $ride_month; ?>"><i class="fa fa-calendar" aria-hidden="true"></i> Calendar View</a>
 <?php } ?>
 <?php if ($is_road_captain) { ?>
