@@ -358,7 +358,7 @@ class PwtcMapdb {
                 		<button class="dark button" type="submit" name="offset" value="<?php echo $offset+$limit; ?>" <?php if (!$is_more) { ?>disabled<?php } ?>><i class="fa fa-chevron-right" aria-hidden="true"></i></button>
 				<button class="dark button" type="submit" name="offset" value="<?php echo ($total_pages=1)*$limit; ?>" <?php if (!$is_more) { ?>disabled<?php } ?>><i class="fa fa-chevron-right" aria-hidden="true"></i><i class="fa fa-chevron-right" aria-hidden="true"></i></button>
 			</div>
-			<label class="float-right">Page <?php echo $current_page; ?> of <?php echo $total_pages; ?></label>
+			<label class="float-right">Page <?php echo $current_page+1; ?> of <?php echo $total_pages; ?></label>
 		</div>
 		return ob_get_clean();
 	}
