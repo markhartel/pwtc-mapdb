@@ -344,6 +344,24 @@ class PwtcMapdb {
 	}
 
 	/******************* Utility Functions ******************/
+	
+	public static function output_pagination_html($limit, $offset, $total) {
+		$is_more = ($limit > 0) && ($total > ($offset + $limit));
+    		$is_prev = ($limit > 0) && ($offset > 0);
+		$current_page = floor($offset/$limit);
+		$total_pages = ceil($total/$limit);
+		ob_start();
+		<div class="row column clearfix">
+            		<div class="button-group float-left">
+				<button class="dark button" type="submit" name="offset" value="<?php echo 0; ?>" <?php if (!$is_prev) { ?>disabled<?php } ?>><i class="fa fa-chevron-left" aria-hidden="true"></i><i class="fa fa-chevron-left" aria-hidden="true"></i></button>
+                		<button class="dark button" type="submit" name="offset" value="<?php echo $offset-$limit; ?>" <?php if (!$is_prev) { ?>disabled<?php } ?>><i class="fa fa-chevron-left" aria-hidden="true"></i></button>
+                		<button class="dark button" type="submit" name="offset" value="<?php echo $offset+$limit; ?>" <?php if (!$is_more) { ?>disabled<?php } ?>><i class="fa fa-chevron-right" aria-hidden="true"></i></button>
+				<button class="dark button" type="submit" name="offset" value="<?php echo ($total_pages=1)*$limit; ?>" <?php if (!$is_more) { ?>disabled<?php } ?>><i class="fa fa-chevron-right" aria-hidden="true"></i><i class="fa fa-chevron-right" aria-hidden="true"></i></button>
+			</div>
+			<label class="float-right">Page <?php echo $current_page; ?> of <?php echo $total_pages; ?></label>
+		</div>
+		return ob_get_clean();
+	}
 
 	public static function check_plugin_dependency() {
 		if (!defined('PWTC_MILEAGE__PLUGIN_DIR')) {
