@@ -354,14 +354,14 @@ class PwtcMapdb {
 		?>
 		<div class="row column clearfix">
             		<div class="button-group float-left">
-				<button class="dark button" type="submit" name="offset" value="<?php echo 0; ?>" <?php if (!$is_prev) { ?>disabled<?php } ?>><i class="fa fa-chevron-left" aria-hidden="true"></i><i class="fa fa-chevron-left" aria-hidden="true"></i></button>
-                		<button class="dark button" type="submit" name="offset" value="<?php echo $offset-$limit; ?>" <?php if (!$is_prev) { ?>disabled<?php } ?>><i class="fa fa-chevron-left" aria-hidden="true"></i></button>
-                		<button class="dark button" type="submit" name="offset" value="<?php echo $offset+$limit; ?>" <?php if (!$is_more) { ?>disabled<?php } ?>><i class="fa fa-chevron-right" aria-hidden="true"></i></button>
-				<button class="dark button" type="submit" name="offset" value="<?php echo ($total_pages-1)*$limit; ?>" <?php if (!$is_more) { ?>disabled<?php } ?>><i class="fa fa-chevron-right" aria-hidden="true"></i><i class="fa fa-chevron-right" aria-hidden="true"></i></button>
+				<button title="First Page" class="dark button" type="submit" name="offset" value="<?php echo 0; ?>" <?php if (!$is_prev) { ?>disabled<?php } ?>><i class="fa fa-fast-backward" aria-hidden="true"></i></button>
+                		<button title="Previous Page" class="dark button" type="submit" name="offset" value="<?php echo $offset-$limit; ?>" <?php if (!$is_prev) { ?>disabled<?php } ?>><i class="fa fa-backward" aria-hidden="true"></i></button>
+                		<button title="Next Page" class="dark button" type="submit" name="offset" value="<?php echo $offset+$limit; ?>" <?php if (!$is_more) { ?>disabled<?php } ?>><i class="fa fa-forward" aria-hidden="true"></i></button>
+				<button title="Last Page" class="dark button" type="submit" name="offset" value="<?php echo ($total_pages-1)*$limit; ?>" <?php if (!$is_more) { ?>disabled<?php } ?>><i class="fa fa-fast-forward" aria-hidden="true"></i></button>
 			</div>
 			<label class="float-right">Page <?php echo $current_page+1; ?> of <?php echo $total_pages; ?></label>
 		</div>
-		<?php
+		<?php 
 		return ob_get_clean();
 	}
 
