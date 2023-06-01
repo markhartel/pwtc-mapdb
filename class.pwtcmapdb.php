@@ -364,6 +364,24 @@ class PwtcMapdb {
 		<?php 
 		return ob_get_clean();
 	}
+	
+	public static function output_pagination_html2($limit, $offset, $total) {
+		$is_more = ($limit > 0) && ($total > ($offset + $limit));
+    		$is_prev = ($limit > 0) && ($offset > 0);
+		$current_page = floor($offset/$limit);
+		$total_pages = ceil($total/$limit);
+		ob_start();
+		?>
+		<div class="row column clearfix">
+			<div class="button-group float-left">
+			<?php for ($i=0; $i < $total_pages; $i++) { ?>
+				<button title="Page <?php echo $i+1; ?>" class="dark button" type="submit" name="offset" value="<?php echo $i*$limit; ?>" <?php if ($i == $current_page) { ?>disabled<?php } ?>><?php echo $i+1; ?></button>
+			<?php } ?>
+			</div>
+		</div>
+		<?php 
+		return ob_get_clean();
+	}
 
 	public static function check_plugin_dependency() {
 		if (!defined('PWTC_MILEAGE__PLUGIN_DIR')) {
