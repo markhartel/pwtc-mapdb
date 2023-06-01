@@ -374,9 +374,33 @@ class PwtcMapdb {
 		?>
 		<div class="row column clearfix">
 			<div class="button-group float-left">
-			<?php for ($i=0; $i < $total_pages; $i++) { ?>
+				<button title="Page 0" class="dark button" type="submit" name="offset" value="0" <?php if (0 == $current_page) { ?>disabled<?php } ?>>0</button>
+			<?php 
+			if ($current_page > 5) {
+				//TODO: print seperator
+				$i = $current_page - 2;
+			}
+			else {
+				$i = 1;
+			}
+			if ($current_page+2 > $total_pages-2) {
+				$max = $total_pages-2;
+				$seperator = false;
+			}
+			else {
+				$max = $current_page+2;
+				$seperator = true;
+			}
+			for (; $i <= $max; $i++) { 
+			?>
 				<button title="Page <?php echo $i+1; ?>" class="dark button" type="submit" name="offset" value="<?php echo $i*$limit; ?>" <?php if ($i == $current_page) { ?>disabled<?php } ?>><?php echo $i+1; ?></button>
-			<?php } ?>
+			<?php 
+			} 
+			if ($seperator) {
+				//TODO: print seperator
+			}
+			?>
+				<button title="Page <?php echo $total_pages; ?>" class="dark button" type="submit" name="offset" value="<?php echo ($total_pages-1)*$limit; ?>" <?php if (($total_pages-1) == $current_page) { ?>disabled<?php } ?>><?php echo $total_pages; ?></button>
 			</div>
 		</div>
 		<?php 
