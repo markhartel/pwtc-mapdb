@@ -353,6 +353,7 @@ class PwtcMapdb {
 		ob_start();
 		?>
 		<div class="row column clearfix">
+		<?php if ($total_pages > 7) { ?>
             		<div class="button-group float-left">
 				<button title="First Page" class="dark button" type="submit" name="offset" value="<?php echo 0; ?>" <?php if (!$is_prev) { ?>disabled<?php } ?>><i class="fa fa-fast-backward" aria-hidden="true"></i></button>
                 		<button title="Previous Page" class="dark button" type="submit" name="offset" value="<?php echo $offset-$limit; ?>" <?php if (!$is_prev) { ?>disabled<?php } ?>><i class="fa fa-backward" aria-hidden="true"></i></button>
@@ -360,6 +361,13 @@ class PwtcMapdb {
 				<button title="Last Page" class="dark button" type="submit" name="offset" value="<?php echo ($total_pages-1)*$limit; ?>" <?php if (!$is_more) { ?>disabled<?php } ?>><i class="fa fa-fast-forward" aria-hidden="true"></i></button>
 			</div>
 			<label class="float-right">Page <?php echo $current_page+1; ?> of <?php echo $total_pages; ?></label>
+		<?php } else { ?>
+			<div class="button-group float-left">
+			<?php for ($i = 0; $i < $total_pages; $i++) { ?>
+				<button title="Page <?php echo $i+1; ?>" class="dark button" type="submit" name="offset" value="<?php echo $i*$limit; ?>" <?php if ($i == $current_page) { ?>disabled<?php } ?>><?php echo $i+1; ?></button>
+			<?php } ?>
+			</div>
+		<?php } ?>
 		</div>
 		<?php 
 		return ob_get_clean();
