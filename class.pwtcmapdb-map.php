@@ -919,10 +919,11 @@ class PwtcMapdb_Map {
 	
 	// Generates the [pwtc_mapdb_manage_published_maps] shortcode.
 	public static function shortcode_manage_published_maps($atts) {
-		$a = shortcode_atts(array('leaders' => 'no', 'limit' => '10', 'status' => 'all', 'search' => 'close', 'sort' => 'title'), $atts);
+		$a = shortcode_atts(array('leaders' => 'no', 'limit' => '10', 'status' => 'all', 'search' => 'close', 'sort' => 'title', 'viewonly' => 'no'), $atts);
 		$allow_leaders = $a['leaders'] == 'yes';
 		$limit = intval($a['limit']);
 		$search_open = $a['search'] == 'open';
+		$viewonly = $a['viewonly'] == 'yes';
 
 		$current_user = wp_get_current_user();
 
@@ -957,9 +958,14 @@ class PwtcMapdb_Map {
 
 		$user_info = get_userdata($current_user->ID);
 		
-		$is_road_captain = in_array(PwtcMapdb::ROLE_ROAD_CAPTAIN, $user_info->roles);
-
-		$is_ride_leader = in_array(PwtcMapdb::ROLE_RIDE_LEADER, $user_info->roles);
+		if ($viewonly) {
+			$is_road_captain = false;
+			$is_ride_leader = false;
+		}
+		else {
+			$is_road_captain = in_array(PwtcMapdb::ROLE_ROAD_CAPTAIN, $user_info->roles);
+			$is_ride_leader = in_array(PwtcMapdb::ROLE_RIDE_LEADER, $user_info->roles);
+		}
 
 		if (isset($_GET['title'])) {
 			$map_title = $_GET['title'];
