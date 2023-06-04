@@ -127,8 +127,6 @@
     <?php if ($query->have_posts()) { 
     $total = $query->found_posts;
     $warn = $total > $limit;
-    $is_more = ($limit > 0) && ($total > ($offset + $limit));
-    $is_prev = ($limit > 0) && ($offset > 0);
     ?>
     <?php if ($warn) { ?>
     <div class="callout small warning">
@@ -194,7 +192,7 @@
     ?>
         </tbody>
     </table>
-    <?php if ($is_more or $is_prev) { ?>
+    <?php if ($warn) { ?>
     <form class="load-more-frm" method="POST">
         <input type="hidden" name="map_status" value="<?php echo $map_status; ?>">
         <input type="hidden" name="map_title" value="<?php echo stripslashes($map_title); ?>">
@@ -203,19 +201,7 @@
         <input type="hidden" name="map_terrain" value="<?php echo $map_terrain; ?>">
         <input type="hidden" name="sort_by" value="<?php echo $sort_by; ?>">
         <div class="row column errmsg"></div>
-        <div class="row column clearfix">
-            <div class="button-group float-left">
-            <?php if ($is_prev) { ?>
-                <button class="dark button" type="submit" name="offset" value="<?php echo $offset - $limit; ?>">Show Previous <?php echo $limit; ?> Maps</button>
-            <?php } ?>
-            <?php if ($is_more) { ?>
-                <button class="dark button" type="submit" name="offset" value="<?php echo $offset + $limit; ?>">Show Next <?php echo $limit; ?> Maps</button>
-            <?php } ?>
-            </div>
-            <?php if ($is_more) { ?>
-            <label class="float-right">Remaining maps: <?php echo ($total - ($offset + $limit)); ?></label>
-            <?php } ?>
-        </div>
+        <?php echo PwtcMapdb::output_pagination_html($limit, $offset, $total); ?>
     </form>
     <?php } ?>
     <?php } else { ?>
