@@ -3,7 +3,7 @@
         
         $('#pwtc-mapdb-search-riders-div .load-more-frm').on('submit', function(evt) {
             $('#pwtc-mapdb-search-riders-div .load-more-frm .errmsg').html('<div class="callout small"><i class="fa fa-spinner fa-pulse waiting"></i> please wait...</div>');
-            $('#pwtc-mapdb-search-riders-div button[type="submit"]').prop('disabled',true);
+            //$('#pwtc-mapdb-search-riders-div button[type="submit"]').prop('disabled',true);
         });
         
         $('#pwtc-mapdb-search-riders-div .search-frm').on('submit', function(evt) {
@@ -49,7 +49,6 @@
 <?php if (count($riders) > 0) { 
     $total = $user_query->get_total();
     $warn = $total > $limit;
-    $is_more = ($limit > 0) && ($total > ($offset + $limit));
 ?>
     <?php if ($warn) { ?>
     <div class="callout small warning">
@@ -96,16 +95,12 @@
     <?php } ?>
         </tbody>
     </table>
-    <?php if ($is_more) { ?>
+    <?php if ($warn) { ?>
     <form class="load-more-frm" method="POST">
-        <input type="hidden" name="offset" value="<?php echo $offset + $limit; ?>">
         <input type="hidden" name="rider_name" value="<?php echo stripslashes($rider_name); ?>">
         <input type="hidden" name="rider_id" value="<?php echo $rider_id; ?>">
         <div class="row column errmsg"></div>
-        <div class="row column clearfix">
-            <button class="dark button float-left" type="submit">Show Next <?php echo $limit; ?> Riders</button>
-            <label class="float-right">Remaining riders: <?php echo ($total - ($offset + $limit)); ?></label>
-        </div>
+        <?php echo PwtcMapdb::output_pagination_html($limit, $offset, $total); ?>
     </form>
     <?php } ?>
 <?php } else { ?>
