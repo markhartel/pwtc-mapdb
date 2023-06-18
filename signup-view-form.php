@@ -609,7 +609,6 @@
                 </form>
             </div>
         </li>
-    <?php } ?>
     <?php if ($paperless and !$signup_locked) { ?>
         <li class="accordion-item" data-accordion-item>
             <a href="#" class="accordion-title">Sign-up Rider...</a>
@@ -719,7 +718,8 @@
             </div>
         </li>
     <?php } ?>
-    </ul>		
+    </ul>
+    <?php } ?>
     <?php if ($ride_signup_mode == 'no') { ?>
         <div class="callout small"><p>Online sign up is not enabled for ride "<?php echo $ride_title; ?>." <?php echo $return_to_ride; ?></p></div>
     <?php } else { ?>
