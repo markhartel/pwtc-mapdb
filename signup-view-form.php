@@ -830,7 +830,11 @@
             <div class="callout small success"><p>Online sign up is closed, you may now download the ride sign-in sheet and print it.</p></div>
         <?php } ?>
     <?php } else { ?>
-        <?php if ($now_date < $cutoff_date) { ?>
+        <?php if ($logging_limited) { ?>
+            <div class="callout small alert"><p>The ride started before <?php echo $limit_date->format('m/d/Y'); ?>, but signup is not closed. This is unexpected.</p></div>
+        <?php } else if ($mileage_logged) { ?>
+            <div class="callout small alert"><p>The rider mileages have already been logged to the mileage database, but signup is not closed. This is unexpected.</p></div>
+        <?php } else if ($now_date < $cutoff_date) { ?>
             <div class="callout small warning"><p>Online sign up is allowed until <?php echo $cutoff_date_str; ?>, you cannot close it until then.</p></div>
         <?php } else if ($paperless) { ?>
             <div class="callout small success"><p>The period for online sign up has expired, but you may continue to modify the mileages. Close the sign up only after you have entered all of the final mileages.</p></div>
@@ -856,8 +860,10 @@
         <?php } ?>
             </div>
     <?php } else { ?>
+        <?php if (!$mileage_logged and !$logging_limited) { ?>
             <input type="hidden" name="lock_signup" value="yes"/>
             <button class="dark button float-left" type="submit" <?php echo $now_date < $cutoff_date ? 'disabled': ''; ?>><i class="fa fa-lock"></i> Close Sign-up</button>
+        <?php } ?>
     <?php } ?>
         </form>
     </div>
