@@ -538,6 +538,18 @@ class PwtcMapdb_Signup {
 
 		$mileage_logged = false;
 		$logging_limited = false;
+		$ride_start = PwtcMapdb::get_ride_start_time($postid);
+		$limit_date = self::get_log_mileage_lookback_limit();
+		if ($ride_start < $limit_date) {
+			$logging_limited = true;
+		}
+		else {
+			$results = PwtcMileage_DB::fetch_ride_by_post_id($postid);
+			if (count($results) > 0) {
+				$mileage_logged = true;
+			}
+		}
+		
 		if ($ride_signup_mode != 'no') {
 			if ($ride_signup_mode == 'paperless') {
 				$paperless = $set_mileage = true;
@@ -560,17 +572,6 @@ class PwtcMapdb_Signup {
 			$signup_locked = self::get_signup_locked($postid);
 			if ($signup_locked) {
 				$set_mileage = $take_attendance = false;
-				$ride_start = PwtcMapdb::get_ride_start_time($postid);
-				$limit_date = self::get_log_mileage_lookback_limit();
-				if ($ride_start < $limit_date) {
-					$logging_limited = true;
-				}
-				else {
-					$results = PwtcMileage_DB::fetch_ride_by_post_id($postid);
-					if (count($results) > 0) {
-						$mileage_logged = true;
-					}
-				}
 			}
 		}
 		else {
