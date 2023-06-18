@@ -566,6 +566,7 @@
 </script>
 <div id='pwtc-mapdb-view-signup-div'>
     <ul class="breadcrumbs"><li><a href="<?php echo $ride_link; ?>">Back to Ride</a></li></ul>
+    <?php if (!$mileage_logged and !$logging_limited) { ?>
     <ul class="accordion" data-accordion data-allow-all-closed="true">
         <li class="accordion-item" data-accordion-item>
                     <a href="#" class="accordion-title">Set Sign-up Options...</a>
@@ -608,6 +609,7 @@
                 </form>
             </div>
         </li>
+    <?php } ?>
     <?php if ($paperless and !$signup_locked) { ?>
         <li class="accordion-item" data-accordion-item>
             <a href="#" class="accordion-title">Sign-up Rider...</a>
@@ -819,9 +821,9 @@
     <?php } ?>
     <?php if ($signup_locked) { ?>
         <?php if ($logging_limited) { ?>
-            <div class="callout small success"><p>Rider mileages cannot be logged to the mileage database because the ride starts before <?php echo $limit_date->format('m/d/Y'); ?>.</p></div>
+            <div class="callout small success"><p>The ride started before <?php echo $limit_date->format('m/d/Y'); ?>, signup changes are no longer allowed.</p></div>
         <?php } else if ($mileage_logged) { ?>
-            <div class="callout small success"><p>The rider mileages have already been logged to the mileage database, you must contact the club statistician to make any changes.</p></div>
+            <div class="callout small success"><p>The rider mileages have already been logged to the mileage database, signup changes are no longer allowed.</p></div>
         <?php } else if ($paperless) { ?>
             <div class="callout small success"><p>Online sign up is closed, you may now log the rider mileages to the mileage database. <em>Warning: this can only be done once, so be certain that you have entered all of the final mileages.</em></p></div>
         <?php } else { ?>
@@ -845,11 +847,13 @@
         <?php if ($mileage_logged or $logging_limited) { ?>
         <?php } else if ($paperless) { ?>
             <a class="log_mileage dark button"><i class="fa fa-bicycle"></i> Log Mileage</a>
-        <?php } else { ?>
-            <a class="download_sheet dark button"><i class="fa fa-download"></i> Sign-in Sheet</a>
-        <?php } ?>
             <input type="hidden" name="lock_signup" value="no"/>
             <button class="dark button" type="submit"><i class="fa fa-unlock"></i> Reopen Sign-up</button>
+        <?php } else { ?>
+            <a class="download_sheet dark button"><i class="fa fa-download"></i> Sign-in Sheet</a>
+            <input type="hidden" name="lock_signup" value="no"/>
+            <button class="dark button" type="submit"><i class="fa fa-unlock"></i> Reopen Sign-up</button>
+        <?php } ?>
             </div>
     <?php } else { ?>
             <input type="hidden" name="lock_signup" value="yes"/>
