@@ -11,6 +11,7 @@ function pwtc_mapdb_get_signup() {
         $result['ride_signup_msg'] = false;
         $result['ride_signup_url'] = false;
         $result['ride_signup_btn'] = false;
+        $result['allow_cancel'] = true;
         return $result;
     }
     $current_user = wp_get_current_user();
@@ -99,6 +100,13 @@ function pwtc_mapdb_get_signup() {
             $result['ride_signup_btn'] = false;
             $result['ride_signup_msg'] = 'Only club members may attend this ride. Members must first <a href="/wp-login.php">log in</a> to sign up.';
         }
+    }
+
+    $result['allow_cancel'] = true;
+    $ride_start = PwtcMapdb::get_ride_start_time($postid);
+    $now_date = PwtcMapdb::get_current_time();
+    if ($ride_start < $now_date) {
+        $result['allow_cancel'] = false;
     }
 
     return $result;
