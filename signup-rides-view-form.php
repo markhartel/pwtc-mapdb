@@ -42,7 +42,7 @@
             $ride_start = PwtcMapdb::get_ride_start_time($postid);
             $limit_date = self::get_log_mileage_lookback_limit();
             if ($ride_start < $limit_date) {
-                $status = 'expired';
+                $status = 'archived';
             }
             else {
                 $results = PwtcMileage_DB::fetch_ride_by_post_id($postid);
