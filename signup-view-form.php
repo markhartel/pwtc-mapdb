@@ -824,7 +824,7 @@
     <?php } ?>
     <?php if ($signup_locked) { ?>
         <?php if ($logging_limited) { ?>
-            <div class="callout small success"><p>The ride started before <?php echo $limit_date->format('m/d/Y'); ?>, signup changes are no longer allowed.</p></div>
+            <div class="callout small success"><p>The ride is archived because it started before <?php echo $limit_date->format('m/d/Y'); ?>, signup changes are no longer allowed.</p></div>
         <?php } else if ($mileage_logged) { ?>
             <div class="callout small success"><p>The rider mileages have already been logged to the mileage database, signup changes are no longer allowed.</p></div>
         <?php } else if ($paperless) { ?>
@@ -834,9 +834,9 @@
         <?php } ?>
     <?php } else { ?>
         <?php if ($logging_limited) { ?>
-            <div class="callout small alert"><p>The ride started before <?php echo $limit_date->format('m/d/Y'); ?>, but signup is not closed. This is unexpected.</p></div>
+            <div class="callout small alert"><p>The ride is archived because it started before <?php echo $limit_date->format('m/d/Y'); ?>, but signup is not closed. This is unexpected, notify a road captain.</p></div>
         <?php } else if ($mileage_logged) { ?>
-            <div class="callout small alert"><p>The rider mileages have already been logged to the mileage database, but signup is not closed. This is unexpected.</p></div>
+            <div class="callout small alert"><p>The rider mileages have already been logged to the mileage database, but signup is not closed. This is unexpected, notify a road captain.</p></div>
         <?php } else if ($now_date < $cutoff_date) { ?>
             <div class="callout small warning"><p>Online sign up is allowed until <?php echo $cutoff_date_str; ?>, you cannot close it until then.</p></div>
         <?php } else if ($paperless) { ?>
