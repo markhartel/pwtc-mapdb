@@ -570,7 +570,7 @@ class PwtcMapdb_Signup {
 			$total_signups = count($signup_list) + count($nonmember_signup_list);
 
 			$signup_locked = self::get_signup_locked($postid);
-			if ($signup_locked) {
+			if ($signup_locked or $logging_limited or $mileage_logged) {
 				$set_mileage = $take_attendance = false;
 			}
 		}
