@@ -3,7 +3,7 @@
 
         $('#pwtc-mapdb-signup-rides-view-div .load-more-frm').on('submit', function(evt) {
             $('#pwtc-mapdb-signup-rides-view-div .load-more-frm .errmsg').html('<div class="callout small"><i class="fa fa-spinner fa-pulse waiting"></i> please wait...</div>');
-            $('#pwtc-mapdb-signup-rides-view-div button[type="submit"]').prop('disabled',true);
+            //$('#pwtc-mapdb-signup-rides-view-div button[type="submit"]').prop('disabled',true);
         });
 
     });
@@ -11,7 +11,7 @@
 <div id="pwtc-mapdb-signup-rides-view-div">
     <?php if ($query->have_posts()) { 
     $total = $query->found_posts;
-    $is_more = ($limit > 0) && ($total > ($offset + $limit));
+    $is_more = $total > $limit;
     ?>
     <table class="pwtc-mapdb-rwd-table">
         <thead><tr><th>Start Time</th><th>Ride Title</th><th>1st Leader</th><th>Sign-up Mode</th><th>Status</th></tr></thead>
@@ -77,12 +77,8 @@
     <p class="help-text">These scheduled rides <?php echo $addendum; ?> have online sign-up enabled.</p>
     <?php if ($is_more) { ?>
     <form class="load-more-frm" method="POST">
-        <input type="hidden" name="offset" value="<?php echo $offset + $limit; ?>">
         <div class="row column errmsg"></div>
-        <div class="row column clearfix">
-            <button class="dark button float-left" type="submit">Show Next <?php echo $limit; ?> Rides</button>
-            <label class="float-right">Remaining rides: <?php echo ($total - ($offset + $limit)); ?></label>
-        </div>
+        <?php echo PwtcMapdb::output_pagination_html($limit, $offset, $total); ?>
     </form>
     <?php } ?>
     <?php } else { ?>
