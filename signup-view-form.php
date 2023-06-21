@@ -566,7 +566,7 @@
 </script>
 <div id='pwtc-mapdb-view-signup-div'>
     <ul class="breadcrumbs"><li><a href="<?php echo $ride_link; ?>">Back to Ride</a></li></ul>
-    <?php if (!$mileage_logged and !$logging_limited) { ?>
+    <?php if ($is_admin or (!$mileage_logged and !$logging_limited)) { ?>
     <ul class="accordion" data-accordion data-allow-all-closed="true">
         <li class="accordion-item" data-accordion-item>
                     <a href="#" class="accordion-title">Set Sign-up Options...</a>
@@ -834,9 +834,9 @@
         <?php } ?>
     <?php } else { ?>
         <?php if ($logging_limited) { ?>
-            <div class="callout small alert"><p>The ride is archived because it started before <?php echo $limit_date->format('m/d/Y'); ?>, but signup is not closed. This is unexpected, notify a road captain.</p></div>
+            <div class="callout small alert"><p>The ride is archived because it started before <?php echo $limit_date->format('m/d/Y'); ?>, but signup is not closed. This is unexpected, contact an administrator to resolve.</p></div>
         <?php } else if ($mileage_logged) { ?>
-            <div class="callout small alert"><p>The rider mileages have already been logged to the mileage database, but signup is not closed. This is unexpected, notify a road captain.</p></div>
+            <div class="callout small alert"><p>The rider mileages have already been logged to the mileage database, but signup is not closed. This is unexpected, contact an administrator to resolve.</p></div>
         <?php } else if ($now_date < $cutoff_date) { ?>
             <div class="callout small warning"><p>Online sign up is allowed until <?php echo $cutoff_date_str; ?>, you cannot close it until then.</p></div>
         <?php } else if ($paperless) { ?>
@@ -851,19 +851,20 @@
             <?php wp_nonce_field('signup-view-form', 'nonce_field'); ?>
     <?php if ($signup_locked) { ?>
             <div class="button-group float-left">
-        <?php if ($mileage_logged or $logging_limited) { ?>
-        <?php } else if ($paperless) { ?>
-            <a class="log_mileage dark button"><i class="fa fa-bicycle"></i> Log Mileage</a>
-            <input type="hidden" name="lock_signup" value="no"/>
-            <button class="dark button" type="submit"><i class="fa fa-unlock"></i> Reopen Sign-up</button>
-        <?php } else { ?>
-            <a class="download_sheet dark button"><i class="fa fa-download"></i> Sign-in Sheet</a>
-            <input type="hidden" name="lock_signup" value="no"/>
-            <button class="dark button" type="submit"><i class="fa fa-unlock"></i> Reopen Sign-up</button>
-        <?php } ?>
+	<?php if (!$mileage_logged and !$logging_limited) { ?>
+		<?php if ($paperless) { ?>
+            		<a class="log_mileage dark button"><i class="fa fa-bicycle"></i> Log Mileage</a>
+        	<?php } else { ?>
+            		<a class="download_sheet dark button"><i class="fa fa-download"></i> Sign-in Sheet</a>
+        	<?php } ?>	
+	<?php } ?>
+	<?php if ($is_admin or (!$mileage_logged and !$logging_limited)) { ?>
+		<input type="hidden" name="lock_signup" value="no"/>
+            	<button class="dark button" type="submit"><i class="fa fa-unlock"></i> Reopen Sign-up</button>
+	<?php } ?>
             </div>
     <?php } else { ?>
-        <?php if (!$mileage_logged and !$logging_limited) { ?>
+        <?php if ($is_admin or (!$mileage_logged and !$logging_limited)) { ?>
             <input type="hidden" name="lock_signup" value="yes"/>
             <button class="dark button float-left" type="submit" <?php echo $now_date < $cutoff_date ? 'disabled': ''; ?>><i class="fa fa-lock"></i> Close Sign-up</button>
         <?php } ?>
