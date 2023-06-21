@@ -514,6 +514,8 @@ class PwtcMapdb_Signup {
 			return '<div class="callout small warning"><p>The ride "' . $ride_title . '" has been canceled, no sign up view allowed. ' . $return_to_ride . '</p></div>';
 		}
 
+		$is_admin = user_can($current_user,'manage_options');
+
 		if (!user_can($current_user,'edit_published_rides')) {
 			$denied = true;
 			$leaders = PwtcMapdb::get_leader_userids($postid);
@@ -570,7 +572,10 @@ class PwtcMapdb_Signup {
 			$total_signups = count($signup_list) + count($nonmember_signup_list);
 
 			$signup_locked = self::get_signup_locked($postid);
-			if ($signup_locked or $logging_limited or $mileage_logged) {
+			if ($signup_locked) {
+				$set_mileage = $take_attendance = false;
+			}
+			else if (!$is_admin and ($logging_limited or $mileage_logged)) {
 				$set_mileage = $take_attendance = false;
 			}
 		}
