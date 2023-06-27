@@ -724,7 +724,7 @@
         <div class="callout small"><p>Online sign up is not enabled for ride "<?php echo $ride_title; ?>." <?php echo $return_to_ride; ?></p></div>
     <?php } else { ?>
     <?php if (!$paperless and ($mileage_logged or $logging_limited)) { ?>
-	    <div class="callout small warning"><p>These are only the riders that signed up online before the ride, check the printed sign up sheet for the complete list of riders.</p></div>
+	    <div class="callout small warning"><p>These are only the riders that signed up online before the ride, for the complete list of riders check the printed sign-in sheet that the ride leader submitted to the club statistician.</p></div>
     <?php } ?>
     <?php if ($total_signups > 0) { ?>
         <p>The following <?php echo $total_signups; ?> riders are currently signed up for the ride "<?php echo $ride_title; ?>."
