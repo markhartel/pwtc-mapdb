@@ -94,6 +94,7 @@ class PwtcMapdb_Signup {
 				$date = DateTime::createFromFormat('Y-m-d H:i:s', get_field(PwtcMapdb::RIDE_DATE, $rideid));
 				$ride_date = $date->format('m/d/Y g:ia');
 				$leaders = PwtcMapdb::get_leader_userids($rideid);
+				$mode = self::get_signup_mode($rideid);
 				$ride_leader = '';
 				if (count($leaders) > 0) {
 					$user_info = get_userdata($leaders[0]);
@@ -111,6 +112,7 @@ class PwtcMapdb_Signup {
 				$ride_title = '';
 				$ride_date = '';
 				$ride_leader = '';
+				$mode = 'no';
 			}			
 			$waiver_post = get_page_by_title('Terms and Conditions');
 			if ($waiver_post) {
@@ -178,11 +180,19 @@ class PwtcMapdb_Signup {
 					$rider_id = '';
 					$contact = '';
 					$mileage = '';
+					$signature = '';
 					if ($rider_count < count($signup_list)) {
 						$arr = $signup_list[$rider_count];
 						if ($arr['userid']) {
 							$userid = $arr['userid'];
-							$mileage = '';
+							if ($mode == 'paperless') {
+								$mileage = $arr['mileage'];
+								$signature = '(waiver accepted)';
+							}
+							else {
+								$mileage = '';
+								$signature = '';
+							}
 							$user_info = get_userdata($userid);
 							if ($user_info) {
 								$rider_name = $user_info->first_name . ' ' . $user_info->last_name;
@@ -204,7 +214,13 @@ class PwtcMapdb_Signup {
 							$contact_name = $arr['contact_name'];
 							$contact = self::get_nonmember_emergency_contact($contact_phone, $contact_name, false);	
 							$mileage = 'n/a';
-							$rider_id = 'n/a';						
+							$rider_id = 'n/a';
+							if ($mode == 'paperless') {
+								$signature = '(waiver accepted)';
+							}
+							else {
+								$signature = '';
+							}
 						}
 					}
 					$rider_count++;
@@ -215,7 +231,7 @@ class PwtcMapdb_Signup {
 					$pdf->Cell(30, $cell_h, $rider_id, 1, 0,'C');
 					$pdf->Cell(20, $cell_h, $mileage, 1, 0,'C');
 					$pdf->Cell(80, $cell_h, $rider_name, 1, 0,'L');
-					$pdf->Cell(40, $cell_h, '', 1, 0,'L');
+					$pdf->Cell(40, $cell_h, $signature, 1, 0,'L');
 					$pdf->Cell(80, $cell_h, $contact, 1, 0,'L');
 				}
 			}
