@@ -856,7 +856,11 @@
             		<a class="log_mileage dark button"><i class="fa fa-bicycle"></i> Log Mileage</a>
         	<?php } else { ?>
             		<a class="download_sheet dark button"><i class="fa fa-download"></i> Sign-in Sheet</a>
-        	<?php } ?>	
+        	<?php } ?>
+	<?php } else { ?>
+		<?php if ($paperless) { ?>
+			<a class="download_sheet dark button"><i class="fa fa-download"></i> Download</a>
+		<?php } ?>
 	<?php } ?>
 	<?php if ($is_admin or (!$mileage_logged and !$logging_limited)) { ?>
 		<input type="hidden" name="lock_signup" value="no"/>
