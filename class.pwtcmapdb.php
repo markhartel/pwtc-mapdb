@@ -129,6 +129,7 @@ class PwtcMapdb {
 		add_action('wp_ajax_pwtc_mapdb_lookup_schedule_dates', array('PwtcMapdb', 'lookup_schedule_dates_callback'));
 		
 		// Register shortcode callbacks
+		add_shortcode('pwtc_mapdb_logged_in_content', array('PwtcMapdb', 'shortcode_logged_in_content'));
 		add_shortcode('pwtc_mapdb_role_content', array('PwtcMapdb', 'shortcode_role_content'));
 		add_shortcode('pwtc_mapdb_leader_contact', array('PwtcMapdb', 'shortcode_leader_contact'));
 		add_shortcode('pwtc_mapdb_alert_contact', array('PwtcMapdb', 'shortcode_alert_contact'));
@@ -153,6 +154,15 @@ class PwtcMapdb {
 	
 	/******************* Shortcode Functions ******************/
 
+	// Generates the [pwtc_mapdb_logged_in_content] shortcode.
+	public static function shortcode_logged_in_content($atts, $content) {
+		$current_user = wp_get_current_user();
+		if (0 == $current_user->ID) {
+			return '';
+		}
+		return do_shortcode($content);
+	}
+	
 	// Generates the [pwtc_mapdb_role_content] shortcode.
 	public static function shortcode_role_content($atts, $content) {
 		$a = shortcode_atts(array('role' => '', 'not_role' => ''), $atts);
