@@ -130,6 +130,7 @@ class PwtcMapdb {
 		
 		// Register shortcode callbacks
 		add_shortcode('pwtc_mapdb_logged_in_content', array('PwtcMapdb', 'shortcode_logged_in_content'));
+		add_shortcode('pwtc_mapdb_not_logged_in_content', array('PwtcMapdb', 'shortcode_not_logged_in_content'));
 		add_shortcode('pwtc_mapdb_role_content', array('PwtcMapdb', 'shortcode_role_content'));
 		add_shortcode('pwtc_mapdb_leader_contact', array('PwtcMapdb', 'shortcode_leader_contact'));
 		add_shortcode('pwtc_mapdb_alert_contact', array('PwtcMapdb', 'shortcode_alert_contact'));
@@ -161,6 +162,15 @@ class PwtcMapdb {
 			return '';
 		}
 		return do_shortcode($content);
+	}
+
+	// Generates the [pwtc_mapdb_not_logged_in_content] shortcode.
+	public static function shortcode_not_logged_in_content($atts, $content) {
+		$current_user = wp_get_current_user();
+		if (0 == $current_user->ID) {
+			return do_shortcode($content);
+		}
+		return '';
 	}
 	
 	// Generates the [pwtc_mapdb_role_content] shortcode.
