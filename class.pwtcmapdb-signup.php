@@ -1238,7 +1238,7 @@ class PwtcMapdb_Signup {
 									$userid = $arr['userid'];
 									$mileage = $arr['mileage'];
 									$attended = $arr['attended'];
-									if ($attended and !empty($mileage)) {
+									if ($attended) {
 										$memberid = get_field(PwtcMapdb::USER_RIDER_ID, 'user_'.$userid);
 										$user_info = get_userdata($userid);
 										if (in_array(PwtcMapdb::ROLE_EXPIRED_MEMBER, (array) $user_info->roles)) {
