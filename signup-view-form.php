@@ -208,6 +208,10 @@
                         show_errmsg2_success(msg);
                     }
                     $('#pwtc-mapdb-view-signup-div .signup-buttons-frm .log_mileage').hide();
+		<?php if (!$is_admin) { ?>
+		    $('#pwtc-mapdb-view-signup-div .accordion').hide();
+		    $('#pwtc-mapdb-view-signup-div .signup-buttons-frm .reopen_signup').hide();
+		<?php } ?>
                  }
                 else {
                     show_errmsg2('Ride post ID does not match post ID returned by server.');
@@ -864,7 +868,7 @@
 	<?php } ?>
 	<?php if ($is_admin or (!$mileage_logged and !$logging_limited)) { ?>
 		<input type="hidden" name="lock_signup" value="no"/>
-            	<button class="dark button" type="submit"><i class="fa fa-unlock"></i> Reopen Sign-up</button>
+            	<button class="reopen_signup dark button" type="submit"><i class="fa fa-unlock"></i> Reopen Sign-up</button>
 	<?php } ?>
             </div>
     <?php } else { ?>
