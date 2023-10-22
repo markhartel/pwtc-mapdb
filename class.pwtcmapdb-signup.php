@@ -534,6 +534,12 @@ class PwtcMapdb_Signup {
 
 		if (!user_can($current_user,'edit_published_rides')) {
 			$denied = true;
+			$user_info = get_userdata($current_user->ID);
+		    	if ($user_info) {
+			    if (in_array(PwtcMapdb::ROLE_STATISTICIAN, $user_info->roles)) {
+				$denied = false;
+			    }
+		    	}
 			$leaders = PwtcMapdb::get_leader_userids($postid);
 			foreach ($leaders as $item) {
 				if ($current_user->ID == $item) {
