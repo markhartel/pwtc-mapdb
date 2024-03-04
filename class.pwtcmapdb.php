@@ -126,6 +126,7 @@ class PwtcMapdb {
 
 		// Register ajax callbacks
 		add_action('wp_ajax_pwtc_mapdb_lookup_ride_leaders', array('PwtcMapdb', 'lookup_ride_leaders_callback'));
+		add_action('wp_ajax_pwtc_mapdb_lookup_current_members', array('PwtcMapdb', 'lookup_current_members_callback'));
 		add_action('wp_ajax_pwtc_mapdb_lookup_riderid', array('PwtcMapdb', 'lookup_riderid_callback'));
 		add_action('wp_ajax_pwtc_mapdb_lookup_schedule_dates', array('PwtcMapdb', 'lookup_schedule_dates_callback'));
 		
@@ -598,6 +599,71 @@ class PwtcMapdb {
 		else {
 			$response = array(
 				'error' => 'Server arguments missing for ride leader lookup.'
+			);		
+		}		
+		echo wp_json_encode($response);
+		wp_die();
+	}
+
+	public static function lookup_current_members_callback() {
+		if (isset($_POST['search'])) {
+			$limit = 0;
+			$offset = 0;
+			$search = trim($_POST['search']);
+			$query_args = [
+				'meta_key' => 'last_name',
+				'orderby' => 'meta_value',
+				'order' => 'ASC',
+				'role' => 'current_member',
+				'search' => '*'.$search.'*',
+				'search_columns' => array('display_name'),
+				'fields' => ['ID', 'display_name']
+			];
+			if (isset($_POST['limit'])) {
+				$limit = intval($_POST['limit']);
+				$query_args['number'] = $limit;
+				if (isset($_POST['offset'])) {
+					$offset = intval($_POST['offset']);
+					$query_args['offset'] = $offset;
+				}
+			}
+			$select = 0;
+			if (isset($_POST['select'])) {
+				$select = intval($_POST['select']);
+			}
+			$user_query = new WP_User_Query($query_args);
+			$members = $user_query->get_results();
+			$users = array();
+			$is_more = false;
+			if (count($members) > 0) {
+				$total = $user_query->get_total();
+				$is_more = ($limit > 0) && ($total > ($offset + $limit));
+				foreach ( $members as $member ) {
+					$item = array(
+						'userid' => $member->ID,
+						'display_name' => $member->display_name
+					);
+					$users[] = $item;
+				}
+			}
+			$response = array(
+				'limit' => $limit,
+				'offset' => $offset,
+				'users' => $users
+			);
+			if ($is_more) {
+				$response['more'] = 1;
+			}
+			if ($select > 0 and $offset == 0 and count($users) == 1) {
+				$response['select'] = 1;
+			}
+			if (isset($_POST['count'])) {
+				$response['count'] = intval($_POST['count']);
+			}
+		}
+		else {
+			$response = array(
+				'error' => 'Server arguments missing for current_member lookup.'
 			);		
 		}		
 		echo wp_json_encode($response);
