@@ -185,7 +185,7 @@ class PwtcMapdb_Signup {
 						$arr = $signup_list[$rider_count];
 						if ($arr['userid']) {
 							$userid = $arr['userid'];
-							if ($mode == 'paperless') {
+							if ($mode == 'paperless' or $mode == 'hardcopy') {
 								$mileage = $arr['mileage'];
 								$signature = '(waiver accepted)';
 							}
@@ -215,7 +215,7 @@ class PwtcMapdb_Signup {
 							$contact = self::get_nonmember_emergency_contact($contact_phone, $contact_name, false);	
 							$mileage = 'n/a';
 							$rider_id = 'n/a';
-							if ($mode == 'paperless') {
+							if ($mode == 'paperless' or $mode == 'hardcopy') {
 								$signature = '(waiver accepted)';
 							}
 							else {
@@ -347,7 +347,7 @@ class PwtcMapdb_Signup {
 			$set_mileage = true;
 		}
 		else if ($ride_signup_mode == 'hardcopy') {
-			$set_mileage = false;
+			$set_mileage = true;
 		}
 		else {
 			return '<div class="callout small warning"><p>The leader for ride "' . $ride_title . '" does not allow online sign up. ' . $return_to_ride . '</p></div>';			
