@@ -829,6 +829,31 @@ class PwtcMapdb_Ride {
         	return ob_get_clean();
 	}
 
+	// Generates the [pwtc_mapdb_leader_edit_ride] shortcode.
+	public static function shortcode_leader_edit_ride($atts, $content) {
+		$current_user = wp_get_current_user();
+		$return = '';
+		if (isset($_GET['return'])) {
+			$return = $_GET['return'];
+		}
+
+		if (isset($_POST['postid']) and isset($_POST['title']) and $current_user->ID != 0) {
+			if (!isset($_POST['nonce_field']) or !wp_verify_nonce($_POST['nonce_field'], 'ride-leader-edit-form')) {
+				wp_nonce_ays('');
+			}
+			wp_redirect(add_query_arg(array(
+				'post' => $postid,
+				'return' => urlencode($return),
+				'op' => $operation,
+				'email' => $email
+			), get_permalink()), 303);
+			exit;
+		}
+	        ob_start();
+        	include('ride-leader-edit-form.php');
+        	return ob_get_clean();
+	}
+
 	// Generates the [pwtc_mapdb_delete_ride] shortcode.
 	public static function shortcode_delete_ride($atts) {
 		$a = shortcode_atts(array('leaders' => 'no', 'use_return' => 'no', 'template' => 'no'), $atts);
