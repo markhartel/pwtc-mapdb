@@ -831,6 +831,11 @@ class PwtcMapdb_Ride {
 
 	// Generates the [pwtc_mapdb_leader_edit_ride] shortcode.
 	public static function shortcode_leader_edit_ride($atts, $content) {
+		$a = shortcode_atts(array('use_return' => 'no', 'email' => 'no', 'captain' => PwtcMapdb::ROAD_CAPTAIN_EMAIL), $atts);
+		$use_return = $a['use_return'] == 'yes';
+		$allow_email = $a['email'] == 'yes';
+		$captain_email = $a['captain'];
+		
 		$current_user = wp_get_current_user();
 		$return = '';
 		if (isset($_GET['return'])) {
@@ -841,14 +846,71 @@ class PwtcMapdb_Ride {
 			if (!isset($_POST['nonce_field']) or !wp_verify_nonce($_POST['nonce_field'], 'ride-leader-edit-form')) {
 				wp_nonce_ays('');
 			}
+			$postid = intval($_POST['postid']);
+			$title = trim($_POST['title']);
+			$my_post = array(
+				'ID' => $postid,
+				'post_title' => $title
+			);
+			$status = wp_update_post( $my_post );	
+			if ($status != $postid) {
+				wp_die('Failed to update this post.', 403);
+			}
+			update_post_meta($postid, '_edit_last', $current_user->ID);
+			if (isset($_POST['description'])) {
+				update_field(PwtcMapdb::RIDE_DESCRIPTION_KEY, $_POST['description'], $postid);
+			}
+			if (isset($_POST['start_location_comment'])) {
+				update_field(PwtcMapdb::RIDE_START_LOC_COMMENT_KEY, $_POST['start_location_comment'], $postid);
+			}
+			if (isset($_POST['ride_time'])) {
+				//TODO: get current start date of ride!
+				$date_str = trim($_POST['ride_date']) . ' ' . trim($_POST['ride_time']) . ':00';
+				$timezone = new DateTimeZone(pwtc_get_timezone_string());
+				$date = DateTime::createFromFormat('Y-m-d H:i:s', $date_str, $timezone);
+				if ($date) {
+					$date_str = $date->format('Y-m-d H:i:s');
+					update_field(PwtcMapdb::RIDE_DATE, $date_str, $postid);
+				}
+			}
+			
 			wp_redirect(add_query_arg(array(
 				'post' => $postid,
-				'return' => urlencode($return),
-				'op' => $operation,
-				'email' => $email
+				'return' => urlencode($return)
 			), get_permalink()), 303);
 			exit;
 		}
+
+		$ride_link = '';
+		$return_to_ride = '';
+		if (!empty($return) and $use_return) {
+			$ride_link = esc_url($return);
+			$return_to_ride = self::create_return_link($ride_link);
+		}
+
+		if (isset($_GET['post'])) {
+			$error = self::check_post_id();
+			if (!empty($error)) {
+				return $return_to_ride . $error;
+			}
+			$postid = intval($_GET['post']);
+		}
+		else {
+			//TODO: show error!
+		}
+		
+		if (0 == $current_user->ID) {
+			return $return_to_ride . '<div class="callout small alert"><p>You must be logged in to submit rides or ride templates.</p></div>';
+		}
+
+		$post = get_post($postid);
+            	$title = $post->post_title;
+		$description = get_field(PwtcMapdb::RIDE_DESCRIPTION, $postid, false);
+		$start_location_comment = get_field(PwtcMapdb::RIDE_START_LOC_COMMENT, $postid);
+		$ride_datetime = PwtcMapdb::get_ride_start_time($postid);
+		$ride_date = $ride_datetime->format('Y-m-d');
+		$ride_time = $ride_datetime->format('H:i');
+		
 	        ob_start();
         	include('ride-leader-edit-form.php');
         	return ob_get_clean();
