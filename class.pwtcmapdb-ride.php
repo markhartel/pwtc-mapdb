@@ -31,6 +31,7 @@ class PwtcMapdb_Ride {
 		// Register shortcode callbacks
 		add_shortcode('pwtc_mapdb_ride_breadcrumb', array('PwtcMapdb_Ride', 'shortcode_ride_breadcrumb'));
         	add_shortcode('pwtc_mapdb_edit_ride', array('PwtcMapdb_Ride', 'shortcode_edit_ride'));
+		add_shortcode('pwtc_mapdb_leader_edit_ride', array('PwtcMapdb_Ride', 'shortcode_leader_edit_ride'));
 		add_shortcode('pwtc_mapdb_manage_rides', array('PwtcMapdb_Ride', 'shortcode_manage_rides'));
 		add_shortcode('pwtc_mapdb_delete_ride', array( 'PwtcMapdb_Ride', 'shortcode_delete_ride'));
 		add_shortcode('pwtc_mapdb_manage_published_rides', array('PwtcMapdb_Ride', 'shortcode_manage_published_rides'));
@@ -890,16 +891,11 @@ class PwtcMapdb_Ride {
 			$return_to_ride = self::create_return_link($ride_link);
 		}
 
-		if (isset($_GET['post'])) {
-			$error = self::check_post_id();
-			if (!empty($error)) {
-				return $return_to_ride . $error;
-			}
-			$postid = intval($_GET['post']);
+		$error = self::check_post_id();
+		if (!empty($error)) {
+			return $return_to_ride . $error;
 		}
-		else {
-			//TODO: show error!
-		}
+		$postid = intval($_GET['post']);
 		
 		if (0 == $current_user->ID) {
 			return $return_to_ride . '<div class="callout small alert"><p>You must be logged in to edit rides.</p></div>';
