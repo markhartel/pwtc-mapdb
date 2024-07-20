@@ -837,6 +837,7 @@ class PwtcMapdb_Ride {
 		$captain_email = $a['captain'];
 		
 		$current_user = wp_get_current_user();
+		$user_info = get_userdata($current_user->ID);
 		$return = '';
 		if (isset($_GET['return'])) {
 			$return = $_GET['return'];
@@ -900,16 +901,38 @@ class PwtcMapdb_Ride {
 		}
 		
 		if (0 == $current_user->ID) {
-			return $return_to_ride . '<div class="callout small alert"><p>You must be logged in to submit rides or ride templates.</p></div>';
+			return $return_to_ride . '<div class="callout small alert"><p>You must be logged in to edit rides.</p></div>';
 		}
+
+		$now_date = PwtcMapdb::get_current_time();
 
 		$post = get_post($postid);
             	$title = $post->post_title;
+		$status = $post->post_status;
+		$ride_title = esc_html(get_the_title($postid));
 		$description = get_field(PwtcMapdb::RIDE_DESCRIPTION, $postid, false);
 		$start_location_comment = get_field(PwtcMapdb::RIDE_START_LOC_COMMENT, $postid);
 		$ride_datetime = PwtcMapdb::get_ride_start_time($postid);
 		$ride_date = $ride_datetime->format('Y-m-d');
 		$ride_time = $ride_datetime->format('H:i');
+
+		$lock_user = self::check_post_lock($postid);
+		if ($lock_user) {
+			$info = get_userdata($lock_user);
+			$name = $info->first_name . ' ' . $info->last_name;	
+			return $return_to_ride . '<div class="callout small warning"><p>Post "' . $ride_title . '" is currently being edited by ' . $name . '. </p></div>';
+		}
+
+		if ($status != 'publish') {
+			return $return_to_ride . '<div class="callout small warning"><p>Ride "' . $ride_title . '" is not published so you cannot edit it.</p></div>';
+		}
+
+		$ride_datetime = PwtcMapdb::get_ride_start_time($postid);
+		if ($ride_datetime < $now_date) {
+			return $return_to_ride . '<div class="callout small warning"><p>Ride "' . $ride_title . '" has already finished so you cannot edit it.</p></div>';
+		}
+
+		//TODO: only allow the ride leader to edit their ride!
 		
 	        ob_start();
         	include('ride-leader-edit-form.php');
