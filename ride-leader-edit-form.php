@@ -1,7 +1,119 @@
 <style>
+    .indicate-error {
+        border-color: #900 !important;
+        background-color: #FDD !important;
+    }
 </style>
 <script type="text/javascript">
     jQuery(document).ready(function($) { 
+
+        function show_warning(msg) {
+            $('#pwtc-mapdb-leader-edit-ride-div .errmsg').html('<div class="callout small warning"><p>' + msg + '</p></div>');
+        }
+
+        function show_waiting() {
+            $('#pwtc-mapdb-leader-edit-ride-div .errmsg').html('<div class="callout small"><i class="fa fa-spinner fa-pulse"></i> please wait...</div>');
+        }
+
+        $('#pwtc-mapdb-leader-edit-ride-div form').on('keypress', function(evt) {
+            var keyPressed = evt.keyCode || evt.which; 
+            if (keyPressed === 13) { 
+                evt.preventDefault(); 
+                return false; 
+            } 
+        });	
+
+        $('#pwtc-mapdb-leader-edit-ride-div form textarea').on('keypress', function(evt) {
+            is_dirty = true;
+            var keyPressed = evt.keyCode || evt.which; 
+            if (keyPressed === 13) { 
+                evt.stopPropagation(); 
+            } 
+        });	
+
+        $('#pwtc-mapdb-leader-edit-ride-div input[name="title"]').on('input', function() {
+            is_dirty = true;
+            $(this).removeClass('indicate-error');
+        });
+	    
+        $('#pwtc-mapdb-leader-edit-ride-div input[name="ride_time"]').change(function() {
+            is_dirty = true;
+	    $(this).removeClass('indicate-error');
+        });
+
+        $('#pwtc-mapdb-leader-edit-ride-div input[name="start_location_comment"]').on('input', function() {
+            is_dirty = true;
+        });
+
+        $('#pwtc-mapdb-leader-edit-ride-div form').on('submit', function(evt) {
+            $('#pwtc-mapdb-leader-edit-ride-div input').removeClass('indicate-error');
+            $('#pwtc-mapdb-leader-edit-ride-div textarea').removeClass('indicate-error');
+
+            if ($('#pwtc-mapdb-leader-edit-ride-div input[name="title"]').val().trim().length == 0) {
+                show_warning('The <strong>ride title</strong> cannot be blank.');
+                $('#pwtc-mapdb-leader-edit-ride-div input[name="title"]').addClass('indicate-error');
+                evt.preventDefault();
+                return;
+            }
+
+            if ($('#pwtc-mapdb-leader-edit-ride-div textarea[name="description"]').val().trim().length == 0) {
+                show_warning('The <strong>ride description</strong> cannot be blank.');
+                $('#pwtc-mapdb-leader-edit-ride-div textarea[name="description"]').addClass('indicate-error');
+                evt.preventDefault();
+                return;
+            }
+		
+            var time = $('#pwtc-mapdb-leader-edit-ride-div input[name="ride_time"]').val().trim();
+            if (time.length == 0) {
+                show_warning('The <strong>departure time</strong> must be set.');
+                $('#pwtc-mapdb-leader-edit-ride-div input[name="ride_time"]').addClass('indicate-error');
+                evt.preventDefault();
+                return;			
+            }
+            var timergx = /^\d{2}:\d{2}$/;
+            if (!timergx.test(time)) {
+                show_warning('The <strong>departure time</strong> format is invalid. Your browser may not support time entry, try upgrading it to the latest version or use a different browser.');
+                $('#pwtc-mapdb-leader-edit-ride-div input[name="ride_time"]').addClass('indicate-error');
+                evt.preventDefault();
+                return;					
+            }
+            is_dirty = false;
+            show_waiting();
+            $('#pwtc-mapdb-leader-edit-ride-div button[type="submit"]').prop('disabled',true);
+        });
+
+        window.addEventListener('beforeunload', function(e) {
+            if (is_dirty) {
+                e.preventDefault();
+                e.returnValue = 'If you leave this page, any data you have entered will not be saved.';
+            }
+            else {
+                delete e['returnValue'];
+            }
+        });
+
+        var is_dirty = false;
+
+        $(document).on( 'heartbeat-send', function( e, data ) {
+            var send = {};
+            send.post_id = '<?php echo $postid; ?>';
+            data['pwtc-refresh-post-lock'] = send;
+        });
+
+        $(document).on( 'heartbeat-tick', function( e, data ) {
+            if ( data['pwtc-refresh-post-lock'] ) {
+                var received = data['pwtc-refresh-post-lock'];
+                if ( received.lock_error ) {
+                    show_warning('You can no longer edit this post. ' + received.lock_error.text);
+                    $('#pwtc-mapdb-leader-edit-ride-div button[type="submit"]').prop('disabled',true);
+                } 
+                else if ( received.new_lock ) {
+                }
+            }
+        });
+
+        wp.heartbeat.interval( 15 );
+
     });
 </script>
 <div id='pwtc-mapdb-leader-edit-ride-div'>
