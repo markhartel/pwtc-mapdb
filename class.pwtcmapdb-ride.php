@@ -865,8 +865,9 @@ class PwtcMapdb_Ride {
 				update_field(PwtcMapdb::RIDE_START_LOC_COMMENT_KEY, $_POST['start_location_comment'], $postid);
 			}
 			if (isset($_POST['ride_time'])) {
-				//TODO: get current start date of ride!
-				$date_str = trim($_POST['ride_date']) . ' ' . trim($_POST['ride_time']) . ':00';
+				$ride_datetime = PwtcMapdb::get_ride_start_time($postid);
+				$ride_date = $ride_datetime->format('Y-m-d');
+				$date_str = $ride_date . ' ' . trim($_POST['ride_time']) . ':00';
 				$timezone = new DateTimeZone(pwtc_get_timezone_string());
 				$date = DateTime::createFromFormat('Y-m-d H:i:s', $date_str, $timezone);
 				if ($date) {
@@ -932,7 +933,17 @@ class PwtcMapdb_Ride {
 			return $return_to_ride . '<div class="callout small warning"><p>Ride "' . $ride_title . '" has already finished so you cannot edit it.</p></div>';
 		}
 
-		//TODO: only allow the ride leader to edit their ride!
+		$denied = true;
+		$leaders = PwtcMapdb::get_leader_userids($postid);
+		foreach ($leaders as $item) {
+			if ($current_user->ID == $item) {
+				$denied = false;
+				break;
+			}
+		}
+		if ($denied) {
+			return $return_to_ride . '<div class="callout small warning"><p>You must be a leader of ride "' . $ride_title . '" to edit it.</p></div>';
+		}
 		
 	        ob_start();
         	include('ride-leader-edit-form.php');
