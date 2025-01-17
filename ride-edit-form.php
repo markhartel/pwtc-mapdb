@@ -770,12 +770,12 @@
                 var userid = Number($(this).attr('userid'));
                 new_leaders.push(userid); 
             });
-            if (new_leaders.length == 0) {
-                show_warning('You must assign at least one <strong>ride leader</strong>.');
-                $('#pwtc-mapdb-edit-ride-div .leaders-div').addClass('indicate-error');
-                evt.preventDefault();
-                return;
-            }
+            //if (new_leaders.length == 0) {
+            //    show_warning('You must assign at least one <strong>ride leader</strong>.');
+            //    $('#pwtc-mapdb-edit-ride-div .leaders-div').addClass('indicate-error');
+            //    evt.preventDefault();
+            //    return;
+            //}
             $('#pwtc-mapdb-edit-ride-div input[name="leaders"]').val(JSON.stringify(new_leaders));
 		
     <?php if (!$is_template) { ?>  
