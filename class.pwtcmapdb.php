@@ -247,6 +247,15 @@ class PwtcMapdb {
 		include('leader-contact-form.php');
 		return ob_get_clean();
 	}
+
+	public static function shortcode_clear_cache($atts) {
+		if (isset($_POST['clearcache'])) {
+			WordKeeper\System\Purge::purge_all();
+			wp_redirect(get_permalink(), 303);
+			exit;
+		}
+		return '<form method="POST"><input class="dark button" type="submit" name="clearcache" value="Clear Cache"/></form>';
+	}
 	
 	// Generates the [pwtc_mapdb_alert_contact] shortcode.
 	public static function shortcode_alert_contact($atts) {
