@@ -254,7 +254,14 @@ class PwtcMapdb {
 			wp_redirect(get_permalink(), 303);
 			exit;
 		}
-		return '<form method="POST"><input class="dark button" type="submit" name="clearcache" value="Clear Cache"/></form>';
+		$chron_job = wp_get_scheduled_event('pwtc_chron_clear_cache');
+		if ($chron_job === false) {
+			$report = 'pwtc_chron_clear_cache scheduled event not installed!'
+		}
+		else {
+			$report = 'hook=' . $chron_job['hook'] . ', timestamp=' . $chron_job['timestamp'] . ', schedule=' . $chron_job['schedule'];
+		}
+		return '<div>' . $report . '</div><form method="POST"><input class="dark button" type="submit" name="clearcache" value="Clear Cache"/></form>';
 	}
 	
 	// Generates the [pwtc_mapdb_alert_contact] shortcode.
