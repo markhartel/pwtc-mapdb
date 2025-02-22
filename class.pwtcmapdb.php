@@ -254,12 +254,17 @@ class PwtcMapdb {
 			wp_redirect(get_permalink(), 303);
 			exit;
 		}
-		$chron_job = wp_get_scheduled_event('pwtc_chron_clear_cache');
-		if ($chron_job === false) {
-			$report = 'pwtc_chron_clear_cache scheduled event not installed!'
+		if (function_exists('wp_get_scheduled_event')) {
+			$chron_job = wp_get_scheduled_event('pwtc_chron_clear_cache');
+			if ($chron_job === false) {
+				$report = 'pwtc_chron_clear_cache scheduled event not installed!';
+			}
+			else {
+				$report = 'hook=' . $chron_job['hook'] . ', timestamp=' . $chron_job['timestamp'] . ', schedule=' . $chron_job['schedule'];
+			}
 		}
 		else {
-			$report = 'hook=' . $chron_job['hook'] . ', timestamp=' . $chron_job['timestamp'] . ', schedule=' . $chron_job['schedule'];
+			$report = 'Function wp_get_scheduled_event does not exist!';
 		}
 		return '<div>' . $report . '</div><form method="POST"><input class="dark button" type="submit" name="clearcache" value="Clear Cache"/></form>';
 	}
