@@ -184,6 +184,11 @@ class PwtcMapdb_Ride {
 				'op' => 'revert_draft',
 				'email' => $email
 			), get_permalink()), 303);
+
+			if (!$is_template) {
+				WordKeeper\System\Purge::purge_all();
+			}
+
 			exit;
 		}
 		else if (isset($_POST['postid']) and isset($_POST['title']) and $current_user->ID != 0) {
@@ -479,6 +484,11 @@ class PwtcMapdb_Ride {
 				'op' => $operation,
 				'email' => $email
 			), get_permalink()), 303);
+
+			if (!$is_template) {
+				WordKeeper\System\Purge::purge_all();
+			}
+
 			exit;
 		}
 		
