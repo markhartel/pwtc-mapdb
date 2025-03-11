@@ -397,10 +397,9 @@
             <?php } else if ($status == 'draft') { ?>
                 <div class="button-group float-left">
                     <input class="dark button" name="draft" value="Update" type="submit"/>
-		    <?php if ($allow_leaders) { ?>
+		    <?php if ($allow_leaders and !$is_road_captain) { ?>
                     <input class="dark button" name="pending" value="Submit for Review" type="submit"/>
-                    <?php } ?>
-                    <?php if ($is_road_captain) { ?>
+                    <?php } else { ?>
                     <input class="dark button" name="publish" value="Publish" type="submit"/>
                     <?php } ?>
                 </div>
