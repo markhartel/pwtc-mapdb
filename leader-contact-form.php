@@ -12,9 +12,9 @@
         $("#pwtc-mapdb-leader-contact-div form select[name='use_contact_email']").change(function() {
             $(this).find('option:selected').each(function() {
                 if ($(this).val() == 'yes') {
-                    $('#pwtc-mapdb-leader-contact-div input[type="contact_email"]').prop('disabled',false);
+                    $('#pwtc-mapdb-leader-contact-div input[name="contact_email"]').prop('disabled',false);
                 } else {
-                    $('#pwtc-mapdb-leader-contact-div input[type="contact_email"]').prop('disabled',true);
+                    $('#pwtc-mapdb-leader-contact-div input[name="contact_email"]').prop('disabled',true);
                 }
             });
         });
