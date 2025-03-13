@@ -9,6 +9,16 @@
             is_dirty = true;
         });
 
+        $("#pwtc-mapdb-leader-contact-div form select[name='use_contact_email']").change(function() {
+            $(this).find('option:selected').each(function() {
+                if ($(this).val() == 'yes') {
+                    $('#pwtc-mapdb-leader-contact-div input[type="contact_email"]').prop('disabled',false);
+                } else {
+                    $('#pwtc-mapdb-leader-contact-div input[type="contact_email"]').prop('disabled',true);
+                }
+            });
+        });
+
         $('#pwtc-mapdb-leader-contact-div form').on('submit', function(evt) {
             is_dirty = false;
             $('#pwtc-mapdb-leader-contact-div .errmsg').html('<div class="callout small"><i class="fa fa-spinner fa-pulse"></i> please wait...</div>');
@@ -43,7 +53,7 @@
             </div>
             <div class="small-12 medium-6 columns">
                 <label><i class="fa fa-envelope"></i> Contact Email
-                    <input type="text" name="contact_email" value="<?php echo $contact_email; ?>"/>
+                    <input type="text" name="contact_email" value="<?php echo $contact_email; ?>" <?php echo $use_contact_email ? '': 'disabled'; ?> />
                 </label>
             </div>
             <div class="small-12 medium-6 columns">
