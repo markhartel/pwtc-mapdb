@@ -208,7 +208,7 @@ class PwtcMapdb {
 		$current_user = wp_get_current_user();
 		$userid = $current_user->ID;
 
-		if (isset($_POST['use_contact_email']) and isset($_POST['contact_email']) and isset($_POST['voice_phone']) and isset($_POST['text_phone'])) {
+		if (isset($_POST['use_contact_email']) and isset($_POST['voice_phone']) and isset($_POST['text_phone'])) {
 			if (!isset($_POST['nonce_field']) or !wp_verify_nonce($_POST['nonce_field'], 'leader-contact-form')) {
 				wp_nonce_ays('');
 			}
@@ -221,7 +221,9 @@ class PwtcMapdb {
 			else {
 				update_field(self::USER_USE_EMAIL, false, 'user_'.$userid);
 			}
-			update_field(self::USER_CONTACT_EMAIL, sanitize_email($_POST['contact_email']), 'user_'.$userid);
+			if (isset($_POST['contact_email'])) {
+				update_field(self::USER_CONTACT_EMAIL, sanitize_email($_POST['contact_email']), 'user_'.$userid);
+			}
 			update_field(self::USER_CELL_PHONE, pwtc_members_format_phone_number($_POST['voice_phone']), 'user_'.$userid);
 			update_field(self::USER_HOME_PHONE, pwtc_members_format_phone_number($_POST['text_phone']), 'user_'.$userid);
 
