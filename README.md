@@ -45,6 +45,16 @@ unused_rows|the number of unused rows added to the end of a downloaded ride sign
 
 `[pwtc_mapdb_reset_signups]` *renders a button that allows a user to remove all riders signed-up for a scheduled ride*
 
+### Ride Online Signup Shortcodes
+
+### Scheduled Ride Shortcodes
+
+### Ride Template Shortcodes
+
+### Route Map Shortcodes
+
+### Attached File Shortcodes
+
 ## Package Files Used By This Plugin
 - `README.md` *this file*
 - `pwtc-mapdb-hooks.php` *plugin hooks file*
