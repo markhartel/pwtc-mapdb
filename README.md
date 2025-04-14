@@ -47,13 +47,35 @@ unused_rows|the number of unused rows added to the end of a downloaded ride sign
 
 ### Ride Online Signup Shortcodes
 
+`[pwtc_mapdb_rider_signup]` *TBD*
+
+`[pwtc_mapdb_view_signup]` *TBD*
+
+`[pwtc_mapdb_nonmember_signup]` *TBD*
+
+`[pwtc_mapdb_show_userid_signups]` *TBD*
+
+`[pwtc_mapdb_download_signup]` *TBD*
+
+`[pwtc_mapdb_reset_signups]` *TBD*
+
+`[pwtc_mapdb_view_signup_rides]` *TBD*
+
 ### Scheduled Ride Shortcodes
+
+`[]` *TBD*
 
 ### Ride Template Shortcodes
 
+`[]` *TBD*
+
 ### Route Map Shortcodes
 
+`[]` *TBD*
+
 ### Attached File Shortcodes
+
+`[]` *TBD*
 
 ## Package Files Used By This Plugin
 - `README.md` *this file*
