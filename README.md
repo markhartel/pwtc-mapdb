@@ -25,9 +25,9 @@ limit|limit the number of maps shown per page|(number)|0 (unlimited)
 
 `[pwtc_mapdb_map_breadcrumb]` *TBD*
 
-`[pwtc_mapdb_edit_map]` *TBD*
+`[pwtc_mapdb_edit_map]` *renders a form that allows a user to create/copy/edit a route map*
 
-`[pwtc_mapdb_delete_map]` *TBD*
+`[pwtc_mapdb_delete_map]` *renders a form that allows a user to delete a route map*
 
 `[pwtc_mapdb_usage_map]` *TBD*
 
