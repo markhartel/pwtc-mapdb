@@ -17,13 +17,13 @@ of maps returned to 10 per page:
 `[pwtc_search_mapdb limit="10"]`
 
 ### Route Map Related Shortcodes
-`[pwtc_search_mapdb]` *renders a page that allow search and access of the route map library*
+`[pwtc_search_mapdb]` *renders a page that allow search and access of the route map library - deprecated, use [pwtc_mapdb_manage_published_maps] instead*
 
 Argument|Description|Values|Default
 --------|-----------|------|-------
 limit|limit the number of maps shown per page|(number)|0 (unlimited)
 
-`[pwtc_mapdb_map_breadcrum]` *TBD*
+`[pwtc_mapdb_map_breadcrumb]` *TBD*
 
 `[pwtc_mapdb_edit_map]` *TBD*
 
