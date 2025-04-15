@@ -91,6 +91,28 @@ unused_rows|the number of unused rows added to the end of a downloaded ride sign
 
 `[pwtc_mapdb_new_file_link]` *TBD*
 
+### Other Shortcodes
+
+`[pwtc_mapdb_logged_in_content]` *TBD*
+
+`[pwtc_mapdb_not_logged_in_content]` *TBD*
+
+`[pwtc_mapdb_role_content]` *TBD*
+
+`[pwtc_mapdb_leader_contact]` *TBD*
+
+`[pwtc_mapdb_alert_contact]` *TBD*
+
+`[pwtc_mapdb_search_riders]` *TBD*
+
+## Plugin Function Hooks
+
+`pwtc_mapdb_get_signup` *TBD*
+
+`pwtc_mapdb_get_map_metadata` *TBD*
+
+`pwtc_mapdb_get_template_metadata` *TBD*
+
 ## Package Files Used By This Plugin
 - `README.md` *this file*
 - `pwtc-mapdb-hooks.php` *plugin hooks file*
