@@ -31,11 +31,11 @@ limit|limit the number of maps shown per page|(number)|0 (unlimited)
 
 `[pwtc_mapdb_usage_map]` *TBD*
 
-`[pwtc_mapdb_manage_maps]` *TBD*
+`[pwtc_mapdb_manage_maps]` *renders a table that allows a user to view and manage (view/create/copy/edit) their draft or pending route maps*
 
 `[pwtc_mapdb_manage_pending_maps]` *TBD*
 
-`[pwtc_mapdb_manage_published_maps]` *TBD*
+`[pwtc_mapdb_manage_published_maps]` *renders a table that allows a user to view and manage (view/create/copy/edit) published route maps*
 
 `[pwtc_mapdb_new_map_link]` *TBD*
 
@@ -67,11 +67,11 @@ unused_rows|the number of unused rows added to the end of a downloaded ride sign
 
 `[pwtc_mapdb_leader_edit_ride]` *TBD*
 
-`[pwtc_mapdb_manage_rides]` *renders a table that allows a user to view and manage (view/create/copy/edit) scheduled rides*
+`[pwtc_mapdb_manage_rides]` *renders a table that allows a user to view and manage (view/create/copy/edit) their draft or pending scheduled rides*
 
 `[pwtc_mapdb_delete_ride]` *renders a form that allows a user to delete a scheduled ride*
 
-`[pwtc_mapdb_manage_published_rides]` *TBD*
+`[pwtc_mapdb_manage_published_rides]` *renders a table that allows a user to view and manage (view/create/copy/edit) published scheduled rides*
 
 `[pwtc_mapdb_manage_ride_templates]` *TBD*
 
