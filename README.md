@@ -45,29 +45,43 @@ unused_rows|the number of unused rows added to the end of a downloaded ride sign
 
 `[pwtc_mapdb_reset_signups]` *renders a button that allows a user to remove all riders signed-up for a scheduled ride*
 
-### Ride Online Signup Shortcodes
+### Online Signup Related Shortcodes
 
-`[pwtc_mapdb_rider_signup]` *TBD*
+`[pwtc_mapdb_rider_signup]` *renders a form that allows a user to signup for a ride*
 
-`[pwtc_mapdb_view_signup]` *TBD*
+`[pwtc_mapdb_view_signup]` *renders a page that displays/manages the attendees signed up for a ride*
 
-`[pwtc_mapdb_nonmember_signup]` *TBD*
+`[pwtc_mapdb_nonmember_signup]` *renders a form that allows a club non-member to signup for a ride*
 
-`[pwtc_mapdb_show_userid_signups]` *TBD*
+`[pwtc_mapdb_show_userid_signups]` *renders a page that displays the upcoming rides for which a user is signed up*
 
-`[pwtc_mapdb_download_signup]` *TBD*
+`[pwtc_mapdb_download_signup]` *renders a button that allows a user to download a blank ride sign-in sheet*
 
-`[pwtc_mapdb_reset_signups]` *TBD*
+`[pwtc_mapdb_reset_signups]` *renders a button that allows a user to remove all riders signed-up for a scheduled ride*
 
 `[pwtc_mapdb_view_signup_rides]` *TBD*
 
-### Scheduled Ride Shortcodes
+### Scheduled Ride Related Shortcodes
 
-`[]` *TBD*
+`[pwtc_mapdb_ride_breadcrumb]` *TBD*
 
-### Ride Template Shortcodes
+`[pwtc_mapdb_edit_ride]` *renders a form that allows a user to create/copy/edit a scheduled ride*
 
-`[]` *TBD*
+`[pwtc_mapdb_leader_edit_ride]` *TBD*
+
+`[pwtc_mapdb_manage_rides]` *TBD*
+
+`[pwtc_mapdb_delete_ride]` *TBD*
+
+`[pwtc_mapdb_manage_published_rides]` *TBD*
+
+`[pwtc_mapdb_manage_ride_templates]` *TBD*
+
+`[pwtc_mapdb_manage_pending_rides]` *TBD*
+
+`[pwtc_mapdb_new_ride_link]` *TBD*
+
+`[pwtc_mapdb_schedule_template]` *TBD*
 
 ### Route Map Shortcodes
 
