@@ -81,13 +81,15 @@ unused_rows|the number of unused rows added to the end of a downloaded ride sign
 
 `[pwtc_mapdb_schedule_template]` *TBD*
 
-### Route Map Shortcodes
+### Attached File Related Shortcodes
 
-`[]` *TBD*
+`[pwtc_mapdb_upload_file]` *TBD*
 
-### Attached File Shortcodes
+`[pwtc_mapdb_delete_file]` *TBD*
 
-`[]` *TBD*
+`[pwtc_mapdb_manage_files]` *TBD*
+
+`[pwtc_mapdb_new_file_link]` *TBD*
 
 ## Package Files Used By This Plugin
 - `README.md` *this file*
