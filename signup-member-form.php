@@ -5,8 +5,19 @@
             $('#pwtc-mapdb-rider-signup-div .errmsg').html('<div class="callout small"><i class="fa fa-spinner fa-pulse waiting"></i> please wait...</div>');
         }
 
+        <?php if ($accept_signup) { ?>
         $('#pwtc-mapdb-rider-signup-div form').on('submit', function(evt) {
-            <?php if ($accept_signup) { ?>
+            <?php if ($set_mileage) { ?>
+            var mileage = $('#pwtc-mapdb-rider-signup-div form input[name="mileage"]').val().trim();
+            if (mileage.length > 0) {
+                mileage = Math.abs(parseInt(mileage, 10));
+                if (mileage > 250) {
+                    $('#pwtc-mapdb-rider-signup-div .errmsg').html('<div class="callout small warning"><p>You cannot log more than 250 miles for a single ride.</p></div>');
+                    evt.preventDefault();
+                    return;
+                }
+            }
+            <?php } ?>
             $(this).find("select[name='accept_terms'] option:selected").each(function() {
                 var accept_terms = $(this).val();
                 if (accept_terms == 'no') {
@@ -18,12 +29,30 @@
                     $('#pwtc-mapdb-rider-signup-div button[type="submit"]').prop('disabled',true);
                 }
             });
-            <?php } else { ?>
+        });
+        <?php } else { ?>
+        <?php if ($set_mileage) { ?>
+        $('#pwtc-mapdb-rider-signup-div .mileage-frm').on('submit', function(evt) {
+            var mileage = $('#pwtc-mapdb-rider-signup-div form input[name="mileage"]').val().trim();
+            if (mileage.length > 0) {
+                mileage = Math.abs(parseInt(mileage, 10));
+                if (mileage > 250) {
+                    $('#pwtc-mapdb-rider-signup-div .errmsg').html('<div class="callout small warning"><p>You cannot log more than 250 miles for a single ride.</p></div>');
+                    evt.preventDefault();
+                    return;
+                }
+            }
             show_waiting();
             $('#pwtc-mapdb-rider-signup-div button[type="submit"]').prop('disabled',true);
             $('#pwtc-mapdb-rider-signup-div input[type="submit"]').prop('disabled',true);
-            <?php } ?>
-            });
+        });
+        <?php } ?>
+        $('#pwtc-mapdb-rider-signup-div .cancel-frm').on('submit', function(evt) {
+            show_waiting();
+            $('#pwtc-mapdb-rider-signup-div button[type="submit"]').prop('disabled',true);
+            $('#pwtc-mapdb-rider-signup-div input[type="submit"]').prop('disabled',true);
+        });
+        <?php } ?>
         
         $('#pwtc-mapdb-rider-signup-div form').on('keypress', function(evt) {
             var keyPressed = evt.keyCode || evt.which; 
@@ -97,7 +126,7 @@
             </p>
         <?php if ($set_mileage) { ?>
             <p>To update your mileage, enter the new value below and press the update button.</p>
-            <form method="POST">
+            <form method="POST" class="mileage-frm" novalidate>
                 <?php wp_nonce_field('signup-member-form', 'nonce_field'); ?>
                 <div class="row">
                     <div class="input-group small-12 medium-3 columns">
@@ -112,7 +141,7 @@
             </form>
         <?php } ?>
             <p>To cancel your sign up, press the cancel button below.</p>
-            <form method="POST">
+            <form method="POST" class="cancel-frm">
                 <?php wp_nonce_field('signup-member-form', 'nonce_field'); ?>
                 <div class="row column errmsg"></div>
                 <div class="row column clearfix">
