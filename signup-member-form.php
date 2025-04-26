@@ -11,8 +11,8 @@
             var mileage = $('#pwtc-mapdb-rider-signup-div form input[name="mileage"]').val().trim();
             if (mileage.length > 0) {
                 mileage = Math.abs(parseInt(mileage, 10));
-                if (mileage > 250) {
-                    $('#pwtc-mapdb-rider-signup-div .errmsg').html('<div class="callout small warning"><p>You cannot log more than 250 miles for a single ride.</p></div>');
+                if (mileage > <?php echo $ride_mileage; ?>) {
+                    $('#pwtc-mapdb-rider-signup-div .errmsg').html('<div class="callout small warning"><p>You cannot log more than <?php echo $ride_mileage; ?> miles for this ride.</p></div>');
                     evt.preventDefault();
                     return;
                 }
@@ -36,8 +36,8 @@
             var mileage = $('#pwtc-mapdb-rider-signup-div form input[name="mileage"]').val().trim();
             if (mileage.length > 0) {
                 mileage = Math.abs(parseInt(mileage, 10));
-                if (mileage > 250) {
-                    $('#pwtc-mapdb-rider-signup-div .errmsg').html('<div class="callout small warning"><p>You cannot log more than 250 miles for a single ride.</p></div>');
+                if (mileage > <?php echo $ride_mileage; ?>) {
+                    $('#pwtc-mapdb-rider-signup-div .errmsg').html('<div class="callout small warning"><p>You cannot log more than <?php echo $ride_mileage; ?> miles for this ride.</p></div>');
                     evt.preventDefault();
                     return;
                 }
