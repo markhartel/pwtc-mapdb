@@ -387,10 +387,9 @@ class PwtcMapdb_Signup {
 
 		$ride_mileage = get_actual_ride_length($postid);
 		$max_ride_mileage = get_actual_ride_maxlength($postid);
-		if ($max_ride_mileage > $ride_mileage) {
-			$ride_mileage = $max_ride_mileage;
-		}
-		$ride_mileage += 50;
+		$ride_mileage = max($ride_mileage, $max_ride_mileage);
+		$ride_mileage *= 2;
+		$ride_mileage = max($ride_mileage, 40);
 
 		ob_start();
 		include('signup-member-form.php');
