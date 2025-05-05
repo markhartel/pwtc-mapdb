@@ -385,11 +385,12 @@ class PwtcMapdb_Signup {
 		$contact_name = get_field(PwtcMapdb::USER_EMER_NAME, 'user_'.$current_user->ID);
 		$release_accepted = get_field(PwtcMapdb::USER_RELEASE_ACCEPTED, 'user_'.$current_user->ID);
 
-		$ride_mileage = get_actual_ride_length($postid);
-		$max_ride_mileage = get_actual_ride_maxlength($postid);
-		$ride_mileage = max($ride_mileage, $max_ride_mileage);
-		$ride_mileage *= 2;
-		$ride_mileage = max($ride_mileage, 40);
+		//$ride_mileage = get_actual_ride_length($postid);
+		//$max_ride_mileage = get_actual_ride_maxlength($postid);
+		//$ride_mileage = max($ride_mileage, $max_ride_mileage);
+		//$ride_mileage *= 2;
+		//$ride_mileage = max($ride_mileage, 40);
+		$ride_mileage = 250;
 
 		ob_start();
 		include('signup-member-form.php');
